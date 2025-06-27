@@ -12,7 +12,7 @@ const ENV = {
     },
     production: {
         API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/api',
-        CLIENT_URL: 'SUA_URL_VERCEL_AQUI',    // Será atualizada após deploy do Vercel  
+        CLIENT_URL: 'https://programa-indicacao-multicliente.vercel.app',
         REFERRAL_BASE_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/indicacao'
     }
 };
