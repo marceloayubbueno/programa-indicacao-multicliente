@@ -16,7 +16,12 @@ const statusConfig = {
 // Função principal para carregar leads
 async function loadLeadsFromBackend() {
     try {
-        const response = await fetch('http://localhost:3000/api/referrals');
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                  (window.location.hostname === 'localhost' ? 
+                   'http://localhost:3000/api' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+    const response = await fetch(`${apiUrl}/referrals`);
         const data = await response.json();
         
         if (data.success) {
@@ -226,7 +231,12 @@ async function confirmConversion() {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/referrals/${leadId}/mark-conversion`, {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA  
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/referrals/${leadId}/mark-conversion`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -280,7 +290,12 @@ function closeLeadModal() {
 // Atualizar status do lead
 async function updateLeadStatus(leadId, newStatus) {
     try {
-        const response = await fetch(`http://localhost:3000/api/referrals/${leadId}/status`, {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/referrals/${leadId}/status`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'

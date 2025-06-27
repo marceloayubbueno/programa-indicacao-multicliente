@@ -1,3 +1,9 @@
+// 🌍 CONFIGURAÇÃO DINÂMICA GLOBAL
+const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+               (window.location.hostname === 'localhost' ? 
+                'http://localhost:3000/api' : 
+                'https://programa-indicacao-multicliente-production.up.railway.app/api');
+
 // Variáveis globais
 let currentTab = 'types';
 let rewardTypes = [];
@@ -90,7 +96,7 @@ function toggleRewardFields() {
 async function loadRewardTypes() {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:3000/api/rewards', {
+        const response = await fetch(`${API_URL}/rewards`, {
             headers: {
                 'Content-Type': 'application/json',
                 ...(token && { 'Authorization': 'Bearer ' + token })
@@ -141,7 +147,7 @@ async function handleNewRewardType(event) {
         const token = localStorage.getItem('token');
         let response;
         if (editingRewardTypeId) {
-            response = await fetch(`http://localhost:3000/api/rewards/${editingRewardTypeId}`, {
+            response = await fetch(`${API_URL}/rewards/${editingRewardTypeId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -150,7 +156,7 @@ async function handleNewRewardType(event) {
                 body: JSON.stringify(rewardData)
             });
         } else {
-            response = await fetch('http://localhost:3000/api/rewards', {
+            response = await fetch(`${API_URL}/rewards`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -173,7 +179,7 @@ async function deleteRewardType(id) {
     if (!confirm('Tem certeza que deseja excluir este tipo de recompensa?')) return;
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:3000/api/rewards/${id}`, {
+        const response = await fetch(`${API_URL}/rewards/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -211,7 +217,7 @@ function formatValue(rewardType) {
 }
 
 function editRewardType(id) {
-    fetch(`http://localhost:3000/api/rewards/${id}`, {
+    fetch(`${API_URL}/rewards/${id}`, {
         headers: {
             'Content-Type': 'application/json',
             ...(localStorage.getItem('token') && { 'Authorization': 'Bearer ' + localStorage.getItem('token') })

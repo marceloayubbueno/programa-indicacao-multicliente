@@ -22,7 +22,12 @@ window.toggleLPIndicadoresStatus = async function(event, lpId, currentStatus) {
     button.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i><span class="text-xs">Alterando...</span>';
     
     // Fazer requisição para o backend
-    const response = await fetch(`http://localhost:3000/api/lp-indicadores/${lpId}/${action}`, {
+    // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                  (window.location.hostname === 'localhost' ? 
+                   'http://localhost:3000/api' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+    const response = await fetch(`${apiUrl}/lp-indicadores/${lpId}/${action}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -427,7 +432,12 @@ async function loadLPsFromBackend() {
     return;
   }
   try {
-    const response = await fetch(`http://localhost:3000/api/lp-indicadores?clientId=${clientId}` , {
+            // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/lp-indicadores?clientId=${clientId}` , {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Erro ao buscar LPs');
@@ -522,7 +532,12 @@ window.deleteLPBackend = async function(id) {
   if (!confirm('Tem certeza que deseja excluir esta LP?')) return;
   const token = localStorage.getItem('clientToken');
   try {
-    const response = await fetch(`http://localhost:3000/api/lp-indicadores/${id}`, {
+            // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/lp-indicadores/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

@@ -55,7 +55,12 @@ async function loadRewardsFromBackend() {
         }
         
         // Construir URL com clientId
-        const url = `http://localhost:3000/api/referrals/payments?clientId=${clientId}`;
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                  (window.location.hostname === 'localhost' ? 
+                   'http://localhost:3000/api' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+    const url = `${apiUrl}/referrals/payments?clientId=${clientId}`;
         console.log('[H4] 🔍 DIAGNÓSTICO - URL da requisição:', url);
         
         const headers = {
@@ -377,7 +382,12 @@ async function confirmApproval() {
     const notes = document.getElementById('approvalNotes').value;
 
     try {
-        const response = await fetch(`http://localhost:3000/api/referrals/${rewardId}/approve-reward`, {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/referrals/${rewardId}/approve-reward`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ notes })
@@ -407,7 +417,12 @@ async function rejectReward() {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/referrals/${rewardId}/reject-reward`, {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/referrals/${rewardId}/reject-reward`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ notes })
@@ -457,7 +472,12 @@ async function confirmPayment() {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/referrals/${rewardId}/process-payment`, {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/referrals/${rewardId}/process-payment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

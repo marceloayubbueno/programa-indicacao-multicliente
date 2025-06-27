@@ -22,7 +22,12 @@ async function loadIndicators() {
             renderIndicatorsTable([]);
             return;
         }
-        const response = await fetch(`http://localhost:3000/api/indicadores?indicatorId=${indicatorId}`, {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                  (window.location.hostname === 'localhost' ? 
+                   'http://localhost:3000/api' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+    const response = await fetch(`${apiUrl}/indicadores?indicatorId=${indicatorId}`, {
             headers: {
                 'Content-Type': 'application/json',
                 ...(token && { 'Authorization': 'Bearer ' + token })
