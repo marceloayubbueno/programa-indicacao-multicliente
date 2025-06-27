@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsuarioAdmin, UsuarioAdminSchema } from '../admins/entities/usuario-admin.schema';
 import { Client, ClientSchema } from '../clients/entities/client.schema';
 import { ClientsModule } from '../clients/clients.module'; // 🚀 NOVO: Import do ClientsModule
+import { AdminsModule } from '../admins/admins.module'; // 🚀 NOVO: Import do AdminsModule para SuperAdminSeedService
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ClientsModule } from '../clients/clients.module'; // 🚀 NOVO: Import 
       { name: Client.name, schema: ClientSchema },
     ]),
     ClientsModule, // 🚀 NOVO: Importar ClientsModule para usar ClientsService
+    AdminsModule, // 🚀 NOVO: Importar AdminsModule para usar SuperAdminSeedService
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtClientStrategy],

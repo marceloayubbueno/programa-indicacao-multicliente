@@ -44,6 +44,15 @@ class GlobalExceptionLogger implements ExceptionFilter {
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
+  // 🔐 AUTO-SEED: Garantir que sempre existe um Super Admin
+  try {
+    const { SuperAdminSeedService } = await import('./admins/seed-superadmin');
+    const seedService = app.get(SuperAdminSeedService);
+    await seedService.ensureSuperAdminExists();
+  } catch (error) {
+    console.error('[BOOT] ❌ Erro no auto-seed do Super Admin:', error.message);
+  }
+  
   // ✅ SERVIR ARQUIVOS ESTÁTICOS - CONFIGURAÇÃO EXPLÍCITA
   const clientPath = join(__dirname, '..', '..', 'client');
   console.log(`[BOOT] 🔧 Servindo arquivos estáticos de: ${clientPath}`);
