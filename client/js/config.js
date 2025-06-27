@@ -11,9 +11,9 @@ const ENV = {
         REFERRAL_BASE_URL: 'http://localhost:3000/indicacao'
     },
     production: {
-        API_URL: 'https://sua-api.railway.app/api',  // Será substituído no deploy
-        CLIENT_URL: 'https://sua-app.vercel.app',    // Será substituído no deploy
-        REFERRAL_BASE_URL: 'https://sua-api.railway.app/indicacao'
+        API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/api',
+        CLIENT_URL: 'SUA_URL_VERCEL_AQUI',    // Será atualizada após deploy do Vercel  
+        REFERRAL_BASE_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/indicacao'
     }
 };
 
