@@ -1,5 +1,9 @@
 // 🌟 VARIÁVEIS GLOBAIS REFATORADAS - Usando novos módulos
-const API_URL = 'http://localhost:3000/api';
+// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
+const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+               (window.location.hostname === 'localhost' ? 
+                'http://localhost:3000/api' : 
+                'https://programa-indicacao-multicliente-production.up.railway.app/api');
 let currentTab = 'lists';
 let participants = []; // Mantido para compatibilidade
 let lists = [];
@@ -27,10 +31,14 @@ function showParticipantModal(participantData) {
     document.getElementById('participantStatus').textContent = participantData.status;
     
     // Exibir link de compartilhamento - ATUALIZADO PARA NOVO SISTEMA
+    const baseReferralUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
+                           (window.location.hostname === 'localhost' ? 
+                            'http://localhost:3000/indicacao' : 
+                            'https://programa-indicacao-multicliente-production.up.railway.app/indicacao');
     const link = participantData.uniqueReferralCode
-        ? `http://localhost:3000/indicacao/${participantData.uniqueReferralCode}`
+        ? `${baseReferralUrl}/${participantData.uniqueReferralCode}`
         : (participantData.linkCompartilhamento 
-            ? `http://localhost:3000/indicacao/${participantData.linkCompartilhamento}`
+            ? `${baseReferralUrl}/${participantData.linkCompartilhamento}`
             : '-');
     
     const linkDisplay = link !== '-' ? link : 'Link não disponível';

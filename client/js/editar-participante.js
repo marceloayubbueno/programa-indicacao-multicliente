@@ -1,4 +1,8 @@
-const API_URL = 'http://localhost:3000/api';
+// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
+const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+               (window.location.hostname === 'localhost' ? 
+                'http://localhost:3000/api' : 
+                'https://programa-indicacao-multicliente-production.up.railway.app/api');
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('form-editar-participante');

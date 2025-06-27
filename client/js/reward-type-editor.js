@@ -1,6 +1,11 @@
 // Lógica para página dedicada de edição/criação de tipos de recompensa
 
-const apiUrl = 'http://localhost:3000/api/rewards';
+// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
+const apiBaseUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                  (window.location.hostname === 'localhost' ? 
+                   'http://localhost:3000/api' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+const apiUrl = `${apiBaseUrl}/rewards`;
 let editingRewardTypeId = null;
 let originalRewardData = null;
 
