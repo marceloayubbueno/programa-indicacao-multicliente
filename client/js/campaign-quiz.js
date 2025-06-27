@@ -327,7 +327,7 @@ window.editarLPDivulgacaoBackend = function(id) {
 };
 // Visualizar LP de Divulgação existente
 window.visualizarLPDivulgacaoBackend = function(id) {
-  window.open('/client/pages/lp-preview-divulgacao.html?id=' + id, '_blank');
+          window.open('lp-preview-divulgacao.html?id=' + id, '_blank');
 };
 // Criar nova LP de Divulgação
 window.criarLPDivulgacaoBackend = function() {
@@ -878,7 +878,7 @@ async function salvarCampanhaBackend() {
   const clientId = localStorage.getItem('clientId');
   if (!token || !clientId) {
     alert('Sessão expirada. Faça login novamente.');
-    window.location.href = '/client/pages/login.html';
+                window.location.href = 'login.html';
     return;
   }
 
@@ -956,7 +956,7 @@ async function salvarCampanhaBackend() {
     const data = await response.json();
     if (!response.ok || !data) throw new Error(data.message || 'Erro ao salvar campanha');
     alert('Campanha criada com sucesso!');
-    window.location.href = '/client/pages/campaigns.html';
+                window.location.href = 'campaigns.html';
   } catch (err) {
     console.error('Erro ao salvar campanha:', err);
     alert('Erro ao salvar campanha: ' + err.message);

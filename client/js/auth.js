@@ -52,10 +52,10 @@ async function handleLogin(event) {
 
         // Se for primeiro acesso, redirecionar para página de troca de senha
         if (data.client.primeiroAcesso) {
-            window.location.href = '/client/pages/change-password.html';
+            window.location.href = 'change-password.html';
         } else {
             // Redirecionar para o dashboard
-            window.location.href = '/client/pages/dashboard.html';
+            window.location.href = 'dashboard.html';
         }
     } catch (error) {
         console.error('Erro:', error);
@@ -79,13 +79,13 @@ function checkAuth() {
     if (window.location.pathname.includes('/login.html')) {
         // Se já estiver autenticado na página de login, redireciona para o dashboard
         if (token) {
-            window.location.href = '/client/pages/dashboard.html';
+            window.location.href = 'dashboard.html';
         }
         return;
     }
 
     if (!token) {
-        window.location.href = '/client/pages/login.html';
+        window.location.href = 'login.html';
         return false;
     }
     return true;
@@ -134,7 +134,7 @@ function logout() {
     localStorage.removeItem('clientToken');
     localStorage.removeItem('clientData');
     localStorage.removeItem('clientId');
-    window.location.href = '/client/pages/login.html';
+    window.location.href = 'login.html';
 }
 
 // Verificar autenticação em páginas protegidas

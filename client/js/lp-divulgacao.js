@@ -116,7 +116,7 @@ function renderLPDivulgacaoList() {
             <div class="flex items-center gap-1">
               <button class="p-1.5 rounded hover:bg-gray-700 transition-colors text-blue-400 hover:text-blue-300" 
                       title="Visualizar" 
-                      onclick="window.open('/client/pages/lp-preview-divulgacao.html?id=${lp._id}', '_blank')">
+                      onclick="window.open('lp-preview-divulgacao.html?id=${lp._id}', '_blank')">
                 <i class="fas fa-eye"></i>
               </button>
               <button class="p-1.5 rounded hover:bg-gray-700 transition-colors text-green-400 hover:text-green-300" 
