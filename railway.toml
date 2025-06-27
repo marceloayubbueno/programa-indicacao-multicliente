@@ -1,0 +1,12 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd server && npm run build"
+
+[deploy]
+startCommand = "cd server && npm run start:prod"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+
+[environments.production.variables]
+NODE_ENV = "production"
+PORT = "3000" 
