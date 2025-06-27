@@ -5,7 +5,8 @@
   "scripts": {
     "start:dev": "ts-node src/main.ts",
     "build": "tsc",
-    "start": "node dist/src/main.js"
+    "start": "node dist/src/main.js",
+    "start:prod": "node dist/src/main.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.0",

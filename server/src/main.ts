@@ -73,13 +73,21 @@ async function bootstrap() {
   // Filtro global para logar qualquer erro
   app.useGlobalFilters(new GlobalExceptionLogger());
 
-  // Configuração CORS
+  // Configuração CORS dinâmica
+  const allowedOrigins: string[] = [
+    'http://localhost:5501', 
+    'http://127.0.0.1:5501',
+    ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [])
+  ];
+
   app.enableCors({
-    origin: ['http://localhost:5501', 'http://127.0.0.1:5501'],
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
+
+  console.log(`[BOOT] 🌐 CORS configurado para:`, allowedOrigins);
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
