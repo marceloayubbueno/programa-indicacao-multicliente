@@ -1,9 +1,15 @@
 // users.js - Lógica da página de gerenciamento de administradores
 
+// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
+const API_BASE_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                    (window.location.hostname === 'localhost' ? 
+                     'http://localhost:3000/api' : 
+                     'https://programa-indicacao-multicliente-production.up.railway.app/api');
+
 // URL para listagem de admins (NestJS)
-const API_LIST_ADMINS = 'http://localhost:3000/api/auth/admins';
+const API_LIST_ADMINS = `${API_BASE_URL}/auth/admins`;
 // URL base para operações CRUD de admins (NestJS)
-const API_CRUD_ADMINS = 'http://localhost:3000/api/admins';
+const API_CRUD_ADMINS = `${API_BASE_URL}/admins`;
 let admins = [];
 let editingAdminId = null;
 
@@ -278,8 +284,8 @@ async function salvarUsuario() {
 
         const isEdit = editingAdminId !== null;
         const url = isEdit 
-            ? `http://localhost:3000/api/admins/${editingAdminId}`
-            : 'http://localhost:3000/api/admins';
+            ? `${API_CRUD_ADMINS}/${editingAdminId}`
+            : API_CRUD_ADMINS;
             
         const method = isEdit ? 'PUT' : 'POST';
 

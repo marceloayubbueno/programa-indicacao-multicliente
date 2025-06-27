@@ -82,15 +82,27 @@ async function bootstrap() {
   // Filtro global para logar qualquer erro
   app.useGlobalFilters(new GlobalExceptionLogger());
 
-  // Configuração CORS dinâmica
+  // Configuração CORS dinâmica - SEMPRE incluir Vercel
   const allowedOrigins: string[] = [
     'http://localhost:5501', 
     'http://127.0.0.1:5501',
+    'https://programa-indicacao-multicliente.vercel.app', // ✅ FIXO: Vercel sempre permitido
     ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [])
   ];
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // ✅ CORS mais permissivo: aceitar Vercel sempre
+      if (!origin || 
+          allowedOrigins.includes(origin) || 
+          origin.includes('programa-indicacao-multicliente.vercel.app') ||
+          origin.includes('vercel.app')) {
+        callback(null, true);
+      } else {
+        console.log(`[CORS] ❌ Origem bloqueada: ${origin}`);
+        callback(new Error('Não permitido pelo CORS'), false);
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

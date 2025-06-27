@@ -3,7 +3,12 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     const adminLoginForm = document.getElementById('adminLoginForm');
-    const BASE_URL = 'http://localhost:3000'; // ajuste para backend correto
+    
+    // 🌍 USAR CONFIGURAÇÃO DINÂMICA DO config.js
+    const BASE_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL.replace('/api', '') : 
+                     (window.location.hostname === 'localhost' ? 
+                      'http://localhost:3000' : 
+                      'https://programa-indicacao-multicliente-production.up.railway.app');
 
     // Verifica se já existe um token válido
     const adminToken = localStorage.getItem('adminToken');

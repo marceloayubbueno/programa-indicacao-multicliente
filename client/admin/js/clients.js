@@ -5,7 +5,11 @@ let currentPage = 1;
 let totalPages = 1;
 
 // API URLs
-const BASE_URL = 'http://localhost:3000';
+// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
+const BASE_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL.replace('/api', '') : 
+                (window.location.hostname === 'localhost' ? 
+                 'http://localhost:3000' : 
+                 'https://programa-indicacao-multicliente-production.up.railway.app');
 const API_URL = `${BASE_URL}/api/clients`;
 
 // Utilitário para obter token do localStorage

@@ -1,5 +1,9 @@
 // URLs da API
-window.AUTH_API_URL = window.AUTH_API_URL || 'http://localhost:3000/api';
+// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
+window.AUTH_API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                     (window.location.hostname === 'localhost' ? 
+                      'http://localhost:3000/api' : 
+                      'https://programa-indicacao-multicliente-production.up.railway.app/api');
 
 // Função para fazer login
 async function handleAdminLogin(event) {
