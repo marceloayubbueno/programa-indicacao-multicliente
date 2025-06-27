@@ -7,7 +7,12 @@ async function loadCompanyData() {
             return;
         }
 
-        const response = await fetch('http://localhost:3000/api/clients/me', {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                  (window.location.hostname === 'localhost' ? 
+                   'http://localhost:3000/api' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+    const response = await fetch(`${apiUrl}/clients/me`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -132,7 +137,12 @@ async function saveCompanyData() {
             notifyCampaigns: document.getElementById('notifyCampaigns').checked
         };
 
-        const response = await fetch(`http://localhost:3000/api/clients/${clientId}`, {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/clients/${clientId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
