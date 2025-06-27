@@ -33,4 +33,42 @@ export class AuthService {
   async listAdmins() {
     return await this.usuarioAdminModel.find({}, '-senha');
   }
+
+  // 🚀 NOVO: Bootstrap do primeiro admin (só funciona se não houver nenhum admin)
+  async bootstrapFirstAdmin(createAdminDto: any) {
+    // Verificar se já existem admins
+    const adminCount = await this.usuarioAdminModel.countDocuments();
+    
+    if (adminCount > 0) {
+      throw new UnauthorizedException('Sistema já possui administradores. Use login normal.');
+    }
+
+    // Criar primeiro admin
+    const { nome, email, senha, telefone } = createAdminDto;
+    
+    if (!nome || !email || !senha) {
+      throw new UnauthorizedException('Nome, email e senha são obrigatórios');
+    }
+
+    const hash = await bcrypt.hash(senha, 10);
+    const admin = new this.usuarioAdminModel({
+      nome,
+      email: email.toLowerCase(),
+      senha: hash,
+      telefone: telefone || '',
+      role: 'superadmin',
+      ativo: true,
+      superadmin: true
+    });
+
+    await admin.save();
+    
+    const { senha: _, ...adminSemSenha } = admin.toObject();
+    
+    return {
+      success: true,
+      message: 'Primeiro administrador criado com sucesso! Sistema inicializado.',
+      admin: adminSemSenha
+    };
+  }
 } 

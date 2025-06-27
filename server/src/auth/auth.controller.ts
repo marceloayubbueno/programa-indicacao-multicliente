@@ -16,6 +16,12 @@ export class AuthController {
     return this.authService.loginAdmin(loginDto);
   }
 
+  @Post('bootstrap-admin')
+  @HttpCode(HttpStatus.OK)
+  async bootstrapAdmin(@Body() createAdminDto: any) {
+    return this.authService.bootstrapFirstAdmin(createAdminDto);
+  }
+
   @Post('client-login')
   @HttpCode(HttpStatus.OK)
   async clientLogin(@Body() loginDto: LoginDto) {
