@@ -83,7 +83,12 @@ function validateForm() {
 
 async function buscarPlanoTrial() {
     try {
-        const response = await fetch('http://localhost:3000/api/planos');
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                  (window.location.hostname === 'localhost' ? 
+                   'http://localhost:3000/api' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+    const response = await fetch(`${apiUrl}/planos`);
         const planos = await response.json();
         const trial = planos.find(p => p.nome && p.nome.toLowerCase() === 'trial');
         if (!trial) throw new Error('Plano Trial não encontrado');
@@ -96,7 +101,12 @@ async function buscarPlanoTrial() {
 
 async function cadastrarClienteTrial(formData, planId) {
     try {
-        const response = await fetch('http://localhost:3000/api/clients/trial', {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/clients/trial`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...formData, plan: planId })
@@ -114,7 +124,12 @@ async function cadastrarClienteTrial(formData, planId) {
 
 async function autenticarCliente(email, senha) {
     try {
-        const response = await fetch('http://localhost:3000/api/auth/client-login', {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/auth/client-login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password: senha })
