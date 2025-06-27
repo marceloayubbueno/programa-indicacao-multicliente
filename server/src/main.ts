@@ -89,8 +89,10 @@ async function bootstrap() {
 
   console.log(`[BOOT] 🌐 CORS configurado para:`, allowedOrigins);
 
-  const port = process.env.PORT ?? 3000;
-  await app.listen(port);
-  console.log(`\n[BOOT] Backend rodando em http://localhost:${port}/api\n`);
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`\n[BOOT] 🚀 Backend rodando na porta ${port}`);
+  console.log(`[BOOT] 🌐 API disponível em: /api/`);
+  console.log(`[BOOT] 🔗 Environment: ${process.env.NODE_ENV || 'development'}\n`);
 }
 bootstrap();

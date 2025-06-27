@@ -25,7 +25,13 @@ import { IndicatorAuthModule } from './indicator-auth/indicator-auth.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/programa-indicacao'),
+    MongooseModule.forRoot(process.env.MONGODB_URI || (() => {
+      throw new Error('MONGODB_URI environment variable is required');
+    })(), {
+      dbName: 'programa-indicacao',
+      retryWrites: true,
+      w: 'majority'
+    }),
     AuthModule,
     UsersModule,
     CampaignsModule,
