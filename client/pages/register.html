@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Área do Cliente</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Criar Nova Conta</h1>
+            <form id="registerForm" onsubmit="return handleRegister(event)">
+                <div class="form-group">
+                    <label for="name">Nome Completo</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Telefone</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required>
+                    <small class="password-hint">
+                        A senha deve conter pelo menos 6 caracteres, incluindo letras maiúsculas, minúsculas e números
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Senha</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit">Criar Conta</button>
+                <div class="form-footer">
+                    <a href="login.html">Já tem uma conta? Faça login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="../js/auth.js"></script>
+    <script src="../js/register.js"></script>
+</body>
+</html> 

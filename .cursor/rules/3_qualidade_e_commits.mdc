@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# REGRAS DE QUALIDADE E VERSIONAMENTO
+
+- **Testes:** Para novas funcionalidades críticas no backend (em Services), sempre proponha a criação de um arquivo de teste (`.spec.ts`) correspondente.
+- **Tratamento de Erros:** Implemente tratamento de erros robusto. No backend, use os mecanismos de exceção do NestJS. No frontend, sempre inclua blocos `try/catch` para chamadas de API e feedback visual para o usuário em caso de falha.
+- **Clareza:** O código deve ser autoexplicativo. Use nomes de variáveis e funções claros e descritivos. Adicione comentários apenas para explicar o "porquê" de uma lógica complexa, não o "o quê".
+- **Mensagens de Commit:** Siga o padrão **Conventional Commits**. Exemplos:
+  - `feat: adiciona endpoint de login de usuário`
+  - `fix: corrige cálculo de impostos no carrinho`
+  - `docs: atualiza documentação da API de pagamentos`
+  - `refactor: extrai lógica de validação para um serviço`
+

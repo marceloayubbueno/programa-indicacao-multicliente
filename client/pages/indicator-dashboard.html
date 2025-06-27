@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Área do Indicador</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .indicator-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .indicator-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex items-center">
+                        <i class="fas fa-share-alt text-2xl text-blue-400 mr-3"></i>
+                        <h1 class="text-xl font-bold text-white">Área do Indicador</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="indicatorName" class="text-gray-300">Carregando...</span>
+                    <button onclick="logout()" class="text-gray-300 hover:text-white">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h2 id="welcomeMessage" class="text-3xl font-bold text-white mb-2">Bem-vindo!</h2>
+            <p class="text-gray-400">Acompanhe suas indicações e recompensas</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="indicator-card bg-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-500/20">
+                        <i class="fas fa-users text-blue-400 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Total de Indicações</p>
+                        <p id="totalReferrals" class="text-2xl font-bold text-white">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="indicator-card bg-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-500/20">
+                        <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Aprovadas</p>
+                        <p id="approvedReferrals" class="text-2xl font-bold text-white">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="indicator-card bg-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-500/20">
+                        <i class="fas fa-clock text-yellow-400 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Pendentes</p>
+                        <p id="pendingReferrals" class="text-2xl font-bold text-white">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="indicator-card bg-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-500/20">
+                        <i class="fas fa-money-bill-wave text-purple-400 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Recompensas Pendentes</p>
+                        <p id="pendingRewards" class="text-2xl font-bold text-white">R$ -</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Referral Link Section -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i class="fas fa-link mr-2 text-blue-400"></i>
+                    Seu Link Exclusivo
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Link de Indicação</label>
+                        <div class="flex">
+                            <input
+                                type="text"
+                                id="referralLink"
+                                readonly
+                                class="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-l-lg text-white"
+                                value="Carregando..."
+                            >
+                            <button
+                                onclick="copyReferralLink()"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700 transition-colors"
+                            >
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Compartilhe este link para ganhar recompensas por cada indicação
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i class="fas fa-bolt mr-2 text-yellow-400"></i>
+                    Ações Rápidas
+                </h3>
+                <div class="space-y-3">
+                    <button onclick="viewReferrals()" class="w-full text-left p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-list mr-3 text-blue-400"></i>
+                        Ver Todas as Indicações
+                    </button>
+                    <button onclick="viewRewards()" class="w-full text-left p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-gift mr-3 text-green-400"></i>
+                        Ver Recompensas
+                    </button>
+                    <button onclick="shareOnWhatsApp()" class="w-full text-left p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <i class="fab fa-whatsapp mr-3 text-green-400"></i>
+                        Compartilhar no WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Referrals -->
+        <div class="mt-8 bg-gray-800 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-white mb-4">
+                <i class="fas fa-history mr-2 text-gray-400"></i>
+                Indicações Recentes
+            </h3>
+            <div id="recentReferrals" class="space-y-3">
+                <div class="text-center text-gray-400 py-8">
+                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                    <p>Carregando indicações...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Variáveis globais
+        const API_BASE = 'http://localhost:3000/api';
+        let indicatorData = null;
+        let dashboardData = null;
+
+        // Funções de autenticação
+        function checkAuth() {
+            const token = localStorage.getItem('indicatorToken');
+            if (!token) {
+                window.location.href = 'indicator-login.html';
+                return false;
+            }
+            return token;
+        }
+
+        function logout() {
+            localStorage.removeItem('indicatorToken');
+            localStorage.removeItem('indicatorData');
+            window.location.href = 'indicator-login.html';
+        }
+
+        // Função para fazer requests autenticadas
+        async function authenticatedFetch(url, options = {}) {
+            const token = checkAuth();
+            if (!token) return null;
+
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            try {
+                const response = await fetch(url, { ...options, headers });
+                const result = await response.json();
+
+                if (response.status === 401) {
+                    logout();
+                    return null;
+                }
+
+                return result;
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                return null;
+            }
+        }
+
+        // Carregar dados do dashboard
+        async function loadDashboard() {
+            const result = await authenticatedFetch(`${API_BASE}/indicator-auth/dashboard`);
+            
+            if (result && result.success) {
+                dashboardData = result.data;
+                updateUI();
+            }
+        }
+
+        // Atualizar interface
+        function updateUI() {
+            if (!dashboardData) return;
+
+            const { indicator, stats, recentReferrals } = dashboardData;
+
+            // Atualizar header
+            document.getElementById('indicatorName').textContent = indicator.name;
+            document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${indicator.name}!`;
+
+            // Atualizar estatísticas
+            document.getElementById('totalReferrals').textContent = stats.totalReferrals;
+            document.getElementById('approvedReferrals').textContent = stats.approvedReferrals;
+            document.getElementById('pendingReferrals').textContent = stats.pendingReferrals;
+            document.getElementById('pendingRewards').textContent = `R$ ${stats.pendingRewards.toFixed(2)}`;
+
+            // Atualizar link de referral
+            const fullLink = `${window.location.origin}/indicacao/${indicator.referralCode}`;
+            document.getElementById('referralLink').value = fullLink;
+
+            // Atualizar indicações recentes
+            updateRecentReferrals(recentReferrals);
+        }
+
+        // Atualizar indicações recentes
+        function updateRecentReferrals(referrals) {
+            const container = document.getElementById('recentReferrals');
+            
+            if (!referrals || referrals.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <i class="fas fa-inbox text-2xl mb-2"></i>
+                        <p>Nenhuma indicação ainda</p>
+                        <p class="text-sm">Compartilhe seu link para começar!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = referrals.map(ref => `
+                <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-white">${ref.leadName}</p>
+                            <p class="text-sm text-gray-400">${ref.leadEmail}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block px-2 py-1 text-xs rounded-full ${
+                            ref.status === 'aprovada' ? 'bg-green-500/20 text-green-400' :
+                            ref.status === 'pendente' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                        }">
+                            ${ref.status === 'aprovada' ? 'Aprovada' : ref.status === 'pendente' ? 'Pendente' : 'Rejeitada'}
+                        </span>
+                        ${ref.rewardValue > 0 ? `<p class="text-sm text-green-400 mt-1">R$ ${ref.rewardValue.toFixed(2)}</p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Ações da interface
+        function copyReferralLink() {
+            const linkInput = document.getElementById('referralLink');
+            linkInput.select();
+            document.execCommand('copy');
+            
+            // Feedback visual
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i>';
+            button.classList.add('bg-green-600');
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('bg-green-600');
+            }, 2000);
+        }
+
+        function shareOnWhatsApp() {
+            const link = document.getElementById('referralLink').value;
+            const message = `Olá! Gostaria de compartilhar uma oportunidade incrível com você. Acesse: ${link}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function viewReferrals() {
+            // TODO: Implementar página de indicações
+            alert('Página de indicações em desenvolvimento');
+        }
+
+        function viewRewards() {
+            // TODO: Implementar página de recompensas
+            alert('Página de recompensas em desenvolvimento');
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadDashboard();
+        });
+    </script>
+</body>
+</html> 

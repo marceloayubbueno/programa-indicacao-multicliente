@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Área do Cliente</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+        <div class="flex items-center mb-8">
+          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+        </div>
+        <ul class="space-y-2 flex-1">
+          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+          <li><a href="engagements.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-bar mr-2"></i> Engajamentos</a></li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Indicações</a></li>
+          <li><a href="payments.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+          <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+          <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+        </ul>
+      </nav>
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+        <div class="flex-1 flex flex-col">
+          <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+            <h1 class="text-3xl font-bold text-blue-400">Dashboard</h1>
+            <div class="flex items-center gap-4">
+              <span id="clientName" class="block text-gray-200 font-medium">Nome do Cliente</span>
+              <i class="fas fa-user-circle text-2xl text-gray-400"></i>
+            </div>
+          </header>
+          <main class="flex-1 p-8">
+            <!-- Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
+                <span class="text-gray-400 text-sm mb-2">Campanhas Ativas</span>
+                <span class="text-2xl font-bold text-gray-100">0</span>
+              </div>
+              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
+                <span class="text-gray-400 text-sm mb-2">Total de Participantes</span>
+                <span class="text-2xl font-bold text-gray-100">0</span>
+              </div>
+              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
+                <span class="text-gray-400 text-sm mb-2">Indicações Recebidas</span>
+                <span class="text-2xl font-bold text-gray-100">0</span>
+              </div>
+              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
+                <span class="text-gray-400 text-sm mb-2">Recompensas Pagas</span>
+                <span class="text-2xl font-bold text-gray-100">R$ 0,00</span>
+              </div>
+            </div>
+            <!-- Gráficos -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div class="bg-gray-800 rounded-xl p-6 shadow border-none flex flex-col">
+                <h3 class="text-lg font-semibold text-gray-100 mb-4">Indicações por Campanha</h3>
+                <div id="campaignChart" class="flex-1 flex items-center justify-center text-gray-500">[Gráfico aqui]</div>
+              </div>
+              <div class="bg-gray-800 rounded-xl p-6 shadow border-none flex flex-col">
+                <h3 class="text-lg font-semibold text-gray-100 mb-4">Conversão de Indicações</h3>
+                <div id="conversionChart" class="flex-1 flex items-center justify-center text-gray-500">[Gráfico aqui]</div>
+              </div>
+            </div>
+            <!-- Atividade Recente -->
+            <div class="bg-gray-800 rounded-xl p-6 shadow border-none">
+              <h3 class="text-lg font-semibold text-gray-100 mb-4">Atividade Recente</h3>
+              <div class="divide-y divide-gray-700">
+                <div class="flex items-center gap-4 py-4">
+                  <span class="text-2xl">📊</span>
+                  <div class="flex-1">
+                    <p class="text-gray-100">Nova campanha criada: "Indique e Ganhe"</p>
+                    <small class="text-gray-400">Há 2 horas</small>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4 py-4">
+                  <span class="text-2xl">👥</span>
+                  <div class="flex-1">
+                    <p class="text-gray-100">Novo participante registrado</p>
+                    <small class="text-gray-400">Há 3 horas</small>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4 py-4">
+                  <span class="text-2xl">🎁</span>
+                  <div class="flex-1">
+                    <p class="text-gray-100">Recompensa paga para João Silva</p>
+                    <small class="text-gray-400">Há 5 horas</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>checkAuth();</script>
+</body>
+</html> 

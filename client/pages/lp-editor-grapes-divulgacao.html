@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor Visual Avançado (GrapesJS) - LP de Divulgação</title>
+  <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body { 
+      background: #f5f6fa; 
+      margin: 0; 
+      padding: 15px; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .editor-header { 
+      display: flex; 
+      flex-direction: row; 
+      align-items: center; 
+      justify-content: space-between; 
+      background: #fff; 
+      padding: 16px 24px 16px 24px; 
+      border-radius: 8px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+      margin-bottom: 0;
+    }
+    .editor-header h1 { 
+      font-size: 1.4rem; 
+      margin: 0; 
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    .editor-header .actions { display: flex; gap: 12px; align-items: center; }
+    .btn { 
+      padding: 10px 20px; 
+      border-radius: 6px; 
+      border: none; 
+      font-weight: 500; 
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    .btn-primary { 
+      background: #3498db; 
+      color: #fff; 
+    }
+    .btn-primary:hover {
+      background: #2980b9;
+    }
+    .btn-secondary { 
+      background: #95a5a6; 
+      color: #fff; 
+    }
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+    
+    .editor-row { 
+      display: flex; 
+      gap: 15px;
+      height: calc(100vh - 140px);
+    }
+    .editor-canvas { 
+      flex: 1;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    #gjs { 
+      height: 100%;
+      border: none;
+    }
+    
+    .panel__right { 
+      width: 320px; 
+      background: #fff; 
+      border-radius: 8px; 
+      padding: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .panel__devices { 
+      padding: 12px 15px;
+      border-bottom: 1px solid #ecf0f1;
+      background: #f8f9fa;
+      flex-shrink: 0;
+    }
+    
+    /* Sistema de Abas */
+    .panel__tabs {
+      display: flex;
+      background: #fff;
+      border-bottom: 2px solid #ecf0f1;
+      flex-shrink: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .panel__tab {
+      flex: 1;
+      padding: 15px 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      color: #95a5a6;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+      position: relative;
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .panel__tab:hover {
+      background: #f8f9fa;
+      color: #2c3e50;
+      transform: translateY(-1px);
+    }
+    
+    .panel__tab.active {
+      color: #3498db;
+      background: #fff;
+      border-bottom-color: #3498db;
+      box-shadow: 0 -2px 8px rgba(52, 152, 219, 0.1);
+    }
+    
+    /* Destaque especial para a aba de blocos quando ativa */
+    .panel__tab[data-tab="blocks"].active {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      color: #2c3e50;
+      border-bottom-color: #27ae60;
+    }
+    
+    .panel__tab[data-tab="blocks"].active::before {
+      background: #27ae60;
+    }
+    
+    .panel__tab i {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+    
+    .panel__tab span {
+      font-size: 10px;
+      font-weight: 600;
+    }
+    
+    /* Conteúdo das Abas */
+    .panel__content {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .panel__tab-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .panel__tab-content.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    /* Estilos específicos para cada aba */
+    .blocks-container, 
+    .styles-container, 
+    .traits-container { 
+      border: none;
+      flex: none;
+      overflow: visible;
+      height: 100%;
+      padding: 15px;
+    }
+    
+    .blocks-container h3,
+    .styles-container h3,
+    .traits-container h3 {
+      display: none; /* Removemos os títulos já que temos abas */
+    }
+    
+    /* Customização específica dos blocos */
+    .gjs-block {
+      width: calc(50% - 6px);
+      margin: 3px;
+      min-height: 65px;
+      font-size: 11px;
+      border-radius: 6px;
+      border: 2px solid #ecf0f1;
+      background: #fff;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .gjs-block::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #3498db, #2ecc71);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .gjs-block:hover {
+      border-color: #3498db;
+      background: #f8f9fb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+    }
+    
+    .gjs-block:hover::before {
+      transform: translateX(0);
+    }
+    
+    .gjs-block .gjs-block-label {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-top: 5px;
+      font-size: 10px;
+    }
+    
+    .gjs-block .fa {
+      font-size: 20px;
+      color: #3498db;
+      margin-bottom: 5px;
+    }
+    
+    /* Animação de destaque para novos blocos */
+    @keyframes blockHighlight {
+      0% { background: #e8f5e8; border-color: #4caf50; }
+      100% { background: #fff; border-color: #ecf0f1; }
+    }
+    
+    .gjs-block.new-block {
+      animation: blockHighlight 2s ease-out;
+    }
+    
+    /* Customização da área de estilos */
+    .styles-container {
+      background: #fff;
+    }
+    
+    .gjs-sm-sector {
+      margin-bottom: 15px;
+      border: 1px solid #ecf0f1;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    
+    .gjs-sm-sector .gjs-sm-title {
+      background: #f8f9fa;
+      padding: 12px 15px;
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 12px;
+      border-bottom: 1px solid #ecf0f1;
+    }
+    
+    .gjs-sm-properties {
+      padding: 15px;
+    }
+    
+    /* Indicadores visuais para abas */
+    .panel__tab.empty {
+      opacity: 0.5;
+      position: relative;
+    }
+    
+    .panel__tab.empty::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 6px;
+      height: 6px;
+      background: #bdc3c7;
+      border-radius: 50%;
+    }
+    
+    .panel__tab.has-content {
+      position: relative;
+    }
+    
+    .panel__tab.has-content::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      background: #e74c3c;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+    
+    /* Responsive da sidebar */
+    .panel__right.collapsed {
+      width: 60px;
+      overflow: visible;
+    }
+    
+    .panel__right.collapsed .panel__tabs,
+    .panel__right.collapsed .panel__content {
+      display: none;
+    }
+    
+    .panel__right.collapsed .panel__devices {
+      padding: 15px 10px;
+      text-align: center;
+    }
+    
+    .panel__toggle-btn {
+      position: absolute;
+      top: 50%;
+      right: -15px;
+      transform: translateY(-50%);
+      background: #3498db;
+      color: white;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 12px;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+    
+    .panel__toggle-btn:hover {
+      background: #2980b9;
+      transform: translateY(-50%) scale(1.1);
+    }
+    
+    /* Responsividade */
+    @media (max-width: 1200px) {
+      .editor-row { flex-direction: column; height: auto; }
+      .panel__right { width: 100%; order: -1; margin-bottom: 15px; }
+      .editor-canvas { min-height: 500px; }
+    }
+    
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      .editor-header { padding: 15px; flex-direction: column; gap: 15px; }
+      .editor-header .actions { width: 100%; justify-content: center; }
+      .panel__right { height: 300px; }
+    }
+    
+    /* Animações suaves */
+    .gjs-cv-canvas {
+      transition: all 0.3s ease;
+    }
+    
+    /* Dicas contextuais */
+    .element-tip {
+      background: #e3f2fd;
+      border: 1px solid #2196f3;
+      border-radius: 4px;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    
+    .element-tip strong {
+      color: #1976d2;
+    }
+    
+    /* Melhorias nos dispositivos */
+    .btn-device {
+      background: #ecf0f1;
+      border: 1px solid #bdc3c7;
+      padding: 8px 12px;
+      margin: 0 2px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-device.active {
+      background: #3498db;
+      color: white;
+      border-color: #2980b9;
+    }
+    
+    .btn-device:hover {
+      background: #d5dbdb;
+    }
+    
+    .btn-device.active:hover {
+      background: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="editor-header" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; background: #fff; padding: 16px 24px 16px 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 0;">
+    <span style="font-size: 1.2rem; font-weight: 600; color: #22304a; text-align: left;">Editor Visual Avançado (GrapesJS) - LP de Divulgação</span>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button class="btn-device active" data-device="desktop" style="padding: 6px 10px; font-size: 15px;"><i class="fas fa-desktop"></i></button>
+      <button class="btn-device" data-device="mobile" style="padding: 6px 10px; font-size: 15px;"><i class="fas fa-mobile-alt"></i></button>
+      <button class="btn btn-secondary" onclick="window.location.href='lp-divulgacao.html'" style="padding: 6px 18px;">Voltar</button>
+      <button class="btn btn-primary" onclick="saveLP()" style="padding: 6px 18px;">Salvar LP</button>
+    </div>
+  </div>
+  <div style="margin: 18px 0 24px 24px; display: flex; align-items: center;">
+    <label for="lpNameInput" style="font-weight: 500; margin-right: 8px;">Nome da Landing Page:</label>
+    <input id="lpNameInput" type="text" placeholder="Digite o nome da LP" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc; min-width: 220px;">
+  </div>
+  
+  <div class="editor-row">
+    <div class="editor-canvas">
+      <div id="gjs"></div>
+    </div>
+    
+    <div class="panel__right">
+      <button class="panel__toggle-btn" onclick="toggleSidebar()" title="Esconder painel de componentes">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <div class="panel__devices">
+        <div style="font-size: 11px; color: #666; text-align: center;">
+          <i class="fas fa-mobile-alt"></i> 
+          Use os botões acima para alternar entre dispositivos
+        </div>
+      </div>
+      
+      <div class="panel__tabs">
+        <button class="panel__tab active" data-tab="blocks">
+          <i class="fas fa-cube"></i>
+          <span>Blocos</span>
+        </button>
+        <button class="panel__tab empty" data-tab="styles">
+          <i class="fas fa-paint-brush"></i>
+          <span>Estilos</span>
+        </button>
+        <button class="panel__tab empty" data-tab="traits">
+          <i class="fas fa-cog"></i>
+          <span>Propriedades</span>
+        </button>
+      </div>
+      
+      <div class="panel__content">
+        <div class="panel__tab-content active" data-content="blocks">
+          <div class="blocks-container" id="blocks"></div>
+        </div>
+        <div class="panel__tab-content" data-content="styles">
+          <div class="styles-container" id="tab-styles">
+            <div style="text-align: center; padding: 40px 20px; color: #95a5a6;">
+              <i class="fas fa-mouse-pointer" style="font-size: 24px; margin-bottom: 10px;"></i>
+              <p style="margin: 0; font-size: 13px;">Selecione um elemento no canvas para editar seus estilos</p>
+            </div>
+          </div>
+        </div>
+        <div class="panel__tab-content" data-content="traits">
+          <div class="traits-container" id="tab-traits">
+            <div style="text-align: center; padding: 40px 20px; color: #95a5a6;">
+              <i class="fas fa-hand-pointer" style="font-size: 24px; margin-bottom: 10px;"></i>
+              <p style="margin: 0; font-size: 13px;">Selecione um elemento para ver suas propriedades</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/grapesjs@0.20.4/dist/grapes.min.js"></script>
+  <script>
+    console.log('[GrapesJS Debug] Iniciando editor para LP de Divulgação...');
+    
+    // Função para extrair imagens do editor
+    function extractImagesFromEditor(editor) {
+      const html = editor.getHtml();
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      const imgs = div.querySelectorAll('img');
+      const urls = [];
+      imgs.forEach(img => {
+        if (img.src) urls.push(img.src);
+      });
+      return urls;
+    }
+    
+    // Função para salvar LP no backend
+    async function saveLP() {
+      try {
+        const html = editor.getHtml();
+        const css = editor.getCss();
+        const grapesData = editor.getProjectData();
+        const name = document.getElementById('lpNameInput').value.trim();
+        const images = extractImagesFromEditor(editor);
+        const clientId = localStorage.getItem('clientId');
+        if (!name) {
+          alert('Preencha o nome da Landing Page antes de salvar.');
+          document.getElementById('lpNameInput').focus();
+          return;
+        }
+        if (!html || html.trim() === '') {
+          alert('Nenhum conteúdo para salvar. Adicione elementos à sua LP primeiro.');
+          return;
+        }
+        if (!clientId) {
+          alert('Não foi possível identificar o cliente logado. Faça login novamente.');
+          return;
+        }
+        const slug = name
+          .toLowerCase()
+          .normalize('NFD').replace(/[^\w\s-]/g, '') // remove acentos
+          .replace(/[^a-z0-9]+/g, '-') // troca não alfanuméricos por hífen
+          .replace(/^-+|-+$/g, ''); // remove hífens do início/fim
+        
+        // Corrigir extração dos componentes do GrapesJS
+        const components = grapesData.components || [];
+        // ... outros campos do grapesData
+
+        // Corrigir blocksUsed para ser array de strings
+        const blocksUsed = Array.isArray(components)
+          ? components.map((c, idx) => (typeof c === 'object' && c.id ? String(c.id) : `block-${idx}`))
+          : [];
+
+        // Montar metadata correto
+        const metadata = {
+          blocksUsed, // agora array de strings
+          version: '1.0',
+          editorVersion: grapesData && grapesData.version ? grapesData.version : 'unknown'
+        };
+        
+        // Montar payload padronizado
+        const payload = {
+          name,
+          slug,
+          clientId,
+          grapesData: { ...grapesData, components }, // garantir que components está presente
+          compiledOutput: { html, css },
+          images,
+          metadata
+        };
+        
+        // Logar o payload para depuração
+        console.log('[GrapesJS Debug] Payload enviado para o backend:', payload);
+        
+        // Detectar se é edição
+        const lpId = getUrlParam('id');
+        let url = 'http://localhost:3000/api/lp-divulgacao';
+        let method = 'POST';
+        if (lpId) {
+          url = `http://localhost:3000/api/lp-divulgacao/${lpId}`;
+          method = 'PUT';
+        }
+        // Enviar para o backend
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) {
+          throw new Error('Erro ao salvar a LP no backend.');
+        }
+        
+        const data = await response.json();
+        // Buscar o ID corretamente, mesmo se vier aninhado
+        const lpdedivulgacaoId = data.data?.lpdedivulgacaoId || data.data?._id || data.lpdedivulgacaoId || data._id;
+        
+        // Salvar no localStorage como backup
+        localStorage.setItem('grapesLPDivulgacaoHtml', html);
+        localStorage.setItem('grapesLPDivulgacaoCss', css);
+        localStorage.setItem('grapesLPDivulgacaoCreatedAt', new Date().toLocaleString('pt-BR'));
+        localStorage.setItem('lpdedivulgacaoId', lpdedivulgacaoId);
+        
+        // Feedback visual
+        const btn = document.querySelector('.btn-primary');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Salvo!';
+        btn.style.background = '#27ae60';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.style.background = '#3498db';
+        }, 2000);
+        alert('LP de Divulgação salva com sucesso!');
+      } catch (error) {
+        console.error('[GrapesJS Debug] Erro ao salvar:', error);
+        alert('Erro ao salvar a LP. Tente novamente.');
+      }
+    }
+    
+    // Função para alternar abas
+    function switchTab(tabName) {
+      console.log(`[GrapesJS Debug] Alternando para aba: ${tabName}`);
+      
+      // Remove active de todas as abas e conteúdos
+      document.querySelectorAll('.panel__tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.panel__tab-content').forEach(content => content.classList.remove('active'));
+      
+      // Adiciona active na aba e conteúdo corretos
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      document.querySelector(`[data-content="${tabName}"]`).classList.add('active');
+    }
+    
+    // Event listeners para as abas
+    document.querySelectorAll('.panel__tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        switchTab(tabName);
+      });
+    });
+    
+    try {
+      console.log('[GrapesJS Debug] Inicializando GrapesJS...');
+      
+      const editor = window.editor = grapesjs.init({
+        container: '#gjs',
+        height: '100%',
+        width: 'auto',
+        storageManager: false, // Desabilitar storage automático
+        blockManager: {
+          appendTo: '#blocks',
+          blocks: [
+            {
+              id: 'section-hero',
+              label: 'Seção Hero',
+              category: 'Seções',
+              content: `
+                <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 80px 20px; text-align: center; color: white;">
+                  <div style="max-width: 1200px; margin: 0 auto;">
+                    <h1 style="font-size: 3rem; margin-bottom: 20px; font-weight: bold;">Título Principal da LP</h1>
+                    <p style="font-size: 1.3rem; margin-bottom: 30px; opacity: 0.9;">Subtítulo explicativo que converte visitantes em leads</p>
+                    <button style="background: #ff6b6b; color: white; padding: 15px 40px; border: none; border-radius: 50px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease;">Chame para Ação</button>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-home' }
+            },
+            {
+              id: 'benefits-section',
+              label: 'Seção Benefícios',
+              category: 'Seções',
+              content: `
+                <section style="padding: 60px 20px; background: #f8f9fa;">
+                  <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 50px; color: #2c3e50;">Por que escolher nosso produto?</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                      <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🚀</div>
+                        <h3 style="color: #2c3e50; margin-bottom: 15px;">Benefício 1</h3>
+                        <p style="color: #666; line-height: 1.6;">Descrição detalhada do primeiro benefício que seu produto oferece.</p>
+                      </div>
+                      <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">💡</div>
+                        <h3 style="color: #2c3e50; margin-bottom: 15px;">Benefício 2</h3>
+                        <p style="color: #666; line-height: 1.6;">Descrição detalhada do segundo benefício que seu produto oferece.</p>
+                      </div>
+                      <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">⭐</div>
+                        <h3 style="color: #2c3e50; margin-bottom: 15px;">Benefício 3</h3>
+                        <p style="color: #666; line-height: 1.6;">Descrição detalhada do terceiro benefício que seu produto oferece.</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-star' }
+            },
+            {
+              id: 'lead-form',
+              label: 'Formulário de Lead',
+              category: 'Formulários',
+              content: `
+                <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 20px;">
+                  <div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">Receba mais informações</h2>
+                    <form style="display: flex; flex-direction: column; gap: 20px;">
+                      <input type="text" placeholder="Seu nome completo" style="padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                      <input type="email" placeholder="Seu melhor e-mail" style="padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                      <input type="tel" placeholder="Seu telefone (WhatsApp)" style="padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                      <button type="submit" style="background: #ff6b6b; color: white; padding: 18px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">QUERO RECEBER AS INFORMAÇÕES</button>
+                    </form>
+                    <p style="text-align: center; font-size: 12px; color: #666; margin-top: 15px;">Seus dados estão seguros conosco</p>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-envelope' }
+            },
+            {
+              id: 'testimonial',
+              label: 'Depoimento',
+              category: 'Seções',
+              content: `
+                <section style="padding: 60px 20px; background: #fff;">
+                  <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 50px; color: #2c3e50;">O que nossos clientes dizem</h2>
+                    <div style="background: #f8f9fa; padding: 40px; border-radius: 15px; position: relative;">
+                      <div style="font-size: 4rem; color: #3498db; margin-bottom: 20px;">"</div>
+                      <p style="font-size: 1.2rem; line-height: 1.6; color: #2c3e50; margin-bottom: 30px; font-style: italic;">Este produto mudou completamente minha forma de trabalhar. Recomendo para todos!</p>
+                      <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                        <div style="width: 60px; height: 60px; background: #3498db; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">👤</div>
+                        <div>
+                          <h4 style="margin: 0; color: #2c3e50;">João Silva</h4>
+                          <p style="margin: 0; color: #666;">CEO, Empresa XYZ</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-quote-left' }
+            },
+            {
+              id: 'pricing-table',
+              label: 'Tabela de Preços',
+              category: 'Seções',
+              content: `
+                <section style="padding: 60px 20px; background: #f8f9fa;">
+                  <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 50px; color: #2c3e50;">Escolha seu plano</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                      <div style="background: white; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative;">
+                        <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 1.5rem;">Plano Básico</h3>
+                        <div style="font-size: 3rem; color: #3498db; margin-bottom: 20px; font-weight: bold;">R$ 97</div>
+                        <p style="color: #666; margin-bottom: 30px;">Por mês</p>
+                        <ul style="list-style: none; padding: 0; margin-bottom: 30px;">
+                          <li style="padding: 8px 0; color: #2c3e50;">✅ Benefício 1</li>
+                          <li style="padding: 8px 0; color: #2c3e50;">✅ Benefício 2</li>
+                          <li style="padding: 8px 0; color: #2c3e50;">✅ Benefício 3</li>
+                        </ul>
+                        <button style="background: #3498db; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%;">Escolher Plano</button>
+                      </div>
+                      <div style="background: white; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; border: 3px solid #ff6b6b;">
+                        <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #ff6b6b; color: white; padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: bold;">MAIS POPULAR</div>
+                        <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 1.5rem;">Plano Pro</h3>
+                        <div style="font-size: 3rem; color: #ff6b6b; margin-bottom: 20px; font-weight: bold;">R$ 197</div>
+                        <p style="color: #666; margin-bottom: 30px;">Por mês</p>
+                        <ul style="list-style: none; padding: 0; margin-bottom: 30px;">
+                          <li style="padding: 8px 0; color: #2c3e50;">✅ Tudo do Básico</li>
+                          <li style="padding: 8px 0; color: #2c3e50;">✅ Benefício Premium 1</li>
+                          <li style="padding: 8px 0; color: #2c3e50;">✅ Benefício Premium 2</li>
+                          <li style="padding: 8px 0; color: #2c3e50;">✅ Suporte Priority</li>
+                        </ul>
+                        <button style="background: #ff6b6b; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%;">Escolher Plano</button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-dollar-sign' }
+            },
+            {
+              id: 'faq-section',
+              label: 'FAQ (Perguntas)',
+              category: 'Seções',
+              content: `
+                <section style="padding: 60px 20px; background: #fff;">
+                  <div style="max-width: 800px; margin: 0 auto;">
+                    <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 50px; color: #2c3e50;">Perguntas Frequentes</h2>
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                      <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                        <div style="background: #f8f9fa; padding: 20px; cursor: pointer; font-weight: bold; color: #2c3e50;">
+                          ❓ Como funciona o produto?
+                        </div>
+                        <div style="padding: 20px; background: white; color: #666; line-height: 1.6;">
+                          Explicação detalhada sobre como o produto funciona e quais são os principais benefícios para o usuário.
+                        </div>
+                      </div>
+                      <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                        <div style="background: #f8f9fa; padding: 20px; cursor: pointer; font-weight: bold; color: #2c3e50;">
+                          💰 Qual é o valor do investimento?
+                        </div>
+                        <div style="padding: 20px; background: white; color: #666; line-height: 1.6;">
+                          Informações claras sobre preços, formas de pagamento e possíveis descontos disponíveis.
+                        </div>
+                      </div>
+                      <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                        <div style="background: #f8f9fa; padding: 20px; cursor: pointer; font-weight: bold; color: #2c3e50;">
+                          🔒 Meus dados estão seguros?
+                        </div>
+                        <div style="padding: 20px; background: white; color: #666; line-height: 1.6;">
+                          Explicação sobre as medidas de segurança e proteção de dados que utilizamos.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-question-circle' }
+            },
+            {
+              id: 'footer-section',
+              label: 'Rodapé',
+              category: 'Seções',
+              content: `
+                <footer style="background: #2c3e50; color: white; padding: 40px 20px; text-align: center;">
+                  <div style="max-width: 1200px; margin: 0 auto;">
+                    <div style="margin-bottom: 30px;">
+                      <h3 style="margin-bottom: 20px;">Contato</h3>
+                      <p style="margin: 5px 0;">📧 contato@empresa.com</p>
+                      <p style="margin: 5px 0;">📞 (11) 99999-9999</p>
+                      <p style="margin: 5px 0;">📍 São Paulo, SP</p>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                      <a href="#" style="color: #3498db; margin: 0 10px; font-size: 24px;">📘</a>
+                      <a href="#" style="color: #3498db; margin: 0 10px; font-size: 24px;">📷</a>
+                      <a href="#" style="color: #3498db; margin: 0 10px; font-size: 24px;">🐦</a>
+                    </div>
+                    <hr style="border: 1px solid #34495e; margin: 20px 0;">
+                    <p style="margin: 0; opacity: 0.8;">© 2024 Sua Empresa. Todos os direitos reservados.</p>
+                  </div>
+                </footer>
+              `,
+              attributes: { class: 'fa fa-globe' }
+            },
+            {
+              id: 'cta-section',
+              label: 'Call-to-Action',
+              category: 'Seções',
+              content: `
+                <section style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); padding: 80px 20px; text-align: center; color: white;">
+                  <div style="max-width: 800px; margin: 0 auto;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 20px; font-weight: bold;">Não perca esta oportunidade!</h2>
+                    <p style="font-size: 1.3rem; margin-bottom: 40px; opacity: 0.9;">Junte-se a milhares de pessoas que já transformaram suas vidas com nosso produto</p>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                      <button style="background: white; color: #ff6b6b; padding: 20px 50px; border: none; border-radius: 50px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">GARANTIR MINHA VAGA AGORA</button>
+                      <p style="font-size: 14px; opacity: 0.8; margin: 0;">⏰ Oferta por tempo limitado • Últimas vagas disponíveis</p>
+                    </div>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-bullhorn' }
+            },
+            {
+              id: 'about-section',
+              label: 'Sobre/Quem Somos',
+              category: 'Seções',
+              content: `
+                <section style="padding: 80px 20px; background: #fff;">
+                  <div style="max-width: 1200px; margin: 0 auto;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+                      <div>
+                        <h2 style="font-size: 2.5rem; margin-bottom: 30px; color: #2c3e50;">Nossa História</h2>
+                        <p style="font-size: 1.1rem; line-height: 1.8; color: #666; margin-bottom: 25px;">
+                          Há mais de 10 anos no mercado, somos especialistas em transformar vidas através de soluções inovadoras e eficazes.
+                        </p>
+                        <p style="font-size: 1.1rem; line-height: 1.8; color: #666; margin-bottom: 25px;">
+                          Nossa missão é democratizar o acesso a ferramentas que realmente fazem a diferença na vida das pessoas.
+                        </p>
+                        <div style="display: flex; gap: 30px; margin-top: 40px;">
+                          <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: #3498db;">10+</div>
+                            <p style="color: #666; margin: 5px 0 0 0;">Anos de experiência</p>
+                          </div>
+                          <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: #27ae60;">50k+</div>
+                            <p style="color: #666; margin: 5px 0 0 0;">Clientes atendidos</p>
+                          </div>
+                          <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: #f39c12;">98%</div>
+                            <p style="color: #666; margin: 5px 0 0 0;">Satisfação</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div style="text-align: center;">
+                        <img src="https://via.placeholder.com/500x400/3498db/ffffff?text=Nossa+Equipe" alt="Nossa Equipe" style="width: 100%; max-width: 500px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-users' }
+            },
+            {
+              id: 'nome-indicador',
+              label: 'Nome do Indicador',
+              category: 'Seções',
+              content: '<span style="background: rgba(25, 118, 210, 0.1); padding: 2px 4px; border-radius: 3px; border-bottom: 1px dotted #1976d2; font-weight: inherit; color: inherit;">{{NOME_INDICADOR}}</span>',
+              attributes: { class: 'fa fa-user' }
+            },
+            // Elementos básicos
+            {
+              id: 'text',
+              label: 'Texto',
+              category: 'Básico',
+              content: '<p>Insira seu texto aqui</p>',
+              attributes: { class: 'fa fa-font' }
+            },
+            {
+              id: 'image',
+              label: 'Imagem',
+              category: 'Básico',
+              content: '<img src="https://via.placeholder.com/400x300" alt="Imagem" style="max-width: 100%; height: auto;">',
+              attributes: { class: 'fa fa-image' }
+            },
+            {
+              id: 'button',
+              label: 'Botão',
+              category: 'Básico',
+              content: '<button style="background: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Clique aqui</button>',
+              attributes: { class: 'fa fa-hand-pointer' }
+            },
+            {
+              id: 'video',
+              label: 'Vídeo',
+              category: 'Mídia',
+              content: '<video controls style="width: 100%; max-width: 100%;"><source src="" type="video/mp4">Seu navegador não suporta vídeo.</video>',
+              attributes: { class: 'fa fa-video' }
+            },
+            {
+              id: 'spacer',
+              label: 'Espaçador',
+              category: 'Layout',
+              content: '<div class="spacer-block" style="height: 50px; background: linear-gradient(90deg, transparent 0%, rgba(52,152,219,0.1) 50%, transparent 100%); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #3498db; border: 1px dashed rgba(52,152,219,0.3);">↕️ Espaçador (50px)</div>',
+              attributes: { class: 'fa fa-arrows-alt-v' }
+            },
+            {
+              id: 'divider',
+              label: 'Divisor',
+              category: 'Layout',
+              content: '<hr style="border: none; height: 2px; background: linear-gradient(90deg, transparent, #3498db, transparent); margin: 20px 0;">',
+              attributes: { class: 'fa fa-minus' }
+            },
+            {
+              id: 'two-column-section',
+              label: 'Seção 2 Colunas',
+              category: 'Layout',
+              content: `
+                <section style="padding: 60px 20px; background: #f8f9fa;">
+                  <div style="max-width: 1200px; margin: 0 auto;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;">
+                      <!-- Coluna de Texto -->
+                      <div style="padding: 20px;">
+                        <h2 style="font-size: 2.2rem; margin-bottom: 20px; color: #2c3e50; line-height: 1.3;">
+                          Título da Seção
+                        </h2>
+                        <p style="font-size: 1.1rem; line-height: 1.7; color: #666; margin-bottom: 20px;">
+                          Descreva aqui os benefícios do seu produto ou serviço. Explique como você pode ajudar seus clientes a resolver problemas específicos.
+                        </p>
+                        <ul style="list-style: none; padding: 0; margin-bottom: 25px;">
+                          <li style="padding: 8px 0; color: #2c3e50; display: flex; align-items: center;">
+                            <span style="color: #27ae60; margin-right: 10px; font-size: 18px;">✓</span>
+                            Benefício importante número 1
+                          </li>
+                          <li style="padding: 8px 0; color: #2c3e50; display: flex; align-items: center;">
+                            <span style="color: #27ae60; margin-right: 10px; font-size: 18px;">✓</span>
+                            Benefício importante número 2
+                          </li>
+                          <li style="padding: 8px 0; color: #2c3e50; display: flex; align-items: center;">
+                            <span style="color: #27ae60; margin-right: 10px; font-size: 18px;">✓</span>
+                            Benefício importante número 3
+                          </li>
+                        </ul>
+                        <p style="font-size: 1rem; color: #666; font-style: italic;">
+                          "Depoimento curto de um cliente satisfeito para aumentar a credibilidade da sua oferta."
+                        </p>
+                      </div>
+                      
+                      <!-- Coluna do Formulário -->
+                      <div style="background: white; padding: 35px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid #e0e0e0;">
+                        <h3 style="text-align: center; color: #2c3e50; margin-bottom: 25px; font-size: 1.4rem;">
+                          📧 Receba informações gratuitas
+                        </h3>
+                        <form style="display: flex; flex-direction: column; gap: 15px;">
+                          <input 
+                            type="text" 
+                            placeholder="Seu nome completo" 
+                            style="padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: all 0.3s ease;"
+                            onfocus="this.style.borderColor='#3498db'"
+                            onblur="this.style.borderColor='#e0e0e0'"
+                          >
+                          <input 
+                            type="email" 
+                            placeholder="Seu melhor e-mail" 
+                            style="padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: all 0.3s ease;"
+                            onfocus="this.style.borderColor='#3498db'"
+                            onblur="this.style.borderColor='#e0e0e0'"
+                          >
+                          <input 
+                            type="tel" 
+                            placeholder="Seu WhatsApp" 
+                            style="padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: all 0.3s ease;"
+                            onfocus="this.style.borderColor='#3498db'"
+                            onblur="this.style.borderColor='#e0e0e0'"
+                          >
+                          <button 
+                            type="submit" 
+                            style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 18px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(52,152,219,0.3);"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(52,152,219,0.4)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(52,152,219,0.3)'"
+                          >
+                            🚀 QUERO RECEBER AS INFORMAÇÕES
+                          </button>
+                        </form>
+                        <p style="text-align: center; font-size: 11px; color: #999; margin-top: 15px; line-height: 1.4;">
+                          🔒 Seus dados estão 100% seguros conosco<br>
+                          Não enviamos spam • Política de privacidade
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <!-- Versão Mobile (responsiva) -->
+                    <style>
+                      @media (max-width: 768px) {
+                        div[style*="grid-template-columns: 1fr 1fr"] {
+                          grid-template-columns: 1fr !important;
+                          gap: 30px !important;
+                        }
+                      }
+                    </style>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-columns' }
+            },
+            {
+              id: 'hero-with-signup',
+              label: 'Hero c/ Cadastro',
+              category: 'Seções',
+              content: `
+                <section style="background: none; padding: 80px 20px; min-height: 90vh; display: flex; align-items: center; position: relative; overflow: hidden;">
+                  <div style="max-width: 1400px; margin: 0 auto; width: 100%; position: relative; z-index: 2;">
+                    <div class="hero-signup-grid" style="display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 80px; align-items: center;">
+                      <!-- Coluna Esquerda - Conteúdo Principal -->
+                      <div style="color: #2c3e50;">
+                        <!-- Logo -->
+                        <div style="margin-bottom: 40px;">
+                          <img src="https://via.placeholder.com/200x60/f39c12/ffffff?text=SUA+MARCA" alt="Logo" style="height: 60px; width: auto;">
+                          <p style="color: #bdc3c7; font-size: 14px; margin: 8px 0 0 0; font-weight: 300;">
+                            PROGRAMA DE INDICAÇÃO
+                          </p>
+                        </div>
+                        <!-- Texto de Convite Personalizado -->
+                        <div style="margin-bottom: 40px;">
+                          <h1 style="font-size: 2.8rem; font-weight: 400; line-height: 1.2; margin-bottom: 25px; color: #2c3e50;">
+                            <span style="font-weight: 300;">João</span> te convidou para<br>
+                            <strong style="font-weight: 700;">testar a Plataforma grátis por 7 dias</strong><br>
+                            <span style="font-weight: 300;">e ainda te presenteou com</span>
+                          </h1>
+                          <!-- Destaque da Oferta -->
+                          <div style="background: #f39c12; color: #2c3e50; padding: 12px 25px; display: inline-block; font-size: 1.8rem; font-weight: bold; margin-bottom: 25px; transform: rotate(-2deg); box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                            15% de desconto(*) na<br>
+                            <span style="font-size: 2rem;">contratação!</span>
+                          </div>
+                        </div>
+                        <!-- Termos da Oferta -->
+                        <div style="margin-bottom: 30px;">
+                          <p style="font-size: 14px; color: #bdc3c7; line-height: 1.6; margin-bottom: 15px;">
+                            (*) Desconto válido por 12 meses caso decida contratar a<br>
+                            plataforma após o período de testes. Informe os dados no<br>
+                            formulário para iniciar seus testes e garantir os benefícios.
+                          </p>
+                          <p style="font-size: 16px; color: #f39c12; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                            OFERTA POR TEMPO LIMITADO
+                          </p>
+                        </div>
+                        <!-- Hashtag -->
+                        <div style="font-size: 1.2rem; color: #f39c12; font-weight: 600; letter-spacing: 1px;">
+                          #ProgramaDeIndicacao
+                        </div>
+                      </div>
+                      <!-- Coluna Direita - Formulário de Cadastro -->
+                      <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.08);">
+                        <!-- Cabeçalho do Formulário -->
+                        <div style="text-align: center; margin-bottom: 30px;">
+                          <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 10px; font-weight: 600;">
+                            Crie seu ambiente de testes<br>
+                            agora e garanta os benefícios!
+                          </h3>
+                          <p style="color: #6c757d; font-size: 13px; margin: 15px 0; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                            <span style="font-size: 16px;">🔒</span> Este é um ambiente seguro
+                          </p>
+                        </div>
+                        <!-- Formulário -->
+                        <form class="lp-referral-form" onsubmit="return window.submitReferralForm(event, this)">
+                          <div style="margin-bottom: 18px;">
+                            <label style="display: block; color: #495057; font-size: 14px; font-weight: 500; margin-bottom: 5px;">Nome</label>
+                            <input type="text" name="name" required placeholder="Seu nome completo" style="width: 100%; padding: 15px; border: none; border-bottom: 2px solid #e9ecef; background: transparent; font-size: 16px; transition: all 0.3s ease; outline: none; color: #495057;" onfocus="this.style.borderBottomColor='#f39c12'" onblur="this.style.borderBottomColor='#e9ecef'">
+                          </div>
+                          <div style="margin-bottom: 18px;">
+                            <label style="display: block; color: #495057; font-size: 14px; font-weight: 500; margin-bottom: 5px;">Celular</label>
+                            <input type="tel" name="phone" required placeholder="(00) 00000-0000" style="width: 100%; padding: 15px; border: none; border-bottom: 2px solid #e9ecef; background: transparent; font-size: 16px; transition: all 0.3s ease; outline: none; color: #495057;" onfocus="this.style.borderBottomColor='#f39c12'" onblur="this.style.borderBottomColor='#e9ecef'">
+                          </div>
+                          <div style="margin-bottom: 18px;">
+                            <label style="display: block; color: #495057; font-size: 14px; font-weight: 500; margin-bottom: 5px;">Email</label>
+                            <input type="email" name="email" required placeholder="Informe o e-mail" style="width: 100%; padding: 15px; border: none; border-bottom: 2px solid #e9ecef; background: transparent; font-size: 16px; transition: all 0.3s ease; outline: none; color: #495057;" onfocus="this.style.borderBottomColor='#f39c12'" onblur="this.style.borderBottomColor='#e9ecef'">
+                          </div>
+                          <button type="submit" style="background: #27ae60; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <span style="font-size: 18px;">📧</span> Enviar
+                          </button>
+                          <div class="lp-referral-feedback" style="margin-top:8px;font-size:0.95em;"></div>
+                        </form>
+                      </div>
+                    </div>
+                    <!-- CSS Responsivo -->
+                    <style>
+                      @media (max-width: 1024px) {
+                        .hero-signup-grid {
+                          grid-template-columns: 1fr !important;
+                          gap: 40px !important;
+                          text-align: center;
+                        }
+                        .hero-signup-grid > div {
+                          margin: 0 auto !important;
+                          max-width: 500px;
+                        }
+                        h1 {
+                          font-size: 2.2rem !important;
+                        }
+                        div[style*="transform: rotate(-2deg)"] {
+                          transform: none !important;
+                          margin: 20px auto !important;
+                        }
+                      }
+                      @media (max-width: 768px) {
+                        section {
+                          padding: 40px 15px !important;
+                          min-height: auto !important;
+                        }
+                        h1 {
+                          font-size: 1.8rem !important;
+                        }
+                        .hero-signup-grid > div {
+                          max-width: 100% !important;
+                          padding-left: 0 !important;
+                          padding-right: 0 !important;
+                        }
+                        div[style*="padding: 40px"] {
+                          padding: 25px !important;
+                        }
+                        div[style*="font-size: 1.8rem"] {
+                          font-size: 1.4rem !important;
+                        }
+                        div[style*="font-size: 2rem"] {
+                          font-size: 1.6rem !important;
+                        }
+                      }
+                    </style>
+                  </div>
+                </section>
+              `,
+              attributes: { class: 'fa fa-rocket' }
+            }
+          ]
+        },
+        styleManager: {
+          appendTo: '#tab-styles',
+          sectors: [
+            {
+              name: 'Dimensão',
+              open: false,
+              buildProps: ['width', 'min-height', 'padding', 'margin']
+            },
+            {
+              name: 'Tipografia',
+              open: false,
+              buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align', 'text-decoration', 'text-shadow']
+            },
+            {
+              name: 'Decoração',
+              open: false,
+              buildProps: ['background-color', 'background-image', 'border-radius', 'border', 'box-shadow', 'background']
+            },
+            {
+              name: 'Extra',
+              open: false,
+              buildProps: ['opacity', 'transition', 'perspective', 'transform']
+            },
+            {
+              name: 'Flex',
+              open: false,
+              buildProps: ['display', 'flex-direction', 'justify-content', 'align-items', 'flex-wrap', 'align-content']
+            }
+          ]
+        },
+        traitManager: {
+          appendTo: '#tab-traits'
+        },
+        canvas: {
+          styles: [
+            'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+          ],
+          scripts: []
+        },
+        panels: {
+          defaults: []
+        }
+      });
+      
+      console.log('[GrapesJS Debug] Editor inicializado com sucesso');
+      
+      // Carregar conteúdo salvo anteriormente (se existir)
+      const savedHtml = localStorage.getItem('grapesLPDivulgacaoHtml');
+      const savedCss = localStorage.getItem('grapesLPDivulgacaoCss');
+      
+      if (savedHtml && savedCss) {
+        console.log('[GrapesJS Debug] Carregando conteúdo salvo anteriormente');
+        editor.setComponents(savedHtml);
+        editor.setStyle(savedCss);
+      } else {
+        console.log('[GrapesJS Debug] Nenhum conteúdo salvo encontrado - iniciando com canvas limpo');
+      }
+      
+      // Atualizar indicadores visuais das abas quando um elemento for selecionado
+      editor.on('component:selected', (component) => {
+        console.log('[GrapesJS Debug] Elemento selecionado:', component.get('tagName'));
+        
+        // Atualizar indicadores das abas
+        document.getElementById('tab-styles').classList.remove('empty');
+        document.getElementById('tab-traits').classList.remove('empty');
+        document.querySelector('[data-tab="styles"]').classList.add('has-content');
+        document.querySelector('[data-tab="traits"]').classList.add('has-content');
+        
+        // Adicionar dicas contextuais
+        setTimeout(() => {
+          const styleContainer = document.getElementById('tab-styles');
+          const existingTip = styleContainer.querySelector('.element-tip');
+          if (existingTip) {
+            existingTip.remove();
+          }
+          
+          const tip = document.createElement('div');
+          tip.className = 'element-tip';
+          
+          const tagName = component.get('tagName').toLowerCase();
+          
+          switch (tagName) {
+            case 'h1':
+            case 'h2':
+            case 'h3':
+            case 'h4':
+            case 'h5':
+            case 'h6':
+              tip.innerHTML = `💡 <strong>Título selecionado:</strong> Ajuste font-size, font-weight e color na seção Tipografia`;
+              break;
+            case 'p':
+            case 'span':
+              tip.innerHTML = `💡 <strong>Texto selecionado:</strong> Personalize cores, tamanhos e espaçamento na seção Tipografia`;
+              break;
+            case 'div':
+            case 'section':
+              tip.innerHTML = `💡 <strong>Container selecionado:</strong> Configure layout, padding/margin e background`;
+              break;
+            case 'button':
+              tip.innerHTML = `💡 <strong>Botão selecionado:</strong> Personalize cores, bordas e efeitos hover`;
+              break;
+            case 'img':
+              tip.innerHTML = `💡 <strong>Imagem selecionada:</strong> Ajuste dimensões, bordas e posicionamento`;
+              break;
+            default:
+              tip.innerHTML = `💡 <strong>Elemento ${tagName} selecionado:</strong> Use os painéis abaixo para personalizar`;
+          }
+          
+          styleContainer.insertBefore(tip, styleContainer.firstChild.nextSibling);
+          
+          // Adicionar botões de ação rápida para elementos específicos
+          const quickActions = document.createElement('div');
+          quickActions.className = 'quick-actions';
+          quickActions.style.cssText = `
+            background: #f8f9fa; 
+            border: 1px solid #dee2e6; 
+            border-radius: 4px; 
+            padding: 8px; 
+            margin: 10px 0; 
+            display: flex; 
+            gap: 5px; 
+            flex-wrap: wrap;
+          `;
+          
+          // Botões específicos por tipo de elemento
+          if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span'].includes(tagName)) {
+            // Botões para elementos de texto
+            quickActions.innerHTML = `
+              <button onclick="editor.getSelected().addStyle({'font-weight': 'bold'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer;">Bold</button>
+              <button onclick="editor.getSelected().addStyle({'font-style': 'italic'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer;">Italic</button>
+              <button onclick="editor.getSelected().addStyle({'text-align': 'center'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer;">Center</button>
+              <button onclick="editor.getSelected().addStyle({'color': '#3498db'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer; color: #3498db;">Azul</button>
+              <button onclick="editor.getSelected().addStyle({'color': '#e74c3c'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer; color: #e74c3c;">Vermelho</button>
+            `;
+          } else if (['div', 'section'].includes(tagName)) {
+            // Botões para containers
+            quickActions.innerHTML = `
+              <button onclick="editor.getSelected().addStyle({'padding': '20px'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer;">Padding 20px</button>
+              <button onclick="editor.getSelected().addStyle({'margin': '20px auto'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer;">Centralizar</button>
+              <button onclick="editor.getSelected().addStyle({'background-color': '#f8f9fa'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #f8f9fa; border-radius: 3px; cursor: pointer;">Fundo Cinza</button>
+              <button onclick="editor.getSelected().addStyle({'background-color': '#e3f2fd'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #e3f2fd; border-radius: 3px; cursor: pointer;">Fundo Azul</button>
+              <button onclick="editor.getSelected().addStyle({'border-radius': '8px'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer;">Cantos Arredondados</button>
+            `;
+          } else if (tagName === 'button') {
+            // Botões para botões
+            quickActions.innerHTML = `
+              <button onclick="editor.getSelected().addStyle({'background-color': '#3498db', 'color': 'white'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #3498db; color: white; border-radius: 3px; cursor: pointer;">Azul</button>
+              <button onclick="editor.getSelected().addStyle({'background-color': '#27ae60', 'color': 'white'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #27ae60; color: white; border-radius: 3px; cursor: pointer;">Verde</button>
+              <button onclick="editor.getSelected().addStyle({'background-color': '#e74c3c', 'color': 'white'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #e74c3c; color: white; border-radius: 3px; cursor: pointer;">Vermelho</button>
+              <button onclick="editor.getSelected().addStyle({'border-radius': '25px'})" style="padding: 4px 8px; font-size: 11px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer;">Arredondado</button>
+            `;
+          }
+          
+          if (quickActions.innerHTML.trim()) {
+            const quickTitle = document.createElement('div');
+            quickTitle.style.cssText = 'font-size: 11px; font-weight: 600; color: #495057; margin-bottom: 5px;';
+            quickTitle.textContent = '⚡ Ações Rápidas:';
+            quickActions.insertBefore(quickTitle, quickActions.firstChild);
+            styleContainer.insertBefore(quickActions, tip.nextSibling);
+          }
+        }, 100);
+      });
+      
+      // Feedback quando nenhum elemento estiver selecionado
+      editor.on('component:deselected', () => {
+        console.log('[GrapesJS Debug] Nenhum elemento selecionado');
+        
+        // Adicionar classe empty e remover indicadores
+        document.getElementById('tab-styles').classList.add('empty');
+        document.getElementById('tab-traits').classList.add('empty');
+        document.querySelector('[data-tab="styles"]').classList.remove('has-content');
+        document.querySelector('[data-tab="traits"]').classList.remove('has-content');
+        
+        // Voltar para aba de blocos
+        document.querySelector('[data-tab="blocks"]').click();
+      });
+      
+      // Inicializar estado vazio
+      document.getElementById('tab-styles').classList.add('empty');
+      document.getElementById('tab-traits').classList.add('empty');
+      
+      // Função para alternar visibilidade do painel lateral
+      window.toggleSidebar = function() {
+        const panel = document.querySelector('.panel__right');
+        const btn = document.querySelector('.panel__toggle-btn');
+        const icon = btn.querySelector('i');
+        
+        panel.classList.toggle('collapsed');
+        
+        if (panel.classList.contains('collapsed')) {
+          icon.className = 'fas fa-chevron-right';
+          btn.title = 'Mostrar painel de componentes';
+        } else {
+          icon.className = 'fas fa-bars';
+          btn.title = 'Esconder painel de componentes';
+        }
+        
+        console.log('[GrapesJS Debug] Painel lateral toggled');
+      };
+      
+      // Controle dos botões de dispositivo no header
+      function initDeviceControls() {
+        const deviceButtons = document.querySelectorAll('.btn-device');
+        
+        deviceButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const device = btn.dataset.device;
+            
+            // Remove active de todos os botões
+            deviceButtons.forEach(b => b.classList.remove('active'));
+            // Adiciona active no botão clicado
+            btn.classList.add('active');
+            
+            // Atualiza o device no GrapesJS
+            if (device === 'desktop') {
+              editor.setDevice('Desktop');
+            } else if (device === 'mobile') {
+              editor.setDevice('Mobile');
+            }
+            
+            console.log(`[GrapesJS Debug] Dispositivo alterado para: ${device}`);
+          });
+        });
+      }
+      
+      // Inicializar controles de dispositivo
+      initDeviceControls();
+      
+      // Funcionalidade especial para o bloco espaçador
+      editor.on('component:add', (component) => {
+        if (component.get('classes').includes('spacer-block')) {
+          console.log('[GrapesJS Debug] Espaçador adicionado - configurando funcionalidade especial');
+          
+          // Adicionar funcionalidade de redimensionamento rápido
+          component.set('script', function() {
+            const element = this;
+            const heights = [20, 30, 50, 80, 100, 150];
+            let currentIndex = 2; // 50px é o padrão
+            
+            element.addEventListener('dblclick', function() {
+              currentIndex = (currentIndex + 1) % heights.length;
+              const newHeight = heights[currentIndex];
+              this.style.height = newHeight + 'px';
+              this.innerHTML = `↕️ Espaçador (${newHeight}px)`;
+            });
+          });
+          
+          // Adicionar traits personalizados para o espaçador
+          component.set('traits', [
+            {
+              type: 'number',
+              name: 'height',
+              label: 'Altura (px)',
+              value: 50,
+              min: 10,
+              max: 500,
+              changeProp: true
+            }
+          ]);
+        }
+      });
+      
+      // Melhorar feedback visual para edição de espaçador
+      editor.on('component:selected', (component) => {
+        if (component.get('classes').includes('spacer-block')) {
+          // Adicionar dica especial para espaçador
+          setTimeout(() => {
+            const tip = document.querySelector('.element-tip');
+            if (tip) {
+              tip.innerHTML = `💡 <strong>Espaçador selecionado:</strong> Duplo-clique para alterar tamanho rapidamente ou use o painel Propriedades`;
+              tip.style.background = '#e8f5e8';
+              tip.style.borderColor = '#4caf50';
+            }
+          }, 100);
+        }
+      });
+      
+    } catch (error) {
+      console.error('[GrapesJS Debug] ERRO na inicialização:', error);
+    }
+  </script>
+  <script>
+    // Função utilitária para obter parâmetros da URL
+    function getUrlParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      const lpId = getUrlParam('id');
+      if (lpId) {
+        try {
+          const res = await fetch(`http://localhost:3000/api/lp-divulgacao/${lpId}`);
+          const data = await res.json();
+          if (data.success && data.data && data.data.name) {
+            document.getElementById('lpNameInput').value = data.data.name;
+          }
+        } catch (err) {
+          console.warn('Erro ao buscar dados da LP para edição:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html> 

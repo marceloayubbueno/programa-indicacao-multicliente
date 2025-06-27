@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# REGRAS DE BACKEND (NESTJS)
+
+- **Escopo:** Estas regras se aplicam a todas as alterações dentro do diretório `@server/`.
+- **Arquitetura:** Siga a arquitetura padrão do NestJS. A lógica de negócios deve residir nos **Services**. Os **Controllers** devem ser leves e apenas orquestrar o fluxo de requisição/resposta. A lógica deve ser encapsulada em **Modules**.
+- **Validação de Dados:** Use DTOs (Data Transfer Objects) com `class-validator` para validar todos os dados de entrada nas rotas do Controller.
+- **Schemas e Entidades:** As definições de schema do Mongoose/TypeORM devem residir em seus próprios arquivos (ex: `entities/*.schema.ts`).
+- **Segurança:** Rotas que manipulam dados sensíveis ou exigem autenticação devem ser protegidas usando Guards (ex: `@UseGuards(JwtAuthGuard)`).
+

@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# REGRAS DE FRONTEND
+
+- **Escopo Duplo:** O frontend deste projeto é dividido em duas áreas principais:
+  1.  `@admin/`: A interface administrativa.
+  2.  `@client/`: A interface do cliente/usuário.
+  **Ao trabalhar em uma tarefa, identifique em qual dessas áreas você está e restrinja suas modificações a ela.**
+
+- **Estrutura de Pastas:** Ambas as áreas (`@admin` e `@client`) seguem a mesma estrutura interna. Respeite esta organização:
+  - **HTML:** A estrutura das páginas deve residir em `pages/`. (Ex: `@client/pages/login.html`)
+  - **JavaScript:** A lógica e a interatividade devem estar nos arquivos `.js` dentro de `js/`. (Ex: `@admin/js/dashboard.js`)
+  - **CSS:** Os estilos específicos devem estar nos arquivos `.css` dentro de `css/`. (Ex: `@client/css/indication.css`)
+
+- **Estilização:** Para a área `@client`, use TailwindCSS sempre que possível, aproveitando o `@client/css/tailwind.output.css`. Evite CSS inline em ambas as áreas.
+
+- **Manipulação do DOM:** Evite manipulação direta do DOM (`document.getElementById`, etc.) quando um padrão de framework ou biblioteca puder ser usado. Prefira padrões de data-binding.
+
+- **Comunicação com API:** As chamadas para o backend devem ser centralizadas em funções de serviço/API dedicadas nos arquivos JS, em vez de espalhadas pelos manipuladores de eventos nos arquivos HTML.
+
+
+

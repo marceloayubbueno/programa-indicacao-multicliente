@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamentos e Recompensas - Área do Cliente</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+        <div class="flex items-center mb-8">
+          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+        </div>
+        <ul class="space-y-2 flex-1">
+          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+          <li><a href="engagements.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-bar mr-2"></i> Engajamentos</a></li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de Leads</a></li>
+          <li><a href="payments.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-green-400 font-semibold"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+          <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+          <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+        </ul>
+      </nav>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+        <header class="px-8 py-6 bg-gray-900 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm">
+          <div>
+            <h1 class="text-3xl font-bold text-green-400">Pagamentos e Recompensas</h1>
+            <p class="text-gray-400 mt-1">Gerencie pagamentos de recompensas aos seus indicadores</p>
+          </div>
+          <div class="flex flex-col md:flex-row gap-2 md:gap-4 items-start md:items-center">
+            <button class="px-5 py-2 rounded-lg bg-green-600 text-white font-semibold shadow hover:bg-green-700 transition-colors" onclick="processPaymentsBatch()">
+              <i class="fas fa-credit-card mr-2"></i>Processar Lote
+            </button>
+            <button class="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors" onclick="exportPayments()">
+              <i class="fas fa-download mr-2"></i>Exportar
+            </button>
+          </div>
+        </header>
+
+        <!-- Abas de Navegação -->
+        <div class="px-8 pt-4">
+          <div class="flex space-x-1 bg-gray-800 rounded-lg p-1">
+            <button id="tab-pending" class="flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors bg-green-600 text-white" onclick="switchTab('pending')">
+              <i class="fas fa-clock mr-2"></i>Pendentes de Aprovação
+            </button>
+            <button id="tab-approved" class="flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors text-gray-400 hover:text-gray-200" onclick="switchTab('approved')">
+              <i class="fas fa-check mr-2"></i>Aprovadas para Pagamento
+            </button>
+            <button id="tab-history" class="flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors text-gray-400 hover:text-gray-200" onclick="switchTab('history')">
+              <i class="fas fa-history mr-2"></i>Histórico de Pagamentos
+            </button>
+          </div>
+        </div>
+
+        <main class="flex-1 p-8">
+          <!-- Cards de estatísticas financeiras -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
+              <h3 class="text-lg font-semibold text-gray-300 mb-2">Total a Pagar</h3>
+              <p id="totalToPay" class="text-3xl font-bold text-red-400">R$ 0,00</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
+              <h3 class="text-lg font-semibold text-gray-300 mb-2">Pendentes</h3>
+              <p id="pendingRewards" class="text-3xl font-bold text-yellow-400">0</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
+              <h3 class="text-lg font-semibold text-gray-300 mb-2">Pago no Mês</h3>
+              <p id="monthlyPaid" class="text-3xl font-bold text-green-400">R$ 0,00</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
+              <h3 class="text-lg font-semibold text-gray-300 mb-2">Indicadores Ativos</h3>
+              <p id="activeIndicators" class="text-3xl font-bold text-blue-400">0</p>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div id="filtersSection" class="flex flex-col md:flex-row gap-4 mb-6">
+            <div class="flex flex-col">
+              <label for="indicatorFilter" class="text-gray-400 mb-1">Indicador:</label>
+              <select id="indicatorFilter" onchange="filterRewards()" class="rounded-lg border border-gray-700 bg-gray-800 text-gray-100 px-3 py-2">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="campaignFilter" class="text-gray-400 mb-1">Campanha:</label>
+              <select id="campaignFilter" onchange="filterRewards()" class="rounded-lg border border-gray-700 bg-gray-800 text-gray-100 px-3 py-2">
+                <option value="">Todas</option>
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="rewardTypeFilter" class="text-gray-400 mb-1">Tipo:</label>
+              <select id="rewardTypeFilter" onchange="filterRewards()" class="rounded-lg border border-gray-700 bg-gray-800 text-gray-100 px-3 py-2">
+                <option value="">Todos</option>
+                <option value="fixed">Valor Fixo</option>
+                <option value="percentage">Percentual</option>
+                <option value="monthly">Fixo Mensal</option>
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="dateFromFilter" class="text-gray-400 mb-1">De:</label>
+              <input type="date" id="dateFromFilter" onchange="filterRewards()" class="rounded-lg border border-gray-700 bg-gray-800 text-gray-100 px-3 py-2">
+            </div>
+            <div class="flex flex-col">
+              <label for="dateToFilter" class="text-gray-400 mb-1">Até:</label>
+              <input type="date" id="dateToFilter" onchange="filterRewards()" class="rounded-lg border border-gray-700 bg-gray-800 text-gray-100 px-3 py-2">
+            </div>
+          </div>
+
+          <!-- Conteúdo das Abas -->
+          <div id="tabContent">
+            <!-- Conteúdo será carregado dinamicamente -->
+          </div>
+
+          <!-- Paginação -->
+          <div class="flex items-center justify-center gap-4 mt-8">
+            <button id="prevPagePayments" class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors disabled:opacity-50" onclick="changePagePayments('prev')">
+              <i class="fas fa-chevron-left mr-2"></i>Anterior
+            </button>
+            <span id="pageInfoPayments" class="text-gray-400">Página 1 de 1</span>
+            <button id="nextPagePayments" class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors disabled:opacity-50" onclick="changePagePayments('next')">
+              Próxima<i class="fas fa-chevron-right ml-2"></i>
+            </button>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Modal de Aprovação de Recompensa -->
+    <div id="approvalModal" class="fixed inset-0 z-50 flex items-center justify-center min-h-screen bg-black bg-opacity-40 hidden">
+      <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-lg relative flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-100">Aprovar Recompensa</h2>
+          <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closeApprovalModal()">&times;</button>
+        </div>
+        <div class="mb-4 p-4 bg-gray-700 rounded-lg">
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div><span class="text-gray-400">Indicador:</span> <span id="approvalIndicator" class="text-green-400"></span></div>
+            <div><span class="text-gray-400">Lead:</span> <span id="approvalLead" class="text-blue-400"></span></div>
+            <div><span class="text-gray-400">Campanha:</span> <span id="approvalCampaign" class="text-purple-400"></span></div>
+            <div><span class="text-gray-400">Valor:</span> <span id="approvalValue" class="text-yellow-400"></span></div>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="approvalNotes" class="block text-gray-400 mb-2">Observações da Aprovação:</label>
+          <textarea id="approvalNotes" rows="3" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2" placeholder="Motivo da aprovação, instruções especiais..."></textarea>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors" onclick="rejectReward()">
+            <i class="fas fa-times mr-2"></i>Rejeitar
+          </button>
+          <button class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors" onclick="closeApprovalModal()">Cancelar</button>
+          <button class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors" onclick="confirmApproval()">
+            <i class="fas fa-check mr-2"></i>Aprovar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Processamento de Pagamento -->
+    <div id="paymentModal" class="fixed inset-0 z-50 flex items-center justify-center min-h-screen bg-black bg-opacity-40 hidden">
+      <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-lg relative flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-100">Processar Pagamento</h2>
+          <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closePaymentModal()">&times;</button>
+        </div>
+        <div class="mb-4 p-4 bg-gray-700 rounded-lg">
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div><span class="text-gray-400">Indicador:</span> <span id="paymentIndicator" class="text-green-400"></span></div>
+            <div><span class="text-gray-400">Valor:</span> <span id="paymentValue" class="text-yellow-400"></span></div>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="paymentMethod" class="block text-gray-400 mb-2">Método de Pagamento:</label>
+          <select id="paymentMethod" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            <option value="pix">PIX</option>
+            <option value="discount">Desconto</option>
+            <option value="voucher">Vale/Cupom</option>
+            <option value="discount_link">Link de Desconto</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label for="paymentReference" class="block text-gray-400 mb-2">Referência/ID da Transação:</label>
+          <input type="text" id="paymentReference" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2" placeholder="Ex: PIX ID, código do cupom...">
+        </div>
+        <div class="mb-4">
+          <label for="paymentNotes" class="block text-gray-400 mb-2">Observações:</label>
+          <textarea id="paymentNotes" rows="3" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2" placeholder="Detalhes do pagamento..."></textarea>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors" onclick="closePaymentModal()">Cancelar</button>
+          <button class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors" onclick="confirmPayment()">
+            <i class="fas fa-credit-card mr-2"></i>Processar Pagamento
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Detalhes da Recompensa -->
+    <div id="rewardDetailsModal" class="fixed inset-0 z-50 flex items-center justify-center min-h-screen bg-black bg-opacity-40 hidden">
+      <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-2xl relative flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-100">Detalhes da Recompensa</h2>
+          <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closeRewardDetailsModal()">&times;</button>
+        </div>
+        <div id="rewardDetailsContent" class="mb-4">
+          <!-- Conteúdo será preenchido via JS -->
+        </div>
+        <div class="flex justify-end">
+          <button class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors" onclick="closeRewardDetailsModal()">Fechar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/payments.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>checkAuth();</script>
+</body>
+</html>

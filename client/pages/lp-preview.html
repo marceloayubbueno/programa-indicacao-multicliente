@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Preview da LP de Indicadores</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>body { margin: 0; background: #f5f6fa; }</style>
+</head>
+<body>
+  <div id="lp-container" style="min-height:100vh"></div>
+  <script>
+    async function loadLP() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (!id) {
+        document.getElementById('lp-container').innerHTML = '<p>ID da LP não informado.</p>';
+        return;
+      }
+      try {
+        // 🔒 CORREÇÃO JWT: Incluir token de autenticação
+        const token = localStorage.getItem('clientToken') || localStorage.getItem('token');
+        const headers = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const res = await fetch(`http://localhost:3000/api/lp-indicadores/${id}`, {
+          headers: headers
+        });
+        const data = await res.json();
+        if (!data.success || !data.data) throw new Error('LP não encontrada');
+        // Salva contexto no localStorage para o formulário Hero funcionar
+        localStorage.setItem('currentLpId', id);
+        localStorage.setItem('currentLpName', data.data.name || '');
+        localStorage.setItem('currentClientId', data.data.clientId);
+        // Renderiza HTML salvo
+        document.getElementById('lp-container').innerHTML = data.data.compiledOutput.html || '<p>LP sem conteúdo.</p>';
+        // Injeta CSS salvo, se houver
+        if (data.data.compiledOutput.css) {
+          const style = document.createElement('style');
+          style.innerHTML = data.data.compiledOutput.css;
+          document.head.appendChild(style);
+        }
+        // Só chama o bind depois do JS público estar carregado!
+        setTimeout(() => {
+          if (window.bindIndicadorForms) window.bindIndicadorForms();
+        }, 100);
+      } catch (err) {
+        document.getElementById('lp-container').innerHTML = '<p>Erro ao carregar LP: ' + err.message + '</p>';
+      }
+    }
+    loadLP();
+  </script>
+  <!-- IMPORTANTE: O JS público deve ser importado DEPOIS do script acima -->
+  <script src="../js/lp-indicador-form-public.js"></script>
+</body>
+</html> 

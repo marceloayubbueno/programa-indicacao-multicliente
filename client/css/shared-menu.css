@@ -1,0 +1,115 @@
+/* Variáveis Globais */
+:root {
+    --primary-color: #3498db;
+    --primary-hover: #2980b9;
+    --secondary-color: #6c757d;
+    --secondary-hover: #5a6268;
+    --success-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --warning-color: #f1c40f;
+    --light-gray: #f8f9fa;
+    --border-color: #ddd;
+    --text-color: #2c3e50;
+    --text-muted: #666;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+/* Container Principal */
+.content {
+    padding: 30px;
+    background-color: #f5f6fa;
+    min-height: 100vh;
+}
+
+/* Cabeçalho */
+header {
+    background-color: #fff;
+    margin: -30px -30px 30px -30px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+}
+
+.header-title {
+    padding: 0;
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+}
+
+/* Submenu */
+.submenu {
+    display: flex;
+    gap: 0.5rem;
+    background-color: #f8f9fa;
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    margin: 0;
+    list-style: none;
+}
+
+.submenu-item {
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.submenu-item:hover {
+    color: #495057;
+    background-color: #e9ecef;
+}
+
+.submenu-item.active {
+    color: #0d6efd;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.submenu-item.active::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #0d6efd;
+    border-radius: 2px;
+    transform: scaleX(0.8);
+    transition: transform 0.2s ease;
+}
+
+.submenu-item.active:hover::before {
+    transform: scaleX(1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .header-title {
+        width: 100%;
+    }
+
+    .submenu {
+        width: 100%;
+        overflow-x: auto;
+        padding: 0.5rem;
+    }
+
+    .submenu-item {
+        white-space: nowrap;
+    }
+} 

@@ -1,0 +1,44 @@
+/*
+========================================
+TEMA BASE - PROGRAMA DE INDICAÇÃO (DARK MODE PADRÃO)
+========================================
+
+PALETA DE CORES:
+- Fundo escuro:       #181C23 (bg-gray-900)
+- Sidebar:            #232936 (bg-gray-800)
+- Card:               #232936 (bg-gray-800)
+- Azul destaque:      #3B82F6 (text-blue-400/bg-blue-900)
+- Verde:              #22C55E (text-green-500)
+- Vermelho:           #EF4444 (text-red-500)
+- Texto:              #F3F4F6 (text-gray-100)
+
+TIPOGRAFIA:
+- Fonte principal:    Inter, sans-serif (Tailwind padrão)
+- Títulos:            font-bold, tamanhos: text-2xl, text-3xl
+- Texto normal:       text-base, text-gray-100
+
+ESPAÇAMENTOS:
+- Cards:              p-6, rounded-xl, shadow
+- Sidebar:            py-6 px-4, w-64
+- Header:             px-8 py-6
+- Gaps:               gap-4, gap-6, mb-8
+
+COMPONENTES PADRÃO:
+- Sidebar:            bg-gray-800, text-gray-100
+- Card:               bg-gray-800, border-none
+- Item ativo menu:    bg-gray-800 text-blue-400
+
+DARK MODE:
+- Sempre ativo via classe 'dark' no <html>
+- Todas as cores e backgrounds são do tema escuro
+
+REUTILIZAÇÃO:
+- Replicar sidebar, header e cards em todas as telas
+- Usar sempre utilitários do Tailwind para espaçamento, cor e tipografia
+
+========================================
+*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities; 

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Tipo de Recompensa</title>
+  <link rel="stylesheet" href="../css/tailwind.output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+      <div class="flex items-center mb-8">
+        <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+      </div>
+      <ul class="space-y-2 flex-1">
+        <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+        <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+        <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Usuários Participantes</a></li>
+        <li><a href="participant-lists.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-list mr-2"></i> Listas de Usuários</a></li>
+        <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+        <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+        <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+        <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+        <li><a href="engagements.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-bar mr-2"></i> Engajamentos</a></li>
+        <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Indicações</a></li>
+        <li><a href="payments.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+        <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+        <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+      </ul>
+    </nav>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+      <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+        <h1 class="text-3xl font-bold text-blue-400">Tipo de Recompensa</h1>
+        <a href="rewards.html" class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors">Voltar para Listagem</a>
+      </header>
+      <main class="flex-1 flex flex-col items-center justify-center p-8">
+        <div class="bg-gray-800 rounded-xl shadow-lg p-8 w-full max-w-xl flex flex-col gap-6">
+          <form id="rewardTypeForm" class="flex flex-col gap-4">
+            <div>
+              <label for="rewardName" class="block text-sm font-medium mb-1">Nome da Recompensa:</label>
+              <input type="text" id="rewardName" required placeholder="Ex: Bônus de Indicação" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            </div>
+            <div>
+              <label for="rewardType" class="block text-sm font-medium mb-1">Tipo:</label>
+              <select id="rewardType" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+                <option value="">Selecione um tipo</option>
+                <option value="points">Pontos</option>
+                <option value="pix">PIX</option>
+                <option value="discount">Desconto</option>
+              </select>
+            </div>
+            <div>
+              <label for="rewardValue" class="block text-sm font-medium mb-1">Valor:</label>
+              <input type="number" id="rewardValue" required min="0" step="0.01" placeholder="Ex: 50.00" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            </div>
+            <div>
+              <label for="rewardDescription" class="block text-sm font-medium mb-1">Descrição:</label>
+              <textarea id="rewardDescription" rows="4" placeholder="Descreva os detalhes da recompensa" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2"></textarea>
+            </div>
+            <div class="flex gap-2 justify-end mt-4">
+              <button type="button" id="duplicateBtn" class="px-4 py-2 rounded-lg bg-yellow-600 text-white font-semibold shadow hover:bg-yellow-700 transition-colors">Duplicar</button>
+              <button type="button" id="cancelBtn" class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 shadow hover:bg-gray-600 transition-colors">Cancelar</button>
+              <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors">Salvar</button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../js/reward-type-editor.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>checkAuth();</script>
+</body>
+</html> 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurar Redirecionamento/UTM - LP de Divulgação</title>
+  <link rel="stylesheet" href="../css/tailwind.output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+      <div class="flex items-center mb-8">
+        <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+      </div>
+      <ul class="space-y-2 flex-1">
+        <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+        <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+        <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Usuários Participantes</a></li>
+        <li><a href="participant-lists.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-list mr-2"></i> Listas de Usuários</a></li>
+        <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+        <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+        <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+        <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+        <li><a href="engagements.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-bar mr-2"></i> Engajamentos</a></li>
+        <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Indicações</a></li>
+        <li><a href="payments.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+        <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+        <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+      </ul>
+    </nav>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+      <div class="flex-1 flex flex-col">
+        <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+          <h1 class="text-3xl font-bold text-blue-400">Configurar Redirecionamento/UTM</h1>
+          <div class="flex items-center gap-4">
+            <button class="px-5 py-2 rounded-lg bg-gray-700 text-white font-semibold shadow hover:bg-gray-600 transition-colors" onclick="window.location.href='lp-divulgacao.html'">
+              <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+          </div>
+        </header>
+        <main class="flex-1 p-8 flex flex-col justify-start min-h-screen">
+          <form id="redirectUtmForm" class="w-full bg-gray-800 rounded-xl p-8 shadow-lg flex flex-col">
+            <div class="mb-6">
+              <label for="redirectUrl" class="block text-sm font-semibold mb-2">URL de Redirecionamento (opcional)</label>
+              <input type="text" id="redirectUrl" name="redirectUrl" placeholder="https://seusite.com/obrigado ou link do WhatsApp" class="w-full px-4 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-100 focus:outline-none focus:border-blue-500" />
+            </div>
+            <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="utm_source" class="block text-xs font-semibold mb-1">Origem <span class="text-gray-400">utm_source</span></label>
+                <input type="text" id="utm_source" name="utm_source" placeholder="Ex: google, facebook" class="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-100" />
+              </div>
+              <div>
+                <label for="utm_medium" class="block text-xs font-semibold mb-1">Mídia <span class="text-gray-400">utm_medium</span></label>
+                <input type="text" id="utm_medium" name="utm_medium" placeholder="Ex: cpc, banner" class="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-100" />
+              </div>
+              <div>
+                <label for="utm_campaign" class="block text-xs font-semibold mb-1">Campanha <span class="text-gray-400">utm_campaign</span></label>
+                <input type="text" id="utm_campaign" name="utm_campaign" placeholder="Ex: promo_julho" class="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-100" />
+              </div>
+              <div>
+                <label for="utm_content" class="block text-xs font-semibold mb-1">Conteúdo <span class="text-gray-400">utm_content</span></label>
+                <input type="text" id="utm_content" name="utm_content" placeholder="Ex: banner_topo" class="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-100" />
+              </div>
+              <div>
+                <label for="utm_source_platform" class="block text-xs font-semibold mb-1">Plataforma <span class="text-gray-400">utm_source_platform</span></label>
+                <input type="text" id="utm_source_platform" name="utm_source_platform" placeholder="Ex: youtube" class="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-100" />
+              </div>
+              <div>
+                <label for="utm_creative_format" class="block text-xs font-semibold mb-1">Formato <span class="text-gray-400">utm_creative_format</span></label>
+                <input type="text" id="utm_creative_format" name="utm_creative_format" placeholder="Ex: imagem, vídeo" class="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-100" />
+              </div>
+              <div>
+                <label for="utm_marketing_tactic" class="block text-xs font-semibold mb-1">Tática <span class="text-gray-400">utm_marketing_tactic</span></label>
+                <input type="text" id="utm_marketing_tactic" name="utm_marketing_tactic" placeholder="Ex: remarketing" class="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-100" />
+              </div>
+              <div>
+                <label for="utm_term" class="block text-xs font-semibold mb-1">Palavra-chave <span class="text-gray-400">utm_term</span></label>
+                <input type="text" id="utm_term" name="utm_term" placeholder="Ex: promoaçao" class="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-100" />
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button type="submit" class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors">
+                <i class="fas fa-save"></i> Salvar Configuração
+              </button>
+            </div>
+          </form>
+        </main>
+      </div>
+    </div>
+  </div>
+  <script src="../js/lp-redirect-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>checkAuth();</script>
+</body>
+</html> 

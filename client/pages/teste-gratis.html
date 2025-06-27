@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Grátis - Programa de Indicação</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="../css/teste-gratis.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h1>Teste Grátis</h1>
+                <p>Experimente nosso programa de indicação por 14 dias gratuitamente</p>
+            </div>
+
+            <form id="testeGratisForm" onsubmit="return handleSubmit(event)">
+                <div class="form-group">
+                    <label for="nome">Nome Completo *</label>
+                    <input type="text" id="nome" name="nome" required 
+                           placeholder="Digite seu nome completo">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail Corporativo *</label>
+                    <input type="email" id="email" name="email" required 
+                           placeholder="Digite seu e-mail corporativo">
+                </div>
+
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp *</label>
+                    <input type="tel" id="whatsapp" name="whatsapp" required 
+                           placeholder="(00) 00000-0000"
+                           pattern="\(\d{2}\)\s\d{5}-\d{4}">
+                </div>
+
+                <div class="form-group">
+                    <label for="empresa">Nome da Empresa *</label>
+                    <input type="text" id="empresa" name="empresa" required 
+                           placeholder="Digite o nome da sua empresa">
+                </div>
+
+                <div class="form-group">
+                    <label for="funcionarios">Número de Funcionários *</label>
+                    <select id="funcionarios" name="funcionarios" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="1-10">1 a 10 funcionários</option>
+                        <option value="11-50">11 a 50 funcionários</option>
+                        <option value="51-200">51 a 200 funcionários</option>
+                        <option value="201-500">201 a 500 funcionários</option>
+                        <option value="501+">Mais de 500 funcionários</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha *</label>
+                    <div class="password-input">
+                        <input type="password" id="senha" name="senha" required 
+                               placeholder="Digite sua senha"
+                               minlength="8">
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            👁️
+                        </button>
+                    </div>
+                    <small class="password-hint">
+                        A senha deve ter no mínimo 8 caracteres
+                    </small>
+                </div>
+
+                <div class="form-group terms">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="termos" name="termos" required>
+                        <span>Li e aceito os <a href="#" target="_blank">Termos de Uso</a> e a <a href="#" target="_blank">Política de Privacidade</a></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary">Começar Teste Grátis</button>
+
+                <div class="login-link">
+                    Já possui uma conta? <a href="login.html">Faça login aqui</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="benefits-container">
+            <h2>Benefícios do Teste Grátis</h2>
+            <ul class="benefits-list">
+                <li>
+                    <span class="icon">✨</span>
+                    <div class="benefit-content">
+                        <h3>Acesso Completo</h3>
+                        <p>Teste todas as funcionalidades sem limitações</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="icon">🚀</span>
+                    <div class="benefit-content">
+                        <h3>Configuração Rápida</h3>
+                        <p>Configure sua primeira campanha em minutos</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="icon">💬</span>
+                    <div class="benefit-content">
+                        <h3>Suporte Dedicado</h3>
+                        <p>Suporte técnico durante todo o período de teste</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="icon">🔒</span>
+                    <div class="benefit-content">
+                        <h3>Sem Compromisso</h3>
+                        <p>Cancele a qualquer momento, sem custos</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="../js/teste-gratis.js"></script>
+</body>
+</html> 

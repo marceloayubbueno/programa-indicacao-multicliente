@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Lista - Programa de Indicação</title>
+  <link rel="stylesheet" href="../css/tailwind.output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+      <div class="flex items-center mb-8">
+        <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+      </div>
+      <ul class="space-y-2 flex-1">
+        <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+        <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+                  <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+        <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+        <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+        <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+        <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+        <li><a href="engagements.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-bar mr-2"></i> Engajamentos</a></li>
+        <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Indicações</a></li>
+        <li><a href="payments.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+        <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+        <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+      </ul>
+    </nav>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+      <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+        <h1 id="pageTitle" class="text-3xl font-bold text-blue-400">Nova Lista</h1>
+        <button onclick="window.location.href='participant-lists.html'" class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 shadow hover:bg-gray-600 transition-colors">Voltar</button>
+      </header>
+      <main class="flex-1 flex flex-col items-center justify-center p-8">
+        <!-- 🎯 INTERFACE SIMPLIFICADA - FORMULÁRIO ÚNICO -->
+        <form id="listForm" class="w-full bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-700 flex flex-col gap-6">
+          <!-- 📋 INFORMAÇÕES BÁSICAS DA LISTA -->
+          <div class="border-b border-gray-700 pb-6">
+            <h3 class="text-lg font-semibold text-blue-400 mb-4">📋 Informações da Lista</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-2">
+                <label for="listName" class="text-sm font-medium">Nome da Lista*:</label>
+                <input type="text" id="listName" name="listName" required placeholder="Ex: Clientes VIP 2025" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              
+              <div class="flex flex-col gap-2">
+                <label for="listTipo" class="text-sm font-medium">Tipo da Lista*:</label>
+                <select id="listTipo" name="listTipo" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Selecione o tipo</option>
+                  <option value="participante">🎯 Participante</option>
+                  <option value="indicador">👥 Indicador</option>
+                  <option value="influenciador">⭐ Influenciador</option>
+                  <option value="mista">🔄 Mista</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="mt-4">
+              <label for="listDescription" class="text-sm font-medium mb-2 block">Descrição:</label>
+              <textarea id="listDescription" name="listDescription" rows="2" placeholder="Descreva o objetivo desta lista (opcional)" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+          </div>
+
+          <!-- 👥 ADICIONAR PARTICIPANTES -->
+          <div>
+            <h3 class="text-lg font-semibold text-blue-400 mb-4">👥 Adicionar Participantes</h3>
+            
+            <!-- 🔍 BUSCAR PARTICIPANTES CADASTRADOS -->
+            <div class="mb-6 p-4 bg-gray-700 rounded-lg">
+              <h4 class="font-medium text-green-400 mb-3">🔍 Buscar Participantes Já Cadastrados</h4>
+              <div class="relative">
+                <input type="text" id="participantSearch" placeholder="Digite nome ou e-mail para buscar..." class="w-full rounded-lg border border-gray-600 bg-gray-800 text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500" autocomplete="off">
+                <div id="autocompleteSuggestions" class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-b-lg shadow-lg hidden"></div>
+              </div>
+            </div>
+
+            <!-- 📤 IMPORTAR NOVOS PARTICIPANTES -->
+            <div class="p-4 bg-gray-700 rounded-lg">
+              <h4 class="font-medium text-blue-400 mb-3">📤 Importar Novos Participantes</h4>
+              
+              <!-- 📁 UPLOAD DE ARQUIVO -->
+              <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">📁 Subir Arquivo (CSV ou Excel):</label>
+                <div class="flex items-center gap-4">
+                  <label class="cursor-pointer">
+                    <input type="file" id="importFile" accept=".csv,.xlsx,.xls" class="hidden">
+                    <span class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors">
+                      <i class="fas fa-upload mr-2"></i>Escolher Arquivo
+                    </span>
+                  </label>
+                  <span id="fileName" class="text-sm text-gray-400">Nenhum arquivo selecionado</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">💡 Formatos aceitos: .csv, .xlsx, .xls</p>
+              </div>
+
+              <!-- 📋 COLAR DO EXCEL -->
+              <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">📋 Ou Colar Dados do Excel:</label>
+                <div class="bg-gray-600 p-3 rounded-lg mb-2">
+                  <p class="text-xs text-gray-300 mb-2">💡 <strong>Como usar:</strong></p>
+                  <p class="text-xs text-gray-300">1. Copie 3 colunas do Excel: <code class="bg-gray-800 px-1 rounded">Nome | Email | Telefone</code></p>
+                  <p class="text-xs text-gray-300">2. Cole abaixo e clique em "Processar Dados"</p>
+                </div>
+                <textarea id="pasteArea" rows="4" placeholder="Nome&#9;Email&#9;Telefone&#10;João Silva&#9;joao@email.com&#9;(11) 99999-9999&#10;Maria Santos&#9;maria@email.com&#9;(11) 88888-8888" class="w-full rounded-lg border border-gray-600 bg-gray-800 text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"></textarea>
+                <button type="button" id="btnPasteImport" class="mt-2 px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors">
+                  <i class="fas fa-magic mr-2"></i>Processar Dados
+                </button>
+              </div>
+
+              <!-- 📊 PREVIEW DE IMPORTAÇÃO -->
+              <div id="importPreview" class="text-sm"></div>
+            </div>
+
+            <!-- 👥 PARTICIPANTES SELECIONADOS -->
+            <div class="mt-6">
+              <h4 class="font-medium text-yellow-400 mb-3">👥 Participantes Selecionados</h4>
+              <div id="selectedParticipantsContainer" class="p-4 bg-gray-700 rounded-lg min-h-[60px] flex items-center">
+                <span class="text-gray-400 text-sm">Nenhum participante selecionado</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 🚀 AÇÕES -->
+          <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-700">
+            <button type="button" onclick="window.location.href='participant-lists.html'" class="px-6 py-2 rounded-lg bg-gray-600 text-gray-200 font-medium hover:bg-gray-500 transition-colors">
+              <i class="fas fa-times mr-2"></i>Cancelar
+            </button>
+            <button type="submit" class="px-6 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors">
+              <i class="fas fa-save mr-2"></i>Criar Lista
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <!-- 🔔 SISTEMA DE NOTIFICAÇÕES MODERNO -->
+  <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+  <!-- 📦 DEPENDÊNCIA XLSX PARA IMPORTAÇÃO DE EXCEL -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/editar-lista.js"></script>
+  <script>
+    checkAuth();
+  </script>
+</body>
+</html> 

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Campanhas e LPs</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .debug-card {
+            transition: all 0.3s ease;
+        }
+        .debug-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .issue-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .issue-critical { background-color: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .issue-warning { background-color: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .status-ok { background-color: rgba(34, 197, 94, 0.2); color: #22c55e; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-blue-400 mb-2">
+                    <i class="fas fa-bug mr-3"></i>Debug - Campanhas e LPs
+                </h1>
+                <p class="text-gray-400">Diagnóstico de vinculação entre campanhas, LPs e listas de participantes</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="loadDiagnostics()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-sync-alt mr-2"></i>Atualizar
+                </button>
+                <button onclick="window.location.href='campaigns.html'" class="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-blue-400 mb-4"></i>
+            <p class="text-gray-400">Carregando diagnósticos...</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div id="summaryCards" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" style="display: none;">
+            <div class="bg-gray-800 rounded-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Total de Campanhas</p>
+                        <p id="totalCampaigns" class="text-2xl font-bold text-blue-400">-</p>
+                    </div>
+                    <i class="fas fa-rocket text-blue-400 text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Com Problemas</p>
+                        <p id="campaignsWithIssues" class="text-2xl font-bold text-red-400">-</p>
+                    </div>
+                    <i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Funcionando</p>
+                        <p id="campaignsWorking" class="text-2xl font-bold text-green-400">-</p>
+                    </div>
+                    <i class="fas fa-check-circle text-green-400 text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Taxa de Sucesso</p>
+                        <p id="successRate" class="text-2xl font-bold text-yellow-400">-</p>
+                    </div>
+                    <i class="fas fa-chart-line text-yellow-400 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaigns List -->
+        <div id="campaignsList" class="space-y-6" style="display: none;">
+            <!-- Campaign cards will be inserted here -->
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="text-center py-12" style="display: none;">
+            <i class="fas fa-exclamation-circle text-4xl text-red-400 mb-4"></i>
+            <p class="text-gray-400 mb-4">Erro ao carregar diagnósticos</p>
+            <button onclick="loadDiagnostics()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Tentar Novamente
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div id="detailsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
+        <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-4xl max-h-screen overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-100">Detalhes da Campanha</h2>
+                <button onclick="closeDetailsModal()" class="text-2xl text-gray-400 hover:text-gray-200">
+                    &times;
+                </button>
+            </div>
+            <div id="modalContent">
+                <!-- Modal content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let diagnosticsData = null;
+
+        async function loadDiagnostics() {
+            const loadingState = document.getElementById('loadingState');
+            const summaryCards = document.getElementById('summaryCards');
+            const campaignsList = document.getElementById('campaignsList');
+            const errorState = document.getElementById('errorState');
+            
+            // Show loading
+            loadingState.style.display = 'block';
+            summaryCards.style.display = 'none';
+            campaignsList.style.display = 'none';
+            errorState.style.display = 'none';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/debug/campaigns/overview');
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update summary
+                    document.getElementById('totalCampaigns').textContent = result.data.totalCampaigns;
+                    document.getElementById('campaignsWithIssues').textContent = result.data.campaignsWithIssues;
+                    document.getElementById('campaignsWorking').textContent = result.data.totalCampaigns - result.data.campaignsWithIssues;
+                    
+                    const successRate = result.data.totalCampaigns > 0 
+                        ? Math.round(((result.data.totalCampaigns - result.data.campaignsWithIssues) / result.data.totalCampaigns) * 100)
+                        : 100;
+                    document.getElementById('successRate').textContent = successRate + '%';
+                    
+                    // Show summary and campaigns
+                    loadingState.style.display = 'none';
+                    summaryCards.style.display = 'grid';
+                    campaignsList.style.display = 'block';
+                    
+                    // Render campaigns (simplified for now)
+                    renderCampaigns(result.data.diagnostics);
+                } else {
+                    throw new Error(result.message || 'Erro ao carregar diagnósticos');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+            }
+        }
+
+        function renderCampaigns(diagnostics) {
+            const container = document.getElementById('campaignsList');
+            container.innerHTML = '';
+
+            diagnostics.forEach(diagnostic => {
+                const hasIssues = diagnostic.issues.length > 0;
+                const card = document.createElement('div');
+                card.className = 'debug-card bg-gray-800 rounded-lg p-6 border-l-4 ' + 
+                    (hasIssues ? 'border-red-500' : 'border-green-500');
+                
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-100 mb-2">
+                                <i class="fas fa-rocket mr-2 text-blue-400"></i>
+                                ${diagnostic.campaign.name}
+                            </h3>
+                            <div class="text-sm text-gray-400 mb-3">
+                                Tipo: ${diagnostic.campaign.type} | Status: ${diagnostic.campaign.status}
+                            </div>
+                            ${hasIssues ? 
+                                diagnostic.issues.map(issue => `<span class="issue-badge issue-warning">${issue}</span>`).join(' ') :
+                                '<span class="issue-badge status-ok"><i class="fas fa-check mr-1"></i>Funcionando corretamente</span>'
+                            }
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-gray-700 rounded p-3">
+                            <div class="text-gray-400 mb-1">LP de Indicadores</div>
+                            <div class="text-gray-200">
+                                ${diagnostic.lpIndicadores ? 
+                                    `${diagnostic.lpIndicadores.name} (${diagnostic.lpIndicadores.status})` : 
+                                    'Não vinculada'
+                                }
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded p-3">
+                            <div class="text-gray-400 mb-1">Lista de Participantes</div>
+                            <div class="text-gray-200">
+                                ${diagnostic.participantList ? 
+                                    `${diagnostic.participantList.name} (${diagnostic.participantList.tipo})` : 
+                                    'Não vinculada'
+                                }
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded p-3">
+                            <div class="text-gray-400 mb-1">Estatísticas</div>
+                            <div class="text-gray-200">
+                                ${diagnostic.participantCount} participantes<br>
+                                ${diagnostic.recentSubmissions} envios recentes
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        async function showCampaignDetails(campaignId) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/debug/campaigns/campaign/${campaignId}/detailed`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderCampaignDetails(result.data);
+                    document.getElementById('detailsModal').style.display = 'flex';
+                } else {
+                    alert('Erro ao carregar detalhes: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar detalhes da campanha');
+            }
+        }
+
+        function renderCampaignDetails(data) {
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Campaign Info -->
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-blue-400 mb-3">Informações da Campanha</h3>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div><strong>Nome:</strong> ${data.campaign.name}</div>
+                            <div><strong>Tipo:</strong> ${data.campaign.type}</div>
+                            <div><strong>Status:</strong> ${data.campaign.status}</div>
+                            <div><strong>Cliente ID:</strong> ${data.campaign.clientId}</div>
+                        </div>
+                    </div>
+
+                    <!-- Connection Status -->
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-blue-400 mb-3">Status das Conexões</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center">
+                                <i class="fas ${data.connectionStatus.lpLinked ? 'fa-check-circle text-green-400' : 'fa-times-circle text-red-400'} mr-2"></i>
+                                LP vinculada à campanha
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas ${data.connectionStatus.listLinked ? 'fa-check-circle text-green-400' : 'fa-times-circle text-red-400'} mr-2"></i>
+                                Lista vinculada à campanha
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Submissions -->
+                    ${data.recentSubmissions.length > 0 ? `
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold text-blue-400 mb-3">Submissões Recentes</h3>
+                            <div class="space-y-2 max-h-40 overflow-y-auto">
+                                ${data.recentSubmissions.map(sub => `
+                                    <div class="flex items-center justify-between text-sm bg-gray-600 rounded p-2">
+                                        <div>
+                                            <strong>${sub.name}</strong> (${sub.email})
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-gray-400">${new Date(sub.createdAt).toLocaleDateString()}</span>
+                                            <i class="fas ${sub.isInCampaignList ? 'fa-check-circle text-green-400' : 'fa-times-circle text-red-400'}" 
+                                               title="${sub.isInCampaignList ? 'Na lista da campanha' : 'NÃO está na lista da campanha'}"></i>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Participants -->
+                    ${data.participants.length > 0 ? `
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold text-blue-400 mb-3">Participantes na Lista (${data.participants.length})</h3>
+                            <div class="space-y-2 max-h-40 overflow-y-auto">
+                                ${data.participants.slice(0, 10).map(p => `
+                                    <div class="flex items-center justify-between text-sm bg-gray-600 rounded p-2">
+                                        <div>
+                                            <strong>${p.name}</strong> (${p.email})
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-gray-400">${p.tipo}</span>
+                                            <i class="fas ${p.cameFromCampaignLP ? 'fa-check-circle text-green-400' : 'fa-question-circle text-yellow-400'}" 
+                                               title="${p.cameFromCampaignLP ? 'Veio da LP da campanha' : 'Origem diferente'}"></i>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        async function repairCampaign(campaignId) {
+            if (!confirm('Deseja tentar reparar as conexões desta campanha? Esta ação pode modificar dados no banco.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/debug/campaigns/campaign/${campaignId}/repair`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Reparação concluída!\n\nCorreções aplicadas:\n${result.data.repairs.join('\n')}`);
+                    loadDiagnostics(); // Recarregar para mostrar estado atualizado
+                } else {
+                    alert('Erro na reparação: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao reparar campanha');
+            }
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        // Load diagnostics on page load
+        document.addEventListener('DOMContentLoaded', loadDiagnostics);
+    </script>
+</body>
+</html> 

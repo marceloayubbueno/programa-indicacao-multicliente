@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Dados - Área do Cliente</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+        <div class="flex items-center mb-8">
+          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+        </div>
+        <ul class="space-y-2 flex-1">
+          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+          <li><a href="engagements.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-bar mr-2"></i> Engajamentos</a></li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Indicações</a></li>
+          <li><a href="payments.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+          <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+          <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+        </ul>
+      </nav>
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+        <div class="flex-1 flex flex-col">
+          <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+            <h1 class="text-3xl font-bold text-blue-400">Meus Dados</h1>
+            <div class="flex items-center gap-4">
+              <button class="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors" onclick="saveCompanyData()">Salvar Alterações</button>
+            </div>
+          </header>
+          <main class="flex-1 p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <!-- Dados da Empresa -->
+              <div class="bg-gray-800 rounded-xl p-6 shadow border-none flex flex-col gap-4">
+                <h2 class="text-xl font-semibold text-gray-100 mb-4">Dados da Empresa</h2>
+                <form id="companyDataForm" class="flex flex-col gap-4">
+                  <div>
+                    <label for="companyName" class="block text-sm font-medium mb-1">Nome da Empresa*</label>
+                    <input type="text" id="companyName" name="companyName" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                  <div>
+                    <label for="companyCNPJ" class="block text-sm font-medium mb-1">CNPJ*</label>
+                    <input type="text" id="companyCNPJ" name="companyCNPJ" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                  <div>
+                    <label for="companyPlan" class="block text-sm font-medium mb-1">Plano Atual</label>
+                    <input type="text" id="companyPlan" name="companyPlan" readonly class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+                  </div>
+                  <div>
+                    <label for="companyEmail" class="block text-sm font-medium mb-1">E-mail*</label>
+                    <input type="email" id="companyEmail" name="companyEmail" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                  <div>
+                    <label for="companyPhone" class="block text-sm font-medium mb-1">Telefone*</label>
+                    <input type="tel" id="companyPhone" name="companyPhone" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                  <div>
+                    <label for="companyAddress" class="block text-sm font-medium mb-1">Endereço*</label>
+                    <input type="text" id="companyAddress" name="companyAddress" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                  <div>
+                    <label for="companyCity" class="block text-sm font-medium mb-1">Cidade*</label>
+                    <input type="text" id="companyCity" name="companyCity" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                  <div>
+                    <label for="companyState" class="block text-sm font-medium mb-1">Estado*</label>
+                    <select id="companyState" name="companyState" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+                      <option value="">Selecione...</option>
+                      <option value="AC">Acre</option>
+                      <option value="AL">Alagoas</option>
+                      <option value="AP">Amapá</option>
+                      <option value="AM">Amazonas</option>
+                      <option value="BA">Bahia</option>
+                      <option value="CE">Ceará</option>
+                      <option value="DF">Distrito Federal</option>
+                      <option value="ES">Espírito Santo</option>
+                      <option value="GO">Goiás</option>
+                      <option value="MA">Maranhão</option>
+                      <option value="MT">Mato Grosso</option>
+                      <option value="MS">Mato Grosso do Sul</option>
+                      <option value="MG">Minas Gerais</option>
+                      <option value="PA">Pará</option>
+                      <option value="PB">Paraíba</option>
+                      <option value="PR">Paraná</option>
+                      <option value="PE">Pernambuco</option>
+                      <option value="PI">Piauí</option>
+                      <option value="RJ">Rio de Janeiro</option>
+                      <option value="RN">Rio Grande do Norte</option>
+                      <option value="RS">Rio Grande do Sul</option>
+                      <option value="RO">Rondônia</option>
+                      <option value="RR">Roraima</option>
+                      <option value="SC">Santa Catarina</option>
+                      <option value="SP">São Paulo</option>
+                      <option value="SE">Sergipe</option>
+                      <option value="TO">Tocantins</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="companyCEP" class="block text-sm font-medium mb-1">CEP*</label>
+                    <input type="text" id="companyCEP" name="companyCEP" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                </form>
+              </div>
+              <!-- Dados de Contato -->
+              <div class="bg-gray-800 rounded-xl p-6 shadow border-none flex flex-col gap-4">
+                <h2 class="text-xl font-semibold text-gray-100 mb-4">Dados de Contato</h2>
+                <form id="contactDataForm" class="flex flex-col gap-4">
+                  <div>
+                    <label for="contactName" class="block text-sm font-medium mb-1">Nome do Responsável*</label>
+                    <input type="text" id="contactName" name="contactName" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                  <div>
+                    <label for="contactPosition" class="block text-sm font-medium mb-1">Cargo*</label>
+                    <input type="text" id="contactPosition" name="contactPosition" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                  <div>
+                    <label for="contactEmail" class="block text-sm font-medium mb-1">E-mail do Responsável*</label>
+                    <input type="email" id="contactEmail" name="contactEmail" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                  <div>
+                    <label for="contactPhone" class="block text-sm font-medium mb-1">Telefone do Responsável*</label>
+                    <input type="tel" id="contactPhone" name="contactPhone" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  </div>
+                </form>
+              </div>
+              <!-- Configurações de Notificação -->
+              <div class="bg-gray-800 rounded-xl p-6 shadow border-none flex flex-col gap-4">
+                <h2 class="text-xl font-semibold text-gray-100 mb-4">Configurações de Notificação</h2>
+                <form id="notificationSettingsForm" class="flex flex-col gap-4">
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" id="notifyNewReferrals" name="notifyNewReferrals" class="rounded border-gray-700 text-blue-400 focus:ring-blue-400">
+                    <label for="notifyNewReferrals" class="text-sm font-medium">Notificar sobre novas indicações</label>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" id="notifyRewards" name="notifyRewards" class="rounded border-gray-700 text-blue-400 focus:ring-blue-400">
+                    <label for="notifyRewards" class="text-sm font-medium">Notificar sobre recompensas pendentes</label>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" id="notifyCampaigns" name="notifyCampaigns" class="rounded border-gray-700 text-blue-400 focus:ring-blue-400">
+                    <label for="notifyCampaigns" class="text-sm font-medium">Notificar sobre campanhas próximas do fim</label>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+    <script src="../js/my-data.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>checkAuth();</script>
+</body>
+</html> 

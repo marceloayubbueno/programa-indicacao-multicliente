@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Campanha - Quiz/Onboarding</title>
+  <link rel="stylesheet" href="../css/tailwind.output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+      <div class="flex items-center mb-8">
+        <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+      </div>
+      <ul class="space-y-2 flex-1">
+        <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+        <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+        <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Participantes</a></li>
+        <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+        <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+      </ul>
+    </nav>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+      <div class="flex-1 flex flex-col">
+        <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+          <h1 class="text-3xl font-bold text-blue-400">Nova Campanha</h1>
+        </header>
+        <main class="flex-1 p-8">
+          <!-- Barra de progresso -->
+          <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden mb-8">
+            <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" id="progressBar" style="width: 16.6%"></div>
+          </div>
+          <div id="quizSteps">
+            <!-- Etapa 01: Tipo de Campanha -->
+            <section class="quiz-step active" id="step0">
+              <h2 class="text-2xl font-bold text-blue-400 mb-4">Qual o tipo de campanha?</h2>
+              <p class="text-gray-300 mb-6">Escolha o tipo de campanha que melhor se encaixa no seu objetivo. Você poderá personalizar todos os detalhes nas próximas etapas.</p>
+              <div class="flex gap-8 mt-6">
+                <div class="rounded-xl p-8 flex-1 bg-gray-800 shadow hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-blue-400" onclick="selectCampaignType('offline')" id="cardOffline">
+                  <h3 class="text-lg font-bold mb-2 flex items-center text-blue-300"><i class="fas fa-bullhorn mr-2"></i> LP de Divulgação (Conversão Offline)</h3>
+                  <p class="text-gray-300 mb-2">Para empresas que fazem contato direto com o cliente após a indicação. Ideal para vendas consultivas, B2B, serviços, etc.</p>
+                  <span class="inline-block bg-blue-900 text-blue-300 px-2 py-1 rounded text-xs">Fluxo disponível</span>
+                </div>
+                <div class="rounded-xl p-8 flex-1 bg-gray-800 shadow opacity-60 cursor-not-allowed border-2 border-transparent" onclick="selectCampaignType('online')" id="cardOnline">
+                  <h3 class="text-lg font-bold mb-2 flex items-center text-yellow-400"><i class="fas fa-link mr-2"></i> Link de Compartilhamento (Conversão Online)</h3>
+                  <p class="text-gray-300 mb-2">Para empresas com jornada 100% online, como e-commerce. O lead finaliza a compra sem contato manual.</p>
+                  <span class="inline-block bg-yellow-900 text-yellow-400 px-2 py-1 rounded text-xs">Em breve</span>
+                </div>
+              </div>
+            </section>
+            <!-- Etapa 02: Dados da Campanha -->
+            <section class="quiz-step" id="step1">
+              <h2 class="text-2xl font-bold text-blue-400 mb-4">Dados da campanha</h2>
+              <p class="text-gray-300 mb-6">Preencha as informações principais da sua campanha. O nome será usado para identificar a campanha e criar a lista de indicadores.</p>
+              <div class="form-group mb-4">
+                <label for="campaignName" class="block mb-1 text-gray-200">Nome da Campanha*</label>
+                <input type="text" id="campaignName" class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-4 py-2 focus:outline-none focus:border-blue-500" required>
+              </div>
+              <div class="form-group mb-4">
+                <label for="campaignDescription" class="block mb-1 text-gray-200">Descrição</label>
+                <textarea id="campaignDescription" class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-4 py-2 focus:outline-none focus:border-blue-500" rows="3"></textarea>
+              </div>
+              <div class="form-group mb-4">
+                <label class="block mb-1 text-gray-200">Período da Campanha</label>
+                <div class="flex gap-2">
+                  <input type="date" id="campaignStartDate" class="rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-4 py-2 focus:outline-none focus:border-blue-500">
+                  <span class="self-center text-gray-400">até</span>
+                  <input type="date" id="campaignEndDate" class="rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-4 py-2 focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+            </section>
+            <!-- Etapa 03: Fonte dos Indicadores -->
+            <section class="quiz-step" id="step2">
+              <h2 class="text-2xl font-bold text-blue-400 mb-4">Como você quer cadastrar os indicadores?</h2>
+              <p class="text-gray-300 mb-6">Escolha se os indicadores serão cadastrados via LP (formulário público) ou a partir de uma lista de participantes já existente.</p>
+              <div class="flex gap-8 mt-6">
+                <div class="rounded-xl p-8 flex-1 bg-gray-800 shadow hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-green-500" onclick="selectSourceType('lp')" id="cardLP">
+                  <h3 class="text-lg font-bold mb-2 flex items-center text-green-400"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</h3>
+                  <p class="text-gray-300 mb-2">Permita que novos indicadores se cadastrem via formulário público (LP).</p>
+                </div>
+                <div class="rounded-xl p-8 flex-1 bg-gray-800 shadow hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-blue-400" onclick="selectSourceType('list')" id="cardList">
+                  <h3 class="text-lg font-bold mb-2 flex items-center text-blue-300"><i class="fas fa-users mr-2"></i> Lista de Participantes</h3>
+                  <p class="text-gray-300 mb-2">Selecione uma lista de participantes já cadastrados ou crie uma nova lista.</p>
+                </div>
+              </div>
+            </section>
+            <!-- Etapa 03.1: Se LP de Indicadores -->
+            <section class="quiz-step" id="step3-lp" style="display:none;">
+              <h2 class="text-2xl font-bold text-blue-400 mb-4">Escolha o modelo da LP de Indicadores</h2>
+              <p class="text-gray-300 mb-6">Selecione um modelo pronto ou personalize sua própria LP de indicadores. Você pode editar o modelo no editor visual.</p>
+              <div id="lpIndicadoresModelos" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Modelos de LP serão carregados aqui -->
+              </div>
+              <button class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors mt-4" onclick="editarLPIndicadores()"><i class="fas fa-pen mr-2"></i>Editar/Personalizar LP</button>
+            </section>
+            <!-- Etapa 03.2: Se Lista de Participantes -->
+            <section class="quiz-step" id="step3-lista" style="display:none;">
+              <h2 class="text-2xl font-bold text-blue-400 mb-4">Selecione ou crie a lista de participantes</h2>
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-200 mb-2">1. Selecione uma lista de usuários</h3>
+                <p class="text-gray-400 mb-2">Selecione uma lista criada anteriormente no sistema.</p>
+                <div id="listasParticipantes" class="mb-4"></div>
+              </div>
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-200 mb-2">2. Faça upload de uma lista</h3>
+                <p class="text-gray-400 mb-2">Adicione contatos de uma lista do seu computador.</p>
+                <button id="uploadListaBtn" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors mb-2"><i class="fas fa-upload mr-2"></i>Subir Lista (CSV, XLS, XLSX)</button>
+                <input type="file" id="inputUploadLista" accept=".csv,.xls,.xlsx" style="display:none;" />
+                <div id="uploadListaStatus" class="text-xs text-gray-400 mt-2"></div>
+              </div>
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-200 mb-2">3. Crie uma nova lista</h3>
+                <p class="text-gray-400 mb-2">Selecione contatos um a um manualmente.</p>
+                <div class="flex gap-2 mb-2">
+                  <input type="text" id="novaListaNome" class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-4 py-2 focus:outline-none focus:border-blue-500" placeholder="Nome da nova lista">
+                  <button class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold shadow hover:bg-green-700 transition-colors" onclick="abrirCriacaoManualLista()">Criar Manualmente</button>
+                </div>
+                <div id="criacaoManualListaContainer" style="display:none;"></div>
+              </div>
+            </section>
+            <!-- Etapa 04: LP de Divulgação -->
+            <section class="quiz-step" id="step4">
+              <h2 class="text-2xl font-bold text-blue-400 mb-4">LP de Divulgação</h2>
+              <p class="text-gray-300 mb-6">Selecione um modelo de LP de divulgação ou personalize no editor visual. Cada indicador terá um link exclusivo baseado neste modelo.</p>
+              <div id="lpDivulgacaoModelos" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Modelos de LP de divulgação -->
+              </div>
+              <button class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors mt-4" onclick="editarLPDivulgacao()"><i class="fas fa-pen mr-2"></i>Editar/Personalizar LP de Divulgação</button>
+            </section>
+            <!-- Etapa 05: Recompensas -->
+            <section class="quiz-step" id="step5">
+              <h2 class="text-2xl font-bold text-blue-400 mb-4">Recompensas</h2>
+              <p class="text-gray-300 mb-6">
+                Defina as recompensas para os indicadores desta campanha. Você pode configurar uma recompensa para cada momento do fluxo.
+              </p>
+
+              <!-- Bloco 1: Recompensa por Indicação Realizada -->
+              <div class="mb-8 p-4 rounded-lg bg-gray-800 border border-blue-700">
+                <h3 class="text-lg font-semibold text-blue-300 mb-2">1. Recompensa por Indicação Realizada</h3>
+                <p class="text-gray-400 mb-2">O indicador recebe esta recompensa ao realizar uma indicação, independentemente do resultado.</p>
+                <div id="rewardsOnReferral" class="mb-2">
+                  <!-- Lista de recompensas existentes será renderizada aqui -->
+                </div>
+                <button class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold shadow hover:bg-green-700 transition-colors mb-2" onclick="criarNovaRecompensa('referral')">
+                  <i class="fas fa-plus mr-2"></i>Criar Nova Recompensa
+                </button>
+                <button class="px-2 py-1 rounded bg-gray-700 text-gray-200 text-xs font-semibold hover:bg-gray-800 transition-colors" onclick="selecionarNenhumaRecompensa('referral')">
+                  Nenhuma recompensa neste momento
+                </button>
+              </div>
+
+              <!-- Bloco 2: Recompensa por Conversão -->
+              <div class="mb-8 p-4 rounded-lg bg-gray-800 border border-green-700">
+                <h3 class="text-lg font-semibold text-green-300 mb-2">2. Recompensa por Conversão</h3>
+                <p class="text-gray-400 mb-2">O indicador recebe esta recompensa quando a indicação é aprovada/convertida em cliente.</p>
+                <div id="rewardsOnConversion" class="mb-2">
+                  <!-- Lista de recompensas existentes será renderizada aqui -->
+                </div>
+                <button class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold shadow hover:bg-green-700 transition-colors mb-2" onclick="criarNovaRecompensa('conversion')">
+                  <i class="fas fa-plus mr-2"></i>Criar Nova Recompensa
+                </button>
+                <button class="px-2 py-1 rounded bg-gray-700 text-gray-200 text-xs font-semibold hover:bg-gray-800 transition-colors" onclick="selecionarNenhumaRecompensa('conversion')">
+                  Nenhuma recompensa neste momento
+                </button>
+              </div>
+            </section>
+            <!-- Etapa 06: Resumo da Campanha -->
+            <section class="quiz-step" id="step6">
+              <h2 class="text-2xl font-bold text-blue-400 mb-4">Resumo da Campanha</h2>
+              <p class="text-gray-300 mb-6">Confira todos os detalhes antes de finalizar. Você pode voltar e ajustar qualquer etapa.</p>
+              <div id="summaryStepContent" class="mb-8"></div>
+              <button class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors mb-4" onclick="finalizarCampanha()">Finalizar e Criar Campanha</button>
+              <button class="px-6 py-2 rounded-lg bg-gray-700 text-gray-100 font-semibold hover:bg-gray-600 transition-colors" onclick="previousStep()">Anterior</button>
+            </section>
+          </div>
+          <div class="flex justify-between mt-8">
+            <button class="px-6 py-2 rounded-lg bg-gray-700 text-gray-100 font-semibold hover:bg-gray-600 transition-colors" id="prevButton" onclick="previousStep()" style="display:none;">Anterior</button>
+            <button class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors" id="nextButton" onclick="nextStep()">Próxima</button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+  <script src="../js/campaign-quiz.js"></script>
+  <!-- SheetJS CDN para suporte a Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</body>
+</html> 

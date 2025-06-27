@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPs de Indicadores - Área do Cliente</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+        <div class="flex items-center mb-8">
+          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+        </div>
+        <ul class="space-y-2 flex-1">
+          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+          <li><a href="engagements.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-bar mr-2"></i> Engajamentos</a></li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Indicações</a></li>
+          <li><a href="payments.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+          <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+          <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+        </ul>
+      </nav>
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+        <div class="flex-1 flex flex-col">
+          <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+            <h1 class="text-3xl font-bold text-blue-400">Minhas LPs de Indicadores</h1>
+            <div class="flex items-center gap-4">
+              <button class="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors" onclick="window.location.href='lp-editor-grapes.html'">
+                <i class="fas fa-plus"></i> Nova LP de Indicadores
+              </button>
+            </div>
+          </header>
+          <main class="flex-1 p-8">
+            <div class="overflow-x-auto mb-8">
+              <table class="min-w-full divide-y divide-gray-700">
+                <thead class="bg-gray-800">
+                  <tr>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Nome da LP</th>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Data de Criação</th>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="formsListBody" class="bg-gray-900 divide-y divide-gray-800">
+                  <!-- Linhas de formulários serão inseridas via JS -->
+                </tbody>
+              </table>
+            </div>
+            <!-- Modal/Área para exibir código de incorporação -->
+            <div id="embedCodeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+              <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-lg relative">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-xl font-bold text-gray-100">Código para Incorporação</h2>
+                  <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closeEmbedCodeModal()">&times;</button>
+                </div>
+                <div class="mb-4">
+                  <textarea id="embedCodeView" readonly class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2"></textarea>
+                </div>
+                <div class="flex items-center justify-end gap-2">
+                  <button class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 shadow hover:bg-gray-600 transition-colors" onclick="copyEmbedCodeView()">
+                    <i class="fas fa-copy"></i> Copiar Código
+                  </button>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+    <script src="../js/lp-indicadores.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>checkAuth();</script>
+</body>
+</html> 

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recompensas - Área do Cliente</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+      html, body { height: 100%; min-height: 100%; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+        <div class="flex items-center mb-8">
+          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+        </div>
+        <ul class="space-y-2 flex-1">
+          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+          <li><a href="engagements.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-bar mr-2"></i> Engajamentos</a></li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Indicações</a></li>
+          <li><a href="payments.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+          <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+          <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+        </ul>
+      </nav>
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+        <div class="flex-1 flex flex-col">
+          <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+            <h1 class="text-3xl font-bold text-blue-400">Recompensas</h1>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center border border-gray-700 rounded-lg bg-gray-900 px-2">
+                <input type="text" id="searchReward" placeholder="Buscar recompensa..." class="bg-transparent px-2 py-1 focus:outline-none text-gray-100">
+                <button class="px-3 py-1 rounded bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors" onclick="searchRewards()">Buscar</button>
+              </div>
+              <button class="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors" onclick="showNewRewardTypeModal()">Novo Tipo de Recompensa</button>
+            </div>
+          </header>
+          <main class="flex-1 p-8">
+            <!-- Abas de Navegação -->
+            <div class="mb-6">
+              <button class="px-4 py-2 rounded-t-lg bg-gray-800 text-blue-400 font-semibold border-b-2 border-blue-400">Tipos de Recompensa</button>
+            </div>
+            <!-- Seção de Tipos de Recompensa -->
+            <div id="typesSection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <!-- Os tipos de recompensa serão inseridos aqui via JavaScript -->
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+    <!-- Modal de Novo Tipo de Recompensa (fora do layout principal para centralização absoluta) -->
+    <div id="newRewardTypeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+      <div class="bg-gray-800 rounded-xl p-8 shadow-lg max-w-lg relative flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-100">Novo Tipo de Recompensa</h2>
+          <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closeNewRewardTypeModal()">&times;</button>
+        </div>
+        <form id="newRewardTypeForm" onsubmit="return handleNewRewardType(event)" class="flex flex-col gap-4">
+          <div>
+            <label for="rewardName" class="block text-sm font-medium mb-1">Nome da Recompensa:</label>
+            <input type="text" id="rewardName" required placeholder="Ex: Bônus de Indicação" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+          </div>
+          <div>
+            <label for="rewardType" class="block text-sm font-medium mb-1">Tipo:</label>
+            <select id="rewardType" required onchange="toggleRewardFields()" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+              <option value="">Selecione um tipo</option>
+              <option value="points">Pontos</option>
+              <option value="pix">PIX</option>
+              <option value="discount">Desconto</option>
+            </select>
+          </div>
+          <!-- Campos para Pontos -->
+          <div id="pointsFields" class="reward-type-fields" style="display: none;">
+            <div>
+              <label for="pointsValue" class="block text-sm font-medium mb-1">Quantidade de Pontos:</label>
+              <input type="number" id="pointsValue" min="1" placeholder="Ex: 1000" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            </div>
+            <div>
+              <label for="pointsExpiration" class="block text-sm font-medium mb-1">Validade dos Pontos (dias):</label>
+              <input type="number" id="pointsExpiration" min="1" placeholder="Ex: 30" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            </div>
+          </div>
+          <!-- Campos para PIX -->
+          <div id="pixFields" class="reward-type-fields" style="display: none;">
+            <div>
+              <label for="pixValue" class="block text-sm font-medium mb-1">Valor em R$:</label>
+              <input type="number" id="pixValue" min="0.01" step="0.01" placeholder="Ex: 50.00" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            </div>
+          </div>
+          <!-- Campos para Desconto -->
+          <div id="discountFields" class="reward-type-fields" style="display: none;">
+            <div>
+              <label for="discountValue" class="block text-sm font-medium mb-1">Percentual de Desconto:</label>
+              <input type="number" id="discountValue" min="1" max="100" placeholder="Ex: 10" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            </div>
+            <div>
+              <label for="discountCode" class="block text-sm font-medium mb-1">Código do Cupom:</label>
+              <input type="text" id="discountCode" placeholder="Ex: INDICA10" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            </div>
+            <div>
+              <label for="discountExpiration" class="block text-sm font-medium mb-1">Validade do Cupom (dias):</label>
+              <input type="number" id="discountExpiration" min="1" placeholder="Ex: 30" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            </div>
+          </div>
+          <div>
+            <label for="rewardDescription" class="block text-sm font-medium mb-1">Descrição:</label>
+            <textarea id="rewardDescription" rows="4" placeholder="Descreva os detalhes da recompensa" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2"></textarea>
+          </div>
+          <div class="flex items-center justify-end gap-2 mt-4">
+            <button type="button" class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 shadow hover:bg-gray-600 transition-colors" onclick="closeNewRewardTypeModal()">Cancelar</button>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Modal de Detalhes da Recompensa -->
+    <div id="rewardModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+      <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-lg relative">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-100">Detalhes da Recompensa</h2>
+          <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closeRewardModal()">&times;</button>
+        </div>
+        <div class="reward-details flex flex-col gap-2 mb-4">
+          <div class="flex gap-2"><label class="w-40 text-gray-400">Usuário Participante:</label><span id="rewardParticipant"></span></div>
+          <div class="flex gap-2"><label class="w-40 text-gray-400">Campanha:</label><span id="rewardCampaign"></span></div>
+          <div class="flex gap-2"><label class="w-40 text-gray-400">Indicação:</label><span id="rewardReferral"></span></div>
+          <div class="flex gap-2"><label class="w-40 text-gray-400">Valor:</label><span id="rewardValue"></span></div>
+          <div class="flex gap-2"><label class="w-40 text-gray-400">Status:</label><span id="rewardStatus"></span></div>
+          <div class="flex gap-2"><label class="w-40 text-gray-400">Data:</label><span id="rewardDate"></span></div>
+          <div class="flex gap-2"><label class="w-40 text-gray-400">Método de Pagamento:</label><span id="rewardPaymentMethod"></span></div>
+          <div class="flex gap-2"><label class="w-40 text-gray-400">Observações:</label><span id="rewardNotes"></span></div>
+        </div>
+        <div class="flex items-center justify-end gap-2 mt-4">
+          <button class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 shadow hover:bg-gray-600 transition-colors" onclick="closeRewardModal()">Fechar</button>
+        </div>
+      </div>
+    </div>
+    <script src="../js/rewards.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>checkAuth();</script>
+</body>
+</html> 

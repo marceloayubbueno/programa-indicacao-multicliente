@@ -1,0 +1,524 @@
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { Participant } from './entities/participant.schema';
+import { ParticipantList } from './entities/participant-list.schema';
+import { CreateParticipantDto } from './dto/create-participant.dto';
+import { UpdateParticipantDto } from './dto/update-participant.dto';
+import { ImportParticipantsDto } from './dto/import-participants.dto';
+import { v4 as uuidv4 } from 'uuid';
+
+@Injectable()
+export class ParticipantsService {
+  constructor(
+    @InjectModel(Participant.name) private participantModel: Model<Participant>,
+    @InjectModel(ParticipantList.name) private participantListModel: Model<ParticipantList>,
+  ) {}
+
+  async create(dto: CreateParticipantDto) {
+    console.log('DTO recebido para criação:', dto);
+    const participant = new this.participantModel({
+      ...dto,
+      participantId: (dto as any).participantId || uuidv4()
+    });
+    console.log('Objeto Participant a ser salvo:', participant);
+    return participant.save();
+  }
+
+  async update(id: string, dto: UpdateParticipantDto) {
+    return this.participantModel.findByIdAndUpdate(id, dto, { new: true });
+  }
+
+  async findAll(clientId: string, page = 1, limit = 20, filter = {}) {
+    const query = { clientId, ...filter };
+    
+    // 🔍 DEBUG BACKEND SERVICE - Log da query
+    console.log('🔍 DEBUG BACKEND SERVICE - ClientId:', clientId);
+    console.log('🔍 DEBUG BACKEND SERVICE - Query MongoDB:', query);
+    console.log('🔍 DEBUG BACKEND SERVICE - Page:', page, 'Limit:', limit);
+    
+    // 🔍 H1 - DIAGNÓSTICO CLIENTID
+    console.log('🔍 H1 - ClientId usado na consulta:', clientId);
+    const participantsWithoutClientId = await this.participantModel.find({ 
+      $or: [
+        { clientId: { $exists: false } },
+        { clientId: null },
+        { clientId: '' }
+      ]
+    }).select('_id name email originSource campaignId').exec();
+    console.log('🔍 H1 - Participantes sem clientId:', participantsWithoutClientId.length);
+    
+    // 🔍 H3 - DIAGNÓSTICO ORIGEM CAMPANHA
+    const campaignParticipants = await this.participantModel.find({ 
+      originSource: 'campaign',
+      clientId: clientId
+    }).select('_id name email originSource campaignId campaignName').exec();
+    console.log('🔍 H3 - Participantes origin=campaign para este cliente:', campaignParticipants.length);
+    
+    const participantsWithCampaignId = await this.participantModel.find({ 
+      campaignId: { $exists: true, $ne: null },
+      clientId: clientId
+    }).select('_id name email originSource campaignId campaignName').exec();
+    console.log('🔍 H3 - Participantes com campaignId para este cliente:', participantsWithCampaignId.length);
+    
+    // 🔍 H6 - DIAGNÓSTICO CÓDIGO DE LIMPEZA DE DUPLICADOS
+    console.log('🔍 H6 - Investigando possível remoção de participantes duplicados...');
+    
+    // Verificar participantes órfãos (sem listas)
+    const orphanParticipants = await this.participantModel.find({ 
+      clientId: clientId,
+      $or: [
+        { lists: { $exists: false } },
+        { lists: { $size: 0 } },
+        { lists: null }
+      ]
+    }).select('_id name email originSource campaignId').exec();
+    console.log('🔍 H6 - Participantes órfãos (sem listas):', orphanParticipants.length);
+    
+    // Verificar se há participantes com campaignId mas sem estar em listas de campanha
+    const campaignParticipantsNotInLists = await this.participantModel.find({
+      clientId: clientId,
+      campaignId: { $exists: true, $ne: null },
+      $or: [
+        { lists: { $exists: false } },
+        { lists: { $size: 0 } },
+        { lists: null }
+      ]
+    }).select('_id name email campaignId campaignName originSource').exec();
+    console.log('🔍 H6 - Participantes de campanha SEM listas:', campaignParticipantsNotInLists.length);
+    
+    if (campaignParticipantsNotInLists.length > 0) {
+      console.log('🔍 H6 - Detalhes dos participantes de campanha órfãos:', campaignParticipantsNotInLists.map(p => ({
+        id: p._id,
+        name: p.name,
+        email: p.email,
+        campaignId: p.campaignId,
+        campaignName: p.campaignName
+      })));
+    }
+    
+    const total = await this.participantModel.countDocuments(query);
+    console.log('🔍 DEBUG BACKEND SERVICE - Total documents found:', total);
+    
+    // 🔍 DEBUG BACKEND SERVICE - Verificar todos os participantes no banco
+    const allParticipants = await this.participantModel.find({}).select('_id name email clientId originSource tipo').exec();
+    console.log('🔍 DEBUG BACKEND SERVICE - ALL participants in DB:', allParticipants.length);
+    console.log('🔍 DEBUG BACKEND SERVICE - ALL participants sample:', allParticipants.slice(0, 5).map(p => ({
+      id: p._id,
+      name: p.name,
+      email: p.email,
+      clientId: p.clientId,
+      originSource: p.originSource,
+      tipo: p.tipo
+    })));
+    
+    // 🔍 DEBUG BACKEND SERVICE - Verificar participantes sem clientId
+    const participantsWithoutClientIdOld = await this.participantModel.find({ 
+      $or: [
+        { clientId: { $exists: false } },
+        { clientId: null },
+        { clientId: '' }
+      ]
+    }).select('_id name email clientId originSource tipo').exec();
+    
+    console.log('🔍 DEBUG BACKEND SERVICE - Participants WITHOUT clientId:', participantsWithoutClientIdOld.length);
+    if (participantsWithoutClientIdOld.length > 0) {
+      console.log('🔍 DEBUG BACKEND SERVICE - Participants WITHOUT clientId details:', participantsWithoutClientIdOld.map(p => ({
+        id: p._id,
+        name: p.name,
+        email: p.email,
+        clientId: p.clientId,
+        originSource: p.originSource,
+        tipo: p.tipo
+      })));
+    }
+    
+    const participants = await this.participantModel
+      .find(query)
+      .populate({
+        path: 'lists',
+        model: 'ParticipantList',
+        select: 'name tipo description'
+      })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+    
+    // 🔍 H2 - DIAGNÓSTICO RELAÇÃO LISTA-PARTICIPANTES
+    console.log('🔍 H2 - Participantes retornados:', participants.length);
+    participants.forEach((p, idx) => {
+      if (idx < 3) { // Só os primeiros 3 para não sobrecarregar
+        console.log(`🔍 H2 - Participante ${idx + 1}:`, {
+          id: p._id,
+          name: p.name,
+          email: p.email,
+          lists: p.lists?.length || 0,
+          listsIds: p.lists?.map(l => l._id) || [],
+          originSource: p.originSource,
+          campaignId: p.campaignId
+        });
+      }
+    });
+    
+    // 🔍 H2 - Verificar listas existentes para este cliente
+    const allLists = await this.participantListModel
+      .find({ clientId })
+      .select('_id name tipo participants campaignId')
+      .exec();
+    console.log('🔍 H2 - Listas existentes para este cliente:', allLists.length);
+    
+    // 🔍 H6 - VERIFICAR LISTAS VAZIAS SUSPEITAS
+    const emptyLists = allLists.filter(list => !list.participants || list.participants.length === 0);
+    const campaignLists = allLists.filter(list => list.campaignId);
+    const emptyCampaignLists = campaignLists.filter(list => !list.participants || list.participants.length === 0);
+    
+    console.log('🔍 H6 - Listas vazias (total):', emptyLists.length);
+    console.log('🔍 H6 - Listas de campanha (total):', campaignLists.length);
+    console.log('🔍 H6 - Listas de campanha VAZIAS:', emptyCampaignLists.length);
+    
+    if (emptyCampaignLists.length > 0) {
+      console.log('🔍 H6 - SUSPEITO: Listas de campanha que estão vazias:', emptyCampaignLists.map(list => ({
+        id: list._id,
+        name: list.name,
+        tipo: list.tipo,
+        campaignId: list.campaignId,
+        participantsCount: list.participants?.length || 0
+      })));
+    }
+    
+    allLists.forEach((list, idx) => {
+      if (idx < 3) {
+        console.log(`🔍 H2 - Lista ${idx + 1}:`, {
+          id: list._id,
+          name: list.name,
+          tipo: list.tipo,
+          participants: list.participants?.length || 0,
+          campaignId: list.campaignId
+        });
+      }
+    });
+    
+    console.log('🔍 DEBUG BACKEND SERVICE - Participants returned:', participants.length);
+    console.log('🔍 DEBUG BACKEND SERVICE - Sample participants:', participants.slice(0, 2).map(p => ({
+      id: p._id,
+      name: p.name,
+      email: p.email,
+      originSource: p.originSource,
+      tipo: p.tipo,
+      clientId: p.clientId
+    })));
+    
+    return { participants, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async findById(id: string) {
+    return this.participantModel.findById(id);
+  }
+
+  async importMany(dto: ImportParticipantsDto) {
+    const participants = dto.participants.map(p => ({
+      ...p,
+      clientId: dto.clientId,
+      participantId: (p as any).participantId || uuidv4()
+    }));
+    return this.participantModel.insertMany(participants);
+  }
+
+  async addToList(participantId: string, listId: string) {
+    await this.participantListModel.findByIdAndUpdate(listId, { $addToSet: { participants: participantId } });
+    await this.participantModel.findByIdAndUpdate(participantId, { $addToSet: { lists: listId } });
+    return true;
+  }
+
+  async removeFromList(participantId: string, listId: string) {
+    await this.participantListModel.findByIdAndUpdate(listId, { $pull: { participants: participantId } });
+    await this.participantModel.findByIdAndUpdate(participantId, { $pull: { lists: listId } });
+    return true;
+  }
+
+  async findIndicators() {
+    // Participantes que estão em pelo menos uma lista (campanha)
+    return this.participantModel.find({ lists: { $exists: true, $not: { $size: 0 } } })
+      .populate({ path: 'lists', select: 'name nome' })
+      .exec();
+  }
+
+  async remove(id: string) {
+    const deleted = await this.participantModel.findByIdAndDelete(id);
+    if (!deleted) throw new NotFoundException('Participante não encontrado');
+    return { message: 'Participante removido com sucesso' };
+  }
+
+  async countByList(listId: string) {
+    return this.participantModel.countDocuments({ lists: listId });
+  }
+
+  async transformToIndicators(participantIds: string[], campaignId: string, campaignName: string) {
+    console.log('[PARTICIPANTS-SERVICE] Transformando', participantIds.length, 'participantes em indicadores...');
+    
+    // Verificar se os participantes existem
+    const existingParticipants = await this.participantModel.find({ _id: { $in: participantIds } });
+    
+    if (existingParticipants.length === 0) {
+      console.error('[PARTICIPANTS-SERVICE] ❌ Nenhum participante encontrado com os IDs fornecidos!');
+      return { modifiedCount: 0, matchedCount: 0 };
+    }
+    
+    console.log(`[PARTICIPANTS-SERVICE] Encontrados ${existingParticipants.length} participantes válidos`);
+    
+    // Transformar cada participante individualmente para triggar hooks
+    let modifiedCount = 0;
+    
+    for (const participant of existingParticipants) {
+      try {
+        participant.tipo = 'indicador';
+        participant.campaignId = new Types.ObjectId(campaignId);
+        participant.campaignName = campaignName;
+        participant.canIndicate = true;
+        participant.updatedAt = new Date();
+        
+        // save() vai triggar o hook pre('save') que gera o código
+        await participant.save();
+        modifiedCount++;
+        
+        console.log(`[PARTICIPANTS-SERVICE] ✅ ${participant.name} transformado - Código: ${participant.uniqueReferralCode}`);
+      } catch (error) {
+        console.error(`[PARTICIPANTS-SERVICE] ❌ Erro ao transformar ${participant.name}:`, error);
+      }
+    }
+    
+    console.log(`[PARTICIPANTS-SERVICE] ✅ ${modifiedCount} participantes transformados em indicadores com códigos gerados`);
+    
+    return { modifiedCount, matchedCount: existingParticipants.length };
+  }
+
+  // === MÉTODOS PARA SISTEMA DE LINKS EXCLUSIVOS ===
+  
+  /**
+   * Busca um indicador pelo código único de referral
+   */
+  async findByReferralCode(code: string): Promise<Participant | null> {
+    try {
+      return await this.participantModel
+        .findOne({ 
+          uniqueReferralCode: code,
+          tipo: { $in: ['indicador', 'influenciador'] },
+          status: 'ativo'
+        })
+        .populate('clientId', 'name')
+        .populate('campaignId', 'name')
+        .exec();
+    } catch (error) {
+      console.error('Erro ao buscar participante por código de referral:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Gera ou regenera código único para um indicador
+   */
+  async generateReferralCode(participantId: string): Promise<string | null> {
+    try {
+      const participant = await this.participantModel.findById(participantId);
+      
+      if (!participant || !['indicador', 'influenciador'].includes(participant.tipo)) {
+        throw new Error('Participante não é um indicador válido');
+      }
+
+      // Gerar novo código único
+      let newCode: string = '';
+      let isUnique = false;
+      let attempts = 0;
+      
+      while (!isUnique && attempts < 10) {
+        newCode = this.generateUniqueCode();
+        const existing = await this.participantModel.findOne({ uniqueReferralCode: newCode });
+        if (!existing) {
+          isUnique = true;
+        }
+        attempts++;
+      }
+
+      if (!isUnique) {
+        throw new Error('Não foi possível gerar código único após 10 tentativas');
+      }
+
+      // Atualizar participante
+      await this.participantModel.findByIdAndUpdate(participantId, {
+        uniqueReferralCode: newCode,
+        updatedAt: new Date()
+      });
+
+      return newCode;
+    } catch (error) {
+      console.error('Erro ao gerar código de referral:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Valida se um código de referral é válido e ativo
+   */
+  async validateReferralCode(code: string): Promise<{ valid: boolean; participant?: Participant; error?: string }> {
+    try {
+      if (!code || code.length < 6) {
+        return { valid: false, error: 'Código inválido' };
+      }
+
+      const participant = await this.findByReferralCode(code);
+      
+      if (!participant) {
+        return { valid: false, error: 'Código não encontrado ou indicador inativo' };
+      }
+
+      if (!participant.canIndicate) {
+        return { valid: false, error: 'Indicador não autorizado a fazer indicações' };
+      }
+
+      return { valid: true, participant };
+    } catch (error) {
+      console.error('Erro na validação do código de referral:', error);
+      return { valid: false, error: 'Erro interno na validação' };
+    }
+  }
+
+  /**
+   * Incrementa estatísticas do indicador
+   */
+  async incrementIndicatorStats(participantId: string, type: 'total' | 'approved'): Promise<void> {
+    try {
+      const updateField = type === 'approved' ? 'indicacoesAprovadas' : 'totalIndicacoes';
+      
+      await this.participantModel.findByIdAndUpdate(participantId, {
+        $inc: { [updateField]: 1 },
+        lastIndicacaoAt: new Date(),
+        updatedAt: new Date()
+      });
+    } catch (error) {
+      console.error('Erro ao incrementar estatísticas do indicador:', error);
+    }
+  }
+
+  /**
+   * Gera código único (método auxiliar privado)
+   */
+  private generateUniqueCode(): string {
+    const timestamp = Date.now().toString(36);
+    const randomPart = Math.random().toString(36).substring(2, 8);
+    return `${timestamp}${randomPart}`.toUpperCase();
+  }
+
+  /**
+   * Lista indicadores com seus links e estatísticas
+   */
+  async findIndicatorsWithLinks(clientId: string): Promise<any[]> {
+    try {
+      const indicators = await this.participantModel
+        .find({ 
+          clientId,
+          tipo: { $in: ['indicador', 'influenciador'] },
+          uniqueReferralCode: { $exists: true, $ne: null }
+        })
+        .select('name email phone uniqueReferralCode totalIndicacoes indicacoesAprovadas lastIndicacaoAt status campaignName')
+        .sort({ createdAt: -1 })
+        .exec();
+
+      return indicators.map(indicator => ({
+        _id: indicator._id,
+        name: indicator.name,
+        email: indicator.email,
+        phone: indicator.phone,
+        referralCode: indicator.uniqueReferralCode,
+        referralLink: `/indicacao/${indicator.uniqueReferralCode}`,
+        totalIndicacoes: indicator.totalIndicacoes || 0,
+        indicacoesAprovadas: indicator.indicacoesAprovadas || 0,
+        lastIndicacaoAt: indicator.lastIndicacaoAt,
+        status: indicator.status,
+        campaignName: indicator.campaignName || '-'
+      }));
+    } catch (error) {
+      console.error('Erro ao listar indicadores com links:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Método de diagnóstico para verificar todos os participantes
+   */
+  async debugAllParticipants(currentClientId: string) {
+    console.log('🔍 DEBUG SERVICE - ClientId do usuário logado:', currentClientId);
+    
+    // Buscar TODOS os participantes no banco
+    const allParticipants = await this.participantModel.find({}).select('_id name email clientId originSource tipo campaignId originLandingPageId').exec();
+    console.log('🔍 DEBUG SERVICE - Total de participantes no banco:', allParticipants.length);
+    
+    // Agrupar por clientId
+    const byClientId: { [key: string]: any[] } = {};
+    const withoutClientId: any[] = [];
+    
+    allParticipants.forEach(p => {
+      const key = p.clientId?.toString() || 'SEM_CLIENT_ID';
+      if (key === 'SEM_CLIENT_ID') {
+        withoutClientId.push(p);
+      } else {
+        if (!byClientId[key]) byClientId[key] = [];
+        byClientId[key].push(p);
+      }
+    });
+    
+    console.log('🔍 DEBUG SERVICE - Participantes por clientId:', Object.keys(byClientId).map(k => `${k}: ${byClientId[k].length}`));
+    console.log('🔍 DEBUG SERVICE - Participantes SEM clientId:', withoutClientId.length);
+    
+    // Verificar participantes do cliente atual
+    const currentClientParticipants = byClientId[currentClientId] || [];
+    console.log('🔍 DEBUG SERVICE - Participantes do cliente atual:', currentClientParticipants.length);
+    
+    // Agrupar por originSource
+    const byOriginSource: { [key: string]: any[] } = {};
+    currentClientParticipants.forEach(p => {
+      const origin = p.originSource || 'undefined';
+      if (!byOriginSource[origin]) byOriginSource[origin] = [];
+      byOriginSource[origin].push(p);
+    });
+    
+    console.log('🔍 DEBUG SERVICE - Por originSource no cliente atual:', Object.keys(byOriginSource).map(k => `${k}: ${byOriginSource[k].length}`));
+    
+    // Verificar participantes de LP
+    const lpParticipants = allParticipants.filter(p => 
+      p.originSource === 'landing-page' || 
+      p.originLandingPageId
+    );
+    
+    console.log('🔍 DEBUG SERVICE - Participantes de LP (total):', lpParticipants.length);
+    console.log('🔍 DEBUG SERVICE - Participantes de LP samples:', lpParticipants.slice(0, 3).map(p => ({
+      id: p._id,
+      name: p.name,
+      email: p.email,
+      clientId: p.clientId?.toString(),
+      originSource: p.originSource,
+      originLandingPageId: p.originLandingPageId?.toString()
+    })));
+    
+    return {
+      totalParticipants: allParticipants.length,
+      byClientId: Object.keys(byClientId).map(k => ({ clientId: k, count: byClientId[k].length })),
+      withoutClientId: withoutClientId.length,
+      currentClient: {
+        clientId: currentClientId,
+        count: currentClientParticipants.length,
+        byOriginSource: Object.keys(byOriginSource).map(k => ({ origin: k, count: byOriginSource[k].length }))
+      },
+      lpParticipants: {
+        total: lpParticipants.length,
+        samples: lpParticipants.slice(0, 5).map(p => ({
+          id: p._id,
+          name: p.name,
+          email: p.email,
+          clientId: p.clientId?.toString(),
+          originSource: p.originSource,
+          originLandingPageId: p.originLandingPageId?.toString()
+        }))
+      }
+    };
+  }
+} 
