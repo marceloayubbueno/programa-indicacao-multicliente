@@ -30,6 +30,21 @@ function getApiUrl() {
             'https://programa-indicacao-multicliente-production.up.railway.app/api'));
 }
 
+// 🔍 DIAGNÓSTICO: Função para verificar configuração
+function debugConfig() {
+    console.log('🔍 === DIAGNÓSTICO DE CONFIGURAÇÃO ===');
+    console.log('🔍 window.APP_CONFIG:', window.APP_CONFIG);
+    console.log('🔍 window.location.hostname:', window.location.hostname);
+    console.log('🔍 REFERRAL_BASE_URL configurado:', window.APP_CONFIG?.REFERRAL_BASE_URL);
+    console.log('🔍 API_URL configurado:', window.APP_CONFIG?.API_URL);
+    console.log('🔍 ===================================');
+}
+
+// Executar diagnóstico ao carregar
+if (typeof window !== 'undefined') {
+    setTimeout(debugConfig, 1000);
+}
+
 // Estado das variáveis
 let participants = [];
 let lists = [];
@@ -50,10 +65,20 @@ function showParticipantModal(participantData) {
     document.getElementById('participantStatus').textContent = participantData.status;
     
     // Exibir link de compartilhamento - ATUALIZADO PARA NOVO SISTEMA
-    const baseReferralUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
-                           (window.location.hostname === 'localhost' ? 
-                            'http://localhost:3000/indicacao' : 
-                            'https://programa-indicacao-multicliente-production.up.railway.app/indicacao');
+    // 🔧 CORREÇÃO DEFINITIVA: Garantir que sempre use o backend correto
+    let baseReferralUrl;
+    if (window.APP_CONFIG && window.APP_CONFIG.REFERRAL_BASE_URL) {
+        baseReferralUrl = window.APP_CONFIG.REFERRAL_BASE_URL;
+        console.log('✅ Usando REFERRAL_BASE_URL do config:', baseReferralUrl);
+    } else {
+        // Fallback: SEMPRE usar o backend Railway em produção
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            baseReferralUrl = 'http://localhost:3000/indicacao';
+        } else {
+            baseReferralUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+        }
+        console.log('⚠️ Usando fallback REFERRAL_BASE_URL:', baseReferralUrl);
+    }
     const link = participantData.uniqueReferralCode
         ? `${baseReferralUrl}/${participantData.uniqueReferralCode}`
         : (participantData.linkCompartilhamento 
@@ -3215,9 +3240,21 @@ async function regenerateReferralCode(participantId) {
         const result = await response.json();
 
         if (result.success) {
-            // 🔧 CORREÇÃO: Construir URL completa do link
-            const baseUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
-                           'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+            // 🔧 CORREÇÃO DEFINITIVA: Usar a mesma lógica de construção de URL
+            let baseUrl;
+            if (window.APP_CONFIG && window.APP_CONFIG.REFERRAL_BASE_URL) {
+                baseUrl = window.APP_CONFIG.REFERRAL_BASE_URL;
+                console.log('✅ Regenerar: Usando REFERRAL_BASE_URL do config:', baseUrl);
+            } else {
+                // Fallback: SEMPRE usar o backend Railway em produção
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    baseUrl = 'http://localhost:3000/indicacao';
+                } else {
+                    baseUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+                }
+                console.log('⚠️ Regenerar: Usando fallback REFERRAL_BASE_URL:', baseUrl);
+            }
+            
             const fullLink = `${baseUrl}/${result.referralCode}`;
             
             alert(`Novo código gerado com sucesso!\nCódigo: ${result.referralCode}\nLink: ${fullLink}`);
