@@ -985,13 +985,24 @@ function handleImport(event) {
                     const data = await importResp.json();
                     throw new Error(data.message || 'Erro ao importar participantes');
                 }
+                
+                // 🔍 DEBUG: Verificar resposta da importação
+                const importData = await importResp.json();
+                console.log('🔍 [DEBUG-IMPORT] Resposta da importação:', importData);
+                
                 // Obter os participantes importados (buscar por e-mail)
                 const emails = participants.map(p => p.email);
+                console.log('🔍 [DEBUG-SEARCH] Buscando participantes com emails:', emails);
+                
                 const searchResp = await fetch(`${API_URL}/participants?clientId=${clientId}&limit=1000`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const allData = await searchResp.json();
+                console.log('🔍 [DEBUG-SEARCH] Total participantes encontrados:', allData.participants?.length);
+                
                 const importedParticipants = (allData.participants || []).filter(p => emails.includes(p.email));
+                console.log('🔍 [DEBUG-FILTER] Participantes filtrados por email:', importedParticipants.length);
+                console.log('🔍 [DEBUG-FILTER] Participantes filtrados:', importedParticipants.map(p => ({ id: p._id, email: p.email })));
                 
                 // 🆕 CORREÇÃO: Permitir criar lista mesmo se alguns participantes falharam
                 // A lista será criada e os participantes válidos serão adicionados
@@ -1006,6 +1017,13 @@ function handleImport(event) {
                     return;
                 }
                 
+                // 🔧 CORREÇÃO CRÍTICA: Validar e mapear IDs corretamente
+                const participantIds = importedParticipants
+                    .map(p => p._id || p.id)
+                    .filter(id => id); // Remove IDs undefined/null
+                
+                console.log('🔍 [DEBUG-IDS] IDs mapeados para lista:', participantIds);
+                
                 // Criar a lista (mesmo que vazia inicialmente)
                 const listResp = await fetch(`${API_URL}/participant-lists`, {
                     method: 'POST',
@@ -1018,7 +1036,7 @@ function handleImport(event) {
                         description: listDescription,
                         tipo: listTipo,
                         clientId,
-                        participants: importedParticipants.map(p => p._id) // Pode ser array vazio
+                        participants: participantIds // IDs validados
                     })
                 });
                 
@@ -1027,13 +1045,15 @@ function handleImport(event) {
                     throw new Error(data.message || 'Erro ao criar lista');
                 }
                 
+                console.log('🔍 [DEBUG-LIST] Lista criada com', participantIds.length, 'participantes associados');
+                
                 // Mensagem de sucesso personalizada baseada no resultado
-                if (importedParticipants.length === 0) {
-                    showNotification(`Lista "${listName}" criada, mas nenhum participante foi importado. Verifique o formato do arquivo.`, 'warning');
-                } else if (importedParticipants.length === participants.length) {
-                    showNotification(`Importação concluída! ${participants.length} participantes importados e adicionados à lista "${listName}".`, 'success');
+                if (participantIds.length === 0) {
+                    showNotification(`Lista "${listName}" criada, mas nenhum participante foi associado. Verifique o formato do arquivo ou contate o suporte.`, 'warning');
+                } else if (participantIds.length === participants.length) {
+                    showNotification(`✅ Importação completa! ${participants.length} participantes importados e associados à lista "${listName}".`, 'success');
                 } else {
-                    showNotification(`Lista "${listName}" criada com ${importedParticipants.length} de ${participants.length} participantes. Alguns podem ter falhado na importação.`, 'warning');
+                    showNotification(`⚠️ Lista "${listName}" criada com ${participantIds.length} de ${participants.length} participantes associados.`, 'warning');
                 }
                 
                 closeImportModal();
