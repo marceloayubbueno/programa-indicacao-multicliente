@@ -820,6 +820,15 @@ function populateListFilter() {
 function displayParticipants() {
     console.log('🔄 displayParticipants ORIGINAL - Sistema restaurado');
     
+    // 🔍 DEBUG HIPÓTESE 5 - Verificando estado global
+    console.log('🔍 DEBUG ESTADO - Participants global:', participants?.slice(0,3).map(p => ({
+        nome: p.name, 
+        tipo: p.tipo, 
+        lists: p.lists?.length || 0,
+        originCampaignId: p.originCampaignId,
+        campaignId: p.campaignId
+    })));
+    
     const tbody = document.getElementById('participantsList');
     if (!tbody) {
         console.error('❌ Elemento participantsList não encontrado');
@@ -859,6 +868,9 @@ function displayParticipants() {
     
     // 🎯 SISTEMA ORIGINAL: Duplicar linhas por lista (João em 2 listas = 2 linhas)
     const html = paginatedParticipants.flatMap(participant => {
+        // 🔍 DEBUG HIPÓTESE 3 - Verificando sistema de duplicação
+        console.log('🔍 DEBUG DUPLICAÇÃO - Participant original:', participant.name, 'tipo:', participant.tipo, 'lists:', participant.lists?.length);
+        
         const tipoInfo = getTipoInfo(participant.tipo || 'participante');
         const status = participant.status || 'ativo';
         const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
@@ -2616,22 +2628,37 @@ async function toggleUserInList(participantId, listId, buttonElement) {
 
 // Funções auxiliares para filtros
 function filterParticipantsData() {
+    // 🔍 DEBUG HIPÓTESE 4 - Verificando se filtros modificam tipos
+    console.log('🔍 DEBUG FILTRO - Participants antes:', participants?.slice(0,3).map(p => ({
+        nome: p.name, 
+        tipo: p.tipo,
+        lists: p.lists?.length || 0
+    })));
+    
     let filtered = [...participants];
     
     // Filtro por tipo
     if (tipoFiltro !== 'todos') {
+        console.log('🔍 DEBUG FILTRO - Aplicando filtro de tipo:', tipoFiltro);
+        const beforeCount = filtered.length;
         filtered = filtered.filter(p => p.tipo === tipoFiltro);
+        console.log(`🔍 DEBUG FILTRO - Filtro tipo: ${beforeCount} → ${filtered.length}`);
     }
     
     // Filtro por status
     const statusFilter = document.getElementById('statusFilter')?.value;
     if (statusFilter) {
+        console.log('🔍 DEBUG FILTRO - Aplicando filtro de status:', statusFilter);
+        const beforeCount = filtered.length;
         filtered = filtered.filter(p => p.status === statusFilter);
+        console.log(`🔍 DEBUG FILTRO - Filtro status: ${beforeCount} → ${filtered.length}`);
     }
     
     // Filtro por lista (do select ou do contexto)
     const listFilter = document.getElementById('listFilter')?.value || currentListFilter?.id;
     if (listFilter) {
+        console.log('🔍 DEBUG FILTRO - Aplicando filtro de lista:', listFilter);
+        const beforeCount = filtered.length;
         const targetList = lists.find(l => (l._id || l.id) === listFilter);
         // ✅ CORREÇÃO: Usar participants (padrão correto do backend)
         const listMembersArray = targetList?.participants || [];
@@ -2640,25 +2667,38 @@ function filterParticipantsData() {
             const memberIds = listMembersArray.map(m => m._id || m.id || m);
             filtered = filtered.filter(p => memberIds.includes(p._id || p.id));
         }
+        console.log(`🔍 DEBUG FILTRO - Filtro lista: ${beforeCount} → ${filtered.length}`);
     }
     
     // Filtro por email
     const emailFilter = document.getElementById('emailFilter')?.value;
     if (emailFilter) {
+        console.log('🔍 DEBUG FILTRO - Aplicando filtro de email:', emailFilter);
+        const beforeCount = filtered.length;
         filtered = filtered.filter(p => 
             p.email && p.email.toLowerCase().includes(emailFilter.toLowerCase())
         );
+        console.log(`🔍 DEBUG FILTRO - Filtro email: ${beforeCount} → ${filtered.length}`);
     }
     
     // Filtro por busca geral (nome/email)
     const searchUsers = document.getElementById('searchUsers')?.value;
     if (searchUsers) {
+        console.log('🔍 DEBUG FILTRO - Aplicando busca geral:', searchUsers);
+        const beforeCount = filtered.length;
         const search = searchUsers.toLowerCase();
         filtered = filtered.filter(p => 
             (p.name && p.name.toLowerCase().includes(search)) ||
             (p.email && p.email.toLowerCase().includes(search))
         );
+        console.log(`🔍 DEBUG FILTRO - Busca geral: ${beforeCount} → ${filtered.length}`);
     }
+    
+    console.log('🔍 DEBUG FILTRO - Filtered depois:', filtered?.slice(0,3).map(p => ({
+        nome: p.name, 
+        tipo: p.tipo,
+        lists: p.lists?.length || 0
+    })));
     
     return filtered;
 }
@@ -3167,6 +3207,12 @@ function showNotification(message, type = 'info') {
 
 // 🎯 FUNÇÃO MELHORADA: Obter nome da campanha com informações extras
 function getCampaignDisplayName(participant) {
+    // 🔍 DEBUG HIPÓTESE 2 - Verificando determinação de campanha
+    console.log('🔍 DEBUG CAMPANHA - Participant:', participant.name, 'tipo:', participant.tipo);
+    console.log('🔍 DEBUG CAMPANHA - originCampaignId:', participant.originCampaignId);
+    console.log('🔍 DEBUG CAMPANHA - campaignId:', participant.campaignId);
+    console.log('🔍 DEBUG CAMPANHA - campaignName:', participant.campaignName);
+    
     let campaignName = 'Sem campanha';
     
     // 🔧 CORREÇÃO PRAGMÁTICA: Verificar cache de campanhas primeiro
@@ -3184,6 +3230,7 @@ function getCampaignDisplayName(participant) {
             const campaign = window.campaignsCache.find(c => (c._id || c.id) === campaignId);
             if (campaign && campaign.name) {
                 campaignName = campaign.name;
+                console.log('🔍 DEBUG CAMPANHA - Found in cache:', campaignName);
                 return `<span class="text-gray-300">${campaignName}</span>`;
             }
         }
@@ -3227,6 +3274,7 @@ function getCampaignDisplayName(participant) {
         campaignName = participant.originMetadata.campaignName;
     }
     
+    console.log('🔍 DEBUG CAMPANHA - Final result:', campaignName);
     return `<span class="text-gray-300">${campaignName}</span>`;
 }
 
@@ -3358,6 +3406,9 @@ function showToast(message, type = 'info') {
 
 // Função auxiliar para getTipoInfo (se não existir)
 function getTipoInfo(tipo) {
+    // 🔍 DEBUG HIPÓTESE 1 - Verificando determinação de tipo
+    console.log('🔍 DEBUG TIPO - Input:', tipo, typeof tipo);
+    
     const tipos = {
         participante: {
             label: 'Participante',
@@ -3379,7 +3430,10 @@ function getTipoInfo(tipo) {
         }
     };
     
-    return tipos[tipo] || tipos.participante;
+    const result = tipos[tipo] || tipos.participante;
+    console.log('🔍 DEBUG TIPO - Output:', result.label, 'para input:', tipo);
+    
+    return result;
 }
 
 // Sistema de Abas
