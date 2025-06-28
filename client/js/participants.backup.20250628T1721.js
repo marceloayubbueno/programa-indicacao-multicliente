@@ -1100,58 +1100,864 @@ function createReferralLinkHTML(participant) {
 }
 
 // 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
+function generateParticipantsHTML(participants) {
+    return participants.flatMap(participant => {
+        // Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                return createParticipantRowHTML(participant, listName);
+            });
+        } else {
+            // Se não tem listas, criar uma linha normal
+            return [createParticipantRowHTML(participant, '-')];
+        }
+    }).join('');
+}
 
 // 🔧 Helper: Criar HTML da linha do participante (template limpo)
+function createParticipantRowHTML(participant, listName) {
+    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+    const status = participant.status || 'ativo';
+    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+    const campaignName = getCampaignDisplayName(participant);
+    const participantId = participant._id || participant.id;
+    
+    // Link de referral simplificado
+    const linkHtml = createReferralLinkHTML(participant);
+    
+    return `
+        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
+            <td class="px-4 py-3">
+                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                        <i class="${tipoInfo.icon} text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${listName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${campaignName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                    <i class="${tipoInfo.icon} mr-1"></i>
+                    ${tipoInfo.label}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${linkHtml}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="${statusColor}">${status}</span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
 
 // 🔧 Helper: Criar link de referral
+function createReferralLinkHTML(participant) {
+    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+        return `
+            <div class="flex items-center gap-2">
+                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        `;
+    }
+    return '-';
+}
 
 // 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
+function generateParticipantsHTML(participants) {
+    return participants.flatMap(participant => {
+        // Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                return createParticipantRowHTML(participant, listName);
+            });
+        } else {
+            // Se não tem listas, criar uma linha normal
+            return [createParticipantRowHTML(participant, '-')];
+        }
+    }).join('');
+}
 
 // 🔧 Helper: Criar HTML da linha do participante (template limpo)
+function createParticipantRowHTML(participant, listName) {
+    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+    const status = participant.status || 'ativo';
+    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+    const campaignName = getCampaignDisplayName(participant);
+    const participantId = participant._id || participant.id;
+    
+    // Link de referral simplificado
+    const linkHtml = createReferralLinkHTML(participant);
+    
+    return `
+        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
+            <td class="px-4 py-3">
+                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                        <i class="${tipoInfo.icon} text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${listName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${campaignName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                    <i class="${tipoInfo.icon} mr-1"></i>
+                    ${tipoInfo.label}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${linkHtml}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="${statusColor}">${status}</span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
 
 // 🔧 Helper: Criar link de referral
+function createReferralLinkHTML(participant) {
+    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+        return `
+            <div class="flex items-center gap-2">
+                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        `;
+    }
+    return '-';
+}
 
 // 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
+function generateParticipantsHTML(participants) {
+    return participants.flatMap(participant => {
+        // Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                return createParticipantRowHTML(participant, listName);
+            });
+        } else {
+            // Se não tem listas, criar uma linha normal
+            return [createParticipantRowHTML(participant, '-')];
+        }
+    }).join('');
+}
 
 // 🔧 Helper: Criar HTML da linha do participante (template limpo)
+function createParticipantRowHTML(participant, listName) {
+    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+    const status = participant.status || 'ativo';
+    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+    const campaignName = getCampaignDisplayName(participant);
+    const participantId = participant._id || participant.id;
+    
+    // Link de referral simplificado
+    const linkHtml = createReferralLinkHTML(participant);
+    
+    return `
+        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
+            <td class="px-4 py-3">
+                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                        <i class="${tipoInfo.icon} text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${listName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${campaignName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                    <i class="${tipoInfo.icon} mr-1"></i>
+                    ${tipoInfo.label}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${linkHtml}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="${statusColor}">${status}</span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
 
 // 🔧 Helper: Criar link de referral
+function createReferralLinkHTML(participant) {
+    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+        return `
+            <div class="flex items-center gap-2">
+                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        `;
+    }
+    return '-';
+}
 
 // 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
+function generateParticipantsHTML(participants) {
+    return participants.flatMap(participant => {
+        // Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                return createParticipantRowHTML(participant, listName);
+            });
+        } else {
+            // Se não tem listas, criar uma linha normal
+            return [createParticipantRowHTML(participant, '-')];
+        }
+    }).join('');
+}
 
 // 🔧 Helper: Criar HTML da linha do participante (template limpo)
+function createParticipantRowHTML(participant, listName) {
+    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+    const status = participant.status || 'ativo';
+    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+    const campaignName = getCampaignDisplayName(participant);
+    const participantId = participant._id || participant.id;
+    
+    // Link de referral simplificado
+    const linkHtml = createReferralLinkHTML(participant);
+    
+    return `
+        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
+            <td class="px-4 py-3">
+                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                        <i class="${tipoInfo.icon} text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${listName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${campaignName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                    <i class="${tipoInfo.icon} mr-1"></i>
+                    ${tipoInfo.label}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${linkHtml}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="${statusColor}">${status}</span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
 
 // 🔧 Helper: Criar link de referral
+function createReferralLinkHTML(participant) {
+    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+        return `
+            <div class="flex items-center gap-2">
+                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        `;
+    }
+    return '-';
+}
 
 // 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
+function generateParticipantsHTML(participants) {
+    return participants.flatMap(participant => {
+        // Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                return createParticipantRowHTML(participant, listName);
+            });
+        } else {
+            // Se não tem listas, criar uma linha normal
+            return [createParticipantRowHTML(participant, '-')];
+        }
+    }).join('');
+}
 
 // 🔧 Helper: Criar HTML da linha do participante (template limpo)
+function createParticipantRowHTML(participant, listName) {
+    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+    const status = participant.status || 'ativo';
+    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+    const campaignName = getCampaignDisplayName(participant);
+    const participantId = participant._id || participant.id;
+    
+    // Link de referral simplificado
+    const linkHtml = createReferralLinkHTML(participant);
+    
+    return `
+        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
+            <td class="px-4 py-3">
+                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                        <i class="${tipoInfo.icon} text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${listName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${campaignName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                    <i class="${tipoInfo.icon} mr-1"></i>
+                    ${tipoInfo.label}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${linkHtml}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="${statusColor}">${status}</span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
 
 // 🔧 Helper: Criar link de referral
+function createReferralLinkHTML(participant) {
+    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+        return `
+            <div class="flex items-center gap-2">
+                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        `;
+    }
+    return '-';
+}
 
 // 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
+function generateParticipantsHTML(participants) {
+    return participants.flatMap(participant => {
+        // Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                return createParticipantRowHTML(participant, listName);
+            });
+        } else {
+            // Se não tem listas, criar uma linha normal
+            return [createParticipantRowHTML(participant, '-')];
+        }
+    }).join('');
+}
 
 // 🔧 Helper: Criar HTML da linha do participante (template limpo)
+function createParticipantRowHTML(participant, listName) {
+    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+    const status = participant.status || 'ativo';
+    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+    const campaignName = getCampaignDisplayName(participant);
+    const participantId = participant._id || participant.id;
+    
+    // Link de referral simplificado
+    const linkHtml = createReferralLinkHTML(participant);
+    
+    return `
+        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
+            <td class="px-4 py-3">
+                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                        <i class="${tipoInfo.icon} text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${listName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${campaignName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                    <i class="${tipoInfo.icon} mr-1"></i>
+                    ${tipoInfo.label}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${linkHtml}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="${statusColor}">${status}</span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
 
 // 🔧 Helper: Criar link de referral
+function createReferralLinkHTML(participant) {
+    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+        return `
+            <div class="flex items-center gap-2">
+                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        `;
+    }
+    return '-';
+}
 
 // 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
+function generateParticipantsHTML(participants) {
+    return participants.flatMap(participant => {
+        // Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                return createParticipantRowHTML(participant, listName);
+            });
+        } else {
+            // Se não tem listas, criar uma linha normal
+            return [createParticipantRowHTML(participant, '-')];
+        }
+    }).join('');
+}
 
 // 🔧 Helper: Criar HTML da linha do participante (template limpo)
+function createParticipantRowHTML(participant, listName) {
+    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+    const status = participant.status || 'ativo';
+    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+    const campaignName = getCampaignDisplayName(participant);
+    const participantId = participant._id || participant.id;
+    
+    // Link de referral simplificado
+    const linkHtml = createReferralLinkHTML(participant);
+    
+    return `
+        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
+            <td class="px-4 py-3">
+                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                        <i class="${tipoInfo.icon} text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${listName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${campaignName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                    <i class="${tipoInfo.icon} mr-1"></i>
+                    ${tipoInfo.label}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${linkHtml}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="${statusColor}">${status}</span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
 
 // 🔧 Helper: Criar link de referral
+function createReferralLinkHTML(participant) {
+    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+        return `
+            <div class="flex items-center gap-2">
+                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        `;
+    }
+    return '-';
+}
 
 // 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
+function generateParticipantsHTML(participants) {
+    return participants.flatMap(participant => {
+        // Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                return createParticipantRowHTML(participant, listName);
+            });
+        } else {
+            // Se não tem listas, criar uma linha normal
+            return [createParticipantRowHTML(participant, '-')];
+        }
+    }).join('');
+}
 
 // 🔧 Helper: Criar HTML da linha do participante (template limpo)
+function createParticipantRowHTML(participant, listName) {
+    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+    const status = participant.status || 'ativo';
+    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+    const campaignName = getCampaignDisplayName(participant);
+    const participantId = participant._id || participant.id;
+    
+    // Link de referral simplificado
+    const linkHtml = createReferralLinkHTML(participant);
+    
+    return `
+        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
+            <td class="px-4 py-3">
+                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                        <i class="${tipoInfo.icon} text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${listName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${campaignName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                    <i class="${tipoInfo.icon} mr-1"></i>
+                    ${tipoInfo.label}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${linkHtml}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="${statusColor}">${status}</span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
 
 // 🔧 Helper: Criar link de referral
+function createReferralLinkHTML(participant) {
+    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+        return `
+            <div class="flex items-center gap-2">
+                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        `;
+    }
+    return '-';
+}
 
 // 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
+function generateParticipantsHTML(participants) {
+    return participants.flatMap(participant => {
+        // Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                return createParticipantRowHTML(participant, listName);
+            });
+        } else {
+            // Se não tem listas, criar uma linha normal
+            return [createParticipantRowHTML(participant, '-')];
+        }
+    }).join('');
+}
 
 // 🔧 Helper: Criar HTML da linha do participante (template limpo)
+function createParticipantRowHTML(participant, listName) {
+    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+    const status = participant.status || 'ativo';
+    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+    const campaignName = getCampaignDisplayName(participant);
+    const participantId = participant._id || participant.id;
+    
+    // Link de referral simplificado
+    const linkHtml = createReferralLinkHTML(participant);
+    
+    return `
+        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
+            <td class="px-4 py-3">
+                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                        <i class="${tipoInfo.icon} text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm text-gray-300">${listName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${campaignName}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                    <i class="${tipoInfo.icon} mr-1"></i>
+                    ${tipoInfo.label}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="text-sm">${linkHtml}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="${statusColor}">${status}</span>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
 
 // 🔧 Helper: Criar link de referral
+function createReferralLinkHTML(participant) {
     if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
         const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
         return `
@@ -2076,6 +2882,192 @@ function populateListFilter() {
 }
 
 // 🚀 FUNÇÃO CORRIGIDA - Display direto COM fallback para ParticipantsManager
+function displayParticipants() {
+    console.log('🔄 displayParticipants ORIGINAL - Sistema restaurado');
+    
+    const tbody = document.getElementById('participantsList');
+    if (!tbody) {
+        console.error('❌ Elemento participantsList não encontrado');
+        return;
+    }
+    
+    // 🔧 SISTEMA ORIGINAL: Usar filtros locais
+    const filteredParticipants = filterParticipantsData();
+    console.log('📊 Participantes filtrados:', filteredParticipants.length);
+    
+    if (!filteredParticipants || filteredParticipants.length === 0) {
+        console.log('⚠️ Nenhum participante após filtros');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center py-8">
+                    <div class="flex flex-col items-center">
+                        <i class="fas fa-users text-4xl text-gray-500 mb-4"></i>
+                        <p class="text-xl text-gray-400 mb-2">Nenhum participante encontrado</p>
+                        <p class="text-sm text-gray-500">Tente ajustar os filtros ou adicionar novos participantes</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // 🔧 SISTEMA ORIGINAL: Paginação simples local
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedParticipants = filteredParticipants.slice(startIndex, endIndex);
+    
+    console.log(`📄 Página ${currentPage}: ${startIndex}-${endIndex} de ${filteredParticipants.length}`);
+    
+    // Atualizar estatísticas globais
+    totalParticipants = filteredParticipants.length;
+    totalPages = Math.ceil(totalParticipants / pageSize) || 1;
+    
+    // 🎯 SISTEMA ORIGINAL: Duplicar linhas por lista (João em 2 listas = 2 linhas)
+    const html = paginatedParticipants.flatMap(participant => {
+        const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+        const status = participant.status || 'ativo';
+        const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+        
+        // Link de referral se for indicador
+        let linkHtml = '-';
+        if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+            const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+            linkHtml = `
+                <div class="flex items-center gap-2">
+                    <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                    <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Campanha
+        const campaignName = getCampaignDisplayName(participant);
+        
+        // 🔧 SISTEMA ORIGINAL: Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                
+                return `
+                    <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participant._id || participant.id}" data-list-name="${listName}">
+                    <td class="px-4 py-3">
+                            <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participant._id || participant.id}">
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                                    <i class="${tipoInfo.icon} text-white text-sm"></i>
+                            </div>
+                            <div>
+                                    <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                                    <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${listName}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm">${campaignName}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                            <i class="${tipoInfo.icon} mr-1"></i>
+                            ${tipoInfo.label}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm">${linkHtml}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <span class="${statusColor}">${status}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <button onclick="viewParticipantDetails('${participant._id || participant.id}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="editParticipant('${participant._id || participant.id}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                                <button onclick="deleteParticipant('${participant._id || participant.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                    </tr>
+                `;
+            });
+        } else {
+            // 🔧 Se não tem listas, criar uma linha normal
+            return [`
+                <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participant._id || participant.id}">
+                <td class="px-4 py-3">
+                        <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participant._id || participant.id}">
+                </td>
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                                <i class="${tipoInfo.icon} text-white text-sm"></i>
+                        </div>
+                        <div>
+                                <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                                <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm text-gray-300">-</div>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm">${campaignName}</div>
+                </td>
+                <td class="px-4 py-3">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                        <i class="${tipoInfo.icon} mr-1"></i>
+                        ${tipoInfo.label}
+                    </span>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm">${linkHtml}</div>
+                </td>
+                <td class="px-4 py-3">
+                        <span class="${statusColor}">${status}</span>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <button onclick="viewParticipantDetails('${participant._id || participant.id}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="editParticipant('${participant._id || participant.id}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                            <button onclick="deleteParticipant('${participant._id || participant.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+                </tr>
+            `];
+        }
+    }).join('');
+    
+    tbody.innerHTML = html;
+    
+    // 🔧 SISTEMA ORIGINAL: Atualizar controles de paginação
+    updatePaginationControls();
+    updateParticipantCount();
+    
+    console.log('✅ Display original concluído com sucesso!');
+}
 
 // Função de teste para verificar conexão de dados
 function testDataConnection() {
