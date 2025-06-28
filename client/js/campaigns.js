@@ -1055,7 +1055,19 @@ function closeLPIndicadoresModal() {
 // Copiar link da LP
 async function copyLPLink(url) {
     try {
-        await navigator.clipboard.writeText(window.location.origin + url);
+        // 🔧 CORREÇÃO: Usar configuração dinâmica em vez de window.location.origin
+        let baseUrl;
+        if (window.APP_CONFIG && window.APP_CONFIG.CLIENT_URL) {
+            baseUrl = window.APP_CONFIG.CLIENT_URL;
+        } else {
+            // Fallback baseado no ambiente
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                baseUrl = 'http://localhost:5501';
+            } else {
+                baseUrl = 'https://programa-indicacao-multicliente.vercel.app';
+            }
+        }
+        await navigator.clipboard.writeText(baseUrl + url);
         alert('Link copiado para a área de transferência!');
     } catch (error) {
         console.error('Erro ao copiar link:', error);
