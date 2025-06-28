@@ -886,7 +886,19 @@ function displayParticipants() {
         // Link de referral se for indicador
         let linkHtml = '-';
         if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
-            const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+            // 🔧 CORREÇÃO CRÍTICA: Usar backend Railway em vez do domínio atual
+            let baseReferralUrl;
+            if (window.APP_CONFIG && window.APP_CONFIG.REFERRAL_BASE_URL) {
+                baseReferralUrl = window.APP_CONFIG.REFERRAL_BASE_URL;
+            } else {
+                // Fallback: SEMPRE usar o backend Railway em produção
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    baseReferralUrl = 'http://localhost:3000/indicacao';
+                } else {
+                    baseReferralUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+                }
+            }
+            const referralLink = `${baseReferralUrl}/${participant.uniqueReferralCode}`;
             linkHtml = `
                 <div class="flex items-center gap-2">
                     <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
