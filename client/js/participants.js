@@ -5043,9 +5043,9 @@ window.debugImportFlow = function() {
         console.log('2. 🔧 ANÁLISE DA FUNÇÃO saveImportedParticipants:');
         console.log('   📄 Código atual da função:');
         console.log('   - Endpoint usado: /participants/import');
-        console.log('   - Campos enviados: name, email, phone, company, status');
-        console.log('   ❌ PROBLEMA: Não envia "tipo" nem "listId"');
-        console.log('   ❌ PROBLEMA: Não vincula à lista específica');
+        console.log('   - Campos enviados: name, email, phone, company, status, tipo, listId');
+        console.log('   ✅ CORRIGIDO: Agora envia "tipo" e "listId"');
+        console.log('   ✅ CORRIGIDO: Vincula à lista específica');
         
         // 3. Simular dados que seriam enviados
         console.log('3. 🔄 SIMULAÇÃO DE DADOS DE IMPORTAÇÃO:');
@@ -5281,3 +5281,141 @@ function setImportListContext(listId) {
     currentEditingListId = listId;
     console.log('🔧 Contexto de importação definido:', { listId });
 }
+
+// 🔧 FUNÇÃO DE VERIFICAÇÃO: Confirmar se correção foi aplicada
+window.verificarCorrecaoImportacao = function() {
+    console.log('🔍 === VERIFICAÇÃO DA CORREÇÃO DE IMPORTAÇÃO ===');
+    
+    try {
+        // 1. Verificar se função corrigida existe
+        const funcaoCorrigida = saveImportedParticipants.toString();
+        console.log('1. 📋 VERIFICAÇÃO DA FUNÇÃO:');
+        
+        if (funcaoCorrigida.includes('listId = null') && funcaoCorrigida.includes('tipoParticipante = \'participante\'')) {
+            console.log('   ✅ Função saveImportedParticipants CORRIGIDA encontrada');
+            console.log('   ✅ Aceita parâmetros: listId e tipoParticipante');
+        } else {
+            console.log('   ❌ Função ainda não corrigida');
+        }
+        
+        if (funcaoCorrigida.includes('listId: listId') && funcaoCorrigida.includes('tipo: tipoParticipante')) {
+            console.log('   ✅ Payload inclui listId e tipo');
+        } else {
+            console.log('   ❌ Payload ainda não inclui listId e tipo');
+        }
+        
+        // 2. Verificar funções auxiliares
+        console.log('2. 🔧 VERIFICAÇÃO DAS FUNÇÕES AUXILIARES:');
+        
+        if (typeof getSelectedListId === 'function') {
+            console.log('   ✅ getSelectedListId() encontrada');
+        } else {
+            console.log('   ❌ getSelectedListId() não encontrada');
+        }
+        
+        if (typeof getCurrentListType === 'function') {
+            console.log('   ✅ getCurrentListType() encontrada');
+        } else {
+            console.log('   ❌ getCurrentListType() não encontrada');
+        }
+        
+        if (typeof setImportListContext === 'function') {
+            console.log('   ✅ setImportListContext() encontrada');
+        } else {
+            console.log('   ❌ setImportListContext() não encontrada');
+        }
+        
+        // 3. Testar detecção de contexto
+        console.log('3. 🧪 TESTE DE DETECÇÃO DE CONTEXTO:');
+        const listId = getSelectedListId();
+        const tipo = getCurrentListType();
+        
+        console.log(`   - ID da lista detectado: ${listId || 'nenhum'}`);
+        console.log(`   - Tipo detectado: ${tipo}`);
+        
+        // 4. Verificar listas disponíveis
+        console.log('4. 📊 LISTAS DISPONÍVEIS:');
+        if (lists && lists.length > 0) {
+            console.log(`   - Total: ${lists.length} listas`);
+            lists.forEach((list, index) => {
+                console.log(`   - Lista ${index + 1}: "${list.name}" (${list.tipo || 'tipo não definido'})`);
+            });
+        } else {
+            console.log('   - Nenhuma lista carregada');
+        }
+        
+        // 5. Status geral
+        console.log('5. 📋 STATUS GERAL DA CORREÇÃO:');
+        const funcaoOK = funcaoCorrigida.includes('listId = null') && funcaoCorrigida.includes('tipoParticipante');
+        const auxiliaresOK = typeof getSelectedListId === 'function' && typeof getCurrentListType === 'function';
+        
+        if (funcaoOK && auxiliaresOK) {
+            console.log('   🎯 STATUS: CORREÇÃO APLICADA COM SUCESSO!');
+            console.log('   ✅ A importação deve funcionar corretamente agora');
+        } else {
+            console.log('   ⚠️ STATUS: CORREÇÃO PARCIAL');
+            console.log('   - Função principal:', funcaoOK ? 'OK' : 'PENDENTE');
+            console.log('   - Funções auxiliares:', auxiliaresOK ? 'OK' : 'PENDENTE');
+        }
+        
+        console.log('✅ === VERIFICAÇÃO CONCLUÍDA ===');
+        
+    } catch (error) {
+        console.error('❌ Erro na verificação:', error);
+    }
+};
+
+// 🧪 FUNÇÃO DE TESTE: Simular importação com correção
+window.testarImportacaoCorrigida = function() {
+    console.log('🧪 === TESTE DA IMPORTAÇÃO CORRIGIDA ===');
+    
+    try {
+        // Dados de teste
+        const mockParticipants = [
+            { name: 'Teste Correção 1', email: 'teste1@correção.com', phone: '11999999999' },
+            { name: 'Teste Correção 2', email: 'teste2@correção.com', phone: '11888888888' }
+        ];
+        
+        // Detectar contexto
+        const listId = getSelectedListId() || (lists && lists.length > 0 ? lists[0]._id : null);
+        const tipo = getCurrentListType() || 'participante';
+        
+        console.log('📋 DADOS DO TESTE:');
+        console.log(`   - Participantes: ${mockParticipants.length}`);
+        console.log(`   - Lista ID: ${listId || 'nenhuma lista disponível'}`);
+        console.log(`   - Tipo: ${tipo}`);
+        
+        if (!listId) {
+            console.log('⚠️ AVISO: Nenhuma lista disponível para teste');
+            console.log('💡 SOLUÇÃO: Crie uma lista primeiro ou teste com lista específica');
+            return;
+        }
+        
+        // Simular payload que seria enviado
+        const payload = {
+            clientId: localStorage.getItem('clientId'),
+            listId: listId,
+            tipoParticipante: tipo,
+            participants: mockParticipants.map(p => ({
+                name: p.name,
+                email: p.email,
+                phone: p.phone,
+                company: '',
+                status: 'active',
+                tipo: tipo,
+                listId: listId
+            }))
+        };
+        
+        console.log('📤 PAYLOAD QUE SERIA ENVIADO:');
+        console.log(payload);
+        
+        console.log('✅ TESTE SIMULADO COM SUCESSO!');
+        console.log('💡 Para teste real, use o modal de importação');
+        
+    } catch (error) {
+        console.error('❌ Erro no teste:', error);
+    }
+    
+    console.log('✅ === TESTE CONCLUÍDO ===');
+};

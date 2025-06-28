@@ -215,13 +215,75 @@ export class ParticipantsService {
     return this.participantModel.findById(id);
   }
 
+  // 🔧 MÉTODO CORRIGIDO: Importar participantes com contexto de lista
   async importMany(dto: ImportParticipantsDto) {
-    const participants = dto.participants.map(p => ({
-      ...p,
+    console.log('🔧 BACKEND importMany CORRIGIDO chamado com:', {
       clientId: dto.clientId,
-      participantId: (p as any).participantId || uuidv4()
-    }));
-    return this.participantModel.insertMany(participants);
+      listId: dto.listId,
+      tipoParticipante: dto.tipoParticipante,
+      participantesCount: dto.participants.length
+    });
+
+    try {
+      // 🔧 CORREÇÃO: Criar participantes com tipo correto
+      const participants = dto.participants.map(p => ({
+        ...p,
+        clientId: dto.clientId,
+        participantId: (p as any).participantId || uuidv4(),
+        tipo: dto.tipoParticipante || 'participante', // ✅ Usar tipo correto
+        originSource: 'import', // Marcar como importado
+        importedAt: new Date(), // Data da importação
+        status: 'ativo' // Status padrão
+      }));
+
+      console.log('🔧 BACKEND Criando participantes com dados:', participants.slice(0, 1));
+
+      // Inserir participantes no banco
+      const insertedParticipants = await this.participantModel.insertMany(participants);
+      console.log('🔧 BACKEND Participantes inseridos:', insertedParticipants.length);
+
+      // 🔧 CORREÇÃO: Se listId fornecido, associar participantes à lista
+      if (dto.listId && insertedParticipants.length > 0) {
+        console.log('🔧 BACKEND Associando participantes à lista:', dto.listId);
+        
+        // Verificar se a lista existe
+        const list = await this.participantListModel.findById(dto.listId);
+        if (!list) {
+          console.error('❌ BACKEND Lista não encontrada:', dto.listId);
+          throw new Error('Lista não encontrada');
+        }
+
+        console.log('✅ BACKEND Lista encontrada:', list.name);
+
+        // Adicionar participantes à lista
+        const participantIds = insertedParticipants.map(p => p._id);
+        
+        // Atualizar lista com novos participantes
+        await this.participantListModel.findByIdAndUpdate(
+          dto.listId,
+          { $addToSet: { participants: { $each: participantIds } } }
+        );
+
+        // Atualizar participantes com a lista
+        await this.participantModel.updateMany(
+          { _id: { $in: participantIds } },
+          { $addToSet: { lists: dto.listId } }
+        );
+
+        console.log('✅ BACKEND Participantes associados à lista com sucesso');
+      }
+
+      return {
+        success: true,
+        message: `${insertedParticipants.length} participantes importados com sucesso`,
+        participantsCreated: insertedParticipants.length,
+        listAssociated: !!dto.listId
+      };
+
+    } catch (error) {
+      console.error('❌ BACKEND Erro na importação:', error);
+      throw error;
+    }
   }
 
   async addToList(participantId: string, listId: string) {

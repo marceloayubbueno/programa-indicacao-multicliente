@@ -328,13 +328,20 @@
         </form>
       </div>
     </div>
-    <!-- 🌟 NOVOS MÓDULOS REFATORADOS -->
+    <!-- 🌟 MÓDULOS REFATORADOS COM ORDEM CORRIGIDA -->
     <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
     <script src="../js/modules/api-client.js"></script>
     <script src="../js/modules/data-adapter.js"></script>
     <script src="../js/modules/participants-manager.js"></script>
     <script src="../js/participants.js"></script>
-    <script src="../js/auth.js"></script>
-    <script>checkAuth();</script>
+    <script>
+        // 🔧 CORREÇÃO: Aguardar carregamento completo antes de chamar checkAuth
+        if (typeof checkAuth === 'function') {
+            checkAuth();
+        } else {
+            console.error('❌ checkAuth não encontrado - verificar carregamento de auth.js');
+        }
+    </script>
 </body>
 </html> 
