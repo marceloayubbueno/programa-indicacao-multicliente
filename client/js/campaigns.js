@@ -906,7 +906,7 @@ async function accessLPIndicadores(campaignId) {
             return;
         }
         
-        const response = await fetch(`http://localhost:3000/api/campaigns/${campaignId}/lp-indicadores`, {
+        const response = await fetch(`${API_URL}/campaigns/${campaignId}/lp-indicadores`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -1194,8 +1194,8 @@ async function loadCampaigns() {
     let recompensasMap = {};
     try {
         const [listasRes, recompensasRes] = await Promise.all([
-            fetch(`http://localhost:3000/api/participant-lists`, { headers: { 'Authorization': `Bearer ${token}` } }),
-            fetch(`http://localhost:3000/api/rewards`, { headers: { 'Authorization': `Bearer ${token}` } })
+            fetch(`${API_URL}/participant-lists`, { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch(`${API_URL}/rewards`, { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
         const listasData = await listasRes.json();
         const recompensasData = await recompensasRes.json();
@@ -1216,8 +1216,8 @@ async function loadCampaigns() {
         const cacheKey = tipo + id;
         if (cache[cacheKey]) return cache[cacheKey];
         let url = '';
-        if (tipo === 'indicadores') url = `http://localhost:3000/api/lp-indicadores/${id}`;
-        if (tipo === 'divulgacao') url = `http://localhost:3000/api/lp-divulgacao/${id}`;
+        if (tipo === 'indicadores') url = `${API_URL}/lp-indicadores/${id}`;
+        if (tipo === 'divulgacao') url = `${API_URL}/lp-divulgacao/${id}`;
         if (!url) return '-';
         try {
             const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -1229,7 +1229,7 @@ async function loadCampaigns() {
     }
 
     try {
-        const res = await fetch(`http://localhost:3000/api/campaigns`, {
+        const res = await fetch(`${API_URL}/campaigns`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -1637,7 +1637,7 @@ async function handleNewCampaign(event) {
         console.log("handleNewCampaign: [6] Tentando salvar via API...");
         const clientId = localStorage.getItem('clientId');
         const token = localStorage.getItem('clientToken') || localStorage.getItem('token');
-        const res = await fetch('http://localhost:3000/api/campaigns', {
+        const res = await fetch(`${API_URL}/campaigns`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
