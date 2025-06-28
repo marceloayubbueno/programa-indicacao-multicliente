@@ -137,71 +137,83 @@ function searchParticipants() {
 
 // 🚀 FUNÇÃO ESCALÁVEL - Usando PaginationSystem
 async function loadParticipants(page = 1, filters = {}) {
-    console.log('🔄 loadParticipants ESCALÁVEL - Usando PaginationSystem');
+    console.log('🔄 loadParticipants ORIGINAL - Sistema restaurado');
+    console.log('📄 Carregando página:', page, 'Filtros:', filters);
     
-    // 🔍 H4 - DIAGNÓSTICO FRONTEND MAIN
-    console.log('🔍 H4 - loadParticipants chamado com:', { page, filters });
-    console.log('🔍 H4 - Estado atual antes do carregamento:', {
-        participants: participants.length,
-        currentPage,
-        totalParticipants,
-        tipoFiltro
-    });
+    if (isLoading) {
+        console.log('⏳ Já carregando participantes...');
+        return;
+    }
     
     try {
-        // 🎯 Usar o sistema de paginação escalável
-        const result = await PaginationSystem.loadPage(page, filters);
+        isLoading = true;
         
-        // 🔍 H4 - DIAGNÓSTICO RESULTADO PAGINATION SYSTEM
-        console.log('🔍 H4 - Resultado do PaginationSystem:', {
-            participantsCount: result.participants?.length || 0,
-            total: result.total,
-            page: result.page,
-            hasData: !!result.participants
-        });
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
         
-        PaginationSystem.updateGlobalState(result, page);
-        
-        // 🔍 H4 - DIAGNÓSTICO APÓS UPDATE GLOBAL STATE
-        console.log('🔍 H4 - Estado após updateGlobalState:', {
-            participants: participants.length,
-            currentPage,
-            totalParticipants,
-            totalPages
-        });
-        
-                 // 🔄 Manter compatibilidade com código legado
-         if (result.participants) {
-             console.log('🔧 FORÇANDO exibição de participantes:', result.participants.length);
-             
-             // SEMPRE usar displayParticipants() - CORREÇÃO CRÍTICA
-             displayParticipants();
-             
-             // Backup: Comentado temporariamente devido a erro bgColor
-             // if (window.participantsManager && window.participantsManager.displayParticipants) {
-             //     console.log('🔧 BACKUP: Também chamando participantsManager');
-             //     window.participantsManager.displayParticipants(participants);
-             // }
-         } else {
-             console.error('❌ result.participants está vazio ou undefined');
-         }
-
-                 console.log('✅ Participantes carregados via PaginationSystem:', {
-            count: participants.length,
-            total: totalParticipants,
-            page: currentPage,
-            totalPages: totalPages
-        });
-        
-        // 🔧 GARANTIA ADICIONAL: Sempre forçar exibição após carregamento
-        if (participants && participants.length > 0) {
-            console.log('🔧 GARANTIA: Forçando exibição após loadParticipants...');
-        displayParticipants();
+        if (!token || !clientId) {
+            console.error('❌ Token ou clientId não encontrado');
+            return;
         }
+        
+        console.log('🔗 Carregando participantes via API...');
+        
+        // 🔧 SISTEMA ORIGINAL: Carregar todos os dados de uma vez
+        const url = `${getApiUrl()}/participants?clientId=${clientId}&limit=1000`;
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('📥 Dados recebidos:', data);
+        
+        // Extrair participantes
+        const participantsArray = data.participants || data.data || data || [];
+        console.log('👥 Participantes extraídos:', participantsArray.length);
+        
+        // 🔧 SISTEMA ORIGINAL: Atualizar estado global
+        participants = participantsArray;
+        totalParticipants = participantsArray.length;
+        currentPage = 1; // Reset para página 1
+        totalPages = Math.ceil(totalParticipants / pageSize) || 1;
+        
+        console.log('✅ Participantes carregados:', {
+            total: participants.length,
+            página: currentPage,
+            páginas_total: totalPages
+        });
+        
+        // Forçar exibição
+        displayParticipants();
         
     } catch (error) {
         console.error('❌ Erro ao carregar participantes:', error);
         showNotification('Erro ao carregar participantes', 'error');
+        
+        // Mostrar erro na tabela
+        const tbody = document.getElementById('participantsList');
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-8">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                            <p class="text-xl text-red-400 mb-2">Erro ao carregar dados</p>
+                            <p class="text-sm text-gray-500">Verifique sua conexão e tente novamente</p>
+                            <button onclick="loadParticipants()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                Tentar novamente
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    } finally {
+        isLoading = false;
     }
 }
 
@@ -806,17 +818,7 @@ function populateListFilter() {
 
 // 🚀 FUNÇÃO CORRIGIDA - Display direto COM fallback para ParticipantsManager
 function displayParticipants() {
-    // 🔍 H4 - DIAGNÓSTICO DISPLAY PRINCIPAL
-    console.log('🔍 H4 - displayParticipants chamado');
-    console.log('🔍 H4 - Participantes globais:', participants ? participants.length : 'undefined');
-    console.log('🔍 H4 - Tipo de dados participants:', typeof participants);
-    console.log('🔍 H4 - É array?', Array.isArray(participants));
-    console.log('🔍 H4 - Filtros ativos no momento:', { tipoFiltro, currentFilters });
-    console.log('🔍 H4 - Aba atual:', currentTab);
-    
-    console.log('🔄 displayParticipants CORRIGIDA - Verificando dados...');
-    console.log('📊 Participants array:', participants ? participants.length : 'undefined');
-    console.log('📊 totalParticipants:', totalParticipants);
+    console.log('🔄 displayParticipants ORIGINAL - Sistema restaurado');
     
     const tbody = document.getElementById('participantsList');
     if (!tbody) {
@@ -824,23 +826,15 @@ function displayParticipants() {
         return;
     }
     
-    // 🔧 CORREÇÃO CRÍTICA: Exibir dados diretamente
-    if (!participants || participants.length === 0) {
-        console.log('🔍 H4 - Nenhum participante para exibir - mostrando mensagem vazia');
-        console.log('⚠️ Nenhum participante para exibir');
-        
-        // 🔍 H4 - DIAGNÓSTICO DETALHADO DO ESTADO VAZIO
-        console.log('🔍 H4 - Diagnóstico do estado vazio:', {
-            participantsExists: !!participants,
-            participantsLength: participants ? participants.length : 'N/A',
-            totalParticipants: totalParticipants,
-            currentPage: currentPage,
-            isLoading: isLoading
-        });
-        
+    // 🔧 SISTEMA ORIGINAL: Usar filtros locais
+    const filteredParticipants = filterParticipantsData();
+    console.log('📊 Participantes filtrados:', filteredParticipants.length);
+    
+    if (!filteredParticipants || filteredParticipants.length === 0) {
+        console.log('⚠️ Nenhum participante após filtros');
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" class="text-center py-8">
+                <td colspan="9" class="text-center py-8">
                     <div class="flex flex-col items-center">
                         <i class="fas fa-users text-4xl text-gray-500 mb-4"></i>
                         <p class="text-xl text-gray-400 mb-2">Nenhum participante encontrado</p>
@@ -852,25 +846,19 @@ function displayParticipants() {
         return;
     }
     
-    console.log('✅ Exibindo participantes diretamente:', participants.length);
+    // 🔧 SISTEMA ORIGINAL: Paginação simples local
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedParticipants = filteredParticipants.slice(startIndex, endIndex);
     
-    // 🔍 H4 - DIAGNÓSTICO PARTICIPANTES COM DADOS
-    console.log('🔍 H4 - Participantes com dados:', {
-        total: participants.length,
-        firstParticipant: participants[0] ? {
-            id: participants[0]._id || participants[0].id,
-            name: participants[0].name,
-            email: participants[0].email,
-            tipo: participants[0].tipo,
-            originSource: participants[0].originSource,
-            lists: participants[0].lists?.length || 0
-        } : null,
-        typesPresent: [...new Set(participants.map(p => p.tipo))],
-        originSources: [...new Set(participants.map(p => p.originSource))]
-    });
+    console.log(`📄 Página ${currentPage}: ${startIndex}-${endIndex} de ${filteredParticipants.length}`);
+    
+    // Atualizar estatísticas globais
+    totalParticipants = filteredParticipants.length;
+    totalPages = Math.ceil(totalParticipants / pageSize) || 1;
     
     // 🎯 SISTEMA ORIGINAL: Duplicar linhas por lista (João em 2 listas = 2 linhas)
-    const html = participants.flatMap(participant => {
+    const html = paginatedParticipants.flatMap(participant => {
         const tipoInfo = getTipoInfo(participant.tipo || 'participante');
         const status = participant.status || 'ativo';
         const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
@@ -1009,7 +997,11 @@ function displayParticipants() {
     
     tbody.innerHTML = html;
     
-        console.log('✅ Display direto concluído com sucesso!');
+    // 🔧 SISTEMA ORIGINAL: Atualizar controles de paginação
+    updatePaginationControls();
+    updateParticipantCount();
+    
+    console.log('✅ Display original concluído com sucesso!');
 }
 
 // Função de teste para verificar conexão de dados
@@ -2791,11 +2783,11 @@ function exportStats() {
     showNotification('Relatório exportado com sucesso', 'success');
 }
 
-// 🚀 FUNÇÕES DE FILTROS ESCALÁVEIS - Usando PaginationSystem
+// 🔧 SISTEMA ORIGINAL RESTAURADO - Filtros simples e funcionais
 async function setTipoFiltro(tipo) {
-    console.log('🔄 setTipoFiltro CORRIGIDO - Tipo:', tipo);
+    console.log('🔄 setTipoFiltro ORIGINAL - Tipo:', tipo);
     
-    // 🔧 CORREÇÃO: Evitar execução paralela
+    // Evitar execução paralela
     if (isLoading) {
         console.log('⏳ Filtro já em andamento, ignorando...');
         return;
@@ -2805,26 +2797,20 @@ async function setTipoFiltro(tipo) {
         isLoading = true;
         tipoFiltro = tipo;
         
-        // 🔧 CORREÇÃO: Montar filtros completos de forma limpa
-        const filters = {};
+        // Atualizar botões visuais
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('bg-gray-700', 'text-gray-200');
+        });
         
-        // Preservar filtros existentes, mas limpar conflitos
-        const statusFilter = document.getElementById('statusFilter')?.value || '';
-        const emailFilter = document.getElementById('emailFilter')?.value || '';
-        const listFilter = document.getElementById('listFilter')?.value;
+        const activeButton = document.getElementById(`filter-${tipo}`);
+        if (activeButton) {
+            activeButton.classList.remove('bg-gray-700', 'text-gray-200');
+            activeButton.classList.add('bg-blue-600', 'text-white');
+        }
         
-        if (statusFilter) filters.status = statusFilter;
-        if (emailFilter) filters.search = emailFilter;
-        
-        // 🔧 CORREÇÃO: Sempre incluir listId (mesmo que vazio) para detectar estado
-        filters.listId = listFilter || '';
-        
-        if (tipo !== 'todos') filters.tipo = tipo;
-        
-        console.log('🔧 Filtros montados limpos:', filters);
-        
-        // 🔧 CORREÇÃO: Aplicar filtros e atualizar interface
-        await PaginationSystem.applyFilters(filters);
+        // Atualizar exibição usando sistema original
+        displayParticipants();
         
         console.log(`✅ Filtro tipo "${tipo}" aplicado com sucesso`);
         
@@ -2837,9 +2823,9 @@ async function setTipoFiltro(tipo) {
 }
 
 async function filterParticipants() {
-    console.log('🔄 filterParticipants CORRIGIDO');
+    console.log('🔄 filterParticipants ORIGINAL');
     
-    // 🔧 CORREÇÃO: Evitar execução paralela
+    // Evitar execução paralela
     if (isLoading) {
         console.log('⏳ Filtro já em andamento, ignorando...');
         return;
@@ -2848,24 +2834,8 @@ async function filterParticipants() {
     try {
         isLoading = true;
         
-        // 🔧 CORREÇÃO: Coletar filtros de forma robusta
-        const statusFilter = document.getElementById('statusFilter')?.value || '';
-        const emailFilter = document.getElementById('emailFilter')?.value || '';
-        const listFilter = document.getElementById('listFilter')?.value;
-        
-        const filters = {};
-        if (statusFilter) filters.status = statusFilter;
-        if (emailFilter) filters.search = emailFilter;
-        
-        // 🔧 CORREÇÃO ESPECÍFICA: Sempre incluir listId para detectar quando foi limpo
-        filters.listId = listFilter || '';
-        
-        if (tipoFiltro && tipoFiltro !== 'todos') filters.tipo = tipoFiltro;
-        
-        console.log('🔧 Filtros coletados:', filters);
-        
-        // 🔧 CORREÇÃO: Aplicar filtros limpos
-        await PaginationSystem.applyFilters(filters);
+        // Sistema original: apenas atualizar exibição
+        displayParticipants();
         
         console.log('✅ Filtros aplicados com sucesso');
         
@@ -2887,21 +2857,33 @@ function toggleAllUsers() {
 }
 
 function changePage(direction) {
+    console.log('🔄 changePage ORIGINAL - Direção:', direction);
+    
     // Verificar se temos participantes carregados antes de tentar paginar
     if (!participants || participants.length === 0) {
+        console.log('⚠️ Nenhum participante carregado para paginar');
         return;
     }
     
+    // 🔧 SISTEMA ORIGINAL: Calcular paginação local
     const filteredParticipants = filterParticipantsData();
-    const totalPages = Math.ceil(filteredParticipants.length / pageSize);
+    const totalPages = Math.ceil(filteredParticipants.length / pageSize) || 1;
     
     if (direction === 'prev' && currentPage > 1) {
         currentPage--;
+        console.log('⬅️ Página anterior:', currentPage);
     } else if (direction === 'next' && currentPage < totalPages) {
         currentPage++;
+        console.log('➡️ Próxima página:', currentPage);
+    } else {
+        console.log('🚫 Mudança de página não permitida - Página atual:', currentPage, 'Total:', totalPages);
+        return;
     }
     
+    // Atualizar exibição
     displayParticipants();
+    
+    console.log(`✅ Página alterada para ${currentPage} de ${totalPages}`);
 }
 
 // 🚀 INICIALIZAÇÃO CORRIGIDA - Sistema escalável com exibição garantida
@@ -4650,3 +4632,84 @@ window.resetUsersTabInitialization = function() {
     
     console.log('✅ Reset concluído. Execute ensureUsersTabInitialized() para re-inicializar.');
 };
+
+// 🔧 SISTEMA ORIGINAL: Atualizar controles de paginação simples
+function updatePaginationControls() {
+    const paginationContainer = document.querySelector('.pagination-controls') || 
+                               document.querySelector('.pagination') ||
+                               document.querySelector('[data-pagination]');
+    
+    if (!paginationContainer || totalPages <= 1) {
+        if (paginationContainer) paginationContainer.innerHTML = '';
+        return;
+    }
+    
+    console.log(`🔧 Atualizando paginação: Página ${currentPage} de ${totalPages}`);
+    
+    let html = '<div class="flex items-center gap-2 flex-wrap">';
+    
+    // Botão Anterior
+    if (currentPage > 1) {
+        html += `<button onclick="changePage('prev')" class="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm">
+            <i class="fas fa-angle-left"></i> Anterior
+        </button>`;
+    }
+    
+    // Páginas numéricas (simples)
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    // Ajustar se estivermos no final
+    if (endPage - startPage + 1 < maxPagesToShow && startPage > 1) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    // Primeira página se necessário
+    if (startPage > 1) {
+        html += `<button onclick="goToPage(1)" class="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm">1</button>`;
+        if (startPage > 2) {
+            html += `<span class="px-2 text-gray-400">...</span>`;
+        }
+    }
+    
+    // Páginas numeradas
+    for (let i = startPage; i <= endPage; i++) {
+        const active = i === currentPage ? 'bg-blue-600' : 'bg-gray-600 hover:bg-gray-700';
+        html += `<button onclick="goToPage(${i})" class="px-3 py-1 ${active} text-white rounded text-sm">${i}</button>`;
+    }
+    
+    // Última página se necessário
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            html += `<span class="px-2 text-gray-400">...</span>`;
+        }
+        html += `<button onclick="goToPage(${totalPages})" class="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm">${totalPages}</button>`;
+    }
+    
+    // Botão Próximo
+    if (currentPage < totalPages) {
+        html += `<button onclick="changePage('next')" class="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm">
+            Próximo <i class="fas fa-angle-right"></i>
+        </button>`;
+    }
+    
+    html += '</div>';
+    
+    paginationContainer.innerHTML = html;
+}
+
+// 🔧 SISTEMA ORIGINAL: Ir para página específica
+function goToPage(pageNumber) {
+    console.log(`📄 goToPage ORIGINAL - Indo para página ${pageNumber}`);
+    
+    if (pageNumber >= 1 && pageNumber <= totalPages && pageNumber !== currentPage) {
+        currentPage = pageNumber;
+        console.log(`✅ Página alterada para ${pageNumber}`);
+        
+        // Atualizar exibição usando sistema original
+        displayParticipants();
+    } else {
+        console.log(`🚫 Página ${pageNumber} inválida ou já ativa`);
+    }
+}
