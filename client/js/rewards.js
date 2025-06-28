@@ -1,9 +1,3 @@
-// 🌍 CONFIGURAÇÃO DINÂMICA GLOBAL
-const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-               (window.location.hostname === 'localhost' ? 
-                'http://localhost:3000/api' : 
-                'https://programa-indicacao-multicliente-production.up.railway.app/api');
-
 // Variáveis globais
 let currentTab = 'types';
 let rewardTypes = [];
@@ -11,6 +5,16 @@ let rewards = [];
 let currentPage = 1;
 const itemsPerPage = 10;
 let editingRewardTypeId = null;
+
+// 🔧 CORREÇÃO: API_URL será obtida do auth.js (carregado depois)
+// Função para obter API_URL de forma segura
+function getApiUrl() {
+    return window.API_URL || 
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+           (window.location.hostname === 'localhost' ? 
+            'http://localhost:3000/api' : 
+            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+}
 
 // Funções de Navegação
 function switchTab(tab) {
@@ -95,6 +99,7 @@ function toggleRewardFields() {
 // Funções de Tipos de Recompensa (CRUD via API)
 async function loadRewardTypes() {
     try {
+        const API_URL = getApiUrl();
         const token = localStorage.getItem('clientToken');
         const clientId = localStorage.getItem('clientId');
         const response = await fetch(`${API_URL}/rewards?clientId=${clientId}`, {
@@ -159,6 +164,7 @@ function renderRewardTypesGrid(rewardTypes) {
 
 async function handleNewRewardType(event) {
     event.preventDefault();
+    const API_URL = getApiUrl();
     const type = document.getElementById('rewardType').value;
     const rewardData = {
         type: type,
@@ -209,6 +215,7 @@ async function handleNewRewardType(event) {
 async function deleteRewardType(id) {
     if (!confirm('Tem certeza que deseja excluir este tipo de recompensa?')) return;
     try {
+        const API_URL = getApiUrl();
         const token = localStorage.getItem('clientToken');
         const response = await fetch(`${API_URL}/rewards/${id}`, {
             method: 'DELETE',
@@ -251,6 +258,7 @@ function formatValue(rewardType) {
 }
 
 function editRewardType(id) {
+    const API_URL = getApiUrl();
     const token = localStorage.getItem('clientToken');
     fetch(`${API_URL}/rewards/${id}`, {
         headers: {
@@ -295,24 +303,45 @@ function editRewardType(id) {
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Página carregada, inicializando...');
-    try {
-        checkAuth();
-        loadRewardTypes();
-        
-        // Adicionar event listeners
-        document.getElementById('rewardType').addEventListener('change', toggleRewardFields);
-        
-        // Fechar modais ao clicar fora
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
+    
+    // 🔧 CORREÇÃO: Aguardar auth.js carregar antes de verificar auth
+    setTimeout(() => {
+        try {
+            // Verificar se checkAuth existe antes de chamar
+            if (typeof checkAuth === 'function') {
+                checkAuth();
+            } else {
+                console.warn('⚠️ [REWARDS] checkAuth não disponível, tentando novamente...');
+                // Tentar novamente após um delay
+                setTimeout(() => {
+                    if (typeof checkAuth === 'function') {
+                        checkAuth();
+                    } else {
+                        console.error('❌ [REWARDS] checkAuth ainda não disponível - problemas de carregamento');
+                    }
+                }, 1000);
             }
+            
+            loadRewardTypes();
+            
+            // Adicionar event listeners
+            const rewardTypeSelect = document.getElementById('rewardType');
+            if (rewardTypeSelect) {
+                rewardTypeSelect.addEventListener('change', toggleRewardFields);
+            }
+            
+            // Fechar modais ao clicar fora
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            }
+            
+            console.log('✅ [REWARDS] Inicialização concluída com sucesso');
+        } catch (error) {
+            console.error('❌ [REWARDS] Erro durante a inicialização:', error);
         }
-        
-        console.log('Inicialização concluída com sucesso');
-    } catch (error) {
-        console.error('Erro durante a inicialização:', error);
-    }
+    }, 100); // Pequeno delay para auth.js carregar
 });
 
 // Ajustar botão de novo tipo de recompensa para redirecionar para a nova página

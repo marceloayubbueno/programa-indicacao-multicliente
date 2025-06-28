@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Recompensas</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }
+        .log { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .error { background: #ff4444; }
+        .success { background: #44ff44; color: #000; }
+        .info { background: #4444ff; }
+        .warning { background: #ffaa00; color: #000; }
+        pre { background: #333; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Recompensas</h1>
+    
+    <div>
+        <button class="btn-primary" onclick="debugAuth()">1. Testar Autenticação</button>
+        <button class="btn-primary" onclick="debugAPI()">2. Testar API</button>
+        <button class="btn-primary" onclick="debugRewards()">3. Carregar Recompensas</button>
+        <button class="btn-success" onclick="clearLogs()">Limpar Logs</button>
+    </div>
+    
+    <div id="logs"></div>
+
+    <script>
+        // Configuração da API
+        const API_URL = window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api';
+
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logElement = document.createElement('div');
+            logElement.className = `log ${type}`;
+            logElement.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logsDiv.appendChild(logElement);
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        async function debugAuth() {
+            log('🔍 Testando autenticação...', 'info');
+            
+            const clientToken = localStorage.getItem('clientToken');
+            const clientId = localStorage.getItem('clientId');
+            
+            if (!clientToken) {
+                log('❌ clientToken não encontrado no localStorage', 'error');
+                return;
+            }
+            
+            if (!clientId) {
+                log('❌ clientId não encontrado no localStorage', 'error');
+                return;
+            }
+            
+            log(`✅ clientToken encontrado: ${clientToken.substring(0, 20)}...`, 'success');
+            log(`✅ clientId encontrado: ${clientId}`, 'success');
+            
+            // Testar se o token é válido
+            try {
+                const response = await fetch(`${API_URL}/clients/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${clientToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Token válido! Cliente: ${data.name || data.email || 'Sem nome'}`, 'success');
+                } else {
+                    log(`❌ Token inválido! Status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Erro ao validar token: ${error.message}`, 'error');
+            }
+        }
+
+        async function debugAPI() {
+            log('🔍 Testando conexão com API...', 'info');
+            log(`API URL: ${API_URL}`, 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (response.ok) {
+                    log('✅ API está online!', 'success');
+                } else {
+                    log(`⚠️ API respondeu com status: ${response.status}`, 'warning');
+                }
+            } catch (error) {
+                log(`❌ Erro ao conectar com API: ${error.message}`, 'error');
+                log('🔍 Testando URL alternativa...', 'info');
+                
+                // Testar URL direta
+                try {
+                    const altResponse = await fetch('https://programa-indicacao-multicliente-production.up.railway.app/api/health');
+                    if (altResponse.ok) {
+                        log('✅ URL alternativa funcionando!', 'success');
+                    }
+                } catch (altError) {
+                    log(`❌ URL alternativa também falhou: ${altError.message}`, 'error');
+                }
+            }
+        }
+
+        async function debugRewards() {
+            log('🔍 Testando carregamento de recompensas...', 'info');
+            
+            const clientToken = localStorage.getItem('clientToken');
+            const clientId = localStorage.getItem('clientId');
+            
+            if (!clientToken || !clientId) {
+                log('❌ Autenticação necessária! Execute teste 1 primeiro.', 'error');
+                return;
+            }
+            
+            const url = `${API_URL}/rewards?clientId=${clientId}`;
+            log(`🔗 URL da requisição: ${url}`, 'info');
+            
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${clientToken}`
+                    }
+                });
+                
+                log(`📡 Status da resposta: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    log(`❌ Erro na resposta: ${errorText}`, 'error');
+                    return;
+                }
+                
+                const result = await response.json();
+                log('✅ Resposta recebida:', 'success');
+                log(`<pre>${JSON.stringify(result, null, 2)}</pre>`, 'info');
+                
+                const rewards = result.data || result || [];
+                log(`📊 Total de recompensas encontradas: ${rewards.length}`, rewards.length > 0 ? 'success' : 'warning');
+                
+                if (rewards.length > 0) {
+                    rewards.forEach((reward, index) => {
+                        log(`Recompensa ${index + 1}: ${reward.description || reward.name || 'Sem nome'} (${reward.type})`, 'info');
+                    });
+                } else {
+                    log('ℹ️ Nenhuma recompensa encontrada. Teste criar uma nova.', 'warning');
+                }
+                
+            } catch (error) {
+                log(`❌ Erro ao carregar recompensas: ${error.message}`, 'error');
+                log(`🔍 Stack trace: ${error.stack}`, 'error');
+            }
+        }
+
+        // Auto-executar testes
+        window.onload = function() {
+            log('🚀 Debug de Recompensas iniciado!', 'info');
+            log('Execute os testes na ordem para diagnosticar o problema.', 'info');
+        };
+    </script>
+</body>
+</html> 
