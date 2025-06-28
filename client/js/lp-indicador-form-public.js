@@ -58,12 +58,12 @@ window.submitIndicadorForm = async function(event, form) {
     referrerUrl, userAgent, language
   };
   try {
-            // 🌍 USAR CONFIGURAÇÃO DINÂMICA
-        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                      (window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/api' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
-        const response = await fetch(`${apiUrl}/lp-indicadores/submit-form`, {
+    // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                  (window.location.hostname === 'localhost' ? 
+                   'http://localhost:3000/api' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+    const response = await fetch(`${apiUrl}/lp-indicadores/submit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

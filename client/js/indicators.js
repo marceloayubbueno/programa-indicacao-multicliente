@@ -23,16 +23,16 @@ async function loadIndicators() {
             return;
         }
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA
-    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                  (window.location.hostname === 'localhost' ? 
-                   'http://localhost:3000/api' : 
-                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
-    const response = await fetch(`${apiUrl}/indicadores?indicatorId=${indicatorId}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...(token && { 'Authorization': 'Bearer ' + token })
-            }
-        });
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/indicadores?indicatorId=${indicatorId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': 'Bearer ' + token })
+                }
+            });
         if (!response.ok) {
             let msg = 'Erro ao buscar indicadores';
             try { const errJson = await response.json(); msg = errJson.message || msg; } catch {}

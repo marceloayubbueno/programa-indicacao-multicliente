@@ -51,18 +51,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Enviar para o backend (PUT)
     try {
       // 🌍 USAR CONFIGURAÇÃO DINÂMICA
-    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                  (window.location.hostname === 'localhost' ? 
-                   'http://localhost:3000/api' : 
-                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
-    const res = await fetch(`${apiUrl}/lp-divulgacao/${lpId}`, {
+      const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                    (window.location.hostname === 'localhost' ? 
+                     'http://localhost:3000/api' : 
+                     'https://programa-indicacao-multicliente-production.up.railway.app/api');
+      const response = await fetch(`${apiUrl}/landing-pages/redirect-config`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ redirectUrl: data.redirectUrl, utmParams })
       });
-      const result = await res.json();
+      const result = await response.json();
       console.log('[CONFIG] Resposta do backend ao salvar:', result);
-      if (res.ok && result.success) {
+      if (response.ok && result.success) {
         alert('Configuração salva com sucesso!');
         window.location.href = 'lp-divulgacao.html';
       } else {

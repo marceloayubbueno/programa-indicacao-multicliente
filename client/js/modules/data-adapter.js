@@ -183,16 +183,32 @@ class DataAdapter {
     static generateDisplayLink(participant) {
         // Priorizar uniqueReferralCode
         if (participant.uniqueReferralCode) {
-            return `http://localhost:3000/indicacao/${participant.uniqueReferralCode}`;
+            return this.generateReferralLink(participant);
         }
         
         // Fallback para shareLink legacy
         if (participant.shareLink) {
-            return `http://localhost:3000/indicacao/${participant.shareLink}`;
+            return this.generateShareLink(participant);
         }
         
         // Não há link disponível
         return null;
+    }
+
+    generateReferralLink(participant) {
+        // 🌍 URL DINÂMICA PARA LINKS DE INDICAÇÃO
+        const baseUrl = window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/indicacao' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+        return `${baseUrl}/${participant.uniqueReferralCode}`;
+    }
+
+    generateShareLink(participant) {
+        // 🌍 URL DINÂMICA PARA LINKS DE COMPARTILHAMENTO
+        const baseUrl = window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/indicacao' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+        return `${baseUrl}/${participant.shareLink}`;
     }
 
     // 📋 FORMATAÇÃO DE LISTAS

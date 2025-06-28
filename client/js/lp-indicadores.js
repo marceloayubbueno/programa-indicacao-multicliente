@@ -109,7 +109,12 @@ function showNotificationIndicadores(message, type = 'info') {
 async function loadLists() {
     try {
         const token = localStorage.getItem('clientToken');
-        const response = await fetch('http://localhost:5501/api/lists', {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000/api' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const response = await fetch(`${apiUrl}/lists`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -258,7 +263,11 @@ function updateFormPreview() {
         };
 
         try {
-            const response = await fetch('http://localhost:5501/api/participants/external', {
+            // 🌍 URL DINÂMICA PARA EMBED CODE
+            const apiUrl = window.location.hostname === 'localhost' ? 
+                           'http://localhost:3000/api' : 
+                           'https://programa-indicacao-multicliente-production.up.railway.app/api';
+            const response = await fetch(\`\${apiUrl}/participants/external\`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
