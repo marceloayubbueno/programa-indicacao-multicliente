@@ -570,7 +570,7 @@
         
         // Detectar se é edição
         const lpId = getUrlParam('id');
-        let url = 'http://localhost:3000/api/lp-divulgacao';
+        let url = (window.location.hostname === "localhost" ? "http://localhost:3000/api" : "https://programa-indicacao-multicliente-production.up.railway.app/api") + "/lp-divulgacao";
         let method = 'POST';
         if (lpId) {
           url = `http://localhost:3000/api/lp-divulgacao/${lpId}`;

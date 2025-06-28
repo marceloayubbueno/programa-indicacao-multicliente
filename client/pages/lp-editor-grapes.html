@@ -1787,7 +1787,11 @@
         const token = localStorage.getItem('clientToken');
         if (token) {
           try {
-            const response = await fetch(`http://localhost:3000/api/lp-indicadores/${id}`, {
+            // 🌍 URL DINÂMICA PARA BUSCAR LP
+            const apiUrl = window.location.hostname === 'localhost' ? 
+                           (window.location.hostname === "localhost" ? "http://localhost:3000/api" : "https://programa-indicacao-multicliente-production.up.railway.app/api") : 
+                           'https://programa-indicacao-multicliente-production.up.railway.app/api';
+            const response = await fetch(`${apiUrl}/lp-indicadores/${id}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
@@ -1866,9 +1870,13 @@
         if (isEdit) {
           payload._id = id;
         }
+        // 🌍 URL DINÂMICA PARA SALVAR LP
+        const apiUrl = window.location.hostname === 'localhost' ? 
+                       (window.location.hostname === "localhost" ? "http://localhost:3000/api" : "https://programa-indicacao-multicliente-production.up.railway.app/api") : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app/api';
         const endpoint = isEdit
-          ? `http://localhost:3000/api/lp-indicadores/${id}`
-          : 'http://localhost:3000/api/lp-indicadores';
+          ? `${apiUrl}/lp-indicadores/${id}`
+          : `${apiUrl}/lp-indicadores`;
         const method = isEdit ? 'PATCH' : 'POST';
         const token = localStorage.getItem('clientToken');
         const response = await fetch(endpoint, {
