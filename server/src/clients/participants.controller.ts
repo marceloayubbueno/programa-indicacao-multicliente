@@ -135,23 +135,15 @@ export class ParticipantsController {
   async validateReferralCode(@Param('code') code: string) {
     try {
       const validation = await this.participantsService.validateReferralCode(code);
+      
       return {
-        success: validation.valid,
-        code,
-        indicator: validation.participant ? {
-          id: validation.participant._id,
-          name: validation.participant.name,
-          email: validation.participant.email,
-          campaign: validation.participant.campaignName || 'N/A'
-        } : null,
-        error: validation.error,
-        message: validation.valid ? 'Código válido' : validation.error
+        success: true,
+        data: validation
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message,
-        message: 'Erro ao validar código'
+        error: error.message
       };
     }
   }
@@ -232,24 +224,34 @@ export class ParticipantsController {
   // === ENDPOINTS GENÉRICOS (DEVEM VIR DEPOIS DOS ESPECÍFICOS) ===
 
   /**
-   * TESTE: Gerar código de referral para um indicador
-   * POST /participants/:id/generate-referral-code
+   * Gera ou regenera código único de referência para um indicador
    */
   @Post(':id/generate-referral-code')
   async generateReferralCode(@Param('id') id: string) {
     try {
-      const code = await this.participantsService.generateReferralCode(id);
+      const referralCode = await this.participantsService.generateReferralCode(id);
+      
+      if (!referralCode) {
+        return {
+          success: false,
+          error: 'Não foi possível gerar código de referência'
+        };
+      }
+
+      // Construir URL completa do link
+      const baseUrl = process.env.BACKEND_URL || 'https://programa-indicacao-multicliente-production.up.railway.app';
+      const referralLink = `${baseUrl}/indicacao/${referralCode}`;
+
       return {
         success: true,
-        referralCode: code,
-        referralLink: code ? `/indicacao/${code}` : null,
-        message: 'Código gerado com sucesso'
+        referralCode,
+        referralLink,
+        message: 'Código de referência gerado com sucesso'
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message,
-        message: 'Erro ao gerar código de referral'
+        error: error.message || 'Erro interno ao gerar código'
       };
     }
   }

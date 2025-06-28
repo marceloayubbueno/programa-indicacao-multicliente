@@ -21,6 +21,25 @@ console.log('📦 APIClient:', typeof window.apiClient);
 console.log('🔄 DataAdapter:', typeof window.DataAdapter);
 console.log('👥 ParticipantsManager:', typeof window.participantsManager);
 
+// 🔧 CORREÇÃO: Função para obter API_URL de forma segura
+function getApiUrl() {
+    return window.API_URL || 
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+           (window.location.hostname === 'localhost' ? 
+            'http://localhost:3000/api' : 
+            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+}
+
+// Estado das variáveis
+let participants = [];
+let lists = [];
+let campaigns = [];
+let currentPage = 1;
+let totalPages = 1;
+let totalParticipants = 0;
+let pageSize = 25;
+let filters = {};
+
 // Funções do Modal
 function showParticipantModal(participantData) {
     document.getElementById('participantName').textContent = participantData.name;
@@ -191,7 +210,7 @@ async function editParticipant(participantId) {
     }
     try {
         // Buscar dados do participante
-        const response = await fetch(`${API_URL}/participants?clientId=${localStorage.getItem('clientId')}`);
+        const response = await fetch(`${getApiUrl()}/participants?clientId=${localStorage.getItem('clientId')}`);
         if (!response.ok) throw new Error('Erro ao buscar participante');
         const data = await response.json();
         const participant = (data.participants || []).find(p => p._id === participantId);
@@ -223,7 +242,7 @@ async function editParticipant(participantId) {
                 status
             };
             try {
-                const patchResp = await fetch(`${API_URL}/participants/${participantId}`, {
+                const patchResp = await fetch(`${getApiUrl()}/participants/${participantId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -265,7 +284,7 @@ async function deleteParticipant(participantId) {
     const btns = document.querySelectorAll('.btn-icon.delete');
     btns.forEach(btn => btn.disabled = true);
     try {
-        const response = await fetch(`${API_URL}/participants/${participantId}`, {
+        const response = await fetch(`${getApiUrl()}/participants/${participantId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -3170,7 +3189,7 @@ function getCampaignDisplayName(participant) {
 // === NOVAS FUNÇÕES PARA SISTEMA DE LINKS EXCLUSIVOS ===
 
 /**
- * Regenera código de referral para um indicador
+ * Regenera código de referência único para um indicador
  */
 async function regenerateReferralCode(participantId) {
     if (!confirm('Tem certeza que deseja gerar um novo código? O link anterior ficará inválido.')) {
@@ -3178,17 +3197,30 @@ async function regenerateReferralCode(participantId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/participants/${participantId}/generate-referral-code`, {
+        // 🔧 CORREÇÃO: Usar getApiUrl() e incluir token de autorização
+        const token = localStorage.getItem('clientToken');
+        if (!token) {
+            alert('Token de autorização não encontrado. Faça login novamente.');
+            return;
+        }
+
+        const response = await fetch(`${getApiUrl()}/participants/${participantId}/generate-referral-code`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // 🔧 CORREÇÃO: Incluir autorização
             }
         });
 
         const result = await response.json();
 
         if (result.success) {
-            alert(`Novo código gerado com sucesso!\nNovo link: ${result.referralLink}`);
+            // 🔧 CORREÇÃO: Construir URL completa do link
+            const baseUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
+                           'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+            const fullLink = `${baseUrl}/${result.referralCode}`;
+            
+            alert(`Novo código gerado com sucesso!\nCódigo: ${result.referralCode}\nLink: ${fullLink}`);
             
             // Recarregar dados para atualizar a interface
             await loadParticipants();
