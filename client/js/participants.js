@@ -889,16 +889,21 @@ function displayParticipants() {
             `;
         }
         
-        // Listas do participante
+        // Listas do participante - CORRIGIDO: listas separadas para filtro
         let listsHtml = '-';
         if (participant.lists && participant.lists.length > 0) {
             const listNames = participant.lists.map(list => {
                 return typeof list === 'object' ? list.name : list;
-            }).filter(Boolean).slice(0, 2);
+            }).filter(Boolean);
             
-            listsHtml = listNames.join(', ');
-            if (participant.lists.length > 2) {
-                listsHtml += ` (+${participant.lists.length - 2})`;
+            // Exibir cada lista como elemento separado (máximo 3)
+            const visibleLists = listNames.slice(0, 3);
+            listsHtml = visibleLists.map(name => 
+                `<span class="inline-block bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs mr-1 mb-1">${name}</span>`
+            ).join('');
+            
+            if (participant.lists.length > 3) {
+                listsHtml += `<span class="text-gray-500 text-xs">+${participant.lists.length - 3}</span>`;
             }
         }
         
