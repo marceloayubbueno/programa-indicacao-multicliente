@@ -1,82 +1,21 @@
-// 🌟 REFATORAÇÃO FASE 1: ESTADO CENTRALIZADO E SIMPLIFICADO
-// 🎯 Objetivo: Simplificar e unificar o gerenciamento de estado
-
-// 🏗️ ESTADO CENTRALIZADO - Substitui múltiplas variáveis globais
-const appState = {
-    // Dados principais
-    participants: [],
-    lists: [],
-    campaigns: [],
-    
-    // Estado de filtros
-    filters: {
-        tipo: 'todos',
-        status: '',
-        lista: '',
-        email: '',
-        search: ''
-    },
-    
-    // Estado de paginação
-    pagination: {
-        currentPage: 1,
-        pageSize: 25,
-        totalParticipants: 0,
-        totalPages: 1
-    },
-    
-    // Estado de carregamento
-    loading: {
-        participants: false,
-        lists: false,
-        campaigns: false
-    },
-    
-    // UI state
-    ui: {
-        currentTab: 'lists',
-        currentEditingListId: null
-    }
-};
-
-// 🔧 COMPATIBILIDADE: Manter variáveis legadas para não quebrar código existente
+// 🌟 VARIÁVEIS GLOBAIS REFATORADAS - Usando novos módulos
+// 🔧 CORREÇÃO: API_URL já declarado em auth.js (removendo duplicação)
 let currentTab = 'lists';
-let participants = []; // Será sincronizado com appState.participants
-let lists = []; // Será sincronizado com appState.lists
-let currentPage = 1; // Será sincronizado com appState.pagination.currentPage
-let pageSize = 25;
-let totalParticipants = 0;
-let totalPages = 1;
+let participants = []; // Mantido para compatibilidade
+let lists = [];
+let currentPage = 1;
+let pageSize = 25; // 🔧 OTIMIZADO: Limite escalável para grandes volumes
+let totalParticipants = 0; // 🔧 CORRIGIDO: Inicializado
+let totalPages = 1; // 🔧 CORRIGIDO: Adicionado
 let tipoFiltro = 'todos';
 let isLoading = false;
-let currentFilters = {};
-let currentEditingListId = null;
+let currentFilters = {}; // 🔧 NOVO: Cache de filtros atuais
 
-// 🔄 FUNÇÕES DE SINCRONIZAÇÃO: Manter compatibilidade com código legado
-function syncLegacyState() {
-    // Sincronizar variáveis legadas com estado centralizado
-    participants = appState.participants;
-    lists = appState.lists;
-    currentPage = appState.pagination.currentPage;
-    totalParticipants = appState.pagination.totalParticipants;
-    totalPages = appState.pagination.totalPages;
-    tipoFiltro = appState.filters.tipo;
-    isLoading = appState.loading.participants || appState.loading.lists;
-    currentTab = appState.ui.currentTab;
-    currentEditingListId = appState.ui.currentEditingListId;
-}
-
-function updateAppState(updates) {
-    // Atualizar estado centralizado e sincronizar
-    if (updates.participants) appState.participants = updates.participants;
-    if (updates.lists) appState.lists = updates.lists;
-    if (updates.filters) Object.assign(appState.filters, updates.filters);
-    if (updates.pagination) Object.assign(appState.pagination, updates.pagination);
-    if (updates.loading) Object.assign(appState.loading, updates.loading);
-    if (updates.ui) Object.assign(appState.ui, updates.ui);
-    
-    syncLegacyState();
-}
+// 🚀 INICIALIZAÇÃO DOS NOVOS MÓDULOS
+console.log('🔧 Inicializando módulos refatorados...');
+console.log('📦 APIClient:', typeof window.apiClient);
+console.log('🔄 DataAdapter:', typeof window.DataAdapter);
+console.log('👥 ParticipantsManager:', typeof window.participantsManager);
 
 // 🔧 CORREÇÃO: Função para obter API_URL de forma segura
 function getApiUrl() {
@@ -5329,7 +5268,8 @@ function getCurrentListType() {
     return 'participante'; // Padrão
 }
 
-//  REMOVIDO: Declara��o duplicada de currentEditingListId
+// 🔧 VARIÁVEL GLOBAL: Para rastrear lista sendo editada
+let currentEditingListId = null;
 
 // 🔧 FUNÇÃO: Definir contexto de lista para importação
 function setImportListContext(listId) {
@@ -5475,148 +5415,3 @@ window.testarImportacaoCorrigida = function() {
     
     console.log('✅ === TESTE CONCLUÍDO ===');
 };
-
-// 🚀 REFATORAÇÃO FASE 1: SISTEMA SIMPLIFICADO DE CARREGAMENTO
-// 🎯 Objetivo: Unificar todos os carregamentos em uma classe centralizada
-
-class SimpleDataLoader {
-    constructor() {
-        this.clientId = localStorage.getItem('clientId');
-        this.token = localStorage.getItem('clientToken');
-        console.log('🔧 SimpleDataLoader inicializado');
-    }
-
-    // 🔧 Método HTTP genérico simplificado
-    async apiCall(endpoint, options = {}) {
-        const url = `${getApiUrl()}${endpoint}`;
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`,
-                ...options.headers
-            },
-            ...options
-        };
-
-        try {
-            const response = await fetch(url, config);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const data = await response.json();
-            return { success: true, data };
-            
-        } catch (error) {
-            console.error(`❌ Erro na API ${endpoint}:`, error);
-            return { success: false, error: error.message };
-        }
-    }
-
-    // 🔧 Carregar participantes simplificado
-    async loadParticipants(page = 1, filters = {}) {
-        console.log('🔄 SimpleDataLoader.loadParticipants:', { page, filters });
-        
-        const params = new URLSearchParams({
-            clientId: this.clientId,
-            limit: '1000', // Carregar todos para compatibilidade
-            ...filters
-        });
-
-        const result = await this.apiCall(`/participants?${params}`);
-        
-        if (result.success) {
-            const participantsData = result.data.participants || result.data.data || result.data || [];
-            
-            updateAppState({
-                participants: participantsData,
-                pagination: {
-                    ...appState.pagination,
-                    currentPage: 1,
-                    totalParticipants: participantsData.length,
-                    totalPages: Math.ceil(participantsData.length / appState.pagination.pageSize) || 1
-                }
-            });
-            
-            console.log('✅ Participantes carregados:', participantsData.length);
-            return participantsData;
-        } else {
-            console.error('❌ Erro ao carregar participantes:', result.error);
-            return [];
-        }
-    }
-
-    // 🔧 Carregar listas simplificado  
-    async loadLists() {
-        console.log('🔄 SimpleDataLoader.loadLists');
-        
-        const result = await this.apiCall(`/participant-lists?clientId=${this.clientId}&populate=true`);
-        
-        if (result.success) {
-            const listsData = result.data;
-            updateAppState({ lists: listsData });
-            console.log('✅ Listas carregadas:', listsData.length);
-            return listsData;
-        } else {
-            console.error('❌ Erro ao carregar listas:', result.error);
-            return [];
-        }
-    }
-
-    // 🔧 Carregar campanhas simplificado
-    async loadCampaigns() {
-        console.log('🔄 SimpleDataLoader.loadCampaigns');
-        
-        const result = await this.apiCall(`/campaigns?clientId=${this.clientId}`);
-        
-        if (result.success) {
-            const campaignsData = result.data;
-            updateAppState({ campaigns: campaignsData });
-            console.log('✅ Campanhas carregadas:', campaignsData.length);
-            return campaignsData;
-        } else {
-            console.error('❌ Erro ao carregar campanhas:', result.error);
-            return [];
-        }
-    }
-}
-
-// 🌟 INSTÂNCIA GLOBAL DO LOADER SIMPLIFICADO
-const simpleLoader = new SimpleDataLoader();
-
-// 🔄 WRAPPER FUNCTIONS: Manter compatibilidade com código legado
-window.loadParticipantsSimple = () => simpleLoader.loadParticipants();
-window.loadListsSimple = () => simpleLoader.loadLists();
-window.loadCampaignsSimple = () => simpleLoader.loadCampaigns();
-
-// 🚀 REFATORAÇÃO FASE 2: SISTEMA SIMPLIFICADO DE EXIBIÇÃO
-// 🎯 Objetivo: Simplificar displayParticipants removendo HTML inline complexo
-
-class SimpleDisplayManager {
-    constructor() {
-        this.templates = this.createTemplates();
-        console.log('🎨 SimpleDisplayManager inicializado');
-    }
-
-    // 🔧 Templates HTML simplificados e reutilizáveis
-    createTemplates() {
-        return {
-            // Template para linha vazia
-            emptyRow: () => `
-                <tr>
-                    <td colspan="9" class="text-center py-8">
-                        <div class="flex flex-col items-center">
-                            <i class="fas fa-users text-4xl text-gray-500 mb-4"></i>
-                            <p class="text-xl text-gray-400 mb-2">Nenhum participante encontrado</p>
-                            <p class="text-sm text-gray-500">Tente ajustar os filtros ou adicionar novos participantes</p>
-                        </div>
-                    </td>
-                </tr>
-            `,
-
-            // Template para linha de erro
-            errorRow: (message) => `
-                <tr>
-                    <td colspan="9" class="text-center py-8">
-                        <div class="flex flex-col items-center">
