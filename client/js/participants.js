@@ -482,10 +482,26 @@ function handleImport(event) {
             }
             
             if (participants.length > 0) {
-                saveImportedParticipants(participants, importUpdate.checked);
+                // 🔧 CORREÇÃO: Determinar contexto da lista e tipo
+                const currentListId = currentEditingListId || getSelectedListId() || null;
+                const tipoParticipante = getCurrentListType() || 'participante';
+                
+                console.log('🔧 handleImport CORRIGIDO - Contexto:', {
+                    listId: currentListId,
+                    tipo: tipoParticipante,
+                    participantes: participants.length
+                });
+                
+                saveImportedParticipants(participants, currentListId, tipoParticipante);
                 alert(`Importação concluída com sucesso! ${participants.length} participantes importados.`);
                 closeImportModal();
-                loadParticipants();
+                
+                // 🔄 Recarregar lista específica se estiver editando uma lista
+                if (currentListId) {
+                    loadParticipantList(currentListId);
+                } else {
+                    loadParticipants();
+                }
             } else {
                 throw new Error('Nenhum participante encontrado no arquivo. Verifique se o arquivo está no formato correto.');
             }
@@ -662,39 +678,65 @@ function parseCSVFile(data) {
     return participants;
 }
 
-async function saveImportedParticipants(participants, updateExisting) {
-    const clientId = localStorage.getItem('clientId');
-    const token = localStorage.getItem('clientToken');
-    if (!clientId || !token) {
-        alert('Erro de autenticação. Faça login novamente.');
-        return;
-    }
+// 🔧 FUNÇÃO CORRIGIDA: Importar participantes com contexto de lista
+async function saveImportedParticipants(participants, listId = null, tipoParticipante = 'participante') {
+    // 🔍 DIAGNÓSTICO: Log dos parâmetros recebidos
+    console.log('🔧 saveImportedParticipants CORRIGIDA chamada com:');
+    console.log('   - Participantes:', participants.length);
+    console.log('   - ListId:', listId);
+    console.log('   - Tipo:', tipoParticipante);
+    
     try {
-        const response = await fetch(`${API_URL}/participants/import`, {
+        const clientId = localStorage.getItem('clientId');
+        if (!clientId) {
+            showMessage('Erro: Cliente não identificado', 'error');
+            return;
+        }
+
+        // 🔧 CORREÇÃO: Payload completo com listId e tipo
+        const payload = {
+            clientId: clientId,
+            listId: listId, // ✅ ID da lista específica
+            tipoParticipante: tipoParticipante, // ✅ Tipo correto
+            participants: participants.map(p => ({
+                name: p.name,
+                email: p.email,
+                phone: p.phone,
+                company: p.company || '',
+                status: p.status || 'active',
+                tipo: tipoParticipante, // ✅ Tipo individual
+                listId: listId // ✅ Associar à lista
+            }))
+        };
+
+        console.log('📤 Enviando payload corrigido:', payload);
+
+        const response = await fetch('/api/participants/import', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${localStorage.getItem('clientToken')}`
             },
-            body: JSON.stringify({
-                clientId,
-                participants: participants.map(p => ({
-                    name: p.name,
-                    email: p.email,
-                    phone: p.phone,
-                    company: p.company,
-                    status: p.status || 'active'
-                }))
-            })
+            body: JSON.stringify(payload)
         });
-        if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.message || 'Erro ao importar participantes');
+
+        const result = await response.json();
+        
+        if (result.success !== false) {
+            showMessage(`${participants.length} participantes importados com sucesso!`, 'success');
+            
+            // 🔄 CORREÇÃO: Recarregar lista específica
+            if (listId) {
+                await loadParticipantList(listId);
+            } else {
+                await loadParticipantLists();
+            }
+        } else {
+            showMessage(`Erro ao importar: ${result.message}`, 'error');
         }
-        showNotification('Importação concluída com sucesso!', 'success');
-        loadParticipants();
     } catch (error) {
-        showNotification(error.message || 'Erro ao importar participantes', 'error');
+        console.error('❌ Erro ao importar participantes:', error);
+        showMessage('Erro ao importar participantes', 'error');
     }
 }
 
@@ -4975,3 +5017,267 @@ window.debugCurrentTable = function() {
         }
     });
 };
+
+// 🧪 DIAGNÓSTICO ESPECÍFICO: Bug Importação Lista de Participantes
+window.debugImportFlow = function() {
+    console.log('🔍 === DIAGNÓSTICO ESPECÍFICO: FLUXO DE IMPORTAÇÃO ===');
+    
+    try {
+        // 1. Verificar estado atual das listas
+        console.log('1. 📊 ESTADO ATUAL DAS LISTAS:');
+        console.log(`   - Total de listas: ${lists?.length || 0}`);
+        
+        if (lists && lists.length > 0) {
+            lists.forEach((list, index) => {
+                console.log(`   - Lista ${index + 1}:`);
+                console.log(`     Nome: "${list.name}"`);
+                console.log(`     ID: ${list._id || list.id}`);
+                console.log(`     Tipo: ${list.tipo || 'não definido'}`);
+                console.log(`     Participantes: ${list.participants?.length || 0}`);
+                console.log(`     CampaignId: ${list.campaignId || 'não definido'}`);
+                console.log('     ---');
+            });
+        }
+        
+        // 2. Analisar função saveImportedParticipants
+        console.log('2. 🔧 ANÁLISE DA FUNÇÃO saveImportedParticipants:');
+        console.log('   📄 Código atual da função:');
+        console.log('   - Endpoint usado: /participants/import');
+        console.log('   - Campos enviados: name, email, phone, company, status');
+        console.log('   ❌ PROBLEMA: Não envia "tipo" nem "listId"');
+        console.log('   ❌ PROBLEMA: Não vincula à lista específica');
+        
+        // 3. Simular dados que seriam enviados
+        console.log('3. 🔄 SIMULAÇÃO DE DADOS DE IMPORTAÇÃO:');
+        const mockParticipants = [
+            { name: 'Teste 1', email: 'teste1@email.com', phone: '123456789' },
+            { name: 'Teste 2', email: 'teste2@email.com', phone: '987654321' }
+        ];
+        
+        console.log('   📤 Dados que seriam enviados para o backend:');
+        const payloadAtual = {
+            clientId: localStorage.getItem('clientId'),
+            participants: mockParticipants.map(p => ({
+                name: p.name,
+                email: p.email,
+                phone: p.phone,
+                company: p.company,
+                status: p.status || 'active'
+            }))
+        };
+        console.log('   Payload atual:', payloadAtual);
+        
+        console.log('   📤 Dados que DEVERIAM ser enviados:');
+        const payloadCorrigido = {
+            clientId: localStorage.getItem('clientId'),
+            listId: lists?.[0]?._id || 'ID_DA_LISTA_CRIADA', // ID da lista recém-criada
+            tipo: 'participante', // Tipo definido na criação da lista
+            participants: mockParticipants.map(p => ({
+                name: p.name,
+                email: p.email,
+                phone: p.phone,
+                company: p.company || '',
+                status: p.status || 'active',
+                tipo: 'participante' // Tipo correto
+            }))
+        };
+        console.log('   Payload corrigido:', payloadCorrigido);
+        
+        // 4. Verificar backend endpoints disponíveis
+        console.log('4. 🌐 ENDPOINTS DISPONÍVEIS:');
+        console.log('   - Atual: POST /participants/import (genérico)');
+        console.log('   - Possível: POST /participant-lists/:listId/participants (específico)');
+        console.log('   - Possível: POST /participant-lists/:listId/import (ideal)');
+        
+        // 5. Analisar fluxo ideal
+        console.log('5. 🎯 FLUXO IDEAL PARA CORREÇÃO:');
+        console.log('   1. Usuário cria lista "Lista teste 01" tipo "participante"');
+        console.log('   2. Usuário faz upload da planilha');
+        console.log('   3. Sistema processa planilha (parseExcelFile/parseCSVFile)');
+        console.log('   4. Sistema envia para backend com:');
+        console.log('      - ID da lista específica');
+        console.log('      - Tipo da lista (participante)');
+        console.log('      - Dados dos participantes');
+        console.log('   5. Backend associa participantes à lista correta');
+        console.log('   6. Sistema atualiza interface mostrando participantes na lista');
+        
+        // 6. Identificar pontos de falha
+        console.log('6. 🚨 PONTOS DE FALHA IDENTIFICADOS:');
+        console.log('   ❌ Função saveImportedParticipants() não recebe listId');
+        console.log('   ❌ Função não sabe qual lista foi criada');
+        console.log('   ❌ Tipo "participante" não é passado para o backend');
+        console.log('   ❌ Backend pode estar criando participantes genéricos');
+        console.log('   ❌ Falta vinculação entre importação e lista específica');
+        
+        console.log('✅ === DIAGNÓSTICO IMPORTAÇÃO CONCLUÍDO ===');
+        
+    } catch (error) {
+        console.error('❌ Erro no diagnóstico:', error);
+    }
+};
+
+// 🔧 DIAGNÓSTICO RÁPIDO: Verificar última importação
+window.debugLastImport = function() {
+    console.log('🔍 === DIAGNÓSTICO ÚLTIMA IMPORTAÇÃO ===');
+    
+    // Verificar LocalStorage para evidências
+    console.log('📦 LocalStorage:');
+    console.log(`   - ClientId: ${localStorage.getItem('clientId')}`);
+    console.log(`   - Token: ${localStorage.getItem('clientToken') ? 'Presente' : 'Ausente'}`);
+    
+    // Verificar estado atual do sistema
+    console.log('📊 Estado do Sistema:');
+    console.log(`   - Listas carregadas: ${lists?.length || 0}`);
+    console.log(`   - Participantes carregados: ${participants?.length || 0}`);
+    
+    // Analisar última lista criada
+    if (lists && lists.length > 0) {
+        const ultimaLista = lists[lists.length - 1];
+        console.log('📋 Última lista criada:');
+        console.log(`   - Nome: "${ultimaLista.name}"`);
+        console.log(`   - Tipo: ${ultimaLista.tipo || 'não definido'}`);
+        console.log(`   - Participantes: ${ultimaLista.participants?.length || 0}`);
+        console.log(`   - ID: ${ultimaLista._id || ultimaLista.id}`);
+        
+        if (ultimaLista.participants && ultimaLista.participants.length === 0) {
+            console.log('🚨 PROBLEMA CONFIRMADO: Lista criada mas sem participantes!');
+        }
+    }
+};
+
+// 🧪 TESTE SIMULADO: Simular processo de importação
+window.simulateImportProcess = function() {
+    console.log('🧪 === SIMULANDO PROCESSO DE IMPORTAÇÃO ===');
+    
+    try {
+        // 1. Simular criação de lista
+        console.log('1. ✅ Lista criada: "Lista teste 01" (tipo: participante)');
+        const mockList = {
+            _id: 'mock-list-id-123',
+            name: 'Lista teste 01',
+            tipo: 'participante',
+            participants: []
+        };
+        
+        // 2. Simular processamento de planilha
+        console.log('2. 📄 Planilha processada:');
+        const mockParticipants = [
+            { name: 'João Silva', email: 'joao@email.com', phone: '11999999999' },
+            { name: 'Maria Santos', email: 'maria@email.com', phone: '11888888888' }
+        ];
+        console.log(`   - ${mockParticipants.length} participantes extraídos da planilha`);
+        
+        // 3. Simular payload atual (com problema)
+        console.log('3. ❌ Payload atual (problemático):');
+        const payloadAtual = {
+            clientId: localStorage.getItem('clientId'),
+            participants: mockParticipants.map(p => ({
+                name: p.name,
+                email: p.email,
+                phone: p.phone,
+                status: 'active'
+                // ❌ Sem tipo, sem listId
+            }))
+        };
+        console.log('   Payload:', payloadAtual);
+        console.log('   🚨 Resultado esperado: Participantes criados como "indicador" genérico');
+        
+        // 4. Simular payload corrigido
+        console.log('4. ✅ Payload corrigido (solução):');
+        const payloadCorrigido = {
+            clientId: localStorage.getItem('clientId'),
+            listId: mockList._id,
+            tipoLista: mockList.tipo,
+            participants: mockParticipants.map(p => ({
+                name: p.name,
+                email: p.email,
+                phone: p.phone,
+                status: 'active',
+                tipo: 'participante' // Tipo correto baseado na lista
+            }))
+        };
+        console.log('   Payload:', payloadCorrigido);
+        console.log('   ✅ Resultado esperado: Participantes criados como "participante" na lista correta');
+        
+        // 5. Mostrar diferença
+        console.log('5. 📊 COMPARAÇÃO:');
+        console.log('   ❌ Atual: Endpoint genérico, sem contexto de lista');
+        console.log('   ✅ Ideal: Endpoint específico com contexto completo');
+        
+        console.log('✅ === SIMULAÇÃO CONCLUÍDA ===');
+        
+    } catch (error) {
+        console.error('❌ Erro na simulação:', error);
+    }
+};
+
+// 🔧 FUNÇÃO PARA TESTAR CORREÇÃO: Preview da solução
+window.previewImportFix = function() {
+    console.log('🔧 === PREVIEW DA CORREÇÃO ===');
+    
+    console.log('📝 MUDANÇAS NECESSÁRIAS:');
+    console.log('');
+    console.log('1. 🔧 Modificar saveImportedParticipants():');
+    console.log('   - Adicionar parâmetro listId');
+    console.log('   - Adicionar parâmetro tipoParticipante');
+    console.log('   - Incluir tipo no payload');
+    console.log('');
+    console.log('2. 🔧 Modificar handleImport():');
+    console.log('   - Passar contexto da lista para saveImportedParticipants()');
+    console.log('   - Determinar tipo correto baseado na lista');
+    console.log('');
+    console.log('3. 🔧 Possível endpoint backend:');
+    console.log('   - Usar endpoint específico de lista se disponível');
+    console.log('   - Ou melhorar endpoint atual para aceitar listId');
+    console.log('');
+    console.log('4. 🔧 Fluxo de criação de lista:');
+    console.log('   - Conectar modal de importação com lista recém-criada');
+    console.log('   - Passar ID e tipo da lista para importação');
+    
+    console.log('✅ === PREVIEW CONCLUÍDO ===');
+};
+
+// 🔧 FUNÇÕES AUXILIARES: Para determinar contexto de lista na importação
+function getSelectedListId() {
+    // Verifica se há uma lista selecionada no filtro ou contexto atual
+    const listFilter = document.getElementById('listFilter');
+    if (listFilter && listFilter.value) {
+        return listFilter.value;
+    }
+    
+    // Verifica se estamos na aba de listas e há uma lista selecionada
+    if (window.selectedListForImport) {
+        return window.selectedListForImport;
+    }
+    
+    return null;
+}
+
+function getCurrentListType() {
+    // Se há uma lista específica selecionada, obter seu tipo
+    const currentListId = currentEditingListId || getSelectedListId();
+    if (currentListId && lists) {
+        const list = lists.find(l => (l._id || l.id) === currentListId);
+        if (list && list.tipo) {
+            return list.tipo;
+        }
+    }
+    
+    // Se não há lista específica, usar tipo padrão baseado na aba atual ou contexto
+    const activeTab = document.querySelector('.tab-button.active');
+    if (activeTab && activeTab.textContent.toLowerCase().includes('indicador')) {
+        return 'indicador';
+    }
+    
+    return 'participante'; // Padrão
+}
+
+// 🔧 VARIÁVEL GLOBAL: Para rastrear lista sendo editada
+let currentEditingListId = null;
+
+// 🔧 FUNÇÃO: Definir contexto de lista para importação
+function setImportListContext(listId) {
+    window.selectedListForImport = listId;
+    currentEditingListId = listId;
+    console.log('🔧 Contexto de importação definido:', { listId });
+}
