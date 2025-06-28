@@ -427,110 +427,144 @@ function toggleImportFields() {
 function handleImport(event) {
     event.preventDefault();
     
-    const importType = document.getElementById('importType');
-    const importFile = document.getElementById('importFile');
-    const importUpdate = document.getElementById('importUpdate');
+    const form = event.target;
+    const fileInput = form.querySelector('#importFile');
+    const file = fileInput.files[0];
     
-    if (!importType || !importFile || !importUpdate) {
-        console.error('Elementos do formulário não encontrados');
-        alert('Erro ao processar o formulário. Por favor, recarregue a página.');
-        return false;
+    if (!file) {
+        showNotification('Selecione um arquivo para importar', 'error');
+        return;
     }
     
-    if (!importType.value) {
-        alert('Por favor, selecione o tipo de arquivo.');
-        importType.focus();
-        return false;
-    }
-    
-    if (!importFile.files || importFile.files.length === 0) {
-        alert('Por favor, selecione um arquivo para importar.');
-        importFile.focus();
-        return false;
-    }
-    
-    const file = importFile.files[0];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    
-    if (file.size > maxSize) {
-        alert('O arquivo é muito grande. Por favor, selecione um arquivo menor que 5MB.');
-        return false;
-    }
-    
-    // Mostrar indicador de carregamento
-    const submitButton = document.querySelector('#importForm button[type="submit"]');
-    if (!submitButton) return false;
-    
+    const submitButton = form.querySelector('button[type="submit"]');
     const originalButtonText = submitButton.textContent;
     submitButton.disabled = true;
     submitButton.textContent = 'Importando...';
     
     const reader = new FileReader();
-    
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
-            let participants = [];
+            console.log('🔄 === INICIANDO IMPORTAÇÃO - FLUXO ORIGINAL ===');
             
-            if (importType.value === 'excel') {
+            let participants;
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            
+            if (fileExtension === 'xlsx') {
                 participants = parseExcelFile(e.target.result);
-            } else if (importType.value === 'csv') {
+            } else if (fileExtension === 'csv') {
                 participants = parseCSVFile(e.target.result);
+            } else {
+                throw new Error('Formato de arquivo não suportado');
             }
             
-            if (participants.length > 0) {
-                // 🔧 CORREÇÃO: Determinar contexto da lista e tipo
-                const currentListId = currentEditingListId || getSelectedListId() || null;
-                const tipoParticipante = getCurrentListType() || 'participante';
+            if (participants && participants.length > 0) {
+                console.log(`📊 ${participants.length} participantes extraídos do arquivo`);
                 
-                console.log('🔧 handleImport CORRIGIDO - Contexto:', {
-                    listId: currentListId,
-                    tipo: tipoParticipante,
-                    participantes: participants.length
+                // 🎯 FLUXO ORIGINAL: 1. IMPORTAR PARTICIPANTES PRIMEIRO (sem lista)
+                console.log('1️⃣ Importando participantes...');
+                const clientId = localStorage.getItem('clientId');
+                const token = localStorage.getItem('clientToken');
+                
+                // Enviar participantes para o backend SEM listId (fluxo original)
+                const importResp = await fetch(`${getApiUrl()}/participants/import`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ 
+                        clientId, 
+                        participants: participants.map(p => ({
+                            name: p.name,
+                            email: p.email,
+                            phone: p.phone,
+                            company: p.company || '',
+                            status: p.status || 'ativo',
+                            tipo: 'participante'  // Tipo padrão
+                        }))
+                    })
                 });
                 
-                saveImportedParticipants(participants, currentListId, tipoParticipante);
-                alert(`Importação concluída com sucesso! ${participants.length} participantes importados.`);
-                closeImportModal();
-                
-                // 🔄 Recarregar lista específica se estiver editando uma lista
-                if (currentListId) {
-                    loadParticipantList(currentListId);
-                } else {
-                    loadParticipants();
+                if (!importResp.ok) {
+                    const data = await importResp.json();
+                    throw new Error(data.message || 'Erro ao importar participantes');
                 }
+                
+                console.log('✅ Participantes importados com sucesso');
+                
+                // 🎯 FLUXO ORIGINAL: 2. BUSCAR PARTICIPANTES IMPORTADOS
+                console.log('2️⃣ Buscando participantes importados...');
+                const emails = participants.map(p => p.email);
+                const searchResp = await fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const allData = await searchResp.json();
+                const importedParticipants = (allData.participants || []).filter(p => emails.includes(p.email));
+                
+                console.log(`📋 ${importedParticipants.length} participantes encontrados no sistema`);
+                
+                // Validação: só cria lista se houver participantes válidos
+                if (importedParticipants.length === 0) {
+                    throw new Error('Nenhum participante válido para criar a lista.');
+                }
+                
+                // 🎯 FLUXO ORIGINAL: 3. CRIAR LISTA COM PARTICIPANTES IMPORTADOS
+                console.log('3️⃣ Criando lista com participantes...');
+                const listName = document.getElementById('listNameImport').value;
+                const listDescription = document.getElementById('listDescriptionImport').value;
+                const listTipo = 'participante'; // Tipo fixo para importação via participants.html
+                
+                const listResp = await fetch(`${getApiUrl()}/participant-lists`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name: listName,
+                        description: listDescription,
+                        tipo: listTipo,
+                        clientId,
+                        participants: importedParticipants.map(p => p._id)  // Associar participantes à lista
+                    })
+                });
+                
+                if (!listResp.ok) {
+                    const data = await listResp.json();
+                    throw new Error(data.message || 'Erro ao criar lista');
+                }
+                
+                const listData = await listResp.json();
+                console.log('✅ Lista criada com sucesso:', listData);
+                
+                // 🎯 SUCESSO: Mostrar resultado
+                showNotification(`✅ Importação concluída! ${participants.length} participantes importados e adicionados à lista "${listName}".`, 'success');
+                
+                // Recarregar dados
+                closeImportModal();
+                await loadLists(true);      // Recarregar listas
+                await loadParticipants();   // Recarregar participantes
+                
             } else {
                 throw new Error('Nenhum participante encontrado no arquivo. Verifique se o arquivo está no formato correto.');
             }
         } catch (error) {
-            console.error('Erro ao processar arquivo:', error);
-            alert(error.message);
+            console.error('❌ Erro ao processar arquivo:', error);
+            showNotification(error.message, 'error');
         } finally {
-            // Restaurar botão
             submitButton.disabled = false;
             submitButton.textContent = originalButtonText;
         }
     };
     
     reader.onerror = function() {
-        alert('Erro ao ler o arquivo. Tente novamente.');
+        showNotification('Erro ao ler o arquivo. Tente novamente.', 'error');
         submitButton.disabled = false;
         submitButton.textContent = originalButtonText;
     };
     
-    try {
-        if (importType.value === 'excel') {
-            reader.readAsArrayBuffer(file);
-        } else {
-            reader.readAsText(file);
-        }
-    } catch (error) {
-        console.error('Erro ao ler arquivo:', error);
-        alert('Erro ao ler o arquivo. Verifique se o arquivo não está corrompido.');
-        submitButton.disabled = false;
-        submitButton.textContent = originalButtonText;
-    }
-    
-    return false;
+    reader.readAsBinaryString(file);
 }
 
 function generateShareLink() {
@@ -707,7 +741,7 @@ async function saveImportedParticipants(participants, listId = null, tipoPartici
 
         console.log('📤 Enviando payload corrigido:', payload);
 
-        const response = await fetch('/api/participants/import', {
+        const response = await fetch(`${getApiUrl()}/participants/import`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -5235,15 +5269,67 @@ window.previewImportFix = function() {
 
 // 🔧 FUNÇÕES AUXILIARES: Para determinar contexto de lista na importação
 function getSelectedListId() {
-    // Verifica se há uma lista selecionada no filtro ou contexto atual
+    console.log('🔍 getSelectedListId() - Iniciando busca por lista selecionada...');
+    
+    // 1. Verificar se há uma lista selecionada no filtro
     const listFilter = document.getElementById('listFilter');
     if (listFilter && listFilter.value) {
+        console.log(`✅ Lista encontrada via filtro: ${listFilter.value}`);
         return listFilter.value;
     }
     
-    // Verifica se estamos na aba de listas e há uma lista selecionada
+    // 2. Verificar se estamos na aba de listas e há uma lista selecionada via import
     if (window.selectedListForImport) {
+        console.log(`✅ Lista encontrada via selectedListForImport: ${window.selectedListForImport}`);
         return window.selectedListForImport;
+    }
+    
+    // 3. NOVO: Verificar se há uma lista sendo editada no momento
+    if (window.currentEditingListId) {
+        console.log(`✅ Lista encontrada via currentEditingListId: ${window.currentEditingListId}`);
+        return window.currentEditingListId;
+    }
+    
+    // 4. NOVO: Fallback para a primeira lista disponível se existir
+    if (lists && lists.length > 0) {
+        const firstListId = lists[0]._id || lists[0].id;
+        console.log(`⚠️ Nenhuma lista selecionada, usando primeira lista como fallback: ${firstListId}`);
+        
+        // Opcional: Selecionar automaticamente no filtro se existir
+        if (listFilter) {
+            console.log('🔄 Selecionando automaticamente no filtro...');
+            
+            // Verificar se o filtro não está populado
+            if (listFilter.options.length <= 1) {
+                console.log('📋 Filtro não populado, populando agora...');
+                if (typeof populateListFilter === 'function') {
+                    populateListFilter();
+                }
+            }
+            
+            // Selecionar a primeira lista
+            listFilter.value = firstListId;
+            console.log(`✅ Primeira lista selecionada automaticamente no filtro`);
+        }
+        
+        return firstListId;
+    }
+    
+    // 5. Se realmente não há nenhuma lista disponível
+    console.log('❌ Nenhuma lista disponível no sistema');
+    
+    // NOVO: Tentar carregar listas se não estão carregadas
+    if ((!lists || lists.length === 0) && typeof loadLists === 'function') {
+        console.log('🔄 Tentando carregar listas automaticamente...');
+        loadLists().then(() => {
+            console.log('✅ Listas carregadas, tentando novamente...');
+            // Não chamar recursivamente para evitar loop, apenas informar
+            if (lists && lists.length > 0) {
+                console.log(`💡 ${lists.length} listas agora disponíveis. Chame getSelectedListId() novamente.`);
+            }
+        }).catch(error => {
+            console.error('❌ Erro ao carregar listas:', error);
+        });
     }
     
     return null;
