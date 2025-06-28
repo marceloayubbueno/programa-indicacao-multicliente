@@ -4507,3 +4507,36 @@ window.resetUsersTabInitialization = function() {
     
     console.log('✅ Reset concluído. Execute ensureUsersTabInitialized() para re-inicializar.');
 };
+
+// 🚀 INICIALIZAÇÃO AUTOMÁTICA DA PÁGINA
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Página carregada - Inicializando Central de Participantes...');
+    
+    // Verificar se estamos na aba de usuários ou inicializar automaticamente
+    const currentTabElement = document.querySelector('.tab-button.bg-blue-600');
+    const isUsersTab = currentTabElement && currentTabElement.id === 'tab-users';
+    
+    if (isUsersTab) {
+        console.log('✅ Aba usuários detectada como ativa - inicializando...');
+        ensureUsersTabInitialized();
+    } else {
+        // Força a inicialização da aba de usuários para garantir que funcione quando clicada
+        console.log('🔧 Pré-carregando dados para aba de usuários...');
+        setTimeout(() => {
+            ensureUsersTabInitialized();
+        }, 1000);
+    }
+});
+
+// 🔧 FALLBACK: Garantir que dados sejam carregados independente da aba
+window.addEventListener('load', function() {
+    console.log('🔧 Window load - Garantindo carregamento de dados...');
+    
+    // Se ainda não foi inicializado após 2 segundos, força inicialização
+    setTimeout(() => {
+        if (!usersTabInitialized) {
+            console.log('⚠️ Inicialização automática não executada - forçando...');
+            ensureUsersTabInitialized();
+        }
+    }, 2000);
+});
