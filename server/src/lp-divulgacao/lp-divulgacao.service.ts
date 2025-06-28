@@ -197,6 +197,26 @@ export class LPDivulgacaoService {
     }
   }
 
+  async toggleStatus(id: string): Promise<LPDivulgacao> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID inválido');
+    }
+
+    const lp = await this.lpDivulgacaoModel.findById(id).exec();
+    if (!lp) {
+      throw new NotFoundException('LP de Divulgação não encontrada');
+    }
+
+    // Alterna entre 'ativo' e 'inativo'
+    const newStatus = lp.status === 'ativo' ? 'inativo' : 'ativo';
+    
+    return await this.lpDivulgacaoModel.findByIdAndUpdate(
+      id,
+      { status: newStatus },
+      { new: true }
+    ).exec();
+  }
+
   // === FUNCIONALIDADES ESPECÍFICAS ===
 
   async publish(id: string): Promise<LPDivulgacao | null> {

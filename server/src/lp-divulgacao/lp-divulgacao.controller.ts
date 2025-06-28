@@ -280,4 +280,65 @@ export class LPDivulgacaoController {
       message: 'Evento de redirecionamento registrado'
     };
   }
+
+  // === TOGGLE STATUS ===
+  @Patch(':id/toggle-status')
+  async toggleStatus(@Param('id') id: string) {
+    try {
+      const result = await this.lpDivulgacaoService.toggleStatus(id);
+      return {
+        success: true,
+        data: result,
+        message: `Status alterado para ${result.status}`
+      };
+    } catch (error) {
+      console.error('[LPDivulgacaoController][TOGGLE-STATUS] Erro:', error);
+      throw error;
+    }
+  }
+
+  // === CONFIGURAÇÃO UTM/REDIRECIONAMENTO ===
+  @Put(':id/redirect-config')
+  async updateRedirectConfig(
+    @Param('id') id: string,
+    @Body() config: {
+      redirectUrl?: string;
+      utmParams?: Record<string, string>;
+    }
+  ) {
+    try {
+      const updateDto: UpdateLPDivulgacaoDto = {
+        redirectUrl: config.redirectUrl,
+        utmParams: config.utmParams
+      };
+
+      const result = await this.lpDivulgacaoService.update(id, updateDto);
+      return {
+        success: true,
+        data: result,
+        message: 'Configuração de redirecionamento/UTM atualizada com sucesso'
+      };
+    } catch (error) {
+      console.error('[LPDivulgacaoController][REDIRECT-CONFIG] Erro:', error);
+      throw error;
+    }
+  }
+
+  @Get(':id/redirect-config')
+  async getRedirectConfig(@Param('id') id: string) {
+    try {
+      const lp = await this.lpDivulgacaoService.findOne(id);
+      return {
+        success: true,
+        data: {
+          redirectUrl: lp.redirectUrl,
+          utmParams: lp.utmParams
+        },
+        message: 'Configuração obtida com sucesso'
+      };
+    } catch (error) {
+      console.error('[LPDivulgacaoController][GET-REDIRECT-CONFIG] Erro:', error);
+      throw error;
+    }
+  }
 } 

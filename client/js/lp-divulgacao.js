@@ -136,20 +136,20 @@ function renderLPList() {
   tbody.innerHTML = lpDivulgacaoList.map((lp, index) => {
     console.log(`🔍 [LP-DIV] LP ${index}:`, lp);
     
-    // Status toggle button
+    // Status toggle button - CORRIGIDO para usar status 'ativo'/'inativo'
     const statusToggle = `
       <div class="flex items-center gap-2">
         <button 
-          onclick="toggleLPStatus('${lp._id || lp.id}', '${lp.status || 'draft'}')" 
+          onclick="toggleLPStatus('${lp._id || lp.id}', '${lp.status || 'inativo'}')" 
           class="flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all duration-200 ${
-            lp.status === 'published' 
+            lp.status === 'ativo' 
               ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
               : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
           }"
-          title="Clique para ${lp.status === 'published' ? 'despublicar' : 'publicar'}"
+          title="Clique para ${lp.status === 'ativo' ? 'desativar' : 'ativar'}"
         >
-          <i class="fas ${lp.status === 'published' ? 'fa-eye' : 'fa-eye-slash'} text-xs"></i>
-          <span class="text-xs font-medium">${lp.status === 'published' ? 'Publicado' : 'Rascunho'}</span>
+          <i class="fas ${lp.status === 'ativo' ? 'fa-eye' : 'fa-eye-slash'} text-xs"></i>
+          <span class="text-xs font-medium">${lp.status === 'ativo' ? 'Ativo' : 'Inativo'}</span>
         </button>
       </div>
     `;
@@ -187,6 +187,11 @@ function renderLPList() {
                     title="Editar" 
                     onclick="editLPDivulgacao('${lp._id || lp.id}')">
               <i class="fas fa-edit"></i>
+            </button>
+            <button class="p-1.5 rounded hover:bg-gray-700 transition-colors text-orange-400 hover:text-orange-300" 
+                    title="Configurar UTM/Redirecionamento" 
+                    onclick="configurarUTMLPDivulgacao('${lp._id || lp.id}')">
+              <i class="fas fa-link"></i>
             </button>
             <button class="p-1.5 rounded hover:bg-gray-700 transition-colors text-purple-400 hover:text-purple-300" 
                     title="Código de Incorporação" 
@@ -228,18 +233,30 @@ window.editLPDivulgacao = function(id) {
 
 window.deleteLPDivulgacao = function(id) {
   if (confirm('Tem certeza que deseja excluir esta LP?')) {
+    const API_URL = getApiUrl(); // 🔧 CORREÇÃO: usar função getApiUrl()
+    const token = localStorage.getItem('clientToken'); // 🔧 CORREÇÃO: clientToken
+    
+    console.log(`🗑️ [LP-DIV] Excluindo LP: ${id}`);
+    
     fetch(`${API_URL}/lp-divulgacao/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}` // 🔧 CORREÇÃO: adicionar autenticação
+      }
     })
       .then(res => {
+        console.log(`📡 [LP-DIV] Status exclusão: ${res.status}`);
         if (res.ok) {
+          console.log('✅ [LP-DIV] LP excluída com sucesso');
           renderLPDivulgacaoList();
+          showNotification('LP excluída com sucesso!', 'success');
         } else {
-          alert('Erro ao excluir a LP. Tente novamente.');
+          throw new Error(`HTTP ${res.status}: Erro ao excluir`);
         }
       })
-      .catch(() => {
-        alert('Erro ao excluir a LP. Tente novamente.');
+      .catch((error) => {
+        console.error('❌ [LP-DIV] Erro ao excluir LP:', error);
+        alert('Erro ao excluir a LP: ' + error.message);
       });
   }
 };
@@ -263,12 +280,13 @@ window.copyEmbedCodeViewDivulgacao = function() {
   alert('Código copiado!');
 };
 
-// Função para alternar status da LP (Publicado/Rascunho)
+// Função para alternar status da LP (Ativo/Inativo) - NOVO ENDPOINT
 window.toggleLPStatus = async function(lpId, currentStatus) {
   try {
-    // Determinar ação baseada no status atual
-    const action = currentStatus === 'published' ? 'unpublish' : 'publish';
-    const newStatus = currentStatus === 'published' ? 'draft' : 'published';
+    const API_URL = getApiUrl();
+    const token = localStorage.getItem('clientToken');
+    
+    console.log(`🔄 [LP-DIV] Alterando status da LP ${lpId}: ${currentStatus}`);
     
     // Feedback visual imediato - desabilitar botão
     const button = event.target.closest('button');
@@ -276,18 +294,23 @@ window.toggleLPStatus = async function(lpId, currentStatus) {
     button.disabled = true;
     button.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i><span class="text-xs">Alterando...</span>';
     
-    // Fazer requisição para o backend
-    const response = await fetch(`${API_URL}/lp-divulgacao/${lpId}/${action}`, {
-      method: 'POST',
+    // 🆕 USAR NOVO ENDPOINT toggle-status
+    const response = await fetch(`${API_URL}/lp-divulgacao/${lpId}/toggle-status`, {
+      method: 'PATCH',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
     });
     
+    console.log(`📡 [LP-DIV] Status da alteração: ${response.status}`);
+    
     if (response.ok) {
-      // Sucesso - atualizar interface
+      const result = await response.json();
+      console.log(`✅ [LP-DIV] Status alterado para: ${result.data.status}`);
+      
       showNotification(
-        `LP ${newStatus === 'published' ? 'publicada' : 'despublicada'} com sucesso!`, 
+        `Status alterado para: ${result.data.status}`, 
         'success'
       );
       
@@ -300,6 +323,7 @@ window.toggleLPStatus = async function(lpId, currentStatus) {
       button.innerHTML = originalContent;
       
       const errorData = await response.json();
+      console.error('❌ [LP-DIV] Erro ao alterar status:', errorData);
       showNotification(
         errorData.message || 'Erro ao alterar status da LP',
         'error'
@@ -308,12 +332,21 @@ window.toggleLPStatus = async function(lpId, currentStatus) {
     
   } catch (error) {
     // Erro de rede - reverter botão e mostrar mensagem
-    button.disabled = false;
-    button.innerHTML = originalContent;
+    const button = event.target.closest('button');
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalContent;
+    }
     
+    console.error('❌ [LP-DIV] Erro de conexão:', error);
     showNotification('Erro de conexão ao alterar status', 'error');
-    console.error('Erro ao alternar status:', error);
   }
+};
+
+// 🆕 FUNÇÃO PARA CONFIGURAR UTM/REDIRECIONAMENTO
+window.configurarUTMLPDivulgacao = function(lpId) {
+  console.log(`🔗 [LP-DIV] Configurando UTM para LP: ${lpId}`);
+  window.location.href = `lp-redirect-config.html?id=${lpId}`;
 };
 
 // Função para mostrar notificações
