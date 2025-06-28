@@ -15,18 +15,21 @@ export class ParticipantListsService {
 
   async create(dto: CreateParticipantListDto) {
     console.log('[CREATE-LIST] DTO recebido:', dto);
-    // 🆕 AJUSTE: Permitir listas vazias para tipo "indicador" (geradas por campanhas)
+    
+    // 🆕 CORREÇÃO: Permitir listas vazias temporariamente durante processo de import
+    // Listas vazias são úteis quando:
+    // 1. Criando lista para depois importar participantes de Excel
+    // 2. Criando lista de indicadores para campanhas
+    // 3. Criando lista template para depois popular
+    
     if (!dto.participants || dto.participants.length === 0) {
-      if (dto.tipo === 'indicador' && dto.campaignId) {
-        console.log('[CREATE-LIST] Criando lista vazia de indicadores para campanha:', dto.campaignName);
-        dto.participants = []; // Lista vazia é permitida para indicadores
-      } else {
-        console.warn('[CREATE-LIST] Tentativa de criar lista sem participantes!');
-        throw new Error('Lista deve conter pelo menos um participante');
-      }
+      console.log('[CREATE-LIST] Criando lista vazia (será populada depois):', dto.name);
+      dto.participants = []; // Lista vazia é permitida
     }
+    
     const list = new this.participantListModel(dto);
     const savedList = await list.save();
+    
     // Atualiza o campo 'lists' dos participantes selecionados (se houver)
     if (dto.participants && dto.participants.length > 0) {
       const participantIds = dto.participants.map(id => new Types.ObjectId(id));
@@ -37,8 +40,9 @@ export class ParticipantListsService {
       );
       console.log('[CREATE-LIST] Resultado updateMany:', updateResult.modifiedCount);
     } else {
-      console.log('[CREATE-LIST] Lista criada sem participantes iniciais (normal para listas de indicadores)');
+      console.log('[CREATE-LIST] Lista criada vazia - será populada posteriormente');
     }
+    
     return savedList;
   }
 

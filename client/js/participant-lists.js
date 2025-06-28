@@ -992,23 +992,21 @@ function handleImport(event) {
                 });
                 const allData = await searchResp.json();
                 const importedParticipants = (allData.participants || []).filter(p => emails.includes(p.email));
-                // Validação: só cria lista se houver participantes válidos
-                if (importedParticipants.length === 0) {
-                    showNotification('Nenhum participante válido para criar a lista.', 'error');
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalButtonText;
-                    return;
-                }
-                // Criar a lista com os participantes importados
+                
+                // 🆕 CORREÇÃO: Permitir criar lista mesmo se alguns participantes falharam
+                // A lista será criada e os participantes válidos serão adicionados
                 const listName = document.getElementById('listNameImport').value;
                 const listDescription = document.getElementById('listDescriptionImport').value;
                 const listTipo = document.getElementById('listTipoImport').value;
+                
                 if (!listTipo) {
                     console.error(new Error('Selecione o tipo da lista.'));
                     submitButton.disabled = false;
                     submitButton.textContent = originalButtonText;
                     return;
                 }
+                
+                // Criar a lista (mesmo que vazia inicialmente)
                 const listResp = await fetch(`${API_URL}/participant-lists`, {
                     method: 'POST',
                     headers: {
@@ -1020,14 +1018,24 @@ function handleImport(event) {
                         description: listDescription,
                         tipo: listTipo,
                         clientId,
-                        participants: importedParticipants.map(p => p._id)
+                        participants: importedParticipants.map(p => p._id) // Pode ser array vazio
                     })
                 });
+                
                 if (!listResp.ok) {
                     const data = await listResp.json();
                     throw new Error(data.message || 'Erro ao criar lista');
                 }
-                showNotification(`Importação concluída! ${participants.length} participantes importados e adicionados à lista "${listName}".`, 'success');
+                
+                // Mensagem de sucesso personalizada baseada no resultado
+                if (importedParticipants.length === 0) {
+                    showNotification(`Lista "${listName}" criada, mas nenhum participante foi importado. Verifique o formato do arquivo.`, 'warning');
+                } else if (importedParticipants.length === participants.length) {
+                    showNotification(`Importação concluída! ${participants.length} participantes importados e adicionados à lista "${listName}".`, 'success');
+                } else {
+                    showNotification(`Lista "${listName}" criada com ${importedParticipants.length} de ${participants.length} participantes. Alguns podem ter falhado na importação.`, 'warning');
+                }
+                
                 closeImportModal();
                 loadLists();
                 loadParticipants();
