@@ -3138,17 +3138,39 @@ function showNotification(message, type = 'info') {
 // 🎯 FUNÇÃO MELHORADA: Obter nome da campanha com informações extras
 function getCampaignDisplayName(participant) {
     let campaignName = 'Sem campanha';
-    let hasOriginInfo = false;
-    let originDetails = '';
+    
+    // 🔧 CORREÇÃO PRAGMÁTICA: Verificar cache de campanhas primeiro
+    if (window.campaignsCache && Array.isArray(window.campaignsCache)) {
+        // Buscar campanha pelo ID no cache
+        let campaignId = null;
+        
+        if (participant.originCampaignId) {
+            campaignId = typeof participant.originCampaignId === 'object' ? participant.originCampaignId._id || participant.originCampaignId.id : participant.originCampaignId;
+        } else if (participant.campaignId) {
+            campaignId = typeof participant.campaignId === 'object' ? participant.campaignId._id || participant.campaignId.id : participant.campaignId;
+        }
+        
+        if (campaignId) {
+            const campaign = window.campaignsCache.find(c => (c._id || c.id) === campaignId);
+            if (campaign && campaign.name) {
+                campaignName = campaign.name;
+                return `<span class="text-gray-300">${campaignName}</span>`;
+            }
+        }
+    }
     
     // 1️⃣ PRIORIDADE: originCampaignId (novos participantes)
     if (participant.originCampaignId) {
         if (typeof participant.originCampaignId === 'object' && participant.originCampaignId.name) {
             campaignName = participant.originCampaignId.name;
         } else if (typeof participant.originCampaignId === 'string') {
-            campaignName = participant.originCampaignId;
+            // 🔧 CORREÇÃO: Se é string de código, não usar como nome
+            if (participant.originCampaignId.length < 10) {
+                campaignName = participant.originCampaignId;
+            } else {
+                campaignName = 'Campanha (carregando...)';
+            }
         }
-        hasOriginInfo = true;
     }
     
     // 2️⃣ FALLBACK: campaignId (participantes antigos)
@@ -3156,7 +3178,12 @@ function getCampaignDisplayName(participant) {
         if (typeof participant.campaignId === 'object' && participant.campaignId.name) {
             campaignName = participant.campaignId.name;
         } else if (typeof participant.campaignId === 'string') {
-            campaignName = participant.campaignId;
+            // 🔧 CORREÇÃO: Se é string de código, não usar como nome
+            if (participant.campaignId.length < 10) {
+                campaignName = participant.campaignId;
+            } else {
+                campaignName = 'Campanha (carregando...)';
+            }
         }
     }
     
@@ -3168,36 +3195,6 @@ function getCampaignDisplayName(participant) {
     // 4️⃣ ÚLTIMO FALLBACK: metadados de origem
     else if (participant.originMetadata?.campaignName) {
         campaignName = participant.originMetadata.campaignName;
-        hasOriginInfo = true;
-    }
-    
-    // 🔍 INFORMAÇÕES EXTRAS DE ORIGEM
-    if (hasOriginInfo && participant.originMetadata) {
-        const metadata = participant.originMetadata;
-        const originParts = [];
-        
-        if (metadata.source) originParts.push(`Fonte: ${metadata.source}`);
-        if (metadata.landingPage) originParts.push(`LP: ${metadata.landingPage}`);
-        if (metadata.referrer) originParts.push(`Ref: ${metadata.referrer}`);
-        
-        if (originParts.length > 0) {
-            originDetails = originParts.join(' | ');
-        }
-    }
-    
-    // 📋 RETORNAR HTML COM TOOLTIP SE HÁ INFORMAÇÕES EXTRAS
-    if (hasOriginInfo && originDetails) {
-        return `
-            <div class="flex items-center gap-1">
-                <span class="text-gray-300">${campaignName}</span>
-                <div class="relative group">
-                    <i class="fas fa-info-circle text-blue-400 text-xs cursor-help"></i>
-                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg border border-gray-600 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                        ${originDetails}
-                    </div>
-                </div>
-            </div>
-        `;
     }
     
     return `<span class="text-gray-300">${campaignName}</span>`;
@@ -4518,11 +4515,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (isUsersTab) {
         console.log('✅ Aba usuários detectada como ativa - inicializando...');
-        ensureUsersTabInitialized();
+        fixCampaignNamesAndLists().then(() => ensureUsersTabInitialized());
     } else {
         // Força a inicialização da aba de usuários para garantir que funcione quando clicada
         console.log('🔧 Pré-carregando dados para aba de usuários...');
-        setTimeout(() => {
+        setTimeout(async () => {
+            await fixCampaignNamesAndLists();
             ensureUsersTabInitialized();
         }, 1000);
     }
@@ -4536,7 +4534,71 @@ window.addEventListener('load', function() {
     setTimeout(() => {
         if (!usersTabInitialized) {
             console.log('⚠️ Inicialização automática não executada - forçando...');
-            ensureUsersTabInitialized();
+            fixCampaignNamesAndLists().then(() => ensureUsersTabInitialized());
         }
     }, 2000);
 });
+
+/**
+ * 🔧 CORREÇÃO PRAGMÁTICA: Força carregamento de campanhas e atualiza exibição
+ */
+window.fixCampaignNamesAndLists = async function() {
+    console.log('🔧 Corrigindo nomes de campanhas e listas...');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        if (!token || !clientId) {
+            console.log('❌ Token ou clientId não encontrado');
+            return;
+        }
+        
+        // 1. Carregar campanhas primeiro
+        console.log('📢 Carregando campanhas...');
+        const campaignsResponse = await fetch(`${getApiUrl()}/campaigns?clientId=${clientId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (campaignsResponse.ok) {
+            const campaignsData = await campaignsResponse.json();
+            const campaigns = Array.isArray(campaignsData) ? campaignsData : (campaignsData.data || []);
+            window.campaignsCache = campaigns;
+            console.log('✅ Campanhas carregadas no cache:', campaigns.length);
+        }
+        
+        // 2. Recarregar participantes para atualizar exibição
+        console.log('👥 Recarregando participantes...');
+        await loadParticipants();
+        
+        // 3. Forçar exibição atualizada
+        console.log('🔄 Atualizando exibição...');
+        displayParticipants();
+        
+        console.log('✅ Correção concluída! Os nomes das campanhas devem aparecer corretamente agora.');
+        
+    } catch (error) {
+        console.error('❌ Erro na correção:', error);
+    }
+};
+
+/**
+ * 🔧 RESET da inicialização da aba usuários
+ */
+window.resetUsersTabInitialization = function() {
+    console.log('🔄 Resetando inicialização da aba usuários...');
+    usersTabInitialized = false;
+    
+    // Limpar cache
+    if (window.PaginationSystem) {
+        PaginationSystem.pageCache.clear();
+    }
+    
+    // Limpar variáveis globais
+    participants = [];
+    totalParticipants = 0;
+    currentPage = 1;
+    currentFilters = {};
+    
+    console.log('✅ Reset concluído. Execute ensureUsersTabInitialized() para re-inicializar.');
+};
