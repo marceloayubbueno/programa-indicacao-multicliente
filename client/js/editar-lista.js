@@ -1,8 +1,14 @@
 // 🎯 EDITAR LISTA - VERSÃO SIMPLIFICADA E OTIMIZADA
 // ===================================================
 
-// 🌐 CONFIGURAÇÃO
-// API_URL já declarado em auth.js - usando a variável global
+// 🌐 CONFIGURAÇÃO CORRIGIDA
+function getApiUrl() {
+    return window.API_URL || 
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+           (window.location.hostname === 'localhost' ? 
+            'http://localhost:3000/api' : 
+            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+}
 
 // 📊 ESTADO GLOBAL
 let allParticipants = [];
@@ -93,7 +99,7 @@ async function loadAllParticipants() {
   }
 
   try {
-    const response = await fetch(`${API_URL}/participants?clientId=${clientId}&limit=1000`, {
+    const response = await fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
@@ -458,8 +464,6 @@ async function createList(formData) {
     selectedArray.includes(p._id || p.id) && !(p.id && p.id.startsWith('tmp_'))
   );
 
-
-
   // 1. Importar novos participantes se houver
   let newParticipantIds = [];
   if (newParticipants.length > 0) {
@@ -474,9 +478,7 @@ async function createList(formData) {
         status: 'ativo' // 🔧 CORREÇÃO: Usar valor em português conforme schema
       }));
 
-
-
-      const response = await fetch(`${API_URL}/participants/import`, {
+      const response = await fetch(`${getApiUrl()}/participants/import`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -513,7 +515,7 @@ async function createList(formData) {
     participants: allParticipantIds
   };
 
-  const response = await fetch(`${API_URL}/participant-lists`, {
+  const response = await fetch(`${getApiUrl()}/participant-lists`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
