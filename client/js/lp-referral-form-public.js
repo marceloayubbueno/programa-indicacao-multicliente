@@ -53,7 +53,7 @@ window.submitReferralForm = async function(event, form) {
     try {
       // Tenta buscar do backend
       console.log('🌐 [REFERRAL-FORM] Buscando UTM params do backend...');
-      const res = await fetch(`http://localhost:3000/api/lp-divulgacao/${lpId}`);
+      const res = await fetch(`${API_URL}/lp-divulgacao/${lpId}`);
       if (res.ok) {
         const data = await res.json();
         if (data && data.data && data.data.utmParams) {
@@ -121,11 +121,11 @@ window.submitReferralForm = async function(event, form) {
     console.log('🚀 [REFERRAL-FORM] Enviando requisição para o backend...');
     
     // === 🔍 DEBUG LOGS - HIPÓTESE 5 (CORS/Headers) ===
-    console.log('🔍 [DEBUG-H5] Fazendo requisição para:', 'http://localhost:3000/api/lp-divulgacao/submit-referral');
+    console.log('🔍 [DEBUG-H5] Fazendo requisição para:', `${API_URL}/lp-divulgacao/submit-referral`);
     console.log('🔍 [DEBUG-H5] Headers enviados:', { 'Content-Type': 'application/json' });
     console.log('🔍 [DEBUG-H5] Payload sendo enviado:', payload);
     
-    const response = await fetch('http://localhost:3000/api/lp-divulgacao/submit-referral', {
+    const response = await fetch(`${API_URL}/lp-divulgacao/submit-referral`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -149,7 +149,7 @@ window.submitReferralForm = async function(event, form) {
       // Buscar redirectUrl da LP e redirecionar se existir
       try {
         console.log('🔍 [REFERRAL-FORM] Verificando URL de redirecionamento...');
-        const res = await fetch(`http://localhost:3000/api/lp-divulgacao/${lpId}`);
+        const res = await fetch(`${API_URL}/lp-divulgacao/${lpId}`);
         if (res.ok) {
           const data = await res.json();
           const redirectUrl = data && data.data && data.data.redirectUrl;

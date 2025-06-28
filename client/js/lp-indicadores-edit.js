@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('[saveLP] Payload montado:', payload);
     try {
       console.log('[saveLP] Enviando fetch para backend...');
-      const response = await fetch('http://localhost:3000/api/lp-indicadores', {
+      const response = await fetch(`${API_URL}/lp-indicadores`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
       userAgent
     };
     try {
-      const response = await fetch('http://localhost:3000/api/lp-indicadores/submit-form', {
+      const response = await fetch(`${API_URL}/lp-indicadores/submit-form`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

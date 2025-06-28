@@ -23,10 +23,20 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       try {
-        const res = await fetch('http://localhost:3000/api/referrals', {
+        const res = await fetch(`${API_URL}/referrals`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ leadName, leadEmail, leadPhone })
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            referredName: leadName,
+            referredEmail: leadEmail,
+            referredPhone: leadPhone,
+            referrerEmail: referrerEmail,
+            source: 'lp-divulgacao',
+            campaign: campaign
+          })
         });
         const data = await res.json();
         if (data.success) {
@@ -55,98 +65,15 @@ function renderLPDivulgacaoList() {
     tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-bullhorn"></i><h3>Não autenticado</h3><p>Faça login novamente para ver suas LPs de divulgação</p></td></tr>';
     return;
   }
-  fetch(`http://localhost:3000/api/lp-divulgacao?clientId=${clientId}`)
-    .then(res => res.json())
-    .then(result => {
-      if (!result.success || !result.data || result.data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-bullhorn"></i><h3>Nenhuma LP cadastrada</h3><p>Crie sua primeira LP de divulgação para começar</p></td></tr>';
-        return;
-      }
-      result.data.forEach(lp => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-800 transition-colors';
-        
-        // Status toggle button
-        const statusToggle = `
-          <div class="flex items-center gap-2">
-            <button 
-              onclick="toggleLPStatus('${lp._id}', '${lp.status}')" 
-              class="flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all duration-200 ${
-                lp.status === 'published' 
-                  ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
-                  : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-              }"
-              title="Clique para ${lp.status === 'published' ? 'despublicar' : 'publicar'}"
-            >
-              <i class="fas ${lp.status === 'published' ? 'fa-eye' : 'fa-eye-slash'} text-xs"></i>
-              <span class="text-xs font-medium">${lp.status === 'published' ? 'Publicado' : 'Rascunho'}</span>
-            </button>
-          </div>
-        `;
-          
-        // Métricas simuladas
-        const clicks = lp.clicks || Math.floor(Math.random() * 500);
-        const conversions = lp.conversions || Math.floor(Math.random() * 50);
-        const conversionRate = clicks > 0 ? ((conversions / clicks) * 100).toFixed(1) : '0';
-        
-        tr.innerHTML = `
-          <td class="px-4 py-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                <i class="fas fa-bullhorn text-purple-400"></i>
-              </div>
-              <div>
-                <div class="font-medium text-gray-200">${lp.name || 'Sem nome'}</div>
-                <div class="text-xs text-gray-400 flex items-center gap-3 mt-1">
-                  <span><i class="fas fa-mouse-pointer mr-1"></i>${clicks} cliques</span>
-                  <span><i class="fas fa-chart-line mr-1"></i>${conversions} conversões</span>
-                  <span class="text-green-400"><i class="fas fa-percentage mr-1"></i>${conversionRate}%</span>
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="px-4 py-3">
-            <div class="text-sm text-gray-300">
-              <i class="fas fa-calendar text-gray-400 mr-1"></i>
-              ${lp.createdAt ? new Date(lp.createdAt).toLocaleDateString('pt-BR') : '-'}
-            </div>
-          </td>
-          <td class="px-4 py-3">${statusToggle}</td>
-          <td class="px-4 py-3">
-            <div class="flex items-center gap-1">
-              <button class="p-1.5 rounded hover:bg-gray-700 transition-colors text-blue-400 hover:text-blue-300" 
-                      title="Visualizar" 
-                      onclick="window.open('lp-preview-divulgacao.html?id=${lp._id}', '_blank')">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="p-1.5 rounded hover:bg-gray-700 transition-colors text-green-400 hover:text-green-300" 
-                      title="Editar" 
-                      onclick="editLPDivulgacao('${lp._id}')">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="p-1.5 rounded hover:bg-gray-700 transition-colors text-purple-400 hover:text-purple-300" 
-                      title="Código de Incorporação" 
-                      onclick="showEmbedCodeDivulgacao('${lp._id}')">
-                <i class="fas fa-code"></i>
-              </button>
-              <button class="p-1.5 rounded hover:bg-gray-700 transition-colors text-orange-400 hover:text-orange-300" 
-                      title="Configurar Redirecionamento/UTM" 
-                      onclick="window.location.href='lp-redirect-config.html?id=${lp._id}'">
-                <i class="fas fa-link"></i>
-              </button>
-              <button class="p-1.5 rounded hover:bg-gray-700 transition-colors text-red-400 hover:text-red-300" 
-                      title="Excluir" 
-                      onclick="deleteLPDivulgacao('${lp._id}')">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+  fetch(`${API_URL}/lp-divulgacao?clientId=${clientId}`)
+    .then(response => response.json())
+    .then(data => {
+      lpDivulgacaoList = data.data || [];
+      renderLPList();
     })
-    .catch(() => {
-      tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-bullhorn"></i><h3>Erro ao carregar LPs</h3><p>Tente novamente mais tarde</p></td></tr>';
+    .catch(error => {
+      console.error('Erro ao carregar LPs:', error);
+      showNotification('Erro ao carregar LPs de Divulgação', 'error');
     });
 }
 
@@ -171,7 +98,7 @@ window.editLPDivulgacao = function(id) {
 
 window.deleteLPDivulgacao = function(id) {
   if (confirm('Tem certeza que deseja excluir esta LP?')) {
-    fetch(`http://localhost:3000/api/lp-divulgacao/${id}`, {
+    fetch(`${API_URL}/lp-divulgacao/${id}`, {
       method: 'DELETE'
     })
       .then(res => {
@@ -220,10 +147,10 @@ window.toggleLPStatus = async function(lpId, currentStatus) {
     button.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i><span class="text-xs">Alterando...</span>';
     
     // Fazer requisição para o backend
-    const response = await fetch(`http://localhost:3000/api/lp-divulgacao/${lpId}/${action}`, {
+    const response = await fetch(`${API_URL}/lp-divulgacao/${lpId}/${action}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${token}`
       }
     });
     

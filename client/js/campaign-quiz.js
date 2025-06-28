@@ -155,7 +155,7 @@ async function fetchLPIndicadoresBackend() {
   const token = localStorage.getItem('clientToken');
   if (!clientId || !token) return [];
   try {
-    const response = await fetch(`http://localhost:3000/api/lp-indicadores?clientId=${clientId}` , {
+    const response = await fetch(`${API_URL}/lp-indicadores?clientId=${clientId}` , {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Erro ao buscar LPs');
@@ -256,7 +256,7 @@ async function fetchLPDivulgacaoBackend() {
   const token = localStorage.getItem('clientToken');
   if (!clientId || !token) return [];
   try {
-    const response = await fetch(`http://localhost:3000/api/lp-divulgacao?clientId=${clientId}` , {
+    const response = await fetch(`${API_URL}/lp-divulgacao?clientId=${clientId}` , {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Erro ao buscar LPs de divulgação');
@@ -346,7 +346,7 @@ async function fetchListasParticipantes() {
     return [];
   }
   try {
-    const response = await fetch(`http://localhost:3000/api/participant-lists?clientId=${clientId}`, {
+    const response = await fetch(`${API_URL}/participant-lists?clientId=${clientId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
@@ -393,7 +393,7 @@ function renderListasParticipantes() {
       try {
         const clientId = localStorage.getItem('clientId');
         const token = localStorage.getItem('clientToken');
-        const resp = await fetch(`http://localhost:3000/api/participant-lists/${lista._id}/participants/count`, {
+        const resp = await fetch(`${API_URL}/participant-lists/${lista._id}/participants/count`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await resp.json();
@@ -432,7 +432,7 @@ window.criarNovaLista = async function() {
   const clientId = localStorage.getItem('clientId');
   const token = localStorage.getItem('clientToken');
   try {
-    const response = await fetch('http://localhost:3000/api/participant-lists', {
+    const response = await fetch(`${API_URL}/participant-lists`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -532,7 +532,7 @@ async function handleUploadLista(e) {
     const listaName = prompt('Nome da nova lista para este upload:');
     if (!listaName) return;
     // 1. Cria lista
-    const resLista = await fetch('http://localhost:3000/api/participant-lists', {
+    const resLista = await fetch(`${API_URL}/participant-lists`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -543,7 +543,7 @@ async function handleUploadLista(e) {
     if (!resLista.ok) throw new Error('Erro ao criar lista');
     const lista = await resLista.json();
     // 2. Importa participantes
-    const resImport = await fetch('http://localhost:3000/api/participants/import', {
+    const resImport = await fetch(`${API_URL}/participants/import`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -556,7 +556,7 @@ async function handleUploadLista(e) {
     // 3. Associa participantes à lista
     const participantIds = (importData.data || []).map(p => p._id);
     if (participantIds.length) {
-      await fetch(`http://localhost:3000/api/participant-lists/${lista.data._id}`, {
+      await fetch(`${API_URL}/participant-lists/${lista.data._id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -633,7 +633,7 @@ window.salvarListaManual = async function() {
   }
   try {
     // 1. Cria lista
-    const resLista = await fetch('http://localhost:3000/api/participant-lists', {
+    const resLista = await fetch(`${API_URL}/participant-lists`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -644,7 +644,7 @@ window.salvarListaManual = async function() {
     if (!resLista.ok) throw new Error('Erro ao criar lista');
     const lista = await resLista.json();
     // 2. Importa participantes
-    const resImport = await fetch('http://localhost:3000/api/participants/import', {
+    const resImport = await fetch(`${API_URL}/participants/import`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -657,7 +657,7 @@ window.salvarListaManual = async function() {
     // 3. Associa participantes à lista
     const participantIds = (importData.data || []).map(p => p._id);
     if (participantIds.length) {
-      await fetch(`http://localhost:3000/api/participant-lists/${lista.data._id}`, {
+      await fetch(`${API_URL}/participant-lists/${lista.data._id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -684,7 +684,7 @@ async function fetchRewardsBackend() {
     return [];
   }
   try {
-    const response = await fetch(`http://localhost:3000/api/rewards?clientId=${clientId}`, {
+    const response = await fetch(`${API_URL}/rewards?clientId=${clientId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) {
@@ -945,7 +945,7 @@ async function salvarCampanhaBackend() {
   }
 
   try {
-    const response = await fetch('http://localhost:3000/api/campaigns', {
+    const response = await fetch(`${API_URL}/campaigns`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
