@@ -1,82 +1,21 @@
-// 🌟 REFATORAÇÃO FASE 1: ESTADO CENTRALIZADO E SIMPLIFICADO
-// 🎯 Objetivo: Simplificar e unificar o gerenciamento de estado
-
-// 🏗️ ESTADO CENTRALIZADO - Substitui múltiplas variáveis globais
-const appState = {
-    // Dados principais
-    participants: [],
-    lists: [],
-    campaigns: [],
-    
-    // Estado de filtros
-    filters: {
-        tipo: 'todos',
-        status: '',
-        lista: '',
-        email: '',
-        search: ''
-    },
-    
-    // Estado de paginação
-    pagination: {
-        currentPage: 1,
-        pageSize: 25,
-        totalParticipants: 0,
-        totalPages: 1
-    },
-    
-    // Estado de carregamento
-    loading: {
-        participants: false,
-        lists: false,
-        campaigns: false
-    },
-    
-    // UI state
-    ui: {
-        currentTab: 'lists',
-        currentEditingListId: null
-    }
-};
-
-// 🔧 COMPATIBILIDADE: Manter variáveis legadas para não quebrar código existente
+// 🌟 VARIÁVEIS GLOBAIS REFATORADAS - Usando novos módulos
+// 🔧 CORREÇÃO: API_URL já declarado em auth.js (removendo duplicação)
 let currentTab = 'lists';
-let participants = []; // Será sincronizado com appState.participants
-let lists = []; // Será sincronizado com appState.lists
-let currentPage = 1; // Será sincronizado com appState.pagination.currentPage
-let pageSize = 25;
-let totalParticipants = 0;
-let totalPages = 1;
+let participants = []; // Mantido para compatibilidade
+let lists = [];
+let currentPage = 1;
+let pageSize = 25; // 🔧 OTIMIZADO: Limite escalável para grandes volumes
+let totalParticipants = 0; // 🔧 CORRIGIDO: Inicializado
+let totalPages = 1; // 🔧 CORRIGIDO: Adicionado
 let tipoFiltro = 'todos';
 let isLoading = false;
-let currentFilters = {};
-let currentEditingListId = null;
+let currentFilters = {}; // 🔧 NOVO: Cache de filtros atuais
 
-// 🔄 FUNÇÕES DE SINCRONIZAÇÃO: Manter compatibilidade com código legado
-function syncLegacyState() {
-    // Sincronizar variáveis legadas com estado centralizado
-    participants = appState.participants;
-    lists = appState.lists;
-    currentPage = appState.pagination.currentPage;
-    totalParticipants = appState.pagination.totalParticipants;
-    totalPages = appState.pagination.totalPages;
-    tipoFiltro = appState.filters.tipo;
-    isLoading = appState.loading.participants || appState.loading.lists;
-    currentTab = appState.ui.currentTab;
-    currentEditingListId = appState.ui.currentEditingListId;
-}
-
-function updateAppState(updates) {
-    // Atualizar estado centralizado e sincronizar
-    if (updates.participants) appState.participants = updates.participants;
-    if (updates.lists) appState.lists = updates.lists;
-    if (updates.filters) Object.assign(appState.filters, updates.filters);
-    if (updates.pagination) Object.assign(appState.pagination, updates.pagination);
-    if (updates.loading) Object.assign(appState.loading, updates.loading);
-    if (updates.ui) Object.assign(appState.ui, updates.ui);
-    
-    syncLegacyState();
-}
+// 🚀 INICIALIZAÇÃO DOS NOVOS MÓDULOS
+console.log('🔧 Inicializando módulos refatorados...');
+console.log('📦 APIClient:', typeof window.apiClient);
+console.log('🔄 DataAdapter:', typeof window.DataAdapter);
+console.log('👥 ParticipantsManager:', typeof window.participantsManager);
 
 // 🔧 CORREÇÃO: Função para obter API_URL de forma segura
 function getApiUrl() {
@@ -917,1165 +856,191 @@ function populateListFilter() {
 
 // 🚀 FUNÇÃO CORRIGIDA - Display direto COM fallback para ParticipantsManager
 function displayParticipants() {
-    console.log('🎨 displayParticipants REFATORADO - Versão simplificada');
+    console.log('🔄 displayParticipants ORIGINAL - Sistema restaurado');
     
     const tbody = document.getElementById('participantsList');
     if (!tbody) {
         console.error('❌ Elemento participantsList não encontrado');
         return;
     }
-
-    try {
-        // 🔧 Usar filtros do estado centralizado
-        const filteredParticipants = filterParticipantsData();
-        console.log('📊 Participantes filtrados:', filteredParticipants.length);
-
-        // 🔧 Estado vazio
-        if (!filteredParticipants || filteredParticipants.length === 0) {
-            tbody.innerHTML = createEmptyStateHTML();
-            return;
-        }
-
-        // 🔧 Paginação usando estado centralizado
-        const { currentPage, pageSize } = appState.pagination;
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        const paginatedParticipants = filteredParticipants.slice(startIndex, endIndex);
-
-        console.log(`📄 Página ${currentPage}: ${startIndex}-${endIndex} de ${filteredParticipants.length}`);
-
-        // 🔧 Gerar HTML usando função simplificada
-        const html = generateParticipantsHTML(paginatedParticipants);
-        tbody.innerHTML = html;
-
-        // 🔧 Atualizar estado centralizado
-        updateAppState({
-            pagination: {
-                ...appState.pagination,
-                totalParticipants: filteredParticipants.length,
-                totalPages: Math.ceil(filteredParticipants.length / pageSize) || 1
-            }
-        });
-
-        // 🔧 Manter compatibilidade
-        updatePaginationControls();
-        updateParticipantCount();
-
-        console.log('✅ Display simplificado concluído com sucesso!');
-
-    } catch (error) {
-        console.error('❌ Erro na exibição:', error);
-        tbody.innerHTML = createErrorStateHTML(error.message);
+    
+    // 🔧 SISTEMA ORIGINAL: Usar filtros locais
+    const filteredParticipants = filterParticipantsData();
+    console.log('📊 Participantes filtrados:', filteredParticipants.length);
+    
+    if (!filteredParticipants || filteredParticipants.length === 0) {
+        console.log('⚠️ Nenhum participante após filtros');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center py-8">
+                    <div class="flex flex-col items-center">
+                        <i class="fas fa-users text-4xl text-gray-500 mb-4"></i>
+                        <p class="text-xl text-gray-400 mb-2">Nenhum participante encontrado</p>
+                        <p class="text-sm text-gray-500">Tente ajustar os filtros ou adicionar novos participantes</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
     }
-}
-
-// 🔧 Helper: Estado vazio
-function createEmptyStateHTML() {
-    return `
-        <tr>
-            <td colspan="9" class="text-center py-8">
-                <div class="flex flex-col items-center">
-                    <i class="fas fa-users text-4xl text-gray-500 mb-4"></i>
-                    <p class="text-xl text-gray-400 mb-2">Nenhum participante encontrado</p>
-                    <p class="text-sm text-gray-500">Tente ajustar os filtros ou adicionar novos participantes</p>
-                </div>
-            </td>
-        </tr>
-    `;
-}
-
-// 🔧 Helper: Estado de erro
-function createErrorStateHTML(message) {
-    return `
-        <tr>
-            <td colspan="9" class="text-center py-8">
-                <div class="flex flex-col items-center">
-                    <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
-                    <p class="text-xl text-red-400 mb-2">Erro ao carregar dados</p>
-                    <p class="text-sm text-gray-500">${message}</p>
-                    <button onclick="loadParticipants()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Tentar novamente
+    
+    // 🔧 SISTEMA ORIGINAL: Paginação simples local
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedParticipants = filteredParticipants.slice(startIndex, endIndex);
+    
+    console.log(`📄 Página ${currentPage}: ${startIndex}-${endIndex} de ${filteredParticipants.length}`);
+    
+    // Atualizar estatísticas globais
+    totalParticipants = filteredParticipants.length;
+    totalPages = Math.ceil(totalParticipants / pageSize) || 1;
+    
+    // 🎯 SISTEMA ORIGINAL: Duplicar linhas por lista (João em 2 listas = 2 linhas)
+    const html = paginatedParticipants.flatMap(participant => {
+        const tipoInfo = getTipoInfo(participant.tipo || 'participante');
+        const status = participant.status || 'ativo';
+        const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
+        
+        // Link de referral se for indicador
+        let linkHtml = '-';
+        if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
+            const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
+            linkHtml = `
+                <div class="flex items-center gap-2">
+                    <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
+                    <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
+                        <i class="fas fa-copy"></i>
                     </button>
                 </div>
-            </td>
-        </tr>
-    `;
-}
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-function generateParticipantsHTML(participants) {
-    return participants.flatMap(participant => {
-        // Se tem listas, criar uma linha por lista
+            `;
+        }
+        
+        // Campanha
+        const campaignName = getCampaignDisplayName(participant);
+        
+        // 🔧 SISTEMA ORIGINAL: Se tem listas, criar uma linha por lista
         if (participant.lists && participant.lists.length > 0) {
             return participant.lists.map(list => {
                 const listName = typeof list === 'object' ? list.name : list;
-                return createParticipantRowHTML(participant, listName);
-            });
-        } else {
-            // Se não tem listas, criar uma linha normal
-            return [createParticipantRowHTML(participant, '-')];
-        }
-    }).join('');
-}
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-function createParticipantRowHTML(participant, listName) {
-    const tipoInfo = getTipoInfo(participant.tipo || 'participante');
-    const status = participant.status || 'ativo';
-    const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
-    const campaignName = getCampaignDisplayName(participant);
-    const participantId = participant._id || participant.id;
-    
-    // Link de referral simplificado
-    const linkHtml = createReferralLinkHTML(participant);
-    
-    return `
-        <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participantId}" data-list-name="${listName}">
-            <td class="px-4 py-3">
-                <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participantId}">
-            </td>
-            <td class="px-4 py-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
-                        <i class="${tipoInfo.icon} text-white text-sm"></i>
-                    </div>
-                    <div>
-                        <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
-                        <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
-                    </div>
-                </div>
-            </td>
-            <td class="px-4 py-3">
-                <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
-            </td>
-            <td class="px-4 py-3">
-                <div class="text-sm text-gray-300">${listName}</div>
-            </td>
-            <td class="px-4 py-3">
-                <div class="text-sm">${campaignName}</div>
-            </td>
-            <td class="px-4 py-3">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
-                    <i class="${tipoInfo.icon} mr-1"></i>
-                    ${tipoInfo.label}
-                </span>
-            </td>
-            <td class="px-4 py-3">
-                <div class="text-sm">${linkHtml}</div>
-            </td>
-            <td class="px-4 py-3">
-                <span class="${statusColor}">${status}</span>
-            </td>
-            <td class="px-4 py-3">
-                <div class="flex items-center gap-2">
-                    <button onclick="viewParticipantDetails('${participantId}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button onclick="editParticipant('${participantId}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteParticipant('${participantId}')" class="text-red-400 hover:text-red-300" title="Excluir">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `;
-}
-
-// 🔧 Helper: Criar link de referral
-function createReferralLinkHTML(participant) {
-    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
-        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
-        return `
-            <div class="flex items-center gap-2">
-                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
-                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
-                    <i class="fas fa-copy"></i>
-                </button>
-            </div>
-        `;
-    }
-    return '-';
-}
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-
-// 🔧 Helper: Criar link de referral
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-
-// 🔧 Helper: Criar link de referral
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-
-// 🔧 Helper: Criar link de referral
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-
-// 🔧 Helper: Criar link de referral
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-
-// 🔧 Helper: Criar link de referral
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-
-// 🔧 Helper: Criar link de referral
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-
-// 🔧 Helper: Criar link de referral
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-
-// 🔧 Helper: Criar link de referral
-
-// 🔧 Helper: Gerar HTML dos participantes (substitui flatMap complexo)
-
-// 🔧 Helper: Criar HTML da linha do participante (template limpo)
-
-// 🔧 Helper: Criar link de referral
-    if ((participant.tipo === 'indicador' || participant.tipo === 'influenciador') && participant.uniqueReferralCode) {
-        const referralLink = `${window.location.origin}/indicacao/${participant.uniqueReferralCode}`;
-        return `
-            <div class="flex items-center gap-2">
-                <code class="text-xs bg-gray-800 px-2 py-1 rounded">${participant.uniqueReferralCode}</code>
-                <button onclick="copyToClipboard('${referralLink}')" class="text-blue-400 hover:text-blue-300" title="Copiar link">
-// 🌟 REFATORAÇÃO FASE 1: ESTADO CENTRALIZADO E SIMPLIFICADO
-// 🎯 Objetivo: Simplificar e unificar o gerenciamento de estado
-
-// 🏗️ ESTADO CENTRALIZADO - Substitui múltiplas variáveis globais
-const appState = {
-    // Dados principais
-    participants: [],
-    lists: [],
-    campaigns: [],
-    
-    // Estado de filtros
-    filters: {
-        tipo: 'todos',
-        status: '',
-        lista: '',
-        email: '',
-        search: ''
-    },
-    
-    // Estado de paginação
-    pagination: {
-        currentPage: 1,
-        pageSize: 25,
-        totalParticipants: 0,
-        totalPages: 1
-    },
-    
-    // Estado de carregamento
-    loading: {
-        participants: false,
-        lists: false,
-        campaigns: false
-    },
-    
-    // UI state
-    ui: {
-        currentTab: 'lists',
-        currentEditingListId: null
-    }
-};
-
-// 🔧 COMPATIBILIDADE: Manter variáveis legadas para não quebrar código existente
-let currentTab = 'lists';
-let participants = []; // Será sincronizado com appState.participants
-let lists = []; // Será sincronizado com appState.lists
-let currentPage = 1; // Será sincronizado com appState.pagination.currentPage
-let pageSize = 25;
-let totalParticipants = 0;
-let totalPages = 1;
-let tipoFiltro = 'todos';
-let isLoading = false;
-let currentFilters = {};
-let currentEditingListId = null;
-
-// 🔄 FUNÇÕES DE SINCRONIZAÇÃO: Manter compatibilidade com código legado
-function syncLegacyState() {
-    // Sincronizar variáveis legadas com estado centralizado
-    participants = appState.participants;
-    lists = appState.lists;
-    currentPage = appState.pagination.currentPage;
-    totalParticipants = appState.pagination.totalParticipants;
-    totalPages = appState.pagination.totalPages;
-    tipoFiltro = appState.filters.tipo;
-    isLoading = appState.loading.participants || appState.loading.lists;
-    currentTab = appState.ui.currentTab;
-    currentEditingListId = appState.ui.currentEditingListId;
-}
-
-function updateAppState(updates) {
-    // Atualizar estado centralizado e sincronizar
-    if (updates.participants) appState.participants = updates.participants;
-    if (updates.lists) appState.lists = updates.lists;
-    if (updates.filters) Object.assign(appState.filters, updates.filters);
-    if (updates.pagination) Object.assign(appState.pagination, updates.pagination);
-    if (updates.loading) Object.assign(appState.loading, updates.loading);
-    if (updates.ui) Object.assign(appState.ui, updates.ui);
-    
-    syncLegacyState();
-}
-
-// 🔧 CORREÇÃO: Função para obter API_URL de forma segura
-function getApiUrl() {
-    return window.API_URL || 
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-           (window.location.hostname === 'localhost' ? 
-            'http://localhost:3000/api' : 
-            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
-}
-
-// 🔍 DIAGNÓSTICO: Função para verificar configuração
-function debugConfig() {
-    console.log('🔍 === DIAGNÓSTICO DE CONFIGURAÇÃO ===');
-    console.log('🔍 window.APP_CONFIG:', window.APP_CONFIG);
-    console.log('🔍 window.location.hostname:', window.location.hostname);
-    console.log('🔍 REFERRAL_BASE_URL configurado:', window.APP_CONFIG?.REFERRAL_BASE_URL);
-    console.log('🔍 API_URL configurado:', window.APP_CONFIG?.API_URL);
-    console.log('🔍 ===================================');
-}
-
-// Executar diagnóstico ao carregar
-if (typeof window !== 'undefined') {
-    setTimeout(debugConfig, 1000);
-}
-
-// Estado das variáveis (declarações já feitas acima)
-
-// Funções do Modal
-function showParticipantModal(participantData) {
-    document.getElementById('participantName').textContent = participantData.name;
-    document.getElementById('participantEmail').textContent = participantData.email;
-    document.getElementById('participantCampaign').textContent = participantData.campaign;
-    document.getElementById('participantDate').textContent = participantData.date;
-    document.getElementById('participantReferrals').textContent = participantData.referrals;
-    document.getElementById('participantStatus').textContent = participantData.status;
-    
-    // Exibir link de compartilhamento - ATUALIZADO PARA NOVO SISTEMA
-    // 🔧 CORREÇÃO DEFINITIVA: Garantir que sempre use o backend correto
-    let baseReferralUrl;
-    if (window.APP_CONFIG && window.APP_CONFIG.REFERRAL_BASE_URL) {
-        baseReferralUrl = window.APP_CONFIG.REFERRAL_BASE_URL;
-        console.log('✅ Usando REFERRAL_BASE_URL do config:', baseReferralUrl);
-    } else {
-        // Fallback: SEMPRE usar o backend Railway em produção
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            baseReferralUrl = 'http://localhost:3000/indicacao';
-        } else {
-            baseReferralUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
-        }
-        console.log('⚠️ Usando fallback REFERRAL_BASE_URL:', baseReferralUrl);
-    }
-    const link = participantData.uniqueReferralCode
-        ? `${baseReferralUrl}/${participantData.uniqueReferralCode}`
-        : (participantData.linkCompartilhamento 
-            ? `${baseReferralUrl}/${participantData.linkCompartilhamento}`
-            : '-');
-    
-    const linkDisplay = link !== '-' ? link : 'Link não disponível';
-    const isLinkValid = link !== '-';
-    
-    document.getElementById('participantShareLink').innerHTML = `
-        <div class="share-link-container">
-            <input type="text" value="${linkDisplay}" readonly style="width: 70%; font-size: 0.85em; ${!isLinkValid ? 'color: #999;' : ''}" onclick="${isLinkValid ? 'this.select()' : ''}">
-            <button class="btn-icon ${!isLinkValid ? 'disabled' : ''}" title="${isLinkValid ? 'Copiar link' : 'Link não disponível'}" onclick="${isLinkValid ? `copyToClipboard('${link}')` : ''}" ${!isLinkValid ? 'disabled' : ''}>
-                <i class="fas fa-copy"></i>
-            </button>
-            ${isLinkValid ? `<button class="btn-icon" title="Gerar novo link" onclick="regenerateReferralCode('${participantData.id}')"><i class="fas fa-sync-alt"></i></button>` : ''}
-        </div>
-        <small style="display: block; margin-top: 4px; color: #666; font-size: 0.75em;">
-            ${isLinkValid ? 'Link exclusivo de indicação' : 'Disponível apenas para indicadores ativos'}
-        </small>
-    `;
-
-    document.getElementById('participantModal').style.display = 'block';
-}
-
-function closeParticipantModal() {
-    document.getElementById('participantModal').style.display = 'none';
-}
-
-// Fechar modal ao clicar fora dele
-window.onclick = function(event) {
-    const modals = [
-        'importModal',
-        'participantModal',
-        'newParticipantModal',
-        'manageListsModal'
-    ];
-    
-    modals.forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        if (event.target === modal) {
-            if (modalId === 'manageListsModal') {
-                closeManageListsModal();
-            } else if (modalId === 'importModal') {
-                closeImportModal();
-            } else if (modalId === 'participantModal') {
-                closeParticipantModal();
-            } else if (modalId === 'newParticipantModal') {
-                closeNewParticipantModal();
-            }
-        }
-    });
-}
-
-// Funções de busca e filtro
-function searchParticipants() {
-    const searchTerm = document.getElementById('searchParticipant').value.toLowerCase();
-    // A busca agora é feita através dos filtros modernos
-    currentPage = 1;
-    displayParticipants();
-}
-
-// FUNÇÃO ANTIGA REMOVIDA - havia conflito com a nova implementação
-
-// 🚀 FUNÇÃO ESCALÁVEL - Usando PaginationSystem
-async function loadParticipants(page = 1, filters = {}) {
-    console.log('🔄 loadParticipants ORIGINAL - Sistema restaurado');
-    console.log('📄 Carregando página:', page, 'Filtros:', filters);
-    
-    if (isLoading) {
-        console.log('⏳ Já carregando participantes...');
-        return;
-    }
-    
-    try {
-        isLoading = true;
-        
-        const token = localStorage.getItem('clientToken');
-        const clientId = localStorage.getItem('clientId');
-        
-        if (!token || !clientId) {
-            console.error('❌ Token ou clientId não encontrado');
-            return;
-        }
-        
-        console.log('🔗 Carregando participantes via API...');
-        
-        // 🔧 SISTEMA ORIGINAL: Carregar todos os dados de uma vez
-        const url = `${getApiUrl()}/participants?clientId=${clientId}&limit=1000`;
-        const response = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Erro HTTP: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('📥 Dados recebidos:', data);
-        
-        // Extrair participantes
-        const participantsArray = data.participants || data.data || data || [];
-        console.log('👥 Participantes extraídos:', participantsArray.length);
-        
-        // 🔧 SISTEMA ORIGINAL: Atualizar estado global
-        participants = participantsArray;
-        totalParticipants = participantsArray.length;
-        currentPage = 1; // Reset para página 1
-        totalPages = Math.ceil(totalParticipants / pageSize) || 1;
-        
-        console.log('✅ Participantes carregados:', {
-            total: participants.length,
-            página: currentPage,
-            páginas_total: totalPages
-        });
-        
-        // Forçar exibição
-        displayParticipants();
-        
-    } catch (error) {
-        console.error('❌ Erro ao carregar participantes:', error);
-        showNotification('Erro ao carregar participantes', 'error');
-        
-        // Mostrar erro na tabela
-        const tbody = document.getElementById('participantsList');
-        if (tbody) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="9" class="text-center py-8">
-                        <div class="flex flex-col items-center">
-                            <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
-                            <p class="text-xl text-red-400 mb-2">Erro ao carregar dados</p>
-                            <p class="text-sm text-gray-500">Verifique sua conexão e tente novamente</p>
-                            <button onclick="loadParticipants()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                Tentar novamente
+                
+                return `
+                    <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participant._id || participant.id}" data-list-name="${listName}">
+                    <td class="px-4 py-3">
+                            <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participant._id || participant.id}">
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                                    <i class="${tipoInfo.icon} text-white text-sm"></i>
+                            </div>
+                            <div>
+                                    <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                                    <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${listName}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm">${campaignName}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                            <i class="${tipoInfo.icon} mr-1"></i>
+                            ${tipoInfo.label}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm">${linkHtml}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <span class="${statusColor}">${status}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <button onclick="viewParticipantDetails('${participant._id || participant.id}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="editParticipant('${participant._id || participant.id}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                                <button onclick="deleteParticipant('${participant._id || participant.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </td>
-                </tr>
-            `;
-        }
-    } finally {
-        isLoading = false;
-    }
-}
-
-function viewParticipantDetails(participantId) {
-    // Aqui você faria uma chamada para a API para buscar os detalhes do participante
-    const mockData = {
-        name: 'João Silva',
-        email: 'joao@email.com',
-        campaign: 'Indique e Ganhe',
-        date: '01/01/2024',
-        referrals: '3',
-        status: 'Ativo'
-    };
-    
-    showParticipantModal(mockData);
-}
-
-async function editParticipant(participantId) {
-    const token = localStorage.getItem('clientToken');
-    if (!token) {
-        showNotification('Token não encontrado. Faça login novamente.', 'error');
-        return;
-    }
-    try {
-        // Buscar dados do participante
-        const response = await fetch(`${getApiUrl()}/participants?clientId=${localStorage.getItem('clientId')}`);
-        if (!response.ok) throw new Error('Erro ao buscar participante');
-        const data = await response.json();
-        const participant = (data.participants || []).find(p => p._id === participantId);
-        if (!participant) {
-            alert('Participante não encontrado.');
-            return;
-        }
-        // Preencher modal de edição
-        document.getElementById('participantName').value = participant.name;
-        document.getElementById('participantEmail').value = participant.email;
-        document.getElementById('participantPhone').value = participant.phone || '';
-        document.getElementById('participantStatus').value = participant.status || 'ativo';
-        // Exibir o ID do participante
-        const idField = document.getElementById('participantId');
-        if (idField) idField.value = participant._id || '';
-        // Exibir modal
-        showNewParticipantModal(true);
-        // Substituir handler do formulário para salvar edição
-        const form = document.getElementById('newParticipantForm');
-        form.onsubmit = async function(event) {
-            event.preventDefault();
-            let status = document.getElementById('participantStatus').value;
-            if (status === 'active') status = 'ativo';
-            if (status === 'inactive') status = 'inativo';
-            const updatedParticipant = {
-                name: document.getElementById('participantName').value,
-                email: document.getElementById('participantEmail').value,
-                phone: document.getElementById('participantPhone').value,
-                status
-            };
-            try {
-                const patchResp = await fetch(`${getApiUrl()}/participants/${participantId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(updatedParticipant)
-                });
-                if (!patchResp.ok) {
-                    const errData = await patchResp.json();
-                    throw new Error(errData.message || 'Erro ao atualizar participante');
-                }
-                showNotification('Participante atualizado com sucesso!', 'success');
-                closeNewParticipantModal();
-                loadParticipants();
-            } catch (error) {
-                showNotification(error.message || 'Erro ao atualizar participante', 'error');
-            }
-            return false;
-        };
-    } catch (error) {
-        showNotification(error.message || 'Erro ao editar participante', 'error');
-    }
-}
-
-async function deleteParticipant(participantId) {
-    // Buscar participante pelo ID para exibir nome/e-mail na confirmação
-    const participante = participants.find(p => p._id === participantId);
-    let info = '';
-    if (participante) {
-        info = `\nNome: ${participante.name}\nE-mail: ${participante.email}`;
-    }
-    if (!confirm(`Tem certeza que deseja excluir este participante?${info}`)) return;
-    const token = localStorage.getItem('clientToken');
-    if (!token) {
-        alert('Token não encontrado. Faça login novamente.');
-        return;
-    }
-    // Desabilitar todos os botões de excluir temporariamente
-    const btns = document.querySelectorAll('.btn-icon.delete');
-    btns.forEach(btn => btn.disabled = true);
-    try {
-        const response = await fetch(`${getApiUrl()}/participants/${participantId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        if (!response.ok) {
-            let errorMsg = 'Erro ao excluir participante';
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                const data = await response.json();
-                errorMsg = data.message || errorMsg;
-            } else {
-                errorMsg = await response.text();
-            }
-            throw new Error(errorMsg);
-        }
-        showNotification('Participante excluído com sucesso!', 'success');
-        // Recarregar participantes e reaplicar filtro para manter contexto
-        await loadParticipants();
-        filterParticipants();
-    } catch (error) {
-        showNotification(error.message || 'Erro ao excluir participante', 'error');
-    } finally {
-        btns.forEach(btn => btn.disabled = false);
-    }
-}
-
-// Função de exportação
-function exportParticipants() {
-    if (!participants || participants.length === 0) {
-        showNotification('Nenhum participante para exportar', 'warning');
-        return;
-    }
-    
-    // Gerar CSV com dados dos participantes
-    const header = 'Nome,Email,Telefone,Tipo,Status,Data de Cadastro\n';
-    const csvContent = participants.map(p => {
-        return [
-            p.name || '',
-            p.email || '',
-            p.phone || '',
-            p.tipo || 'participante',
-            p.status || 'ativo',
-            new Date(p.createdAt || p.created_at || Date.now()).toLocaleDateString('pt-BR')
-        ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(',');
-    }).join('\n');
-    
-    const blob = new Blob([header + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `participantes-${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    
-    showNotification('Participantes exportados com sucesso', 'success');
-}
-
-// Funções de Importação
-function showImportModal() {
-    const modal = document.getElementById('importModal');
-    if (!modal) {
-        console.error('Modal de importação não encontrado');
-        return;
-    }
-    
-    // Resetar o formulário e limpar o mapeamento
-    const form = document.getElementById('importForm');
-    const mappingContainer = document.getElementById('importMapping');
-    
-    if (form) form.reset();
-    if (mappingContainer) mappingContainer.innerHTML = '';
-    
-    // Exibir o modal
-    modal.style.display = 'block';
-    
-    // Garantir que o input de arquivo aceite ambos os tipos inicialmente
-    const importFile = document.getElementById('importFile');
-    if (importFile) {
-        importFile.accept = '.xlsx,.csv';
-    }
-}
-
-function closeImportModal() {
-    const modal = document.getElementById('importModal');
-    if (!modal) {
-        console.error('Modal de importação não encontrado');
-        return;
-    }
-    
-    // Resetar o formulário e limpar o mapeamento
-    const form = document.getElementById('importForm');
-    const mappingContainer = document.getElementById('importMapping');
-    
-    if (form) form.reset();
-    if (mappingContainer) mappingContainer.innerHTML = '';
-    
-    // Esconder o modal
-    modal.style.display = 'none';
-}
-
-function toggleImportFields() {
-    const importType = document.getElementById('importType').value;
-    const importFile = document.getElementById('importFile');
-    
-    if (!importFile) return;
-    
-    if (importType === 'excel') {
-        importFile.accept = '.xlsx';
-    } else if (importType === 'csv') {
-        importFile.accept = '.csv';
-    } else {
-        importFile.accept = '.xlsx,.csv';
-    }
-}
-
-function handleImport(event) {
-    event.preventDefault();
-    
-    const importType = document.getElementById('importType');
-    const importFile = document.getElementById('importFile');
-    const importUpdate = document.getElementById('importUpdate');
-    
-    if (!importType || !importFile || !importUpdate) {
-        console.error('Elementos do formulário não encontrados');
-        alert('Erro ao processar o formulário. Por favor, recarregue a página.');
-        return false;
-    }
-    
-    if (!importType.value) {
-        alert('Por favor, selecione o tipo de arquivo.');
-        importType.focus();
-        return false;
-    }
-    
-    if (!importFile.files || importFile.files.length === 0) {
-        alert('Por favor, selecione um arquivo para importar.');
-        importFile.focus();
-        return false;
-    }
-    
-    const file = importFile.files[0];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    
-    if (file.size > maxSize) {
-        alert('O arquivo é muito grande. Por favor, selecione um arquivo menor que 5MB.');
-        return false;
-    }
-    
-    // Mostrar indicador de carregamento
-    const submitButton = document.querySelector('#importForm button[type="submit"]');
-    if (!submitButton) return false;
-    
-    const originalButtonText = submitButton.textContent;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Importando...';
-    
-    const reader = new FileReader();
-    
-    reader.onload = function(e) {
-        try {
-            let participants = [];
-            
-            if (importType.value === 'excel') {
-                participants = parseExcelFile(e.target.result);
-            } else if (importType.value === 'csv') {
-                participants = parseCSVFile(e.target.result);
-            }
-            
-            if (participants.length > 0) {
-                // 🔧 CORREÇÃO: Determinar contexto da lista e tipo
-                const currentListId = currentEditingListId || getSelectedListId() || null;
-                const tipoParticipante = getCurrentListType() || 'participante';
-                
-                console.log('🔧 handleImport CORRIGIDO - Contexto:', {
-                    listId: currentListId,
-                    tipo: tipoParticipante,
-                    participantes: participants.length
-                });
-                
-                saveImportedParticipants(participants, currentListId, tipoParticipante);
-                alert(`Importação concluída com sucesso! ${participants.length} participantes importados.`);
-                closeImportModal();
-                
-                // 🔄 Recarregar lista específica se estiver editando uma lista
-                if (currentListId) {
-                    loadParticipantList(currentListId);
-                } else {
-                    loadParticipants();
-                }
-            } else {
-                throw new Error('Nenhum participante encontrado no arquivo. Verifique se o arquivo está no formato correto.');
-            }
-        } catch (error) {
-            console.error('Erro ao processar arquivo:', error);
-            alert(error.message);
-        } finally {
-            // Restaurar botão
-            submitButton.disabled = false;
-            submitButton.textContent = originalButtonText;
-        }
-    };
-    
-    reader.onerror = function() {
-        alert('Erro ao ler o arquivo. Tente novamente.');
-        submitButton.disabled = false;
-        submitButton.textContent = originalButtonText;
-    };
-    
-    try {
-        if (importType.value === 'excel') {
-            reader.readAsArrayBuffer(file);
-        } else {
-            reader.readAsText(file);
-        }
-    } catch (error) {
-        console.error('Erro ao ler arquivo:', error);
-        alert('Erro ao ler o arquivo. Verifique se o arquivo não está corrompido.');
-        submitButton.disabled = false;
-        submitButton.textContent = originalButtonText;
-    }
-    
-    return false;
-}
-
-function generateShareLink() {
-    return `${Date.now().toString(36)}${Math.random().toString(36).substr(2, 5)}`;
-}
-
-async function handleNewParticipant(event) {
-    event.preventDefault();
-    const name = document.getElementById('participantName').value;
-    const email = document.getElementById('participantEmail').value;
-    const phone = document.getElementById('participantPhone').value;
-    let status = 'ativo';
-    const clientId = localStorage.getItem('clientId');
-    const token = localStorage.getItem('clientToken');
-    const tipo = document.getElementById('participantTipo').value;
-    if (!tipo) {
-        alert('Por favor, selecione o tipo de usuário.');
-        return false;
-    }
-
-    // Validar campos obrigatórios
-    if (!name || !email) {
-        alert('Por favor, preencha todos os campos obrigatórios.');
-        return false;
-    }
-    if (!validateEmail(email)) {
-        alert('Por favor, insira um e-mail válido.');
-        return false;
-    }
-    if (!clientId || !token) {
-        alert('Erro de autenticação. Faça login novamente.');
-        return false;
-    }
-    try {
-        const response = await fetch(`${API_URL}/participants`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                name,
-                email,
-                phone,
-                status,
-                clientId,
-                tipo
-            })
-        });
-        if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.message || 'Erro ao cadastrar participante');
-        }
-        // Participante cadastrado com sucesso
-        showNotification('Participante cadastrado com sucesso!', 'success');
-        closeNewParticipantModal();
-        loadParticipants();
-    } catch (error) {
-        showNotification(error.message || 'Erro ao cadastrar participante', 'error');
-    }
-    return false;
-}
-
-function parseExcelFile(data) {
-    const participants = [];
-    try {
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(firstSheet);
-        
-        rows.forEach(row => {
-            const nome = row.Nome || row.nome || row.NOME || '';
-            const email = row.Email || row.email || row.EMAIL || '';
-            const telefone = row.Telefone || row.telefone || row.TELEFONE || '';
-            const empresa = row.Empresa || row.empresa || row.EMPRESA || '';
-            
-            if (nome && email) {
-            participants.push({
-                id: Date.now() + Math.random(),
-                name: nome,
-                email: email,
-                phone: telefone,
-                company: empresa,
-                status: 'active',
-                    createdAt: new Date().toISOString(),
-                    linkCompartilhamento: generateShareLink()
+                    </tr>
+                `;
             });
-            }
-        });
-    } catch (error) {
-        console.error('Erro ao processar arquivo Excel:', error);
-        throw new Error('Erro ao processar arquivo Excel: ' + error.message);
-    }
-    
-    return participants;
-}
-
-function parseCSVFile(data) {
-    const participants = [];
-    try {
-        const lines = data.split('\n');
-        if (lines.length < 2) {
-            throw new Error('O arquivo CSV está vazio ou não contém dados válidos.');
-        }
-        
-        const headers = lines[0].split(',').map(header => header.trim().toLowerCase());
-        
-        // Verificar cabeçalhos obrigatórios
-        if (!headers.includes('nome') && !headers.includes('email')) {
-            throw new Error('Cabeçalhos obrigatórios não encontrados. O arquivo deve conter as colunas "nome" e "email".');
-        }
-        
-        for (let i = 1; i < lines.length; i++) {
-            if (lines[i].trim() === '') continue;
-            
-            const values = lines[i].split(',').map(value => value.trim());
-            const participant = {};
-            
-            headers.forEach((header, index) => {
-                participant[header] = values[index] || '';
-            });
-            
-            if (participant.nome && participant.email) {
-                participants.push({
-                    id: Date.now() + i,
-                    name: participant.nome,
-                    email: participant.email,
-                    phone: participant.telefone || '',
-                    company: participant.empresa || '',
-                    status: 'active',
-                    createdAt: new Date().toISOString(),
-                    linkCompartilhamento: generateShareLink()
-                });
-            }
-        }
-    } catch (error) {
-        console.error('Erro ao processar arquivo CSV:', error);
-        throw new Error('Erro ao processar arquivo CSV: ' + error.message);
-    }
-    
-    return participants;
-}
-
-// 🔧 FUNÇÃO CORRIGIDA: Importar participantes com contexto de lista
-async function saveImportedParticipants(participants, listId = null, tipoParticipante = 'participante') {
-    // 🔍 DIAGNÓSTICO: Log dos parâmetros recebidos
-    console.log('🔧 saveImportedParticipants CORRIGIDA chamada com:');
-    console.log('   - Participantes:', participants.length);
-    console.log('   - ListId:', listId);
-    console.log('   - Tipo:', tipoParticipante);
-    
-    try {
-        const clientId = localStorage.getItem('clientId');
-        if (!clientId) {
-            showMessage('Erro: Cliente não identificado', 'error');
-            return;
-        }
-
-        // 🔧 CORREÇÃO: Payload completo com listId e tipo
-        const payload = {
-            clientId: clientId,
-            listId: listId, // ✅ ID da lista específica
-            tipoParticipante: tipoParticipante, // ✅ Tipo correto
-            participants: participants.map(p => ({
-                name: p.name,
-                email: p.email,
-                phone: p.phone,
-                company: p.company || '',
-                status: p.status || 'active',
-                tipo: tipoParticipante, // ✅ Tipo individual
-                listId: listId // ✅ Associar à lista
-            }))
-        };
-
-        console.log('📤 Enviando payload corrigido:', payload);
-
-        const response = await fetch('/api/participants/import', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('clientToken')}`
-            },
-            body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        
-        if (result.success !== false) {
-            showMessage(`${participants.length} participantes importados com sucesso!`, 'success');
-            
-            // 🔄 CORREÇÃO: Recarregar lista específica
-            if (listId) {
-                await loadParticipantList(listId);
-            } else {
-                await loadParticipantLists();
-            }
         } else {
-            showMessage(`Erro ao importar: ${result.message}`, 'error');
-        }
-    } catch (error) {
-        console.error('❌ Erro ao importar participantes:', error);
-        showMessage('Erro ao importar participantes', 'error');
-    }
-}
-
-// Função consolidada para carregar listas (serve tanto para filtros quanto para exibição)
-async function loadLists(forDisplayInTab = false) {
-    const token = localStorage.getItem('clientToken');
-    const clientId = localStorage.getItem('clientId');
-    
-    if (!token || !clientId) {
-        lists = [];
-        if (!forDisplayInTab) populateListFilter();
-        return Promise.resolve();
-    }
-    
-    try {
-        // Tentar buscar listas com populate de campanhas
-        console.log('🔍 DEBUG - URL da API:', `${API_URL}/participant-lists?clientId=${clientId}`);
-        
-        const response = await fetch(`${API_URL}/participant-lists?clientId=${clientId}&populate=campaign`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (!response.ok) {
-            console.log('🚨 DEBUG - Resposta da API não foi OK:', response.status, response.statusText);
-            
-            // Tentar sem populate se der erro
-            console.log('🔄 Tentando novamente sem populate...');
-            const fallbackResponse = await fetch(`${API_URL}/participant-lists?clientId=${clientId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if (!fallbackResponse.ok) {
-                throw new Error(`Erro ao carregar listas: ${response.status} ${response.statusText}`);
-            }
-            
-            lists = await fallbackResponse.json() || [];
-            console.log('✅ Listas carregadas via fallback (sem populate)');
-        } else {
-            lists = await response.json() || [];
-            console.log('✅ Listas carregadas com populate');
-        }
-        
-        // 🔍 DEBUG DETALHADO - Verificar dados completos das listas da API
-        console.log(`✅ ${lists.length} listas carregadas da API`);
-        console.log('🔍 DEBUG - Dados completos das listas da API:', lists);
-        
-        // Analisar cada lista individualmente para campanhas
-        lists.forEach((list, index) => {
-            console.log(`🔍 DEBUG Lista ${index + 1} - "${list.name}":`, {
-                id: list._id || list.id,
-                campaign: list.campaign,
-                campaignType: typeof list.campaign,
-                campaignId: list.campaignId,
-                campaignIdType: typeof list.campaignId,
-                campaignName: list.campaignName,
-                temCampanha: !!(list.campaign || list.campaignId || list.campaignName),
-                todasPropriedades: Object.keys(list)
-            });
-            
-            // Análise específica de campanha
-            if (list.campaign) {
-                console.log(`  📢 CAMPANHA ENCONTRADA em "${list.name}":`, list.campaign);
-            } else if (list.campaignId) {
-                console.log(`  🆔 CAMPAIGN ID em "${list.name}":`, list.campaignId);
-            } else {
-                console.log(`  ❌ SEM CAMPANHA em "${list.name}"`);
-            }
-        });
-        
-        if (forDisplayInTab) {
-            displayListsInTab(lists);
-        } else {
-        populateListFilter();
-        // Se participantes já estiverem carregados, exibe agora
-        if (participants && participants.length > 0) displayParticipants();
-        }
-        
-    } catch (error) {
-        lists = [];
-        if (forDisplayInTab) {
-            const container = document.getElementById('listsContainer');
-            if (container) {
-                container.innerHTML = `
-                    <div class="text-center py-8">
-                        <p class="text-red-400 mb-4">Erro ao carregar listas: ${error.message}</p>
-                        <button onclick="loadLists(true)" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            Tentar novamente
+            // 🔧 Se não tem listas, criar uma linha normal
+            return [`
+                <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participant._id || participant.id}">
+                <td class="px-4 py-3">
+                        <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participant._id || participant.id}">
+                </td>
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                                <i class="${tipoInfo.icon} text-white text-sm"></i>
+                        </div>
+                        <div>
+                                <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                                <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm text-gray-300">-</div>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm">${campaignName}</div>
+                </td>
+                <td class="px-4 py-3">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                        <i class="${tipoInfo.icon} mr-1"></i>
+                        ${tipoInfo.label}
+                    </span>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm">${linkHtml}</div>
+                </td>
+                <td class="px-4 py-3">
+                        <span class="${statusColor}">${status}</span>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <button onclick="viewParticipantDetails('${participant._id || participant.id}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="editParticipant('${participant._id || participant.id}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                            <button onclick="deleteParticipant('${participant._id || participant.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                `;
-            }
-        } else {
-        populateListFilter();
+                </td>
+                </tr>
+            `];
         }
-    }
-}
-
-function populateListFilter() {
-    console.log('🔄 Populando filtro de listas...');
+    }).join('');
     
-    const listFilter = document.getElementById('listFilter');
-    if (!listFilter) {
-        console.log('⚠️ Elemento listFilter não encontrado');
-        return;
-    }
-
-    // Limpar opções existentes mantendo apenas a opção "Todas"
-    listFilter.innerHTML = '<option value="">Todas as listas</option>';
-
-    // Adicionar cada lista como uma opção (padronizando uso de _id)
-    if (lists && lists.length > 0) {
-        lists.forEach(list => {
-            const option = document.createElement('option');
-            option.value = list._id || list.id;
-            option.textContent = list.name;
-            listFilter.appendChild(option);
-        });
-        console.log(`✅ ${lists.length} listas adicionadas ao filtro`);
-    }
+    tbody.innerHTML = html;
+    
+    // 🔧 SISTEMA ORIGINAL: Atualizar controles de paginação
+    updatePaginationControls();
+    updateParticipantCount();
+    
+    console.log('✅ Display original concluído com sucesso!');
 }
-
-// 🚀 FUNÇÃO CORRIGIDA - Display direto COM fallback para ParticipantsManager
 
 // Função de teste para verificar conexão de dados
 function testDataConnection() {
@@ -6303,7 +5268,8 @@ function getCurrentListType() {
     return 'participante'; // Padrão
 }
 
-//  REMOVIDO: Declara��o duplicada de currentEditingListId
+// 🔧 VARIÁVEL GLOBAL: Para rastrear lista sendo editada
+let currentEditingListId = null;
 
 // 🔧 FUNÇÃO: Definir contexto de lista para importação
 function setImportListContext(listId) {
@@ -6449,148 +5415,3 @@ window.testarImportacaoCorrigida = function() {
     
     console.log('✅ === TESTE CONCLUÍDO ===');
 };
-
-// 🚀 REFATORAÇÃO FASE 1: SISTEMA SIMPLIFICADO DE CARREGAMENTO
-// 🎯 Objetivo: Unificar todos os carregamentos em uma classe centralizada
-
-class SimpleDataLoader {
-    constructor() {
-        this.clientId = localStorage.getItem('clientId');
-        this.token = localStorage.getItem('clientToken');
-        console.log('🔧 SimpleDataLoader inicializado');
-    }
-
-    // 🔧 Método HTTP genérico simplificado
-    async apiCall(endpoint, options = {}) {
-        const url = `${getApiUrl()}${endpoint}`;
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`,
-                ...options.headers
-            },
-            ...options
-        };
-
-        try {
-            const response = await fetch(url, config);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const data = await response.json();
-            return { success: true, data };
-            
-        } catch (error) {
-            console.error(`❌ Erro na API ${endpoint}:`, error);
-            return { success: false, error: error.message };
-        }
-    }
-
-    // 🔧 Carregar participantes simplificado
-    async loadParticipants(page = 1, filters = {}) {
-        console.log('🔄 SimpleDataLoader.loadParticipants:', { page, filters });
-        
-        const params = new URLSearchParams({
-            clientId: this.clientId,
-            limit: '1000', // Carregar todos para compatibilidade
-            ...filters
-        });
-
-        const result = await this.apiCall(`/participants?${params}`);
-        
-        if (result.success) {
-            const participantsData = result.data.participants || result.data.data || result.data || [];
-            
-            updateAppState({
-                participants: participantsData,
-                pagination: {
-                    ...appState.pagination,
-                    currentPage: 1,
-                    totalParticipants: participantsData.length,
-                    totalPages: Math.ceil(participantsData.length / appState.pagination.pageSize) || 1
-                }
-            });
-            
-            console.log('✅ Participantes carregados:', participantsData.length);
-            return participantsData;
-        } else {
-            console.error('❌ Erro ao carregar participantes:', result.error);
-            return [];
-        }
-    }
-
-    // 🔧 Carregar listas simplificado  
-    async loadLists() {
-        console.log('🔄 SimpleDataLoader.loadLists');
-        
-        const result = await this.apiCall(`/participant-lists?clientId=${this.clientId}&populate=true`);
-        
-        if (result.success) {
-            const listsData = result.data;
-            updateAppState({ lists: listsData });
-            console.log('✅ Listas carregadas:', listsData.length);
-            return listsData;
-        } else {
-            console.error('❌ Erro ao carregar listas:', result.error);
-            return [];
-        }
-    }
-
-    // 🔧 Carregar campanhas simplificado
-    async loadCampaigns() {
-        console.log('🔄 SimpleDataLoader.loadCampaigns');
-        
-        const result = await this.apiCall(`/campaigns?clientId=${this.clientId}`);
-        
-        if (result.success) {
-            const campaignsData = result.data;
-            updateAppState({ campaigns: campaignsData });
-            console.log('✅ Campanhas carregadas:', campaignsData.length);
-            return campaignsData;
-        } else {
-            console.error('❌ Erro ao carregar campanhas:', result.error);
-            return [];
-        }
-    }
-}
-
-// 🌟 INSTÂNCIA GLOBAL DO LOADER SIMPLIFICADO
-const simpleLoader = new SimpleDataLoader();
-
-// 🔄 WRAPPER FUNCTIONS: Manter compatibilidade com código legado
-window.loadParticipantsSimple = () => simpleLoader.loadParticipants();
-window.loadListsSimple = () => simpleLoader.loadLists();
-window.loadCampaignsSimple = () => simpleLoader.loadCampaigns();
-
-// 🚀 REFATORAÇÃO FASE 2: SISTEMA SIMPLIFICADO DE EXIBIÇÃO
-// 🎯 Objetivo: Simplificar displayParticipants removendo HTML inline complexo
-
-class SimpleDisplayManager {
-    constructor() {
-        this.templates = this.createTemplates();
-        console.log('🎨 SimpleDisplayManager inicializado');
-    }
-
-    // 🔧 Templates HTML simplificados e reutilizáveis
-    createTemplates() {
-        return {
-            // Template para linha vazia
-            emptyRow: () => `
-                <tr>
-                    <td colspan="9" class="text-center py-8">
-                        <div class="flex flex-col items-center">
-                            <i class="fas fa-users text-4xl text-gray-500 mb-4"></i>
-                            <p class="text-xl text-gray-400 mb-2">Nenhum participante encontrado</p>
-                            <p class="text-sm text-gray-500">Tente ajustar os filtros ou adicionar novos participantes</p>
-                        </div>
-                    </td>
-                </tr>
-            `,
-
-            // Template para linha de erro
-            errorRow: (message) => `
-                <tr>
-                    <td colspan="9" class="text-center py-8">
-                        <div class="flex flex-col items-center">
