@@ -1,9 +1,5 @@
 // 🌟 VARIÁVEIS GLOBAIS REFATORADAS - Usando novos módulos
-// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
-const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-               (window.location.hostname === 'localhost' ? 
-                'http://localhost:3000/api' : 
-                'https://programa-indicacao-multicliente-production.up.railway.app/api');
+// 🔧 CORREÇÃO: API_URL já declarado em auth.js (removendo duplicação)
 let currentTab = 'lists';
 let participants = []; // Mantido para compatibilidade
 let lists = [];
