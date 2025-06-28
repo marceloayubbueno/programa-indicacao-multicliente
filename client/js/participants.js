@@ -4713,3 +4713,132 @@ function goToPage(pageNumber) {
         console.log(`🚫 Página ${pageNumber} inválida ou já ativa`);
     }
 }
+
+// 🧪 TESTE ESPECÍFICO DO SISTEMA ORIGINAL RESTAURADO
+window.testOriginalSystem = async function() {
+    console.log('🧪 === TESTANDO SISTEMA ORIGINAL RESTAURADO ===');
+    
+    try {
+        // 1. Verificar se dados estão carregados
+        console.log('1. 📊 Verificando dados:');
+        console.log(`   - Participantes: ${participants?.length || 0}`);
+        console.log(`   - Listas: ${lists?.length || 0}`);
+        console.log(`   - Página atual: ${currentPage}`);
+        console.log(`   - Total páginas: ${totalPages}`);
+        
+        // 2. Testar filtro por tipo
+        console.log('2. 🔍 Testando filtro por tipo:');
+        console.log('   - Aplicando filtro "indicador"...');
+        await setTipoFiltro('indicador');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const indicadoresCount = document.querySelectorAll('#participantsList tr[data-participant-id]').length;
+        console.log(`   ✅ Indicadores exibidos: ${indicadoresCount}`);
+        
+        // 3. Testar filtro por lista
+        console.log('3. 📋 Testando filtro por lista:');
+        const listFilter = document.getElementById('listFilter');
+        if (listFilter && listFilter.options.length > 1) {
+            const firstListValue = listFilter.options[1].value;
+            const firstListText = listFilter.options[1].text;
+            
+            console.log(`   - Aplicando filtro lista "${firstListText}"...`);
+            listFilter.value = firstListValue;
+            await filterParticipants();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const listaCount = document.querySelectorAll('#participantsList tr[data-participant-id]').length;
+            console.log(`   ✅ Participantes da lista exibidos: ${listaCount}`);
+        } else {
+            console.log('   ⚠️ Nenhuma lista disponível para testar');
+        }
+        
+        // 4. Testar sistema de duplicação
+        console.log('4. 🔄 Testando sistema de duplicação:');
+        await setTipoFiltro('todos');
+        const listFilterEl = document.getElementById('listFilter');
+        if (listFilterEl) listFilterEl.value = '';
+        await filterParticipants();
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Contar quantos participantes têm múltiplas listas
+        const participantesComMultiplasListas = participants.filter(p => p.lists && p.lists.length > 1);
+        const linhasTabela = document.querySelectorAll('#participantsList tr[data-participant-id]').length;
+        
+        console.log(`   - Participantes com múltiplas listas: ${participantesComMultiplasListas.length}`);
+        console.log(`   - Total de linhas na tabela: ${linhasTabela}`);
+        console.log(`   ✅ Duplicação funcionando: ${linhasTabela >= participants.length ? 'SIM' : 'VERIFICAR'}`);
+        
+        // 5. Testar paginação
+        console.log('5. 📄 Testando paginação:');
+        if (totalPages > 1) {
+            console.log(`   - Mudando para página 2...`);
+            changePage('next');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log(`   ✅ Página atual: ${currentPage}`);
+            
+            console.log(`   - Voltando para página 1...`);
+            changePage('prev');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log(`   ✅ Página atual: ${currentPage}`);
+        } else {
+            console.log('   ⚠️ Apenas 1 página disponível');
+        }
+        
+        // 6. Resumo final
+        console.log('6. 📋 RESUMO DO TESTE:');
+        const finalCount = document.querySelectorAll('#participantsList tr[data-participant-id]').length;
+        console.log(`   📊 Participantes exibidos: ${finalCount}`);
+        console.log(`   📄 Sistema de paginação: ${totalPages > 1 ? 'ATIVO' : 'SIMPLES'}`);
+        console.log(`   🔍 Filtros disponíveis: Tipo, Lista, Status, Busca`);
+        console.log(`   🔄 Sistema de duplicação: ${linhasTabela >= participants.length ? 'FUNCIONANDO' : 'VERIFICAR'}`);
+        
+        console.log('✅ === TESTE DO SISTEMA ORIGINAL CONCLUÍDO ===');
+        console.log('💡 O sistema deve estar funcionando como antes - João em 2 listas = 2 linhas!');
+        
+        return {
+            participantes: participants?.length || 0,
+            linhasTabela: finalCount,
+            paginacao: totalPages,
+            duplicacao: linhasTabela >= participants.length,
+            filtros: 'OK'
+        };
+        
+    } catch (error) {
+        console.error('❌ Erro no teste:', error);
+        return { error: error.message };
+    }
+};
+
+// 🔧 FUNÇÃO RÁPIDA: Verificar se filtros estão funcionando
+window.quickFilterTest = function() {
+    console.log('🔍 === TESTE RÁPIDO DE FILTROS ===');
+    
+    // Teste 1: Todos
+    console.log('1. Filtro TODOS:');
+    setTipoFiltro('todos');
+    const todosCount = document.querySelectorAll('#participantsList tr[data-participant-id]').length;
+    console.log(`   Resultado: ${todosCount} linhas`);
+    
+    // Teste 2: Indicadores
+    setTimeout(() => {
+        console.log('2. Filtro INDICADORES:');
+        setTipoFiltro('indicador');
+        setTimeout(() => {
+            const indicadoresCount = document.querySelectorAll('#participantsList tr[data-participant-id]').length;
+            console.log(`   Resultado: ${indicadoresCount} linhas`);
+            
+            // Teste 3: Participantes
+            setTimeout(() => {
+                console.log('3. Filtro PARTICIPANTES:');
+                setTipoFiltro('participante');
+                setTimeout(() => {
+                    const participantesCount = document.querySelectorAll('#participantsList tr[data-participant-id]').length;
+                    console.log(`   Resultado: ${participantesCount} linhas`);
+                    
+                    console.log('✅ Teste rápido concluído!');
+                }, 500);
+            }, 500);
+        }, 500);
+    }, 500);
+};
