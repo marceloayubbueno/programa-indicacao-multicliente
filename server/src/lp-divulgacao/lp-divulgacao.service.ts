@@ -210,11 +210,17 @@ export class LPDivulgacaoService {
     // Alterna entre 'ativo' e 'inativo'
     const newStatus = lp.status === 'ativo' ? 'inativo' : 'ativo';
     
-    return await this.lpDivulgacaoModel.findByIdAndUpdate(
+    const updated = await this.lpDivulgacaoModel.findByIdAndUpdate(
       id,
       { status: newStatus },
       { new: true }
     ).exec();
+    
+    if (!updated) {
+      throw new NotFoundException('LP de Divulgação não encontrada');
+    }
+    
+    return updated;
   }
 
   // === FUNCIONALIDADES ESPECÍFICAS ===

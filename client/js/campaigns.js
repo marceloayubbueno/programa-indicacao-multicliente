@@ -1,3 +1,12 @@
+// 🔧 CORREÇÃO: Função para obter API_URL de forma segura
+function getApiUrl() {
+    return window.API_URL || 
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+           (window.location.hostname === 'localhost' ? 
+            'http://localhost:3000/api' : 
+            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+}
+
 // Variáveis globais
 let campaigns = [];
 let currentStep = 1;
@@ -906,7 +915,7 @@ async function accessLPIndicadores(campaignId) {
             return;
         }
         
-        const response = await fetch(`${API_URL}/campaigns/${campaignId}/lp-indicadores`, {
+        const response = await fetch(`${getApiUrl()}/campaigns/${campaignId}/lp-indicadores`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -1194,8 +1203,8 @@ async function loadCampaigns() {
     let recompensasMap = {};
     try {
         const [listasRes, recompensasRes] = await Promise.all([
-            fetch(`${API_URL}/participant-lists`, { headers: { 'Authorization': `Bearer ${token}` } }),
-            fetch(`${API_URL}/rewards`, { headers: { 'Authorization': `Bearer ${token}` } })
+            fetch(`${getApiUrl()}/participant-lists`, { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch(`${getApiUrl()}/rewards`, { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
         const listasData = await listasRes.json();
         const recompensasData = await recompensasRes.json();
@@ -1216,8 +1225,8 @@ async function loadCampaigns() {
         const cacheKey = tipo + id;
         if (cache[cacheKey]) return cache[cacheKey];
         let url = '';
-        if (tipo === 'indicadores') url = `${API_URL}/lp-indicadores/${id}`;
-        if (tipo === 'divulgacao') url = `${API_URL}/lp-divulgacao/${id}`;
+        if (tipo === 'indicadores') url = `${getApiUrl()}/lp-indicadores/${id}`;
+        if (tipo === 'divulgacao') url = `${getApiUrl()}/lp-divulgacao/${id}`;
         if (!url) return '-';
         try {
             const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -1229,7 +1238,7 @@ async function loadCampaigns() {
     }
 
     try {
-        const res = await fetch(`${API_URL}/campaigns`, {
+        const res = await fetch(`${getApiUrl()}/campaigns`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -1637,7 +1646,7 @@ async function handleNewCampaign(event) {
         console.log("handleNewCampaign: [6] Tentando salvar via API...");
         const clientId = localStorage.getItem('clientId');
         const token = localStorage.getItem('clientToken') || localStorage.getItem('token');
-        const res = await fetch(`${API_URL}/campaigns`, {
+        const res = await fetch(`${getApiUrl()}/campaigns`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
