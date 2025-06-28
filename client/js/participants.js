@@ -869,8 +869,8 @@ function displayParticipants() {
         originSources: [...new Set(participants.map(p => p.originSource))]
     });
     
-    // 🎯 Exibir participantes diretamente na tabela
-    const html = participants.map(participant => {
+    // 🎯 SISTEMA ORIGINAL: Duplicar linhas por lista (João em 2 listas = 2 linhas)
+    const html = participants.flatMap(participant => {
         const tipoInfo = getTipoInfo(participant.tipo || 'participante');
         const status = participant.status || 'ativo';
         const statusColor = status === 'ativo' ? 'text-green-400' : 'text-red-400';
@@ -889,79 +889,122 @@ function displayParticipants() {
             `;
         }
         
-        // Listas do participante - CORRIGIDO: listas separadas para filtro
-        let listsHtml = '-';
-        if (participant.lists && participant.lists.length > 0) {
-            const listNames = participant.lists.map(list => {
-                return typeof list === 'object' ? list.name : list;
-            }).filter(Boolean);
-            
-            // Exibir cada lista como elemento separado (máximo 3)
-            const visibleLists = listNames.slice(0, 3);
-            listsHtml = visibleLists.map(name => 
-                `<span class="inline-block bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs mr-1 mb-1">${name}</span>`
-            ).join('');
-            
-            if (participant.lists.length > 3) {
-                listsHtml += `<span class="text-gray-500 text-xs">+${participant.lists.length - 3}</span>`;
-            }
-        }
-        
         // Campanha
         const campaignName = getCampaignDisplayName(participant);
         
-        return `
-            <tr class="hover:bg-gray-800 transition-colors">
-            <td class="px-4 py-3">
-                    <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participant._id || participant.id}">
-            </td>
-            <td class="px-4 py-3">
-                <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
-                            <i class="${tipoInfo.icon} text-white text-sm"></i>
+        // 🔧 SISTEMA ORIGINAL: Se tem listas, criar uma linha por lista
+        if (participant.lists && participant.lists.length > 0) {
+            return participant.lists.map(list => {
+                const listName = typeof list === 'object' ? list.name : list;
+                
+                return `
+                    <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participant._id || participant.id}" data-list-name="${listName}">
+                    <td class="px-4 py-3">
+                            <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participant._id || participant.id}">
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                                    <i class="${tipoInfo.icon} text-white text-sm"></i>
+                            </div>
+                            <div>
+                                    <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                                    <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${listName}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm">${campaignName}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                            <i class="${tipoInfo.icon} mr-1"></i>
+                            ${tipoInfo.label}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="text-sm">${linkHtml}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                            <span class="${statusColor}">${status}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <button onclick="viewParticipantDetails('${participant._id || participant.id}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="editParticipant('${participant._id || participant.id}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                                <button onclick="deleteParticipant('${participant._id || participant.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                    </tr>
+                `;
+            });
+        } else {
+            // 🔧 Se não tem listas, criar uma linha normal
+            return [`
+                <tr class="hover:bg-gray-800 transition-colors" data-participant-id="${participant._id || participant.id}">
+                <td class="px-4 py-3">
+                        <input type="checkbox" class="user-checkbox rounded border-gray-600 text-blue-600" value="${participant._id || participant.id}">
+                </td>
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full ${tipoInfo.bgColor} flex items-center justify-center">
+                                <i class="${tipoInfo.icon} text-white text-sm"></i>
+                        </div>
+                        <div>
+                                <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
+                                <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
+                        </div>
                     </div>
-                    <div>
-                            <div class="font-medium text-gray-100">${participant.name || 'Sem nome'}</div>
-                            <div class="text-sm text-gray-400">${participant.email || 'Sem email'}</div>
-                    </div>
-                </div>
-            </td>
-            <td class="px-4 py-3">
-                    <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
-            </td>
-            <td class="px-4 py-3">
-                    <div class="text-sm text-gray-300">${listsHtml}</div>
-            </td>
-            <td class="px-4 py-3">
-                    <div class="text-sm">${campaignName}</div>
-            </td>
-            <td class="px-4 py-3">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
-                    <i class="${tipoInfo.icon} mr-1"></i>
-                    ${tipoInfo.label}
-                </span>
-            </td>
-            <td class="px-4 py-3">
-                    <div class="text-sm">${linkHtml}</div>
-            </td>
-            <td class="px-4 py-3">
-                    <span class="${statusColor}">${status}</span>
-            </td>
-            <td class="px-4 py-3">
-                    <div class="flex items-center gap-2">
-                        <button onclick="viewParticipantDetails('${participant._id || participant.id}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
-                            <i class="fas fa-eye"></i>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm text-gray-300">${participant.phone || '-'}</div>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm text-gray-300">-</div>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm">${campaignName}</div>
+                </td>
+                <td class="px-4 py-3">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tipoInfo.badgeClass}">
+                        <i class="${tipoInfo.icon} mr-1"></i>
+                        ${tipoInfo.label}
+                    </span>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="text-sm">${linkHtml}</div>
+                </td>
+                <td class="px-4 py-3">
+                        <span class="${statusColor}">${status}</span>
+                </td>
+                <td class="px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <button onclick="viewParticipantDetails('${participant._id || participant.id}')" class="text-blue-400 hover:text-blue-300" title="Ver detalhes">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="editParticipant('${participant._id || participant.id}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
+                            <i class="fas fa-edit"></i>
                         </button>
-                        <button onclick="editParticipant('${participant._id || participant.id}')" class="text-yellow-400 hover:text-yellow-300" title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                        <button onclick="deleteParticipant('${participant._id || participant.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-            </tr>
-        `;
+                            <button onclick="deleteParticipant('${participant._id || participant.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+                </tr>
+            `];
+        }
     }).join('');
     
     tbody.innerHTML = html;
