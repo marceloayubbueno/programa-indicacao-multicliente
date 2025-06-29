@@ -5641,7 +5641,7 @@ window.diagnosticAndFixListSync = async function() {
                             
                             // CORREÇÃO: Adicionar lista ao participante
                             try {
-                                const fixResponse = await fetch(`${getApiUrl()}/participant-lists/${list._id}/add-participant`, {
+                                const fixResponse = await fetch(`${getApiUrl()}/participant-lists/${list._id}/participants`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -5688,7 +5688,7 @@ window.diagnosticAndFixListSync = async function() {
                             
                             // CORREÇÃO: Adicionar participante à lista
                             try {
-                                const fixResponse = await fetch(`${getApiUrl()}/participant-lists/${list._id}/add-participant`, {
+                                const fixResponse = await fetch(`${getApiUrl()}/participant-lists/${list._id}/participants`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
