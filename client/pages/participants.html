@@ -334,6 +334,112 @@
     <script src="../js/modules/api-client.js"></script>
     <script src="../js/modules/data-adapter.js"></script>
     <script src="../js/modules/participants-manager.js"></script>
+    
+    <!-- 🚨 CORREÇÃO EMERGENCIAL: Resolver travamento da Central de Participantes -->
+    <script>
+        console.log('🚨 CORREÇÃO EMERGENCIAL ATIVA');
+        
+        // 1. Desativar auto-inicializações problemáticas
+        window.disableAutoFunctions = function() {
+            // Desativar função de auto-correção
+            if (typeof autoFixOrphanParticipants !== 'undefined') {
+                window.autoFixOrphanParticipants = function() {
+                    console.log('⚠️ autoFixOrphanParticipants desativada');
+                    return Promise.resolve(true);
+                };
+            }
+            
+            // Limpar todos os timeouts/intervals existentes
+            const highestId = window.setTimeout(() => {}, 0);
+            for (let i = 0; i < highestId; i++) {
+                window.clearTimeout(i);
+                window.clearInterval(i);
+            }
+            
+            console.log('✅ Funções automáticas desativadas');
+        };
+        
+        // 2. Função de recarregamento seguro
+        window.emergencyReload = async function() {
+            try {
+                console.log('🔄 EMERGENCY RELOAD INICIADO');
+                
+                const token = localStorage.getItem('clientToken');
+                const clientId = localStorage.getItem('clientId');
+                
+                if (!token || !clientId) {
+                    console.log('❌ Credenciais não encontradas - redirecionando');
+                    window.location.href = '/client/pages/login.html';
+                    return;
+                }
+                
+                // Função segura para obter URL da API
+                function getApiUrl() {
+                    return window.API_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+                }
+                
+                // Remover mensagem "Carregando listas..."
+                const loadingElement = document.querySelector('#listsContainer p');
+                if (loadingElement && loadingElement.textContent.includes('Carregando listas')) {
+                    loadingElement.textContent = 'Carregando dados...';
+                }
+                
+                // Carregar listas primeiro
+                try {
+                    const listsRes = await fetch(`${getApiUrl()}/participant-lists?clientId=${clientId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (listsRes.ok) {
+                        const lists = await listsRes.json();
+                        console.log(`✅ ${lists.length} listas carregadas`);
+                        
+                        // Atualizar interface básica
+                        if (loadingElement) {
+                            loadingElement.innerHTML = `
+                                <div class="text-center py-8">
+                                    <i class="fas fa-list text-4xl text-blue-400 mb-4"></i>
+                                    <p class="text-xl text-gray-300 mb-2">${lists.length} listas encontradas</p>
+                                    <p class="text-sm text-gray-500">Use as abas acima para navegar</p>
+                                </div>
+                            `;
+                        }
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao carregar listas:', error);
+                    if (loadingElement) {
+                        loadingElement.innerHTML = `
+                            <div class="text-center py-8">
+                                <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                                <p class="text-xl text-red-400 mb-2">Erro ao carregar dados</p>
+                                <p class="text-sm text-gray-500">Verifique sua conexão</p>
+                                <button onclick="emergencyReload()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    Tentar novamente
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+                
+                console.log('✅ EMERGENCY RELOAD CONCLUÍDO');
+                
+            } catch (error) {
+                console.error('❌ Erro crítico no emergency reload:', error);
+            }
+        };
+        
+        // 3. Executar correções na ordem correta
+        setTimeout(() => {
+            window.disableAutoFunctions();
+        }, 100);
+        
+        setTimeout(() => {
+            window.emergencyReload();
+        }, 500);
+        
+        console.log('✅ CORREÇÃO EMERGENCIAL CONFIGURADA');
+    </script>
+    
     <script src="../js/participants.js"></script>
     <script>
         // 🔧 CORREÇÃO: Aguardar carregamento completo antes de chamar checkAuth
