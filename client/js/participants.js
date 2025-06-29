@@ -5583,3 +5583,211 @@ window.testListFilter = async function() {
         console.error('❌ Erro no teste:', error);
     }
 };
+
+// 🚨 FUNÇÃO DE DIAGNÓSTICO E CORREÇÃO URGENTE
+window.diagnosticAndFixListSync = async function() {
+    console.log('🚨 === DIAGNÓSTICO E CORREÇÃO DE SINCRONIZAÇÃO LISTA-PARTICIPANTES ===');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        if (!token || !clientId) {
+            console.log('❌ Token ou clientId não encontrado');
+            return;
+        }
+        
+        // 1. Buscar todas as listas
+        console.log('1️⃣ Buscando todas as listas...');
+        const listsResponse = await fetch(`${getApiUrl()}/participant-lists?clientId=${clientId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const allLists = await listsResponse.json();
+        console.log(`📋 ${allLists.length} listas encontradas`);
+        
+        // 2. Buscar todos os participantes
+        console.log('2️⃣ Buscando todos os participantes...');
+        const participantsResponse = await fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const participantsData = await participantsResponse.json();
+        const allParticipants = participantsData.participants || [];
+        console.log(`👥 ${allParticipants.length} participantes encontrados`);
+        
+        // 3. Analisar problemas
+        console.log('3️⃣ Analisando problemas de sincronização...');
+        
+        let problemsFound = 0;
+        let fixesApplied = 0;
+        
+        for (const list of allLists) {
+            console.log(`\n🔍 Analisando lista "${list.name}" (ID: ${list._id})`);
+            console.log(`   - Participantes na lista: ${list.participants?.length || 0}`);
+            
+            if (list.participants && list.participants.length > 0) {
+                // Verificar se os participantes têm a lista no seu array 'lists'
+                for (const participantId of list.participants) {
+                    const participant = allParticipants.find(p => p._id === participantId || p._id === String(participantId));
+                    
+                    if (participant) {
+                        const hasListInParticipant = participant.lists && participant.lists.some(l => {
+                            const listId = typeof l === 'object' ? l._id : l;
+                            return String(listId) === String(list._id);
+                        });
+                        
+                        if (!hasListInParticipant) {
+                            console.log(`   ❌ PROBLEMA: Participante "${participant.name}" não tem a lista "${list.name}" no seu array`);
+                            problemsFound++;
+                            
+                            // CORREÇÃO: Adicionar lista ao participante
+                            try {
+                                const fixResponse = await fetch(`${getApiUrl()}/participant-lists/${list._id}/add-participant`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({ participantId: participant._id })
+                                });
+                                
+                                if (fixResponse.ok) {
+                                    console.log(`   ✅ CORRIGIDO: Adicionado participante "${participant.name}" à lista "${list.name}"`);
+                                    fixesApplied++;
+                                } else {
+                                    console.log(`   ❌ ERRO ao corrigir: ${fixResponse.status}`);
+                                }
+                            } catch (error) {
+                                console.log(`   ❌ ERRO na correção: ${error.message}`);
+                            }
+                        } else {
+                            console.log(`   ✅ OK: Participante "${participant.name}" está sincronizado`);
+                        }
+                    } else {
+                        console.log(`   ⚠️ AVISO: Participante ID "${participantId}" não encontrado nos dados`);
+                    }
+                }
+            } else {
+                console.log(`   📭 Lista vazia`);
+            }
+        }
+        
+        // 4. Verificar participantes órfãos
+        console.log('\n4️⃣ Verificando participantes órfãos...');
+        for (const participant of allParticipants) {
+            if (participant.lists && participant.lists.length > 0) {
+                for (const listRef of participant.lists) {
+                    const listId = typeof listRef === 'object' ? listRef._id : listRef;
+                    const list = allLists.find(l => l._id === String(listId));
+                    
+                    if (list) {
+                        const isInListArray = list.participants && list.participants.some(pId => String(pId) === String(participant._id));
+                        
+                        if (!isInListArray) {
+                            console.log(`   ❌ PROBLEMA: Lista "${list.name}" não tem participante "${participant.name}" no seu array`);
+                            problemsFound++;
+                            
+                            // CORREÇÃO: Adicionar participante à lista
+                            try {
+                                const fixResponse = await fetch(`${getApiUrl()}/participant-lists/${list._id}/add-participant`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({ participantId: participant._id })
+                                });
+                                
+                                if (fixResponse.ok) {
+                                    console.log(`   ✅ CORRIGIDO: Adicionado participante "${participant.name}" à lista "${list.name}"`);
+                                    fixesApplied++;
+                                } else {
+                                    console.log(`   ❌ ERRO ao corrigir: ${fixResponse.status}`);
+                                }
+                            } catch (error) {
+                                console.log(`   ❌ ERRO na correção: ${error.message}`);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        console.log('\n📊 === RESUMO DO DIAGNÓSTICO ===');
+        console.log(`🔍 Problemas encontrados: ${problemsFound}`);
+        console.log(`✅ Correções aplicadas: ${fixesApplied}`);
+        
+        if (fixesApplied > 0) {
+            console.log('\n🔄 Recarregando dados após correções...');
+            await loadParticipants();
+            await loadLists(true);
+            
+            if (currentTab === 'lists') {
+                refreshListsDisplay();
+            } else if (currentTab === 'users') {
+                displayParticipants();
+            }
+            
+            console.log('✅ Dados recarregados! Verifique se os problemas foram resolvidos.');
+        } else {
+            console.log('✅ Nenhuma correção necessária ou todos os problemas já foram corrigidos.');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro no diagnóstico:', error);
+    }
+};
+
+// 🔧 FUNÇÃO DE SINCRONIZAÇÃO RÁPIDA PARA LISTAS EXISTENTES
+window.quickSyncAllLists = async function() {
+    console.log('🔄 === SINCRONIZAÇÃO RÁPIDA DE TODAS AS LISTAS ===');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        // Carregar dados atuais
+        await loadParticipants();
+        await loadLists(true);
+        
+        if (lists && lists.length > 0) {
+            console.log(`🔄 Sincronizando ${lists.length} listas...`);
+            
+            for (const list of lists) {
+                if (list.participants && list.participants.length > 0) {
+                    console.log(`📋 Sincronizando lista "${list.name}" com ${list.participants.length} participantes...`);
+                    
+                    // Forçar sincronização bidirecional via backend
+                    try {
+                        const response = await fetch(`${getApiUrl()}/participant-lists/${list._id}/sync`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            console.log(`   ✅ Lista "${list.name}" sincronizada`);
+                        } else {
+                            console.log(`   ⚠️ Erro na sincronização da lista "${list.name}":`, response.status);
+                        }
+                    } catch (error) {
+                        console.log(`   ❌ Erro na sincronização da lista "${list.name}":`, error.message);
+                    }
+                }
+            }
+            
+            console.log('🔄 Recarregando dados após sincronização...');
+            await loadParticipants();
+            await loadLists(true);
+            refreshListsDisplay();
+            
+            console.log('✅ Sincronização concluída!');
+        } else {
+            console.log('⚠️ Nenhuma lista encontrada para sincronizar');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro na sincronização:', error);
+    }
+};
