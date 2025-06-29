@@ -36,64 +36,193 @@ function initializeManagers() {
                 const data = await window.apiClient.getParticipantLists();
                 this.lists = Array.isArray(data) ? data : [];
                 console.log(`✅ ${this.lists.length} listas carregadas`);
-                this.displayLists();
+                await this.displayLists();
+                this.populateListFilter();
                 return this.lists;
             } catch (error) {
                 console.error('❌ Erro ao carregar listas:', error);
                 this.lists = [];
-                this.displayLists();
+                await this.displayLists();
             }
         },
-        displayLists() {
+        
+        populateListFilter() {
+            const listFilter = document.getElementById('listFilter');
+            if (!listFilter) return;
+            
+            // Limpar opções existentes (exceto "Todas as listas")
+            const options = listFilter.querySelectorAll('option:not([value=""])');
+            options.forEach(option => option.remove());
+            
+            // Adicionar opções das listas
+            this.lists.forEach(list => {
+                const option = document.createElement('option');
+                option.value = list._id;
+                option.textContent = list.name;
+                listFilter.appendChild(option);
+            });
+            
+            console.log(`✅ Filtro de listas atualizado com ${this.lists.length} opções`);
+        },
+        async displayLists() {
             const container = document.getElementById('listsContainer');
             if (!container) return;
             
+            // Contar participantes para cada lista
+            await this.updateParticipantCounts();
+            
             if (this.lists.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-12">
-                        <div class="max-w-md mx-auto">
-                            <i class="fas fa-list-ul text-6xl text-gray-600 mb-6"></i>
-                            <h3 class="text-xl font-semibold text-gray-300 mb-2">Nenhuma lista encontrada</h3>
-                            <p class="text-gray-500 mb-6">Crie sua primeira lista para organizar participantes</p>
-                            <button onclick="window.location.href='editar-lista.html'" 
-                                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                <i class="fas fa-plus mr-2"></i>Criar Nova Lista
-                            </button>
-                        </div>
-                    </div>
+                    <tr>
+                        <td colspan="8" class="px-4 py-12 text-center">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-list-ul text-4xl text-gray-600 mb-4"></i>
+                                <h3 class="text-xl font-semibold text-gray-300 mb-2">Nenhuma lista encontrada</h3>
+                                <p class="text-gray-500 mb-6">Crie sua primeira lista para organizar participantes</p>
+                                <button onclick="window.location.href='editar-lista.html'" 
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>Criar Nova Lista
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
                 `;
             } else {
-                container.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        ${this.lists.map(list => `
-                            <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 transition-colors">
-                                <div class="flex items-center justify-between mb-3">
-                                    <h3 class="text-lg font-semibold text-gray-100">${list.name}</h3>
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="editList('${list._id}')" 
-                                                class="text-blue-400 hover:text-blue-300 transition-colors">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button onclick="deleteList('${list._id}')" 
-                                                class="text-red-400 hover:text-red-300 transition-colors">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <p class="text-gray-400 text-sm mb-4">${list.description || 'Sem descrição'}</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-500">
-                                        <i class="fas fa-users mr-1"></i>
-                                        ${list.participantsCount || 0} participantes
-                                    </span>
-                                    <span class="text-xs text-gray-600">
-                                        ${new Date(list.createdAt).toLocaleDateString('pt-BR')}
-                                    </span>
-                                </div>
+                container.innerHTML = this.lists.map(list => this.createListRow(list)).join('');
+            }
+            
+            // Atualizar contadores
+            this.updateListCounters();
+        },
+        
+        createListRow(list) {
+            const participantCount = list.participants?.length || 0;
+            const description = list.description || 'Sem descrição';
+            const tipo = list.tipo || 'participante';
+            const campaignName = list.campaignName || 'Nenhuma campanha';
+            const createdDate = new Date(list.createdAt).toLocaleDateString('pt-BR');
+            
+            return `
+                <tr class="hover:bg-gray-800 transition-colors">
+                    <td class="px-4 py-3">
+                        <input type="checkbox" value="${list._id}" 
+                               class="list-checkbox rounded border-gray-600 text-blue-600"
+                               onchange="handleListCheckboxChange('${list._id}', this.checked)">
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-sm text-white font-medium">
+                                ${list.name.charAt(0).toUpperCase()}
                             </div>
-                        `).join('')}
-                    </div>
-                `;
+                            <div>
+                                <div class="font-medium text-gray-100">${list.name}</div>
+                                <div class="text-sm text-gray-400">ID: ${list._id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="text-sm text-gray-300 max-w-xs truncate" title="${description}">
+                            ${description}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            <i class="fas fa-tag mr-1"></i>
+                            ${tipo}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${participantCount > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                <i class="fas fa-users mr-1"></i>
+                                ${participantCount}
+                            </span>
+                            ${participantCount > 0 ? 
+                                `<button onclick="viewListParticipants('${list._id}', '${list.name.replace(/'/g, '\\\'')}')" 
+                                         class="text-blue-400 hover:text-blue-300 transition-colors text-xs" 
+                                         title="Ver participantes">
+                                    <i class="fas fa-eye"></i>
+                                </button>` : 
+                                ''
+                            }
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="text-sm text-gray-300">
+                            ${campaignName}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="text-sm text-gray-400">
+                            ${createdDate}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <button onclick="viewListParticipants('${list._id}', '${list.name.replace(/'/g, '\\\'')}')" 
+                                    class="text-green-400 hover:text-green-300 transition-colors" 
+                                    title="Ver Participantes">
+                                <i class="fas fa-users"></i>
+                            </button>
+                            <button onclick="editList('${list._id}')" 
+                                    class="text-blue-400 hover:text-blue-300 transition-colors" 
+                                    title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="manageListParticipants('${list._id}')" 
+                                    class="text-purple-400 hover:text-purple-300 transition-colors" 
+                                    title="Gerenciar Participantes">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                            <button onclick="deleteList('${list._id}')" 
+                                    class="text-red-400 hover:text-red-300 transition-colors" 
+                                    title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        },
+        
+        async updateParticipantCounts() {
+            try {
+                // Para cada lista, buscar participantes associados
+                const promises = this.lists.map(async (list) => {
+                    try {
+                        const participants = await window.apiClient.getParticipants({ 
+                            listId: list._id,
+                            limit: 1000 
+                        });
+                        list.participants = participants.participants || [];
+                        list.participantsCount = list.participants.length;
+                    } catch (error) {
+                        console.warn(`Erro ao contar participantes da lista ${list.name}:`, error);
+                        list.participants = [];
+                        list.participantsCount = 0;
+                    }
+                });
+                
+                await Promise.all(promises);
+                console.log('✅ Contagem de participantes atualizada para todas as listas');
+            } catch (error) {
+                console.error('❌ Erro ao atualizar contagens:', error);
+            }
+        },
+        
+        updateListCounters() {
+            const totalLists = this.lists.length;
+            const totalParticipants = this.lists.reduce((sum, list) => sum + (list.participantsCount || 0), 0);
+            
+            const listsCountEl = document.querySelector('.lists-count');
+            const participantsCountEl = document.querySelector('.total-participants-count');
+            
+            if (listsCountEl) {
+                listsCountEl.textContent = `${totalLists} lista${totalLists !== 1 ? 's' : ''}`;
+            }
+            
+            if (participantsCountEl) {
+                participantsCountEl.textContent = `${totalParticipants} participante${totalParticipants !== 1 ? 's' : ''} total`;
             }
         }
     };
@@ -224,6 +353,125 @@ async function deleteList(listId) {
     }
 }
 
+async function viewListParticipants(listId, listName) {
+    console.log(`🔍 Visualizando participantes da lista: ${listName} (ID: ${listId})`);
+    
+    try {
+        // Carregar participantes específicos desta lista
+        const participants = await window.apiClient.getParticipants({ 
+            listId: listId,
+            limit: 1000 
+        });
+        
+        // Trocar para aba de usuários
+        switchTab('users');
+        
+        // Filtrar participantes por esta lista específica
+        if (participantsManager) {
+            await participantsManager.applyFilters({ listId: listId });
+        }
+        
+        // Atualizar o filtro de lista para mostrar a lista selecionada
+        const listFilter = document.getElementById('listFilter');
+        if (listFilter) {
+            // Adicionar opção se não existir
+            let option = listFilter.querySelector(`option[value="${listId}"]`);
+            if (!option) {
+                option = document.createElement('option');
+                option.value = listId;
+                option.textContent = listName;
+                listFilter.appendChild(option);
+            }
+            listFilter.value = listId;
+        }
+        
+        showNotification(`Exibindo ${participants.participants?.length || 0} participantes da lista "${listName}"`, 'info');
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar participantes da lista:', error);
+        showNotification('Erro ao carregar participantes da lista', 'error');
+    }
+}
+
+async function manageListParticipants(listId) {
+    // Implementar modal de gerenciamento de participantes
+    const list = listsManager.lists.find(l => l._id === listId);
+    if (!list) return;
+    
+    showNotification(`Gerenciamento de participantes da lista "${list.name}" em desenvolvimento`, 'info');
+    // TODO: Implementar modal completo de gerenciamento
+}
+
+function handleListCheckboxChange(listId, checked) {
+    const list = listsManager.lists.find(l => l._id === listId);
+    if (list) {
+        list.selected = checked;
+    }
+    
+    updateBulkListActions();
+}
+
+function toggleAllLists() {
+    const selectAll = document.getElementById('selectAllLists');
+    const checkboxes = document.querySelectorAll('.list-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAll.checked;
+        const listId = checkbox.value;
+        handleListCheckboxChange(listId, selectAll.checked);
+    });
+}
+
+function updateBulkListActions() {
+    const selectedCount = listsManager.lists.filter(l => l.selected).length;
+    const bulkActions = document.getElementById('bulkListActions');
+    
+    if (bulkActions) {
+        bulkActions.style.display = selectedCount > 0 ? 'block' : 'none';
+    }
+    
+    console.log(`${selectedCount} listas selecionadas`);
+}
+
+async function refreshLists() {
+    console.log('🔄 Atualizando listas...');
+    if (listsManager) {
+        await listsManager.loadLists();
+    }
+    showNotification('Listas atualizadas!', 'success');
+}
+
+async function exportLists() {
+    try {
+        const data = {
+            timestamp: new Date().toISOString(),
+            lists: listsManager.lists.map(list => ({
+                id: list._id,
+                name: list.name,
+                description: list.description,
+                tipo: list.tipo,
+                participantCount: list.participantsCount || 0,
+                createdAt: list.createdAt,
+                campaignName: list.campaignName
+            }))
+        };
+        
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `listas-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        showNotification('Listas exportadas com sucesso!', 'success');
+    } catch (error) {
+        console.error('❌ Erro ao exportar listas:', error);
+        showNotification('Erro ao exportar listas', 'error');
+    }
+}
+
 // ===== FILTROS DE USUÁRIOS =====
 function setTipoFiltro(tipo) {
     // Atualizar interface dos filtros
@@ -296,7 +544,50 @@ function debounce(func, wait) {
 
 function showNotification(message, type = 'info') {
     console.log(`${type.toUpperCase()}: ${message}`);
-    // TODO: Implementar sistema de notificação visual
+    
+    // Usar sistema de notificação do helpers se disponível
+    if (typeof window.showNotification === 'function' && window.showNotification !== showNotification) {
+        window.showNotification(message, type);
+    } else {
+        // Fallback: notificação simples
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white transition-all duration-300 ${getNotificationColor(type)}`;
+        notification.innerHTML = `
+            <div class="flex items-center gap-2">
+                <i class="${getNotificationIcon(type)}"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-white/80 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+}
+
+function getNotificationColor(type) {
+    switch (type) {
+        case 'success': return 'bg-green-600';
+        case 'error': return 'bg-red-600';
+        case 'warning': return 'bg-yellow-600';
+        default: return 'bg-blue-600';
+    }
+}
+
+function getNotificationIcon(type) {
+    switch (type) {
+        case 'success': return 'fas fa-check-circle';
+        case 'error': return 'fas fa-exclamation-circle';
+        case 'warning': return 'fas fa-exclamation-triangle';
+        default: return 'fas fa-info-circle';
+    }
 }
 
 // ===== EXPORTAR FUNÇÕES IMEDIATAMENTE =====
@@ -306,11 +597,19 @@ window.filterParticipants = filterParticipants;
 window.editList = editList;
 window.deleteList = deleteList;
 window.loadStatistics = loadStatistics;
+window.viewListParticipants = viewListParticipants;
+window.manageListParticipants = manageListParticipants;
+window.handleListCheckboxChange = handleListCheckboxChange;
+window.toggleAllLists = toggleAllLists;
+window.refreshLists = refreshLists;
+window.exportLists = exportLists;
 
 console.log('✅ Funções globais exportadas:', {
     switchTab: typeof window.switchTab,
     setTipoFiltro: typeof window.setTipoFiltro,
-    filterParticipants: typeof window.filterParticipants
+    filterParticipants: typeof window.filterParticipants,
+    viewListParticipants: typeof window.viewListParticipants,
+    toggleAllLists: typeof window.toggleAllLists
 });
 
 // ===== INICIALIZAÇÃO =====
