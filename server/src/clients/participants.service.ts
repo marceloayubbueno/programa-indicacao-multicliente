@@ -215,7 +215,7 @@ export class ParticipantsService {
     return this.participantModel.findById(id);
   }
 
-  // 🔧 MÉTODO CORRIGIDO: Importar participantes com sincronização automática GARANTIDA
+  // 🔧 MÉTODO MELHORADO: Importar participantes com detecção de duplicatas
   async importMany(dto: ImportParticipantsDto) {
     console.log('🔧 BACKEND importMany MELHORADO chamado com:', {
       clientId: dto.clientId,
@@ -225,26 +225,41 @@ export class ParticipantsService {
     });
 
     try {
-      // 🔧 CORREÇÃO: Criar participantes com tipo correto
-      const participants = dto.participants.map(p => ({
-        ...p,
+      // 🎯 DETECÇÃO DE DUPLICATAS: Verificar emails já existentes
+      const incomingEmails = dto.participants.map(p => p.email.toLowerCase());
+      const existingParticipants = await this.participantModel.find({
         clientId: dto.clientId,
-        participantId: (p as any).participantId || uuidv4(),
-        tipo: dto.tipoParticipante || 'participante',
-        originSource: 'import',
-        importedAt: new Date(),
-        status: 'ativo'
-      }));
+        email: { $in: incomingEmails }
+      }).select('_id email name lists').exec();
 
-      console.log('🔧 BACKEND Criando participantes com dados:', participants.slice(0, 1));
+      console.log(`🔍 BACKEND Verificação de duplicatas: ${existingParticipants.length} já existem de ${dto.participants.length} enviados`);
 
-      // Inserir participantes no banco
-      const insertedParticipants = await this.participantModel.insertMany(participants);
-      console.log('🔧 BACKEND Participantes inseridos:', insertedParticipants.length);
+      // Separar novos dos existentes
+      const existingEmails = existingParticipants.map(p => p.email.toLowerCase());
+      const newParticipants = dto.participants.filter(p => !existingEmails.includes(p.email.toLowerCase()));
 
-      // 🚀 SOLUÇÃO DEFINITIVA: SEMPRE sincronizar se listId fornecido
-      if (dto.listId && insertedParticipants.length > 0) {
-        console.log('🔧 BACKEND SINCRONIZAÇÃO AUTOMÁTICA para lista:', dto.listId);
+      console.log(`📊 BACKEND ${newParticipants.length} novos participantes, ${existingParticipants.length} duplicatas`);
+
+      // 🔧 CRIAR NOVOS PARTICIPANTES
+      let insertedParticipants = [];
+      if (newParticipants.length > 0) {
+        const participants = newParticipants.map(p => ({
+          ...p,
+          clientId: dto.clientId,
+          participantId: (p as any).participantId || uuidv4(),
+          tipo: dto.tipoParticipante || 'participante',
+          originSource: 'import',
+          importedAt: new Date(),
+          status: 'ativo'
+        }));
+
+        insertedParticipants = await this.participantModel.insertMany(participants);
+        console.log(`✅ BACKEND ${insertedParticipants.length} novos participantes criados`);
+      }
+
+      // 🚀 SOLUÇÃO DEFINITIVA: SEMPRE sincronizar TODOS (novos + existentes) se listId fornecido
+      if (dto.listId) {
+        console.log('🔧 BACKEND SINCRONIZAÇÃO BIDIRECIONAL COMPLETA para lista:', dto.listId);
         
         try {
           // Verificar se a lista existe
@@ -256,31 +271,37 @@ export class ParticipantsService {
 
           console.log('✅ BACKEND Lista encontrada:', list.name);
 
-          const participantIds = insertedParticipants.map(p => p._id);
+          // IDs de TODOS os participantes (novos + existentes)
+          const allParticipantIds = [
+            ...insertedParticipants.map(p => p._id),
+            ...existingParticipants.map(p => p._id)
+          ];
+
+          console.log(`🔧 BACKEND Sincronizando ${allParticipantIds.length} participantes (${insertedParticipants.length} novos + ${existingParticipants.length} existentes)`);
           
-          // 1. Atualizar lista com novos participantes (sem duplicatas)
+          // 1. Atualizar lista com TODOS os participantes (sem duplicatas)
           await this.participantListModel.findByIdAndUpdate(
             dto.listId,
-            { $addToSet: { participants: { $each: participantIds } } }
+            { $addToSet: { participants: { $each: allParticipantIds } } }
           );
 
-          // 2. Atualizar participantes com a lista (sem duplicatas)
+          // 2. Atualizar TODOS os participantes com a lista (sem duplicatas)
           await this.participantModel.updateMany(
-            { _id: { $in: participantIds } },
+            { _id: { $in: allParticipantIds } },
             { $addToSet: { lists: dto.listId } }
           );
 
-          console.log('✅ BACKEND Sincronização bidirecional aplicada automaticamente');
+          console.log('✅ BACKEND Sincronização bidirecional aplicada para TODOS os participantes');
 
-          // 3. VERIFICAÇÃO ADICIONAL: Garantir que todos estão sincronizados
-          console.log('🔍 BACKEND Verificando sincronização...');
+          // 3. VERIFICAÇÃO FINAL: Garantir que todos estão sincronizados
+          console.log('🔍 BACKEND Verificação final...');
           
-          for (const participant of insertedParticipants) {
-            const updatedParticipant = await this.participantModel.findById(participant._id);
-            if (!updatedParticipant.lists || !updatedParticipant.lists.includes(dto.listId)) {
-              console.log(`⚠️ BACKEND Re-sincronizando ${participant.name}...`);
+          for (const participantId of allParticipantIds) {
+            const participant = await this.participantModel.findById(participantId);
+            if (!participant.lists || !participant.lists.includes(dto.listId)) {
+              console.log(`⚠️ BACKEND Re-sincronizando participante ${participantId}...`);
               await this.participantModel.findByIdAndUpdate(
-                participant._id,
+                participantId,
                 { $addToSet: { lists: dto.listId } }
               );
             }
@@ -298,8 +319,10 @@ export class ParticipantsService {
 
       return {
         success: true,
-        message: `${insertedParticipants.length} participantes importados com sucesso`,
+        message: `${insertedParticipants.length} novos participantes criados, ${existingParticipants.length} duplicatas associadas à lista`,
         participantsCreated: insertedParticipants.length,
+        duplicatesFound: existingParticipants.length,
+        totalProcessed: insertedParticipants.length + existingParticipants.length,
         listAssociated: !!dto.listId,
         autoSyncApplied: !!dto.listId
       };
