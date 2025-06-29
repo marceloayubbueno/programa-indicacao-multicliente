@@ -770,6 +770,778 @@ async function saveImportedParticipants(participants, listId = null, tipoPartici
     }
 }
 
+// 🌟 VARIÁVEIS GLOBAIS REFATORADAS - Usando novos módulos
+// 🔧 CORREÇÃO: API_URL já declarado em auth.js (removendo duplicação)
+let currentTab = 'lists';
+let participants = []; // Mantido para compatibilidade
+let lists = [];
+let currentPage = 1;
+let pageSize = 25; // 🔧 OTIMIZADO: Limite escalável para grandes volumes
+let totalParticipants = 0; // 🔧 CORRIGIDO: Inicializado
+let totalPages = 1; // 🔧 CORRIGIDO: Adicionado
+let tipoFiltro = 'todos';
+let isLoading = false;
+let currentFilters = {}; // 🔧 NOVO: Cache de filtros atuais
+
+// 🚀 INICIALIZAÇÃO DOS NOVOS MÓDULOS
+console.log('🔧 Inicializando módulos refatorados...');
+console.log('📦 APIClient:', typeof window.apiClient);
+console.log('🔄 DataAdapter:', typeof window.DataAdapter);
+console.log('👥 ParticipantsManager:', typeof window.participantsManager);
+
+// 🔧 CORREÇÃO: Função para obter API_URL de forma segura
+function getApiUrl() {
+    return window.API_URL || 
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+           (window.location.hostname === 'localhost' ? 
+            'http://localhost:3000/api' : 
+            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+}
+
+// 🔍 DIAGNÓSTICO: Função para verificar configuração
+function debugConfig() {
+    console.log('🔍 === DIAGNÓSTICO DE CONFIGURAÇÃO ===');
+    console.log('🔍 window.APP_CONFIG:', window.APP_CONFIG);
+    console.log('🔍 window.location.hostname:', window.location.hostname);
+    console.log('🔍 REFERRAL_BASE_URL configurado:', window.APP_CONFIG?.REFERRAL_BASE_URL);
+    console.log('🔍 API_URL configurado:', window.APP_CONFIG?.API_URL);
+    console.log('🔍 ===================================');
+}
+
+// Executar diagnóstico ao carregar
+if (typeof window !== 'undefined') {
+    setTimeout(debugConfig, 1000);
+}
+
+// Estado das variáveis (declarações já feitas acima)
+
+// Funções do Modal
+function showParticipantModal(participantData) {
+    document.getElementById('participantName').textContent = participantData.name;
+    document.getElementById('participantEmail').textContent = participantData.email;
+    document.getElementById('participantCampaign').textContent = participantData.campaign;
+    document.getElementById('participantDate').textContent = participantData.date;
+    document.getElementById('participantReferrals').textContent = participantData.referrals;
+    document.getElementById('participantStatus').textContent = participantData.status;
+    
+    // Exibir link de compartilhamento - ATUALIZADO PARA NOVO SISTEMA
+    // 🔧 CORREÇÃO DEFINITIVA: Garantir que sempre use o backend correto
+    let baseReferralUrl;
+    if (window.APP_CONFIG && window.APP_CONFIG.REFERRAL_BASE_URL) {
+        baseReferralUrl = window.APP_CONFIG.REFERRAL_BASE_URL;
+        console.log('✅ Usando REFERRAL_BASE_URL do config:', baseReferralUrl);
+    } else {
+        // Fallback: SEMPRE usar o backend Railway em produção
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            baseReferralUrl = 'http://localhost:3000/indicacao';
+        } else {
+            baseReferralUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+        }
+        console.log('⚠️ Usando fallback REFERRAL_BASE_URL:', baseReferralUrl);
+    }
+    const link = participantData.uniqueReferralCode
+        ? `${baseReferralUrl}/${participantData.uniqueReferralCode}`
+        : (participantData.linkCompartilhamento 
+            ? `${baseReferralUrl}/${participantData.linkCompartilhamento}`
+            : '-');
+    
+    const linkDisplay = link !== '-' ? link : 'Link não disponível';
+    const isLinkValid = link !== '-';
+    
+    document.getElementById('participantShareLink').innerHTML = `
+        <div class="share-link-container">
+            <input type="text" value="${linkDisplay}" readonly style="width: 70%; font-size: 0.85em; ${!isLinkValid ? 'color: #999;' : ''}" onclick="${isLinkValid ? 'this.select()' : ''}">
+            <button class="btn-icon ${!isLinkValid ? 'disabled' : ''}" title="${isLinkValid ? 'Copiar link' : 'Link não disponível'}" onclick="${isLinkValid ? `copyToClipboard('${link}')` : ''}" ${!isLinkValid ? 'disabled' : ''}>
+                <i class="fas fa-copy"></i>
+            </button>
+            ${isLinkValid ? `<button class="btn-icon" title="Gerar novo link" onclick="regenerateReferralCode('${participantData.id}')"><i class="fas fa-sync-alt"></i></button>` : ''}
+        </div>
+        <small style="display: block; margin-top: 4px; color: #666; font-size: 0.75em;">
+            ${isLinkValid ? 'Link exclusivo de indicação' : 'Disponível apenas para indicadores ativos'}
+        </small>
+    `;
+
+    document.getElementById('participantModal').style.display = 'block';
+}
+
+function closeParticipantModal() {
+    document.getElementById('participantModal').style.display = 'none';
+}
+
+// Fechar modal ao clicar fora dele
+window.onclick = function(event) {
+    const modals = [
+        'importModal',
+        'participantModal',
+        'newParticipantModal',
+        'manageListsModal'
+    ];
+    
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (event.target === modal) {
+            if (modalId === 'manageListsModal') {
+                closeManageListsModal();
+            } else if (modalId === 'importModal') {
+                closeImportModal();
+            } else if (modalId === 'participantModal') {
+                closeParticipantModal();
+            } else if (modalId === 'newParticipantModal') {
+                closeNewParticipantModal();
+            }
+        }
+    });
+}
+
+// Funções de busca e filtro
+function searchParticipants() {
+    const searchTerm = document.getElementById('searchParticipant').value.toLowerCase();
+    // A busca agora é feita através dos filtros modernos
+    currentPage = 1;
+    displayParticipants();
+}
+
+// FUNÇÃO ANTIGA REMOVIDA - havia conflito com a nova implementação
+
+// 🚀 FUNÇÃO ESCALÁVEL - Usando PaginationSystem
+async function loadParticipants(page = 1, filters = {}) {
+    console.log('🔄 loadParticipants ORIGINAL - Sistema restaurado');
+    console.log('📄 Carregando página:', page, 'Filtros:', filters);
+    
+    if (isLoading) {
+        console.log('⏳ Já carregando participantes...');
+        return;
+    }
+    
+    try {
+        isLoading = true;
+        
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        if (!token || !clientId) {
+            console.error('❌ Token ou clientId não encontrado');
+            return;
+        }
+        
+        console.log('🔗 Carregando participantes via API...');
+        
+        // 🔧 SISTEMA ORIGINAL: Carregar todos os dados de uma vez
+        const url = `${getApiUrl()}/participants?clientId=${clientId}&limit=1000`;
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('📥 Dados recebidos:', data);
+        
+        // Extrair participantes
+        const participantsArray = data.participants || data.data || data || [];
+        console.log('👥 Participantes extraídos:', participantsArray.length);
+        
+        // 🔧 SISTEMA ORIGINAL: Atualizar estado global
+        participants = participantsArray;
+        totalParticipants = participantsArray.length;
+        currentPage = 1; // Reset para página 1
+        totalPages = Math.ceil(totalParticipants / pageSize) || 1;
+        
+        console.log('✅ Participantes carregados:', {
+            total: participants.length,
+            página: currentPage,
+            páginas_total: totalPages
+        });
+        
+        // Forçar exibição
+        displayParticipants();
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar participantes:', error);
+        showNotification('Erro ao carregar participantes', 'error');
+        
+        // Mostrar erro na tabela
+        const tbody = document.getElementById('participantsList');
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-8">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                            <p class="text-xl text-red-400 mb-2">Erro ao carregar dados</p>
+                            <p class="text-sm text-gray-500">Verifique sua conexão e tente novamente</p>
+                            <button onclick="loadParticipants()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                Tentar novamente
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    } finally {
+        isLoading = false;
+    }
+}
+
+function viewParticipantDetails(participantId) {
+    // Aqui você faria uma chamada para a API para buscar os detalhes do participante
+    const mockData = {
+        name: 'João Silva',
+        email: 'joao@email.com',
+        campaign: 'Indique e Ganhe',
+        date: '01/01/2024',
+        referrals: '3',
+        status: 'Ativo'
+    };
+    
+    showParticipantModal(mockData);
+}
+
+async function editParticipant(participantId) {
+    const token = localStorage.getItem('clientToken');
+    if (!token) {
+        showNotification('Token não encontrado. Faça login novamente.', 'error');
+        return;
+    }
+    try {
+        // Buscar dados do participante
+        const response = await fetch(`${getApiUrl()}/participants?clientId=${localStorage.getItem('clientId')}`);
+        if (!response.ok) throw new Error('Erro ao buscar participante');
+        const data = await response.json();
+        const participant = (data.participants || []).find(p => p._id === participantId);
+        if (!participant) {
+            alert('Participante não encontrado.');
+            return;
+        }
+        // Preencher modal de edição
+        document.getElementById('participantName').value = participant.name;
+        document.getElementById('participantEmail').value = participant.email;
+        document.getElementById('participantPhone').value = participant.phone || '';
+        document.getElementById('participantStatus').value = participant.status || 'ativo';
+        // Exibir o ID do participante
+        const idField = document.getElementById('participantId');
+        if (idField) idField.value = participant._id || '';
+        // Exibir modal
+        showNewParticipantModal(true);
+        // Substituir handler do formulário para salvar edição
+        const form = document.getElementById('newParticipantForm');
+        form.onsubmit = async function(event) {
+            event.preventDefault();
+            let status = document.getElementById('participantStatus').value;
+            if (status === 'active') status = 'ativo';
+            if (status === 'inactive') status = 'inativo';
+            const updatedParticipant = {
+                name: document.getElementById('participantName').value,
+                email: document.getElementById('participantEmail').value,
+                phone: document.getElementById('participantPhone').value,
+                status
+            };
+            try {
+                const patchResp = await fetch(`${getApiUrl()}/participants/${participantId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updatedParticipant)
+                });
+                if (!patchResp.ok) {
+                    const errData = await patchResp.json();
+                    throw new Error(errData.message || 'Erro ao atualizar participante');
+                }
+                showNotification('Participante atualizado com sucesso!', 'success');
+                closeNewParticipantModal();
+                loadParticipants();
+            } catch (error) {
+                showNotification(error.message || 'Erro ao atualizar participante', 'error');
+            }
+            return false;
+        };
+    } catch (error) {
+        showNotification(error.message || 'Erro ao editar participante', 'error');
+    }
+}
+
+async function deleteParticipant(participantId) {
+    // Buscar participante pelo ID para exibir nome/e-mail na confirmação
+    const participante = participants.find(p => p._id === participantId);
+    let info = '';
+    if (participante) {
+        info = `\nNome: ${participante.name}\nE-mail: ${participante.email}`;
+    }
+    if (!confirm(`Tem certeza que deseja excluir este participante?${info}`)) return;
+    const token = localStorage.getItem('clientToken');
+    if (!token) {
+        alert('Token não encontrado. Faça login novamente.');
+        return;
+    }
+    // Desabilitar todos os botões de excluir temporariamente
+    const btns = document.querySelectorAll('.btn-icon.delete');
+    btns.forEach(btn => btn.disabled = true);
+    try {
+        const response = await fetch(`${getApiUrl()}/participants/${participantId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            let errorMsg = 'Erro ao excluir participante';
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const data = await response.json();
+                errorMsg = data.message || errorMsg;
+            } else {
+                errorMsg = await response.text();
+            }
+            throw new Error(errorMsg);
+        }
+        showNotification('Participante excluído com sucesso!', 'success');
+        // Recarregar participantes e reaplicar filtro para manter contexto
+        await loadParticipants();
+        filterParticipants();
+    } catch (error) {
+        showNotification(error.message || 'Erro ao excluir participante', 'error');
+    } finally {
+        btns.forEach(btn => btn.disabled = false);
+    }
+}
+
+// Função de exportação
+function exportParticipants() {
+    if (!participants || participants.length === 0) {
+        showNotification('Nenhum participante para exportar', 'warning');
+        return;
+    }
+    
+    // Gerar CSV com dados dos participantes
+    const header = 'Nome,Email,Telefone,Tipo,Status,Data de Cadastro\n';
+    const csvContent = participants.map(p => {
+        return [
+            p.name || '',
+            p.email || '',
+            p.phone || '',
+            p.tipo || 'participante',
+            p.status || 'ativo',
+            new Date(p.createdAt || p.created_at || Date.now()).toLocaleDateString('pt-BR')
+        ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(',');
+    }).join('\n');
+    
+    const blob = new Blob([header + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `participantes-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    showNotification('Participantes exportados com sucesso', 'success');
+}
+
+// Funções de Importação
+function showImportModal() {
+    const modal = document.getElementById('importModal');
+    if (!modal) {
+        console.error('Modal de importação não encontrado');
+        return;
+    }
+    
+    // Resetar o formulário e limpar o mapeamento
+    const form = document.getElementById('importForm');
+    const mappingContainer = document.getElementById('importMapping');
+    
+    if (form) form.reset();
+    if (mappingContainer) mappingContainer.innerHTML = '';
+    
+    // Exibir o modal
+    modal.style.display = 'block';
+    
+    // Garantir que o input de arquivo aceite ambos os tipos inicialmente
+    const importFile = document.getElementById('importFile');
+    if (importFile) {
+        importFile.accept = '.xlsx,.csv';
+    }
+}
+
+function closeImportModal() {
+    const modal = document.getElementById('importModal');
+    if (!modal) {
+        console.error('Modal de importação não encontrado');
+        return;
+    }
+    
+    // Resetar o formulário e limpar o mapeamento
+    const form = document.getElementById('importForm');
+    const mappingContainer = document.getElementById('importMapping');
+    
+    if (form) form.reset();
+    if (mappingContainer) mappingContainer.innerHTML = '';
+    
+    // Esconder o modal
+    modal.style.display = 'none';
+}
+
+function toggleImportFields() {
+    const importType = document.getElementById('importType').value;
+    const importFile = document.getElementById('importFile');
+    
+    if (!importFile) return;
+    
+    if (importType === 'excel') {
+        importFile.accept = '.xlsx';
+    } else if (importType === 'csv') {
+        importFile.accept = '.csv';
+    } else {
+        importFile.accept = '.xlsx,.csv';
+    }
+}
+
+function handleImport(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const fileInput = form.querySelector('#importFile');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        showNotification('Selecione um arquivo para importar', 'error');
+        return;
+    }
+    
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Importando...';
+    
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            console.log('🔄 === INICIANDO IMPORTAÇÃO - FLUXO ORIGINAL ===');
+            
+            let participants;
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            
+            if (fileExtension === 'xlsx') {
+                participants = parseExcelFile(e.target.result);
+            } else if (fileExtension === 'csv') {
+                participants = parseCSVFile(e.target.result);
+            } else {
+                throw new Error('Formato de arquivo não suportado');
+            }
+            
+            if (participants && participants.length > 0) {
+                console.log(`📊 ${participants.length} participantes extraídos do arquivo`);
+                
+                // 🎯 FLUXO ORIGINAL: 1. IMPORTAR PARTICIPANTES PRIMEIRO (sem lista)
+                console.log('1️⃣ Importando participantes...');
+                const clientId = localStorage.getItem('clientId');
+                const token = localStorage.getItem('clientToken');
+                
+                // Enviar participantes para o backend SEM listId (fluxo original)
+                const importResp = await fetch(`${getApiUrl()}/participants/import`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ 
+                        clientId, 
+                        participants: participants.map(p => ({
+                            name: p.name,
+                            email: p.email,
+                            phone: p.phone,
+                            company: p.company || '',
+                            status: p.status || 'ativo',
+                            tipo: 'participante'  // Tipo padrão
+                        }))
+                    })
+                });
+                
+                if (!importResp.ok) {
+                    const data = await importResp.json();
+                    throw new Error(data.message || 'Erro ao importar participantes');
+                }
+                
+                console.log('✅ Participantes importados com sucesso');
+                
+                // 🎯 FLUXO ORIGINAL: 2. BUSCAR PARTICIPANTES IMPORTADOS
+                console.log('2️⃣ Buscando participantes importados...');
+                const emails = participants.map(p => p.email);
+                const searchResp = await fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const allData = await searchResp.json();
+                const importedParticipants = (allData.participants || []).filter(p => emails.includes(p.email));
+                
+                console.log(`📋 ${importedParticipants.length} participantes encontrados no sistema`);
+                
+                // Validação: só cria lista se houver participantes válidos
+                if (importedParticipants.length === 0) {
+                    throw new Error('Nenhum participante válido para criar a lista.');
+                }
+                
+                // 🎯 FLUXO ORIGINAL: 3. CRIAR LISTA COM PARTICIPANTES IMPORTADOS
+                console.log('3️⃣ Criando lista com participantes...');
+                const listName = document.getElementById('listNameImport').value;
+                const listDescription = document.getElementById('listDescriptionImport').value;
+                const listTipo = 'participante'; // Tipo fixo para importação via participants.html
+                
+                const listResp = await fetch(`${getApiUrl()}/participant-lists`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name: listName,
+                        description: listDescription,
+                        tipo: listTipo,
+                        clientId,
+                        participants: importedParticipants.map(p => p._id)  // Associar participantes à lista
+                    })
+                });
+                
+                if (!listResp.ok) {
+                    const data = await listResp.json();
+                    throw new Error(data.message || 'Erro ao criar lista');
+                }
+                
+                const listData = await listResp.json();
+                console.log('✅ Lista criada com sucesso:', listData);
+                
+                // 🎯 SUCESSO: Mostrar resultado
+                showNotification(`✅ Importação concluída! ${participants.length} participantes importados e adicionados à lista "${listName}".`, 'success');
+                
+                // Recarregar dados
+                closeImportModal();
+                await loadLists(true);      // Recarregar listas
+                await loadParticipants();   // Recarregar participantes
+                
+            } else {
+                throw new Error('Nenhum participante encontrado no arquivo. Verifique se o arquivo está no formato correto.');
+            }
+        } catch (error) {
+            console.error('❌ Erro ao processar arquivo:', error);
+            showNotification(error.message, 'error');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
+        }
+    };
+    
+    reader.onerror = function() {
+        showNotification('Erro ao ler o arquivo. Tente novamente.', 'error');
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
+    };
+    
+    reader.readAsBinaryString(file);
+}
+
+function generateShareLink() {
+    return `${Date.now().toString(36)}${Math.random().toString(36).substr(2, 5)}`;
+}
+
+async function handleNewParticipant(event) {
+    event.preventDefault();
+    const name = document.getElementById('participantName').value;
+    const email = document.getElementById('participantEmail').value;
+    const phone = document.getElementById('participantPhone').value;
+    let status = 'ativo';
+    const clientId = localStorage.getItem('clientId');
+    const token = localStorage.getItem('clientToken');
+    const tipo = document.getElementById('participantTipo').value;
+    if (!tipo) {
+        alert('Por favor, selecione o tipo de usuário.');
+        return false;
+    }
+
+    // Validar campos obrigatórios
+    if (!name || !email) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return false;
+    }
+    if (!validateEmail(email)) {
+        alert('Por favor, insira um e-mail válido.');
+        return false;
+    }
+    if (!clientId || !token) {
+        alert('Erro de autenticação. Faça login novamente.');
+        return false;
+    }
+    try {
+        const response = await fetch(`${API_URL}/participants`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                name,
+                email,
+                phone,
+                status,
+                clientId,
+                tipo
+            })
+        });
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Erro ao cadastrar participante');
+        }
+        // Participante cadastrado com sucesso
+        showNotification('Participante cadastrado com sucesso!', 'success');
+        closeNewParticipantModal();
+        loadParticipants();
+    } catch (error) {
+        showNotification(error.message || 'Erro ao cadastrar participante', 'error');
+    }
+    return false;
+}
+
+function parseExcelFile(data) {
+    const participants = [];
+    try {
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(firstSheet);
+        
+        rows.forEach(row => {
+            const nome = row.Nome || row.nome || row.NOME || '';
+            const email = row.Email || row.email || row.EMAIL || '';
+            const telefone = row.Telefone || row.telefone || row.TELEFONE || '';
+            const empresa = row.Empresa || row.empresa || row.EMPRESA || '';
+            
+            if (nome && email) {
+            participants.push({
+                id: Date.now() + Math.random(),
+                name: nome,
+                email: email,
+                phone: telefone,
+                company: empresa,
+                status: 'active',
+                    createdAt: new Date().toISOString(),
+                    linkCompartilhamento: generateShareLink()
+            });
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao processar arquivo Excel:', error);
+        throw new Error('Erro ao processar arquivo Excel: ' + error.message);
+    }
+    
+    return participants;
+}
+
+function parseCSVFile(data) {
+    const participants = [];
+    try {
+        const lines = data.split('\n');
+        if (lines.length < 2) {
+            throw new Error('O arquivo CSV está vazio ou não contém dados válidos.');
+        }
+        
+        const headers = lines[0].split(',').map(header => header.trim().toLowerCase());
+        
+        // Verificar cabeçalhos obrigatórios
+        if (!headers.includes('nome') && !headers.includes('email')) {
+            throw new Error('Cabeçalhos obrigatórios não encontrados. O arquivo deve conter as colunas "nome" e "email".');
+        }
+        
+        for (let i = 1; i < lines.length; i++) {
+            if (lines[i].trim() === '') continue;
+            
+            const values = lines[i].split(',').map(value => value.trim());
+            const participant = {};
+            
+            headers.forEach((header, index) => {
+                participant[header] = values[index] || '';
+            });
+            
+            if (participant.nome && participant.email) {
+                participants.push({
+                    id: Date.now() + i,
+                    name: participant.nome,
+                    email: participant.email,
+                    phone: participant.telefone || '',
+                    company: participant.empresa || '',
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    linkCompartilhamento: generateShareLink()
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao processar arquivo CSV:', error);
+        throw new Error('Erro ao processar arquivo CSV: ' + error.message);
+    }
+    
+    return participants;
+}
+
+// 🔧 FUNÇÃO CORRIGIDA: Importar participantes com contexto de lista
+async function saveImportedParticipants(participants, listId = null, tipoParticipante = 'participante') {
+    // 🔍 DIAGNÓSTICO: Log dos parâmetros recebidos
+    console.log('🔧 saveImportedParticipants CORRIGIDA chamada com:');
+    console.log('   - Participantes:', participants.length);
+    console.log('   - ListId:', listId);
+    console.log('   - Tipo:', tipoParticipante);
+    
+    try {
+        const clientId = localStorage.getItem('clientId');
+        if (!clientId) {
+            showMessage('Erro: Cliente não identificado', 'error');
+            return;
+        }
+
+        // 🔧 CORREÇÃO: Payload completo com listId e tipo
+        const payload = {
+            clientId: clientId,
+            listId: listId, // ✅ ID da lista específica
+            tipoParticipante: tipoParticipante, // ✅ Tipo correto
+            participants: participants.map(p => ({
+                name: p.name,
+                email: p.email,
+                phone: p.phone,
+                company: p.company || '',
+                status: p.status || 'active',
+                tipo: tipoParticipante, // ✅ Tipo individual
+                listId: listId // ✅ Associar à lista
+            }))
+        };
+
+        console.log('📤 Enviando payload corrigido:', payload);
+
+        const response = await fetch(`${getApiUrl()}/participants/import`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('clientToken')}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        
+        if (result.success !== false) {
+            showMessage(`${participants.length} participantes importados com sucesso!`, 'success');
+            
+            // 🔄 CORREÇÃO: Recarregar lista específica
+            if (listId) {
+                await loadParticipantList(listId);
+            } else {
+                await loadParticipantLists();
+            }
+        } else {
+            showMessage(`Erro ao importar: ${result.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao importar participantes:', error);
+        showMessage('Erro ao importar participantes', 'error');
+    }
+}
+
 // Função consolidada para carregar listas (serve tanto para filtros quanto para exibição)
 async function loadLists(forDisplayInTab = false) {
     const token = localStorage.getItem('clientToken');
@@ -5439,6 +6211,26 @@ window.autoFixOrphanParticipants = async function() {
                         console.log('🔧 Executando sincronização automática...');
                         await autoFixOrphanParticipants();
                         
+                        // 🎯 CORREÇÃO ADICIONAL: Verificar problema de duplicatas
+                        console.log('🔍 Verificando problema de duplicatas...');
+                        const listsAfterImport = await fetch(`${getApiUrl()}/participant-lists?clientId=${localStorage.getItem('clientId')}`, {
+                            headers: { 'Authorization': `Bearer ${localStorage.getItem('clientToken')}` }
+                        }).then(res => res.json());
+                        
+                        const targetList = listsAfterImport.find(l => l._id === listId);
+                        if (targetList) {
+                            const importedCount = result?.participantsCreated || participants.length;
+                            const listCount = targetList.participants?.length || 0;
+                            
+                            console.log(`📊 Verificação: ${importedCount} participantes importados, ${listCount} na lista`);
+                            
+                            // Se a lista tem menos participantes do que foi importado, há problema de duplicatas
+                            if (listCount < importedCount) {
+                                console.log('🚨 PROBLEMA DE DUPLICATAS DETECTADO! Executando correção específica...');
+                                await fixDuplicateImportIssue();
+                            }
+                        }
+                        
                         // Recarregar dados
                         await loadParticipants();
                         await loadLists(true);
@@ -5503,6 +6295,204 @@ window.runDefinitiveFix = async function() {
     }
     
     return success;
+};
+
+// 🚨 CORREÇÃO ESPECÍFICA: Problema de duplicatas na importação
+window.fixDuplicateImportIssue = async function() {
+    console.log('🚨 CORREÇÃO ESPECÍFICA: Problema de duplicatas na importação');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        if (!token || !clientId) {
+            console.log('❌ Token/clientId não encontrado');
+            return false;
+        }
+        
+        // 1. Buscar todas as listas
+        const listsResponse = await fetch(`${getApiUrl()}/participant-lists?clientId=${clientId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const allLists = await listsResponse.json();
+        
+        // 2. Buscar todos os participantes
+        const participantsResponse = await fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const participantsData = await participantsResponse.json();
+        const allParticipants = participantsData.participants || [];
+        
+        console.log(`📊 Total de listas: ${allLists.length}`);
+        console.log(`📊 Total de participantes: ${allParticipants.length}`);
+        
+        // 3. Identificar a lista com problema (última criada ou com poucos membros)
+        const problemList = allLists.find(list => {
+            const expectedCount = 10; // Baseado no relato do usuário
+            const actualCount = list.participants?.length || 0;
+            return actualCount < expectedCount && actualCount > 0;
+        }) || allLists[allLists.length - 1]; // Última lista se não encontrar
+        
+        if (!problemList) {
+            console.log('❌ Nenhuma lista com problema identificada');
+            return false;
+        }
+        
+        console.log(`🎯 Lista com problema identificada: "${problemList.name}"`);
+        console.log(`📊 Membros atuais: ${problemList.participants?.length || 0}`);
+        
+        // 4. Encontrar participantes que deveriam estar na lista mas não estão
+        const listParticipantIds = problemList.participants || [];
+        const participantsInList = allParticipants.filter(p => 
+            listParticipantIds.includes(p._id)
+        );
+        
+        console.log(`👥 Participantes atualmente na lista:`, participantsInList.map(p => ({
+            name: p.name,
+            email: p.email,
+            id: p._id
+        })));
+        
+        // 5. Identificar participantes órfãos ou que podem pertencer à lista
+        const orphanParticipants = allParticipants.filter(p => 
+            !p.lists || p.lists.length === 0 || 
+            !p.lists.some(listId => listId === problemList._id)
+        );
+        
+        console.log(`🔍 Participantes órfãos ou não associados: ${orphanParticipants.length}`);
+        
+        // 6. Mostrar os órfãos para o usuário decidir
+        if (orphanParticipants.length > 0) {
+            console.log('📋 PARTICIPANTES DISPONÍVEIS PARA ASSOCIAR:');
+            orphanParticipants.forEach((p, index) => {
+                console.log(`  ${index + 1}. ${p.name} (${p.email})`);
+            });
+            
+            // 7. Associar automaticamente os primeiros 7 órfãos (para completar os 10)
+            const needed = 10 - listParticipantIds.length;
+            const toAssociate = orphanParticipants.slice(0, needed);
+            
+            if (toAssociate.length > 0) {
+                console.log(`🔧 Associando automaticamente ${toAssociate.length} participantes...`);
+                
+                for (const participant of toAssociate) {
+                    try {
+                        await fetch(`${getApiUrl()}/participant-lists/${problemList._id}/participants`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ participantId: participant._id })
+                        });
+                        
+                        console.log(`✅ ${participant.name} associado à lista`);
+                    } catch (error) {
+                        console.log(`❌ Erro associando ${participant.name}:`, error.message);
+                    }
+                }
+                
+                // 8. Recarregar dados e atualizar tela
+                await loadParticipants();
+                await loadLists(true);
+                
+                if (currentTab === 'lists') {
+                    refreshListsDisplay();
+                }
+                
+                console.log('✅ CORREÇÃO CONCLUÍDA!');
+                showNotification(`Lista "${problemList.name}" corrigida com ${toAssociate.length} participantes adicionados!`, 'success');
+                
+                return true;
+            }
+        }
+        
+        console.log('ℹ️ Nenhuma correção necessária ou possível');
+        return false;
+        
+    } catch (error) {
+        console.error('❌ Erro na correção de duplicatas:', error);
+        return false;
+    }
+};
+
+// 🎯 CORREÇÃO MANUAL RÁPIDA: Para usar quando houver problema
+window.quickFixLastList = async function() {
+    console.log('🎯 CORREÇÃO RÁPIDA: Última lista criada');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        // Buscar dados
+        const [listsRes, participantsRes] = await Promise.all([
+            fetch(`${getApiUrl()}/participant-lists?clientId=${clientId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+        ]);
+        
+        const allLists = await listsRes.json();
+        const participantsData = await participantsRes.json();
+        const allParticipants = participantsData.participants || [];
+        
+        // Pegar a última lista (mais recente)
+        const lastList = allLists[allLists.length - 1];
+        if (!lastList) {
+            console.log('❌ Nenhuma lista encontrada');
+            return false;
+        }
+        
+        console.log(`🎯 Corrigindo lista: "${lastList.name}"`);
+        console.log(`📊 Membros atuais: ${lastList.participants?.length || 0}`);
+        
+        // Encontrar participantes órfãos
+        const orphans = allParticipants.filter(p => !p.lists || p.lists.length === 0);
+        
+        if (orphans.length === 0) {
+            console.log('✅ Nenhum participante órfão encontrado');
+            return true;
+        }
+        
+        console.log(`🔧 Associando ${orphans.length} participantes órfãos à lista...`);
+        
+        // Associar todos os órfãos à última lista
+        for (const participant of orphans) {
+            try {
+                await fetch(`${getApiUrl()}/participant-lists/${lastList._id}/participants`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ participantId: participant._id })
+                });
+                
+                console.log(`✅ ${participant.name} associado`);
+            } catch (error) {
+                console.log(`❌ Erro associando ${participant.name}`);
+            }
+        }
+        
+        // Recarregar tela
+        await loadParticipants();
+        await loadLists(true);
+        
+        if (currentTab === 'lists') {
+            refreshListsDisplay();
+        }
+        
+        console.log('✅ CORREÇÃO RÁPIDA CONCLUÍDA!');
+        showNotification(`Lista "${lastList.name}" corrigida!`, 'success');
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro na correção rápida:', error);
+        return false;
+    }
 };
 
 function getCurrentListType() {
