@@ -1,0 +1,24 @@
+# ===== RAILWAY IGNORE =====
+# Arquivos e pastas a serem ignorados durante o deploy
+
+# Frontend (Railway só precisa do backend)
+client/
+docs/
+*.md
+
+# Arquivos de desenvolvimento e configuração local
+.env.local
+.env.development
+.vscode/
+.git/
+
+# Arquivos temporários
+*.log
+.temp/
+.cache/
+
+# Arquivos específicos do projeto que não são necessários
+tailwind.config.js
+postcss.config.js
+package-lock.json
+nixpacks.toml 

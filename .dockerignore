@@ -1,0 +1,31 @@
+# ===== DOCKERIGNORE PARA RAILWAY =====
+# Ignorar pasta client durante build do backend
+
+# Frontend (não necessário para build do backend)
+client/
+docs/
+*.md
+README*
+
+# Arquivos de desenvolvimento
+.git/
+.github/
+.vscode/
+*.log
+.env.local
+.env.development
+
+# Arquivos temporários e cache
+node_modules/
+*.cache
+.temp/
+dist/
+
+# Arquivos específicos do Windows
+Thumbs.db
+desktop.ini
+
+# Arquivos de teste não necessários para produção
+**/*test*
+**/*spec*
+**/*mock* 

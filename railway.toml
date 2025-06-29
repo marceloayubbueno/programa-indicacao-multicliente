@@ -1,6 +1,7 @@
 [build]
 builder = "nixpacks"
 buildCommand = "cd server && npm run build"
+watchPaths = ["server/**"]
 
 [deploy]
 startCommand = "cd server && npm run start:prod"
