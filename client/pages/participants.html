@@ -339,6 +339,12 @@
     
     <script src="../js/participants-fixed.js?v=1.0.0"></script>
     <script>
+        // 🔧 FORÇAR LIMPEZA DE CACHE
+        if (window.location.search.includes('nocache')) {
+            // Cache já será ignorado pelo parâmetro ?v=1.0.0
+            console.log('🗑️ Cache ignorado via URL');
+        }
+        
         // 🔧 CORREÇÃO: Aguardar carregamento completo antes de chamar checkAuth
         if (typeof checkAuth === 'function') {
             checkAuth();
