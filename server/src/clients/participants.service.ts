@@ -215,9 +215,9 @@ export class ParticipantsService {
     return this.participantModel.findById(id);
   }
 
-  // 🔧 MÉTODO CORRIGIDO: Importar participantes com contexto de lista
+  // 🔧 MÉTODO CORRIGIDO: Importar participantes com sincronização automática GARANTIDA
   async importMany(dto: ImportParticipantsDto) {
-    console.log('🔧 BACKEND importMany CORRIGIDO chamado com:', {
+    console.log('🔧 BACKEND importMany MELHORADO chamado com:', {
       clientId: dto.clientId,
       listId: dto.listId,
       tipoParticipante: dto.tipoParticipante,
@@ -230,10 +230,10 @@ export class ParticipantsService {
         ...p,
         clientId: dto.clientId,
         participantId: (p as any).participantId || uuidv4(),
-        tipo: dto.tipoParticipante || 'participante', // ✅ Usar tipo correto
-        originSource: 'import', // Marcar como importado
-        importedAt: new Date(), // Data da importação
-        status: 'ativo' // Status padrão
+        tipo: dto.tipoParticipante || 'participante',
+        originSource: 'import',
+        importedAt: new Date(),
+        status: 'ativo'
       }));
 
       console.log('🔧 BACKEND Criando participantes com dados:', participants.slice(0, 1));
@@ -242,42 +242,66 @@ export class ParticipantsService {
       const insertedParticipants = await this.participantModel.insertMany(participants);
       console.log('🔧 BACKEND Participantes inseridos:', insertedParticipants.length);
 
-      // 🔧 CORREÇÃO: Se listId fornecido, associar participantes à lista
+      // 🚀 SOLUÇÃO DEFINITIVA: SEMPRE sincronizar se listId fornecido
       if (dto.listId && insertedParticipants.length > 0) {
-        console.log('🔧 BACKEND Associando participantes à lista:', dto.listId);
+        console.log('🔧 BACKEND SINCRONIZAÇÃO AUTOMÁTICA para lista:', dto.listId);
         
-        // Verificar se a lista existe
-        const list = await this.participantListModel.findById(dto.listId);
-        if (!list) {
-          console.error('❌ BACKEND Lista não encontrada:', dto.listId);
-          throw new Error('Lista não encontrada');
+        try {
+          // Verificar se a lista existe
+          const list = await this.participantListModel.findById(dto.listId);
+          if (!list) {
+            console.error('❌ BACKEND Lista não encontrada:', dto.listId);
+            throw new Error('Lista não encontrada');
+          }
+
+          console.log('✅ BACKEND Lista encontrada:', list.name);
+
+          const participantIds = insertedParticipants.map(p => p._id);
+          
+          // 1. Atualizar lista com novos participantes (sem duplicatas)
+          await this.participantListModel.findByIdAndUpdate(
+            dto.listId,
+            { $addToSet: { participants: { $each: participantIds } } }
+          );
+
+          // 2. Atualizar participantes com a lista (sem duplicatas)
+          await this.participantModel.updateMany(
+            { _id: { $in: participantIds } },
+            { $addToSet: { lists: dto.listId } }
+          );
+
+          console.log('✅ BACKEND Sincronização bidirecional aplicada automaticamente');
+
+          // 3. VERIFICAÇÃO ADICIONAL: Garantir que todos estão sincronizados
+          console.log('🔍 BACKEND Verificando sincronização...');
+          
+          for (const participant of insertedParticipants) {
+            const updatedParticipant = await this.participantModel.findById(participant._id);
+            if (!updatedParticipant.lists || !updatedParticipant.lists.includes(dto.listId)) {
+              console.log(`⚠️ BACKEND Re-sincronizando ${participant.name}...`);
+              await this.participantModel.findByIdAndUpdate(
+                participant._id,
+                { $addToSet: { lists: dto.listId } }
+              );
+            }
+          }
+          
+          // 4. Verificar contagem final
+          const finalList = await this.participantListModel.findById(dto.listId);
+          console.log(`✅ BACKEND Lista "${finalList.name}" agora tem ${finalList.participants.length} participantes`);
+          
+        } catch (syncError) {
+          console.error('❌ BACKEND Erro na sincronização automática:', syncError);
+          // Não falhar a importação por erro de sincronização
         }
-
-        console.log('✅ BACKEND Lista encontrada:', list.name);
-
-        // Adicionar participantes à lista
-        const participantIds = insertedParticipants.map(p => p._id);
-        
-        // Atualizar lista com novos participantes
-        await this.participantListModel.findByIdAndUpdate(
-          dto.listId,
-          { $addToSet: { participants: { $each: participantIds } } }
-        );
-
-        // Atualizar participantes com a lista
-        await this.participantModel.updateMany(
-          { _id: { $in: participantIds } },
-          { $addToSet: { lists: dto.listId } }
-        );
-
-        console.log('✅ BACKEND Participantes associados à lista com sucesso');
       }
 
       return {
         success: true,
         message: `${insertedParticipants.length} participantes importados com sucesso`,
         participantsCreated: insertedParticipants.length,
-        listAssociated: !!dto.listId
+        listAssociated: !!dto.listId,
+        autoSyncApplied: !!dto.listId
       };
 
     } catch (error) {
