@@ -782,10 +782,11 @@ async function loadLists(forDisplayInTab = false) {
     }
     
     try {
-        // Tentar buscar listas com populate de campanhas
-        console.log('🔍 DEBUG - URL da API:', `${API_URL}/participant-lists?clientId=${clientId}`);
+        // 🔧 CORREÇÃO: Usar getApiUrl() para garantir URL correta
+        const apiUrl = getApiUrl();
+        console.log('🔍 DEBUG - URL da API:', `${apiUrl}/participant-lists?clientId=${clientId}`);
         
-        const response = await fetch(`${API_URL}/participant-lists?clientId=${clientId}&populate=campaign`, {
+        const response = await fetch(`${apiUrl}/participant-lists?clientId=${clientId}&populate=campaign`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -794,7 +795,7 @@ async function loadLists(forDisplayInTab = false) {
             
             // Tentar sem populate se der erro
             console.log('🔄 Tentando novamente sem populate...');
-            const fallbackResponse = await fetch(`${API_URL}/participant-lists?clientId=${clientId}`, {
+            const fallbackResponse = await fetch(`${apiUrl}/participant-lists?clientId=${clientId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
@@ -1139,7 +1140,7 @@ async function loadCampaignsAndConnect() {
         
         console.log('🔄 Buscando campanhas para conectar com listas...');
         
-        const response = await fetch(`${API_URL}/campaigns?clientId=${clientId}`, {
+        const response = await fetch(`${getApiUrl()}/campaigns?clientId=${clientId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -2701,17 +2702,26 @@ function filterParticipantsData() {
         filtered = filtered.filter(p => p.status === statusFilter);
     }
     
-    // Filtro por lista (do select ou do contexto)
+    // 🔧 CORREÇÃO: Filtro por lista usando a estrutura correta de dados
     const listFilter = document.getElementById('listFilter')?.value || currentListFilter?.id;
     if (listFilter) {
-        const targetList = lists.find(l => (l._id || l.id) === listFilter);
-        // ✅ CORREÇÃO: Usar participants (padrão correto do backend)
-        const listMembersArray = targetList?.participants || [];
-        if (targetList && listMembersArray.length > 0) {
-            // Filtrar pelos membros/participantes da lista
-            const memberIds = listMembersArray.map(m => m._id || m.id || m);
-            filtered = filtered.filter(p => memberIds.includes(p._id || p.id));
-        }
+        console.log('🔍 Aplicando filtro de lista:', listFilter);
+        
+        // MÉTODO CORRETO: Filtrar participantes que têm a lista no seu array 'lists'
+        filtered = filtered.filter(participant => {
+            if (!participant.lists || !Array.isArray(participant.lists)) {
+                return false;
+            }
+            
+            // Verificar se o participante tem a lista selecionada
+            return participant.lists.some(list => {
+                // list pode ser um ObjectId (string) ou um objeto populado
+                const listId = typeof list === 'object' ? (list._id || list.id) : list;
+                return String(listId) === String(listFilter);
+            });
+        });
+        
+        console.log(`🔍 Filtro de lista aplicado: ${filtered.length} participantes encontrados`);
     }
     
     // Filtro por email
@@ -5500,4 +5510,76 @@ window.testarImportacaoCorrigida = function() {
     }
     
     console.log('✅ === TESTE CONCLUÍDO ===');
+};
+
+// 🧪 FUNÇÃO DE TESTE PARA VERIFICAR FILTRO DE LISTAS
+window.testListFilter = async function() {
+    console.log('🧪 === TESTE DE FILTRO DE LISTAS ===');
+    
+    try {
+        // 1. Verificar se existem participantes e listas carregados
+        console.log('📊 Estado atual:');
+        console.log('👥 Participantes carregados:', participants?.length || 0);
+        console.log('📋 Listas carregadas:', lists?.length || 0);
+        
+        if (!participants || participants.length === 0) {
+            console.log('❌ Nenhum participante carregado. Carregando...');
+            await loadParticipants();
+        }
+        
+        if (!lists || lists.length === 0) {
+            console.log('❌ Nenhuma lista carregada. Carregando...');
+            await loadLists();
+        }
+        
+        // 2. Verificar estrutura dos dados
+        if (participants && participants.length > 0) {
+            const sampleParticipant = participants[0];
+            console.log('🔍 Estrutura do primeiro participante:', {
+                id: sampleParticipant._id || sampleParticipant.id,
+                name: sampleParticipant.name,
+                lists: sampleParticipant.lists?.length || 0,
+                listsData: sampleParticipant.lists
+            });
+        }
+        
+        if (lists && lists.length > 0) {
+            const sampleList = lists[0];
+            console.log('🔍 Estrutura da primeira lista:', {
+                id: sampleList._id || sampleList.id,
+                name: sampleList.name,
+                participants: sampleList.participants?.length || 0
+            });
+        }
+        
+        // 3. Testar filtro manualmente
+        console.log('3. Testando filtro de participantes por lista...');
+        
+        if (lists && lists.length > 0) {
+            const firstList = lists[0];
+            const listId = firstList._id || firstList.id;
+            
+            console.log(`   Testando com lista: "${firstList.name}" (ID: ${listId})`);
+            
+            // Simular seleção da lista no dropdown
+            const listFilter = document.getElementById('listFilter');
+            if (listFilter) {
+                listFilter.value = listId;
+                console.log('   Dropdown de lista selecionado');
+                
+                // Aplicar filtro
+                await filterParticipants();
+                
+                console.log('   Filtro aplicado com sucesso!');
+                console.log('✅ Teste concluído - verifique a tabela');
+            } else {
+                console.log('❌ Dropdown de lista não encontrado');
+            }
+        } else {
+            console.log('❌ Nenhuma lista disponível para teste');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro no teste:', error);
+    }
 };
