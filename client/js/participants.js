@@ -5345,6 +5345,166 @@ function getSelectedListId() {
     return null;
 }
 
+// 🔧 SOLUÇÃO DEFINITIVA: Auto-correção na inicialização
+window.autoFixOrphanParticipants = async function() {
+    console.log('🔧 AUTO-CORREÇÃO: Verificando participantes órfãos...');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        if (!token || !clientId) {
+            return false;
+        }
+        
+        // Buscar dados
+        const [participantsRes, listsRes] = await Promise.all([
+            fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch(`${getApiUrl()}/participant-lists?clientId=${clientId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+        ]);
+        
+        const participantsData = await participantsRes.json();
+        const allParticipants = participantsData.participants || [];
+        const allLists = await listsRes.json();
+        
+        // Encontrar órfãos
+        const orphans = allParticipants.filter(p => !p.lists || p.lists.length === 0);
+        
+        if (orphans.length === 0) {
+            console.log('✅ Nenhum participante órfão encontrado');
+            return true;
+        }
+        
+        console.log(`🔧 Encontrados ${orphans.length} participantes órfãos - corrigindo automaticamente...`);
+        
+        // Para cada lista, verificar se tem participantes no array mas órfãos no sistema
+        for (const list of allLists) {
+            if (list.participants && list.participants.length > 0) {
+                for (const participantId of list.participants) {
+                    const participant = allParticipants.find(p => p._id === participantId);
+                    
+                    if (participant && (!participant.lists || participant.lists.length === 0)) {
+                        // Participante órfão que deveria estar na lista
+                        try {
+                            await fetch(`${getApiUrl()}/participant-lists/${list._id}/participants`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({ participantId: participant._id })
+                            });
+                            console.log(`✅ ${participant.name} sincronizado com lista "${list.name}"`);
+                        } catch (error) {
+                            console.log(`❌ Erro sincronizando ${participant.name}:`, error.message);
+                        }
+                    }
+                }
+            }
+        }
+        
+        console.log('✅ Auto-correção concluída');
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro na auto-correção:', error);
+        return false;
+    }
+};
+
+// 🔧 INTERCEPTAÇÃO DEFINITIVA: Sobrescrever saveImportedParticipants permanentemente
+(function() {
+    // Salvar função original se ainda não foi salva
+    if (!window.originalSaveImportedParticipants) {
+        window.originalSaveImportedParticipants = window.saveImportedParticipants;
+    }
+    
+    // Sobrescrever com versão que sempre faz sincronização
+    window.saveImportedParticipants = async function(participants, listId = null, tipoParticipante = 'participante') {
+        console.log('🔧 IMPORTAÇÃO INTERCEPTADA - Aplicando correção automática definitiva');
+        
+        try {
+            // 1. Executar importação original
+            const result = await window.originalSaveImportedParticipants(participants, listId, tipoParticipante);
+            
+            // 2. Forçar sincronização após 3 segundos
+            if (listId) {
+                console.log('⏳ Aguardando 3 segundos para sincronização automática...');
+                setTimeout(async () => {
+                    try {
+                        console.log('🔧 Executando sincronização automática...');
+                        await autoFixOrphanParticipants();
+                        
+                        // Recarregar dados
+                        await loadParticipants();
+                        await loadLists(true);
+                        
+                        if (currentTab === 'lists') {
+                            refreshListsDisplay();
+                        }
+                        
+                        console.log('✅ SINCRONIZAÇÃO AUTOMÁTICA CONCLUÍDA!');
+                        showNotification('Participantes importados e sincronizados automaticamente!', 'success');
+                        
+                    } catch (error) {
+                        console.error('❌ Erro na sincronização automática:', error);
+                    }
+                }, 3000);
+            }
+            
+            return result;
+            
+        } catch (error) {
+            console.error('❌ Erro na importação com correção automática:', error);
+            throw error;
+        }
+    };
+    
+    console.log('🔧 SOLUÇÃO DEFINITIVA ATIVA: Importações agora sincronizam automaticamente');
+})();
+
+// 🔧 AUTO-INICIALIZAÇÃO: Executar correção ao carregar a página
+(function() {
+    // Aguardar um tempo após o carregamento para executar auto-correção
+    setTimeout(async () => {
+        if (document.readyState === 'complete') {
+            console.log('🔧 Executando auto-correção na inicialização...');
+            await autoFixOrphanParticipants();
+        }
+    }, 5000); // 5 segundos após carregar
+})();
+
+// 🔧 COMANDO MANUAL: Para execução quando necessário
+window.runDefinitiveFix = async function() {
+    console.log('🔧 === EXECUÇÃO MANUAL DA CORREÇÃO DEFINITIVA ===');
+    
+    const success = await autoFixOrphanParticipants();
+    
+    if (success) {
+        // Recarregar tudo
+        await loadParticipants();
+        await loadLists(true);
+        
+        if (currentTab === 'lists') {
+            refreshListsDisplay();
+        } else if (currentTab === 'users') {
+            displayParticipants();
+        }
+        
+        console.log('🎉 CORREÇÃO DEFINITIVA EXECUTADA COM SUCESSO!');
+        showNotification('Sistema sincronizado com sucesso!', 'success');
+    } else {
+        console.log('❌ Falha na correção definitiva');
+        showNotification('Erro na sincronização', 'error');
+    }
+    
+    return success;
+};
+
 function getCurrentListType() {
     // Se há uma lista específica selecionada, obter seu tipo
     const currentListId = currentEditingListId || getSelectedListId();
