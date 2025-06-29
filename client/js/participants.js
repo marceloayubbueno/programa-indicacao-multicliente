@@ -5927,3 +5927,197 @@ window.fixMyList = async function(listName) {
         return false;
     }
 };
+
+// 🔍 DIAGNÓSTICO ESPECÍFICO: Problema de contagem de participantes
+window.debugListParticipants = async function() {
+    console.log('🔍 === DIAGNÓSTICO ESPECÍFICO: CONTAGEM DE PARTICIPANTES ===');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        // 1. Verificar dados locais
+        console.log('1️⃣ DADOS LOCAIS:');
+        console.log('Listas carregadas:', lists?.length || 0);
+        console.log('Participantes carregados:', participants?.length || 0);
+        
+        if (lists && lists.length > 0) {
+            lists.forEach((list, index) => {
+                console.log(`Lista ${index + 1}: "${list.name}"`);
+                console.log(`  - ID: ${list._id}`);
+                console.log(`  - Participants: ${list.participants?.length || 0}`);
+                console.log(`  - Participants data:`, list.participants);
+                console.log(`  - ParticipantCount: ${list.participantCount || 'não definido'}`);
+            });
+        }
+        
+        // 2. Buscar dados DIRETO do backend
+        console.log('\n2️⃣ BUSCANDO DADOS DIRETO DO BACKEND:');
+        
+        const listsResponse = await fetch(`${getApiUrl()}/participant-lists?clientId=${clientId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const backendLists = await listsResponse.json();
+        console.log('Backend retornou:', backendLists.length, 'listas');
+        
+        backendLists.forEach((list, index) => {
+            console.log(`\nBackend Lista ${index + 1}: "${list.name}"`);
+            console.log(`  - ID: ${list._id}`);
+            console.log(`  - Participants array:`, list.participants);
+            console.log(`  - Participants length:`, list.participants?.length || 0);
+            console.log(`  - ParticipantCount:`, list.participantCount);
+            console.log(`  - Todas as propriedades:`, Object.keys(list));
+        });
+        
+        // 3. Buscar participantes e verificar conexão
+        console.log('\n3️⃣ VERIFICANDO PARTICIPANTES:');
+        
+        const participantsResponse = await fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const participantsData = await participantsResponse.json();
+        const allParticipants = participantsData.participants || [];
+        
+        console.log('Total participantes no backend:', allParticipants.length);
+        
+        // Verificar quantos participantes têm listas
+        const participantsWithLists = allParticipants.filter(p => p.lists && p.lists.length > 0);
+        console.log('Participantes COM listas:', participantsWithLists.length);
+        
+        // 4. Testar lista específica
+        const testeLista = backendLists.find(l => l.name.toLowerCase().includes('teste'));
+        if (testeLista) {
+            console.log('\n4️⃣ ANÁLISE ESPECÍFICA DA LISTA "TESTE":');
+            console.log('Lista encontrada:', testeLista.name);
+            console.log('ID da lista:', testeLista._id);
+            console.log('Participants array:', testeLista.participants);
+            console.log('Length oficial:', testeLista.participants?.length || 0);
+            
+            if (testeLista.participants && testeLista.participants.length > 0) {
+                console.log('\n📋 PARTICIPANTES NA LISTA:');
+                for (const participantId of testeLista.participants) {
+                    const participant = allParticipants.find(p => p._id === participantId || p._id === String(participantId));
+                    if (participant) {
+                        console.log(`  ✅ ${participant.name} (${participant.email})`);
+                        console.log(`    - Tem listas:`, participant.lists?.length || 0);
+                        console.log(`    - Lista IDs:`, participant.lists);
+                    } else {
+                        console.log(`  ❌ Participante ${participantId} não encontrado`);
+                    }
+                }
+            }
+            
+            // 5. Buscar dados POPULADOS da lista específica
+            console.log('\n5️⃣ BUSCANDO LISTA COM PARTICIPANTES POPULADOS:');
+            const populatedResponse = await fetch(`${getApiUrl()}/participant-lists/${testeLista._id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            const populatedList = await populatedResponse.json();
+            console.log('Lista populada:', populatedList);
+            console.log('Participants populados:', populatedList.participants?.length || 0);
+            
+            if (populatedList.participants && populatedList.participants.length > 0) {
+                console.log('Primeiro participante populado:', populatedList.participants[0]);
+            }
+        }
+        
+        // 6. RESUMO DO DIAGNÓSTICO
+        console.log('\n📊 === RESUMO DO DIAGNÓSTICO ===');
+        const problemas = [];
+        
+        if (!lists || lists.length === 0) {
+            problemas.push('❌ Nenhuma lista carregada no frontend');
+        }
+        
+        if (backendLists.length === 0) {
+            problemas.push('❌ Nenhuma lista no backend');
+        }
+        
+        const listasComParticipantesZero = backendLists.filter(l => !l.participants || l.participants.length === 0);
+        if (listasComParticipantesZero.length > 0) {
+            problemas.push(`❌ ${listasComParticipantesZero.length} listas com participants = 0`);
+        }
+        
+        const participantsSemListas = allParticipants.filter(p => !p.lists || p.lists.length === 0);
+        if (participantsSemListas.length > 0) {
+            problemas.push(`❌ ${participantsSemListas.length} participantes sem listas`);
+        }
+        
+        if (problemas.length > 0) {
+            console.log('🚨 PROBLEMAS ENCONTRADOS:');
+            problemas.forEach(p => console.log(p));
+        } else {
+            console.log('✅ Estrutura parece OK - problema pode ser no frontend');
+        }
+        
+        console.log('\n💡 PRÓXIMOS PASSOS:');
+        console.log('1. Execute: forceFixListCount() para correção automática');
+        console.log('2. Execute: fixMyList("teste") para correção específica');
+        console.log('3. Recarregue a página após a correção');
+        
+    } catch (error) {
+        console.error('❌ Erro no diagnóstico:', error);
+    }
+};
+
+// 🔧 CORREÇÃO AUTOMÁTICA DA CONTAGEM
+window.forceFixListCount = async function() {
+    console.log('🔧 === CORREÇÃO FORÇADA DA CONTAGEM ===');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        // 1. Buscar todas as listas do backend
+        const listsResponse = await fetch(`${getApiUrl()}/participant-lists?clientId=${clientId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const backendLists = await listsResponse.json();
+        console.log(`📋 Processando ${backendLists.length} listas...`);
+        
+        let fixes = 0;
+        
+        for (const list of backendLists) {
+            if (list.participants && list.participants.length > 0) {
+                console.log(`🔧 Corrigindo lista "${list.name}" (${list.participants.length} participantes)`);
+                
+                // Forçar sincronização de cada participante
+                for (const participantId of list.participants) {
+                    try {
+                        await fetch(`${getApiUrl()}/participant-lists/${list._id}/participants`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ participantId })
+                        });
+                        fixes++;
+                    } catch (error) {
+                        console.log(`❌ Erro sincronizando ${participantId}:`, error.message);
+                    }
+                }
+            }
+        }
+        
+        console.log(`✅ ${fixes} sincronizações aplicadas`);
+        
+        // 2. Recarregar dados
+        console.log('🔄 Recarregando dados...');
+        await loadParticipants();
+        await loadLists(true);
+        
+        if (currentTab === 'lists') {
+            refreshListsDisplay();
+        }
+        
+        console.log('🎉 CORREÇÃO CONCLUÍDA! Verifique a contagem nas listas');
+        
+    } catch (error) {
+        console.error('❌ Erro na correção:', error);
+    }
+};
