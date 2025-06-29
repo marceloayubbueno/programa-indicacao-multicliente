@@ -5791,3 +5791,139 @@ window.quickSyncAllLists = async function() {
         console.error('❌ Erro na sincronização:', error);
     }
 };
+
+// 🎯 CORREÇÃO DEFINITIVA: Força sincronização após importação
+window.forceListSync = async function(listId) {
+    console.log('🎯 FORÇANDO SINCRONIZAÇÃO PARA LISTA:', listId);
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        if (!token || !clientId) {
+            console.log('❌ Token/clientId não encontrado');
+            return false;
+        }
+        
+        // 1. Buscar a lista específica
+        const listResponse = await fetch(`${getApiUrl()}/participant-lists/${listId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!listResponse.ok) {
+            console.log('❌ Erro ao buscar lista');
+            return false;
+        }
+        
+        const list = await listResponse.json();
+        console.log(`📋 Lista encontrada: "${list.name}" com ${list.participants?.length || 0} participantes`);
+        
+        if (!list.participants || list.participants.length === 0) {
+            console.log('⚠️ Lista está vazia - nada para sincronizar');
+            return false;
+        }
+        
+        // 2. Para cada participante da lista, forçar a adição bidirecional
+        let syncCount = 0;
+        for (const participantId of list.participants) {
+            try {
+                // Forçar sincronização via endpoint
+                const syncResponse = await fetch(`${getApiUrl()}/participant-lists/${listId}/participants`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ participantId })
+                });
+                
+                if (syncResponse.ok) {
+                    syncCount++;
+                    console.log(`✅ Participante ${participantId} sincronizado`);
+                } else {
+                    console.log(`⚠️ Participante ${participantId} erro:`, syncResponse.status);
+                }
+            } catch (error) {
+                console.log(`❌ Erro sincronizando ${participantId}:`, error.message);
+            }
+        }
+        
+        console.log(`🎯 SINCRONIZAÇÃO COMPLETA: ${syncCount}/${list.participants.length} participantes`);
+        
+        // 3. Recarregar dados
+        await loadParticipants();
+        await loadLists(true);
+        
+        if (currentTab === 'lists') {
+            refreshListsDisplay();
+        }
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro na sincronização forçada:', error);
+        return false;
+    }
+};
+
+// 🚀 SOLUÇÃO AUTOMÁTICA: Executar após qualquer importação
+const originalSaveImportedParticipants = saveImportedParticipants;
+window.saveImportedParticipants = async function(participants, listId = null, tipoParticipante = 'participante') {
+    console.log('🚀 INTERCEPTANDO IMPORTAÇÃO - Aplicando correção automática');
+    
+    try {
+        // Executar importação original
+        const result = await originalSaveImportedParticipants(participants, listId, tipoParticipante);
+        
+        // Se tem listId, forçar sincronização imediatamente
+        if (listId) {
+            console.log('🔧 APLICANDO CORREÇÃO AUTOMÁTICA para lista:', listId);
+            setTimeout(async () => {
+                await forceListSync(listId);
+                console.log('✅ CORREÇÃO AUTOMÁTICA APLICADA!');
+            }, 2000); // Esperar 2 segundos para o backend processar
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('❌ Erro na importação com correção:', error);
+        throw error;
+    }
+};
+
+// 🎯 FUNÇÃO DE CORREÇÃO IMEDIATA: Para usar quando precisar
+window.fixMyList = async function(listName) {
+    console.log('🎯 CORREÇÃO IMEDIATA PARA LISTA:', listName);
+    
+    try {
+        // Carregar listas se necessário
+        if (!lists || lists.length === 0) {
+            await loadLists();
+        }
+        
+        // Encontrar a lista pelo nome
+        const list = lists.find(l => l.name.toLowerCase().includes(listName.toLowerCase()));
+        
+        if (!list) {
+            console.log('❌ Lista não encontrada. Listas disponíveis:');
+            lists.forEach(l => console.log(`  - ${l.name}`));
+            return false;
+        }
+        
+        console.log(`🎯 Corrigindo lista: "${list.name}" (ID: ${list._id})`);
+        const success = await forceListSync(list._id);
+        
+        if (success) {
+            console.log('🎉 LISTA CORRIGIDA COM SUCESSO!');
+            console.log('✅ Verifique agora a aba de listas - deve mostrar a contagem correta');
+        } else {
+            console.log('❌ Falha na correção');
+        }
+        
+        return success;
+        
+    } catch (error) {
+        console.error('❌ Erro na correção:', error);
+        return false;
+    }
+};
