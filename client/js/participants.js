@@ -798,36 +798,7 @@ function getApiUrl() {
             'https://programa-indicacao-multicliente-production.up.railway.app/api'));
 }
 
-// 🔍 DIAGNÓSTICO: Função para verificar configuração
-// 🌟 VARIÁVEIS GLOBAIS REFATORADAS - Usando novos módulos
-// 🔧 CORREÇÃO: API_URL já declarado em auth.js (removendo duplicação)
-let currentTab = 'lists';
-let participants = []; // Mantido para compatibilidade
-let lists = [];
-let currentPage = 1;
-let pageSize = 25; // 🔧 OTIMIZADO: Limite escalável para grandes volumes
-let totalParticipants = 0; // 🔧 CORRIGIDO: Inicializado
-let totalPages = 1; // 🔧 CORRIGIDO: Adicionado
-let tipoFiltro = 'todos';
-let isLoading = false;
-let currentFilters = {}; // 🔧 NOVO: Cache de filtros atuais
-
-// 🚀 INICIALIZAÇÃO DOS NOVOS MÓDULOS
-console.log('🔧 Inicializando módulos refatorados...');
-console.log('📦 APIClient:', typeof window.apiClient);
-console.log('🔄 DataAdapter:', typeof window.DataAdapter);
-console.log('👥 ParticipantsManager:', typeof window.participantsManager);
-
-// 🔧 CORREÇÃO: Função para obter API_URL de forma segura
-function getApiUrl() {
-    return window.API_URL || 
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-           (window.location.hostname === 'localhost' ? 
-            'http://localhost:3000/api' : 
-            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
-}
-
-// 🔍 DIAGNÓSTICO: Função para verificar configuração
+// 🔍 DIAGNÓSTICO: Função para verificar configuração (duplicação removida)
 function debugConfig() {
     console.log('🔍 === DIAGNÓSTICO DE CONFIGURAÇÃO ===');
     console.log('🔍 window.APP_CONFIG:', window.APP_CONFIG);
