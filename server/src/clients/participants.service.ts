@@ -241,7 +241,7 @@ export class ParticipantsService {
       console.log(`📊 BACKEND ${newParticipants.length} novos participantes, ${existingParticipants.length} duplicatas`);
 
       // 🔧 CRIAR NOVOS PARTICIPANTES
-      let insertedParticipants = [];
+      let insertedParticipants: any[] = [];
       if (newParticipants.length > 0) {
         const participants = newParticipants.map(p => ({
           ...p,
@@ -298,7 +298,7 @@ export class ParticipantsService {
           
           for (const participantId of allParticipantIds) {
             const participant = await this.participantModel.findById(participantId);
-            if (!participant.lists || !participant.lists.includes(dto.listId)) {
+            if (participant && (!participant.lists || !participant.lists.includes(dto.listId as any))) {
               console.log(`⚠️ BACKEND Re-sincronizando participante ${participantId}...`);
               await this.participantModel.findByIdAndUpdate(
                 participantId,
@@ -309,7 +309,9 @@ export class ParticipantsService {
           
           // 4. Verificar contagem final
           const finalList = await this.participantListModel.findById(dto.listId);
-          console.log(`✅ BACKEND Lista "${finalList.name}" agora tem ${finalList.participants.length} participantes`);
+          if (finalList) {
+            console.log(`✅ BACKEND Lista "${finalList.name}" agora tem ${finalList.participants?.length || 0} participantes`);
+          }
           
         } catch (syncError) {
           console.error('❌ BACKEND Erro na sincronização automática:', syncError);

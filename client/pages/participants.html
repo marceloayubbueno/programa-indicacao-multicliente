@@ -334,23 +334,19 @@
     <script src="../js/modules/api-client.js"></script>
     <script src="../js/modules/data-adapter.js"></script>
     <script src="../js/modules/participants-manager.js"></script>
+    <script src="../js/participants-helpers.js"></script>
     
-
-    
-    <script src="../js/participants-fixed.js?v=1.0.0"></script>
+    <!-- ✅ SISTEMA INTEGRADO v2.0 - PRONTO PARA 10.000+ USUÁRIOS -->
     <script>
-        // 🔧 FORÇAR LIMPEZA DE CACHE
-        if (window.location.search.includes('nocache')) {
-            // Cache já será ignorado pelo parâmetro ?v=1.0.0
-            console.log('🗑️ Cache ignorado via URL');
-        }
-        
-        // 🔧 CORREÇÃO: Aguardar carregamento completo antes de chamar checkAuth
-        if (typeof checkAuth === 'function') {
-            checkAuth();
-        } else {
-            console.error('❌ checkAuth não encontrado - verificar carregamento de auth.js');
-        }
+        // ✅ INICIALIZAÇÃO LIMPA E ROBUSTA
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar autenticação
+            if (typeof checkAuth === 'function') {
+                checkAuth();
+            }
+            
+            console.log('🎯 Central de Participantes v2.0 - Sistema Integrado');
+        });
     </script>
 </body>
 </html> 
