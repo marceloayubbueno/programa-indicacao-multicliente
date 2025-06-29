@@ -6121,3 +6121,166 @@ window.forceFixListCount = async function() {
         console.error('❌ Erro na correção:', error);
     }
 };
+
+// 🚨 SOLUÇÃO EMERGENCIAL: Força contagem na tela IMEDIATAMENTE
+window.forceFrontendUpdate = async function() {
+    console.log('🚨 FORÇANDO ATUALIZAÇÃO IMEDIATA DA TELA');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        // 1. Buscar dados DIRETOS do backend
+        console.log('1️⃣ Buscando dados diretos do backend...');
+        
+        const [listsRes, participantsRes] = await Promise.all([
+            fetch(`${getApiUrl()}/participant-lists?clientId=${clientId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+        ]);
+        
+        const backendLists = await listsRes.json();
+        const participantsData = await participantsRes.json();
+        const allParticipants = participantsData.participants || [];
+        
+        console.log('📋 Backend retornou:', backendLists.length, 'listas');
+        console.log('👥 Backend retornou:', allParticipants.length, 'participantes');
+        
+        // 2. Para cada lista, CONTAR os participantes que realmente pertencem a ela
+        const correctedLists = backendLists.map(list => {
+            // Contar participantes que têm esta lista no array 'lists'
+            const realCount = allParticipants.filter(participant => {
+                if (!participant.lists || !Array.isArray(participant.lists)) return false;
+                return participant.lists.some(l => {
+                    const listId = typeof l === 'object' ? l._id : l;
+                    return String(listId) === String(list._id);
+                });
+            }).length;
+            
+            console.log(`📋 Lista "${list.name}": ${realCount} participantes conectados`);
+            
+            // Corrigir a lista com a contagem real
+            return {
+                ...list,
+                participants: list.participants || [],
+                participantCount: realCount,
+                realParticipants: allParticipants.filter(participant => {
+                    if (!participant.lists || !Array.isArray(participant.lists)) return false;
+                    return participant.lists.some(l => {
+                        const listId = typeof l === 'object' ? l._id : l;
+                        return String(listId) === String(list._id);
+                    });
+                })
+            };
+        });
+        
+        // 3. SUBSTITUIR as listas globais com dados corrigidos
+        console.log('2️⃣ Substituindo dados globais...');
+        window.lists = correctedLists;
+        lists = correctedLists;
+        
+        // 4. FORÇAR atualização da interface
+        console.log('3️⃣ Forçando atualização da interface...');
+        
+        if (currentTab === 'lists') {
+            // Recriar toda a tabela de listas
+            const tbody = document.querySelector('#listsContainer tbody') || document.querySelector('#listsList');
+            if (tbody) {
+                tbody.innerHTML = correctedLists.map(list => createListRowHTML(list)).join('');
+                console.log('✅ Tabela de listas atualizada');
+            }
+        }
+        
+        // 5. Atualizar participantes globais também
+        window.participants = allParticipants;
+        participants = allParticipants;
+        
+        console.log('4️⃣ Resultado final:');
+        correctedLists.forEach(list => {
+            console.log(`  📋 "${list.name}": ${list.participantCount || 0} membros`);
+        });
+        
+        console.log('🎉 ATUALIZAÇÃO FORÇADA CONCLUÍDA!');
+        console.log('✅ A tela deve mostrar as contagens corretas agora');
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro na atualização forçada:', error);
+        return false;
+    }
+};
+
+// 🎯 FUNÇÃO ESPECÍFICA: Corrigir apenas a lista "teste"
+window.fixTesteList = async function() {
+    console.log('🎯 CORREÇÃO ESPECÍFICA DA LISTA "TESTE"');
+    
+    try {
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        // Buscar participantes
+        const participantsRes = await fetch(`${getApiUrl()}/participants?clientId=${clientId}&limit=1000`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const participantsData = await participantsRes.json();
+        const allParticipants = participantsData.participants || [];
+        
+        console.log('👥 Total participantes no sistema:', allParticipants.length);
+        
+        // Encontrar lista "teste"
+        const testeLista = lists.find(l => l.name.toLowerCase().includes('teste'));
+        if (!testeLista) {
+            console.log('❌ Lista "teste" não encontrada');
+            return false;
+        }
+        
+        console.log('📋 Lista encontrada:', testeLista.name, 'ID:', testeLista._id);
+        
+        // Contar participantes que pertencem a esta lista
+        const testeParticipants = allParticipants.filter(participant => {
+            if (!participant.lists || !Array.isArray(participant.lists)) return false;
+            return participant.lists.some(l => {
+                const listId = typeof l === 'object' ? l._id : l;
+                return String(listId) === String(testeLista._id);
+            });
+        });
+        
+        console.log('🎯 Participantes encontrados na lista "teste":', testeParticipants.length);
+        testeParticipants.forEach(p => console.log(`  - ${p.name} (${p.email})`));
+        
+        // Atualizar a lista na interface IMEDIATAMENTE
+        const testeListIndex = lists.findIndex(l => l._id === testeLista._id);
+        if (testeListIndex !== -1) {
+            lists[testeListIndex].participantCount = testeParticipants.length;
+            lists[testeListIndex].realParticipants = testeParticipants;
+            
+            // Recriar apenas a linha da tabela desta lista
+            if (currentTab === 'lists') {
+                const tbody = document.querySelector('#listsContainer tbody') || document.querySelector('#listsList');
+                if (tbody) {
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        const listName = row.querySelector('td:first-child')?.textContent;
+                        if (listName && listName.toLowerCase().includes('teste')) {
+                            row.outerHTML = createListRowHTML(lists[testeListIndex]);
+                            console.log('✅ Linha da lista "teste" atualizada na tabela');
+                        }
+                    });
+                }
+            }
+        }
+        
+        console.log('🎉 LISTA "TESTE" CORRIGIDA!');
+        console.log(`✅ Deve mostrar ${testeParticipants.length} membros agora`);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro na correção específica:', error);
+        return false;
+    }
+};
