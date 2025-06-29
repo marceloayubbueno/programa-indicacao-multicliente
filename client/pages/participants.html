@@ -335,9 +335,69 @@
     <script src="../js/modules/data-adapter.js"></script>
     <script src="../js/modules/participants-manager.js"></script>
     <script src="../js/participants-helpers.js"></script>
+    <script src="../js/participants.js"></script>
     
     <!-- ✅ SISTEMA INTEGRADO v2.0 - PRONTO PARA 10.000+ USUÁRIOS -->
     <script>
+        // ✅ FALLBACK FUNCTIONS - Definir funções essenciais imediatamente
+        if (typeof window.switchTab === 'undefined') {
+            window.switchTab = function(tabName) {
+                console.log('🔄 Fallback switchTab chamado:', tabName);
+                
+                // Remover classes ativas
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                    btn.classList.add('bg-gray-700', 'text-gray-300');
+                });
+                
+                // Esconder conteúdos
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Esconder ações
+                document.querySelectorAll('[id^="actions-"]').forEach(action => {
+                    action.classList.add('hidden');
+                });
+                
+                // Ativar aba selecionada
+                const activeTab = document.getElementById(`tab-${tabName}`);
+                const activeContent = document.getElementById(`tab-content-${tabName}`);
+                const activeActions = document.getElementById(`actions-${tabName}`);
+                
+                if (activeTab) {
+                    activeTab.classList.add('active', 'bg-blue-600', 'text-white');
+                    activeTab.classList.remove('bg-gray-700', 'text-gray-300');
+                }
+                
+                if (activeContent) {
+                    activeContent.classList.remove('hidden');
+                }
+                
+                if (activeActions) {
+                    activeActions.classList.remove('hidden');
+                    activeActions.classList.add('flex');
+                }
+                
+                console.log(`✅ Aba ${tabName} ativada via fallback`);
+            };
+            
+            console.log('🔧 Fallback switchTab definido');
+        }
+        
+        // Outras funções fallback
+        if (typeof window.setTipoFiltro === 'undefined') {
+            window.setTipoFiltro = function(tipo) {
+                console.log('🔄 Fallback setTipoFiltro:', tipo);
+            };
+        }
+        
+        if (typeof window.filterParticipants === 'undefined') {
+            window.filterParticipants = function() {
+                console.log('🔄 Fallback filterParticipants');
+            };
+        }
+        
         // ✅ INICIALIZAÇÃO LIMPA E ROBUSTA
         document.addEventListener('DOMContentLoaded', () => {
             // Verificar autenticação
@@ -346,6 +406,11 @@
             }
             
             console.log('🎯 Central de Participantes v2.0 - Sistema Integrado');
+            console.log('🔧 Funções disponíveis:', {
+                switchTab: typeof window.switchTab,
+                setTipoFiltro: typeof window.setTipoFiltro,
+                filterParticipants: typeof window.filterParticipants
+            });
         });
     </script>
 </body>

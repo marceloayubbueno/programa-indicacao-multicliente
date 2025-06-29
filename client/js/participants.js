@@ -299,12 +299,19 @@ function showNotification(message, type = 'info') {
     // TODO: Implementar sistema de notificação visual
 }
 
-// ===== FUNÇÕES GLOBAIS PARA COMPATIBILIDADE =====
+// ===== EXPORTAR FUNÇÕES IMEDIATAMENTE =====
 window.switchTab = switchTab;
 window.setTipoFiltro = setTipoFiltro;
 window.filterParticipants = filterParticipants;
 window.editList = editList;
 window.deleteList = deleteList;
+window.loadStatistics = loadStatistics;
+
+console.log('✅ Funções globais exportadas:', {
+    switchTab: typeof window.switchTab,
+    setTipoFiltro: typeof window.setTipoFiltro,
+    filterParticipants: typeof window.filterParticipants
+});
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', function() {
