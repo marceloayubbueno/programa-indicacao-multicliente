@@ -407,19 +407,35 @@ async function fetchListasParticipantes() {
       });
     });
     
-    // ✅ FILTRO CORRETO: tipo "participante" E com participantes ativos
-    const filtradas = listas.filter(l => 
-      l.tipo === 'participante' && 
-      Array.isArray(l.participants) && 
-      l.participants.length > 0
-    );
-    console.log('🔍 H1 - Listas após filtro (tipo participante + com participantes):', filtradas.length);
-    console.log('🔍 H1 - Listas filtradas:', filtradas.map(l => ({
-      id: l._id,
-      name: l.name,
-      tipo: l.tipo,
-      participantsLength: l.participants?.length || 0
-    })));
+    // 🔍 DIAGNÓSTICO: Vamos ver cada condição separadamente
+    listas.forEach((lista, index) => {
+      const tipoOk = lista.tipo === 'participante';
+      const isArray = Array.isArray(lista.participants);
+      const hasLength = lista.participants && lista.participants.length > 0;
+      
+      console.log(`🔍 H1 - LISTA ${index + 1} FILTRO:`, {
+        name: lista.name,
+        tipoValue: lista.tipo,
+        tipoOk: tipoOk,
+        participantsIsArray: isArray,
+        participantsLength: lista.participants?.length || 0,
+        hasLength: hasLength,
+        passaFiltro: tipoOk && isArray && hasLength
+      });
+      
+      // 🚨 PROBLEMA IDENTIFICADO: Lista vazia quando deveria ter participantes
+      if (tipoOk && isArray && !hasLength) {
+        console.error(`🚨 PROBLEMA: Lista "${lista.name}" tem tipo correto mas está VAZIA!`);
+        console.error('🚨 Isso indica problema na sincronização lista ↔ participantes no backend');
+        console.error('🚨 Lista ID:', lista._id, 'Client ID:', lista.clientId);
+      }
+    });
+    
+    // 🚨 SOLUÇÃO TEMPORÁRIA: Aceitar listas vazias do tipo "participante"
+    // Isso permite que listas criadas mas ainda não populadas apareçam no quiz
+    const filtradas = listas.filter(l => l.tipo === 'participante');
+    console.log('🔍 H1 - Listas após filtro (apenas tipo participante):', filtradas.length);
+    console.log('🔍 H1 - SOLUÇÃO TEMPORÁRIA: Aceitando listas vazias para investigar problema backend');
     
     return filtradas;
   } catch (err) {
@@ -463,9 +479,16 @@ function renderListasParticipantes() {
         });
         const data = await resp.json();
         const count = data.count ?? 0;
-        document.getElementById(`count-${lista._id}`).textContent = `(${count} participante${count !== 1 ? 's' : ''})`;
+        const countText = count === 0 ? 
+          '⚠️ (VAZIA - problema backend)' : 
+          `(${count} participante${count !== 1 ? 's' : ''})`;
+        document.getElementById(`count-${lista._id}`).textContent = countText;
         
         console.log(`🔍 H2 - Lista "${lista.name}": ${count} participantes`);
+        
+        if (count === 0) {
+          console.warn(`⚠️ Lista "${lista.name}" está vazia - pode indicar problema na sincronização backend`);
+        }
       } catch (err) {
         console.error(`🔍 H2 - ERRO ao carregar contagem da lista ${lista.name}:`, err);
         document.getElementById(`count-${lista._id}`).textContent = '(erro ao carregar)';
