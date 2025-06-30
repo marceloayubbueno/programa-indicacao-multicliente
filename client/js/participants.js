@@ -33,16 +33,31 @@ function initializeManagers() {
         lists: [],
         async loadLists() {
             try {
+                console.log('🔄 Carregando listas...');
                 const data = await window.apiClient.getParticipantLists();
+                
+                // 🔍 DIAGNÓSTICO LISTAS - Dados vindos do backend
+                console.log('🔍 LISTAS BACKEND - Dados recebidos:', {
+                    listsCount: Array.isArray(data) ? data.length : 0,
+                    isArray: Array.isArray(data),
+                    rawData: data,
+                    listsSample: Array.isArray(data) ? data.slice(0, 2).map(list => ({
+                        id: list._id,
+                        name: list.name,
+                        hasParticipantsField: !!list.participants,
+                        participantsCount: list.participants?.length || 'undefined',
+                        participantsType: typeof list.participants
+                    })) : 'NOT_ARRAY'
+                });
+                
                 this.lists = Array.isArray(data) ? data : [];
                 console.log(`✅ ${this.lists.length} listas carregadas`);
+                
                 await this.displayLists();
                 this.populateListFilter();
-                return this.lists;
             } catch (error) {
                 console.error('❌ Erro ao carregar listas:', error);
                 this.lists = [];
-                await this.displayLists();
             }
         },
         
@@ -201,23 +216,72 @@ function initializeManagers() {
         
         async updateParticipantCounts() {
             try {
-                // Para cada lista, buscar participantes associados
+                // 🔍 DIAGNÓSTICO CONTAGEM - Início
+                console.log('🔍 CONTAGEM - Iniciando contagem de participantes para listas:', this.lists.map(l => ({ id: l._id, name: l.name })));
+                
+                // 🚀 CORREÇÃO ALTERNATIVA: Tentar usar dados da própria lista primeiro
+                let useAlternativeMethod = false;
+                this.lists.forEach(list => {
+                    if (list.participants && Array.isArray(list.participants)) {
+                        list.participantsCount = list.participants.length;
+                        console.log(`✅ CONTAGEM ALTERNATIVA - Lista "${list.name}": ${list.participantsCount} participantes (do campo participants da lista)`);
+                        useAlternativeMethod = true;
+                    } else {
+                        console.log(`⚠️ CONTAGEM ALTERNATIVA - Lista "${list.name}": sem campo participants, usando API`);
+                    }
+                });
+                
+                // Se todas as listas têm dados no campo participants, não precisamos fazer chamadas à API
+                if (useAlternativeMethod && this.lists.every(l => l.participants && Array.isArray(l.participants))) {
+                    console.log('✅ CONTAGEM ALTERNATIVA - Usando dados das próprias listas, evitando chamadas de API desnecessárias');
+                    console.log('🔍 CONTAGEM ALTERNATIVA - Resultado final:', this.lists.map(l => ({
+                        name: l.name,
+                        id: l._id,
+                        count: l.participantsCount || 0
+                    })));
+                    return;
+                }
+                
+                // 🔧 MÉTODO ORIGINAL: Para cada lista, buscar participantes associados via API
+                console.log('🔧 CONTAGEM ORIGINAL - Usando chamadas de API para contagem');
                 const promises = this.lists.map(async (list) => {
                     try {
+                        console.log(`🔍 CONTAGEM - Buscando participantes para lista "${list.name}" (ID: ${list._id})`);
+                        
                         const participants = await window.apiClient.getParticipants({ 
                             listId: list._id,
                             limit: 1000 
                         });
+                        
+                        // 🔍 DIAGNÓSTICO CONTAGEM - Resultado por lista
+                        console.log(`🔍 CONTAGEM - Lista "${list.name}":`, {
+                            listId: list._id,
+                            participantsRetornados: participants.participants?.length || 0,
+                            totalFromAPI: participants.total || 'undefined',
+                            participantsSample: participants.participants?.slice(0, 2).map(p => ({ id: p._id, name: p.name })) || []
+                        });
+                        
                         list.participants = participants.participants || [];
                         list.participantsCount = list.participants.length;
+                        
+                        console.log(`✅ CONTAGEM - Lista "${list.name}" atualizada: ${list.participantsCount} participantes`);
+                        
                     } catch (error) {
-                        console.warn(`Erro ao contar participantes da lista ${list.name}:`, error);
+                        console.warn(`❌ CONTAGEM - Erro ao contar participantes da lista ${list.name}:`, error);
                         list.participants = [];
                         list.participantsCount = 0;
                     }
                 });
                 
                 await Promise.all(promises);
+                
+                // 🔍 DIAGNÓSTICO CONTAGEM - Resultado final
+                console.log('🔍 CONTAGEM - Resultado final:', this.lists.map(l => ({
+                    name: l.name,
+                    id: l._id,
+                    count: l.participantsCount || 0
+                })));
+                
                 console.log('✅ Contagem de participantes atualizada para todas as listas');
             } catch (error) {
                 console.error('❌ Erro ao atualizar contagens:', error);
