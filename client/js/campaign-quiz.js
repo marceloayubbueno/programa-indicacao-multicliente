@@ -428,6 +428,13 @@ async function fetchListasParticipantes() {
         console.error(`🚨 PROBLEMA: Lista "${lista.name}" tem tipo correto mas está VAZIA!`);
         console.error('🚨 Isso indica problema na sincronização lista ↔ participantes no backend');
         console.error('🚨 Lista ID:', lista._id, 'Client ID:', lista.clientId);
+        
+        // 🔧 Adicionar informação para debug
+        window.emptyListDetected = {
+          id: lista._id,
+          name: lista.name,
+          clientId: lista.clientId
+        };
       }
     });
     
@@ -453,7 +460,12 @@ function renderListasParticipantes() {
     console.log('🔍 H2 - renderListasParticipantes - Total de listas:', listas.length);
     
     if (!listas.length) {
-      container.innerHTML = '<div class="text-gray-400">Nenhuma lista de participantes com participantes ativos encontrada. Crie uma nova lista abaixo.</div>';
+      container.innerHTML = `
+        <div class="text-gray-400 mb-4">Nenhuma lista de participantes com participantes ativos encontrada. Crie uma nova lista abaixo.</div>
+        <button onclick="debugBackendData()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+          🔍 DEBUG: Investigar Backend
+        </button>
+      `;
       return;
     }
     container.innerHTML = '';
@@ -488,6 +500,15 @@ function renderListasParticipantes() {
         
         if (count === 0) {
           console.warn(`⚠️ Lista "${lista.name}" está vazia - pode indicar problema na sincronização backend`);
+          
+          // 🔧 Adicionar botão de debug para esta lista específica
+          const debugBtn = document.createElement('button');
+          debugBtn.className = 'ml-2 px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600';
+          debugBtn.innerHTML = '🔍 DEBUG';
+          debugBtn.onclick = () => debugSpecificList(lista._id, lista.name);
+          
+          const listElement = document.querySelector(`#count-${lista._id}`).parentElement.parentElement;
+          listElement.appendChild(debugBtn);
         }
       } catch (err) {
         console.error(`🔍 H2 - ERRO ao carregar contagem da lista ${lista.name}:`, err);
@@ -884,6 +905,144 @@ window.criarNovaRecompensa = function(type) {
   // Abre página de criação de recompensa em nova aba
   window.open('rewards-form.html', '_blank');
 };
+
+// 🔧 FUNÇÕES DE DEBUG PARA INVESTIGAR PROBLEMA BACKEND
+window.debugBackendData = async function() {
+  const clientId = localStorage.getItem('clientId');
+  const token = localStorage.getItem('clientToken');
+  
+  console.log('🔍 DEBUG - Investigando dados do backend...');
+  
+  try {
+    // 1. Verificar endpoint debug de participantes
+    const debugResp = await fetch(`${getApiUrl()}/participants/debug`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (debugResp.ok) {
+      const debugData = await debugResp.json();
+      console.log('🔍 DEBUG - Dados do backend:', debugData);
+      
+      // 2. Verificar se há participantes que deveriam estar na lista vazia
+      if (window.emptyListDetected) {
+        console.log('🔍 DEBUG - Lista vazia detectada:', window.emptyListDetected);
+        
+        // 3. Verificar participantes específicos deste cliente
+        const participantsResp = await fetch(`${getApiUrl()}/participants?limit=100`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (participantsResp.ok) {
+          const participantsData = await participantsResp.json();
+          console.log('🔍 DEBUG - Participantes do cliente:', participantsData);
+          
+          const participantsCount = participantsData.participants?.length || 0;
+          
+          if (participantsCount > 0) {
+            console.log('🚨 PROBLEMA CONFIRMADO: Existem', participantsCount, 'participantes mas a lista está vazia!');
+            
+            if (confirm(`PROBLEMA DETECTADO!\n\nExistem ${participantsCount} participantes no banco mas a lista "${window.emptyListDetected.name}" está vazia.\n\nDeseja tentar corrigir automaticamente?`)) {
+              await fixListSynchronization(window.emptyListDetected.id, participantsData.participants);
+            }
+          } else {
+            alert('DEBUG: Não há participantes para este cliente. A lista está vazia porque realmente não há dados.');
+          }
+        }
+      } else {
+        alert('DEBUG: Dados obtidos - verifique o console para detalhes.');
+      }
+    } else {
+      console.error('🚨 DEBUG - Erro ao acessar endpoint debug:', debugResp.status);
+      alert('Erro ao acessar endpoint de debug. Verifique console.');
+    }
+  } catch (error) {
+    console.error('🚨 DEBUG - Erro na investigação:', error);
+    alert('Erro na investigação: ' + error.message);
+  }
+};
+
+window.debugSpecificList = async function(listId, listName) {
+  console.log(`🔍 DEBUG - Investigando lista específica: ${listName} (${listId})`);
+  
+  const token = localStorage.getItem('clientToken');
+  
+  try {
+    // 1. Verificar detalhes da lista
+    const listResp = await fetch(`${getApiUrl()}/participant-lists/${listId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (listResp.ok) {
+      const listData = await listResp.json();
+      console.log('🔍 DEBUG - Detalhes da lista:', listData);
+    }
+    
+    // 2. Verificar contagem via endpoint específico
+    const countResp = await fetch(`${getApiUrl()}/participant-lists/${listId}/participants/count`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (countResp.ok) {
+      const countData = await countResp.json();
+      console.log('🔍 DEBUG - Contagem via endpoint:', countData);
+    }
+    
+    // 3. Buscar todos os participantes do cliente
+    const participantsResp = await fetch(`${getApiUrl()}/participants?limit=100`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (participantsResp.ok) {
+      const participantsData = await participantsResp.json();
+      console.log('🔍 DEBUG - Participantes do cliente:', participantsData.participants?.length || 0);
+      
+      if (participantsData.participants?.length > 0) {
+        if (confirm(`Lista "${listName}" está vazia mas existem ${participantsData.participants.length} participantes.\n\nDeseja tentar associar os participantes a esta lista?`)) {
+          await fixListSynchronization(listId, participantsData.participants);
+        }
+      }
+    }
+    
+  } catch (error) {
+    console.error('🚨 DEBUG - Erro na investigação da lista:', error);
+    alert('Erro na investigação: ' + error.message);
+  }
+};
+
+async function fixListSynchronization(listId, participants) {
+  console.log('🔧 CORREÇÃO - Tentando corrigir sincronização da lista:', listId);
+  
+  const token = localStorage.getItem('clientToken');
+  
+  try {
+    // Para cada participante, tentar associar à lista
+    for (const participant of participants) {
+      try {
+        const resp = await fetch(`${getApiUrl()}/participants/${participant._id}/add-to-list/${listId}`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (resp.ok) {
+          console.log(`✅ Participante ${participant.name} associado à lista`);
+        } else {
+          console.error(`❌ Erro ao associar ${participant.name}:`, resp.status);
+        }
+      } catch (error) {
+        console.error(`❌ Erro ao associar ${participant.name}:`, error);
+      }
+    }
+    
+    alert('Correção tentada! Recarregue a página para ver se a lista agora tem participantes.');
+    
+    // Recarregar as listas
+    renderListasParticipantes();
+    
+  } catch (error) {
+    console.error('🚨 CORREÇÃO - Erro ao corrigir sincronização:', error);
+    alert('Erro na correção: ' + error.message);
+  }
+}
 
 // Inicialização
 window.onload = function() {
