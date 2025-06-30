@@ -195,7 +195,7 @@ class DataAdapter {
         return null;
     }
 
-    generateReferralLink(participant) {
+    static generateReferralLink(participant) {
         // 🌍 URL DINÂMICA PARA LINKS DE INDICAÇÃO
         const baseUrl = window.location.hostname === 'localhost' ? 
                        'http://localhost:3000/indicacao' : 
@@ -203,7 +203,7 @@ class DataAdapter {
         return `${baseUrl}/${participant.uniqueReferralCode}`;
     }
 
-    generateShareLink(participant) {
+    static generateShareLink(participant) {
         // 🌍 URL DINÂMICA PARA LINKS DE COMPARTILHAMENTO
         const baseUrl = window.location.hostname === 'localhost' ? 
                        'http://localhost:3000/indicacao' : 
