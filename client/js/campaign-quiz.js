@@ -19,6 +19,8 @@ let selectedRewardOnReferral = null;
 let selectedRewardOnConversion = null;
 
 function showStep(step) {
+  console.log('🔍 H4 - showStep chamado:', step, 'selectedSourceType:', selectedSourceType);
+  
   // Oculta todas as etapas
   const steps = document.querySelectorAll('.quiz-step');
   steps.forEach((el) => (el.style.display = 'none'));
@@ -65,6 +67,7 @@ function showStep(step) {
   }
 
   if (step === 3 && selectedSourceType === 'list') {
+    console.log('🔍 H3 - Entrando no step 3 com sourceType = list');
     renderListasParticipantes();
     setupUploadLista();
     validarListaSelecionada();
@@ -351,14 +354,35 @@ let selectedListaId = null;
 async function fetchListasParticipantes() {
   const clientId = localStorage.getItem('clientId');
   const token = localStorage.getItem('clientToken');
+  
+  // 🔍 H1 - LOG DE DEPURAÇÃO
+  console.log('🔍 H1 - fetchListasParticipantes iniciada');
+  console.log('🔍 H1 - clientId:', clientId);
+  console.log('🔍 H1 - token presente:', !!token);
+  
   if (!clientId || !token) {
+    console.log('🔍 H1 - ERRO: clientId ou token ausente');
     return [];
   }
+  
   try {
-    const response = await fetch(`${getApiUrl()}/participant-lists?clientId=${clientId}`, {
+    const url = `${getApiUrl()}/participant-lists?clientId=${clientId}`;
+    console.log('🔍 H1 - URL da requisição:', url);
+    
+    const response = await fetch(url, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
+    
+    console.log('🔍 H1 - Status da resposta:', response.status);
+    
+    if (!response.ok) {
+      console.error('🔍 H1 - ERRO: Resposta não ok:', response.status, response.statusText);
+      return [];
+    }
+    
     const data = await response.json();
+    console.log('🔍 H1 - Dados brutos do backend:', data);
+    
     let listas = [];
     if (Array.isArray(data)) {
       listas = data;
@@ -366,11 +390,33 @@ async function fetchListasParticipantes() {
       listas = data.data;
     }
     
-    // Filtro: só listas com participantes
-    const filtradas = listas.filter(l => Array.isArray(l.participants) && l.participants.length > 0);
+    console.log('🔍 H1 - Total de listas encontradas:', listas.length);
+    console.log('🔍 H1 - Detalhes das listas:', listas.map(l => ({
+      id: l._id,
+      name: l.name,
+      tipo: l.tipo,
+      participantsLength: l.participants?.length || 0,
+      hasParticipants: Array.isArray(l.participants),
+      createdAt: l.createdAt
+    })));
+    
+    // ✅ FILTRO CORRETO: tipo "participante" E com participantes ativos
+    const filtradas = listas.filter(l => 
+      l.tipo === 'participante' && 
+      Array.isArray(l.participants) && 
+      l.participants.length > 0
+    );
+    console.log('🔍 H1 - Listas após filtro (tipo participante + com participantes):', filtradas.length);
+    console.log('🔍 H1 - Listas filtradas:', filtradas.map(l => ({
+      id: l._id,
+      name: l.name,
+      tipo: l.tipo,
+      participantsLength: l.participants?.length || 0
+    })));
+    
     return filtradas;
   } catch (err) {
-    console.error('Erro ao buscar listas:', err);
+    console.error('🔍 H1 - ERRO na requisição:', err);
     return [];
   }
 }
@@ -380,8 +426,11 @@ function renderListasParticipantes() {
   container.innerHTML = '<div class="text-gray-400">Carregando listas...</div>';
   fetchListasParticipantes().then(async listas => {
     window.listasParticipantes = listas; // Salva os dados globalmente
+    
+    console.log('🔍 H2 - renderListasParticipantes - Total de listas:', listas.length);
+    
     if (!listas.length) {
-      container.innerHTML = '<div class="text-gray-400">Nenhuma lista encontrada.</div>';
+      container.innerHTML = '<div class="text-gray-400">Nenhuma lista de participantes com participantes ativos encontrada. Crie uma nova lista abaixo.</div>';
       return;
     }
     container.innerHTML = '';
@@ -408,7 +457,10 @@ function renderListasParticipantes() {
         const data = await resp.json();
         const count = data.count ?? 0;
         document.getElementById(`count-${lista._id}`).textContent = `(${count} participante${count !== 1 ? 's' : ''})`;
+        
+        console.log(`🔍 H2 - Lista "${lista.name}": ${count} participantes`);
       } catch (err) {
+        console.error(`🔍 H2 - ERRO ao carregar contagem da lista ${lista.name}:`, err);
         document.getElementById(`count-${lista._id}`).textContent = '(erro ao carregar)';
       }
     }
@@ -805,6 +857,7 @@ window.criarNovaRecompensa = function(type) {
 
 // Inicialização
 window.onload = function() {
+  console.log('🔍 H5 - window.onload executado, currentStep:', currentStep);
   showStep(currentStep);
 };
 
