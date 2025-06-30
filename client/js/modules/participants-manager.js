@@ -303,14 +303,22 @@ class ParticipantsManager {
             return '<span class="text-gray-500">Nenhuma lista</span>';
         }
 
-        const count = participant.lists.length;
-        return `
-            <button onclick="participantsManager.showParticipantLists('${participant.id}')" 
-                    class="text-blue-400 hover:text-blue-300 text-sm">
-                ${count} lista${count !== 1 ? 's' : ''}
-                <i class="fas fa-external-link-alt ml-1 text-xs"></i>
-            </button>
-        `;
+        // Exibir nomes das listas diretamente
+        const listNames = participant.lists.map(list => {
+            if (typeof list === 'object' && list.name) {
+                return list.name;
+            }
+            return 'Lista sem nome';
+        });
+
+        if (listNames.length === 1) {
+            return `<span class="text-gray-300">${listNames[0]}</span>`;
+        } else {
+            return `<div class="text-gray-300">
+                ${listNames.slice(0, 2).map(name => `<div class="text-xs">${name}</div>`).join('')}
+                ${listNames.length > 2 ? `<div class="text-xs text-gray-500">+${listNames.length - 2} mais</div>` : ''}
+            </div>`;
+        }
     }
 
     // 🔗 FORMATAÇÃO DE LINK PARA EXIBIÇÃO
