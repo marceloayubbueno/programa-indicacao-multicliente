@@ -166,14 +166,6 @@ function initializeManagers() {
                                 <i class="fas fa-users mr-1"></i>
                                 ${participantCount}
                             </span>
-                            ${participantCount > 0 ? 
-                                `<button onclick="viewListParticipants('${list._id}', '${list.name.replace(/'/g, '\\\'')}')" 
-                                         class="text-blue-400 hover:text-blue-300 transition-colors text-xs" 
-                                         title="Ver participantes">
-                                    <i class="fas fa-eye"></i>
-                                </button>` : 
-                                ''
-                            }
                         </div>
                     </td>
                     <td class="px-4 py-3">
