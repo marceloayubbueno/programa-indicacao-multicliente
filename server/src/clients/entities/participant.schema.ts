@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Schema({ timestamps: true })
 export class Participant extends Document {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: false })
   participantId: string;
 
   @Prop({ required: true })
@@ -97,6 +97,9 @@ export class Participant extends Document {
 
   @Prop({ required: false })
   campaignName?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Participant', required: false })
+  originalParticipantId?: Types.ObjectId;
 }
 
 export const ParticipantSchema = SchemaFactory.createForClass(Participant);
@@ -109,6 +112,8 @@ ParticipantSchema.index({ email: 1, clientId: 1 });
 ParticipantSchema.index({ totalIndicacoes: -1 });
 ParticipantSchema.index({ createdAt: -1 });
 ParticipantSchema.index({ uniqueReferralCode: 1 });
+ParticipantSchema.index({ originalParticipantId: 1 });
+ParticipantSchema.index({ email: 1, clientId: 1, campaignId: 1 });
 
 function generateUniqueReferralCode(): string {
   const timestamp = Date.now().toString(36);

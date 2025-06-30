@@ -407,9 +407,9 @@ async function fetchListasParticipantes() {
       });
     });
     
-    // 🔍 DIAGNÓSTICO: Vamos ver cada condição separadamente
+    // 🔍 DIAGNÓSTICO: Vamos ver cada condição separadamente  
     listas.forEach((lista, index) => {
-      const tipoOk = lista.tipo === 'participante';
+      const tipoOk = ['participante', 'indicador', 'mista'].includes(lista.tipo);
       const isArray = Array.isArray(lista.participants);
       const hasLength = lista.participants && lista.participants.length > 0;
       
@@ -423,13 +423,12 @@ async function fetchListasParticipantes() {
         passaFiltro: tipoOk && isArray && hasLength
       });
       
-      // 🚨 PROBLEMA IDENTIFICADO: Lista vazia quando deveria ter participantes
+      // 🔍 INFO: Lista pode ser reutilizada agora com duplicação real
       if (tipoOk && isArray && !hasLength) {
-        console.error(`🚨 PROBLEMA: Lista "${lista.name}" tem tipo correto mas está VAZIA!`);
-        console.error('🚨 Isso indica problema na sincronização lista ↔ participantes no backend');
-        console.error('🚨 Lista ID:', lista._id, 'Client ID:', lista.clientId);
+        console.warn(`⚠️ Lista "${lista.name}" está vazia mas será aceita se tiver participantes`);
+        console.log('ℹ️ Com duplicação real, listas podem ser reutilizadas em múltiplas campanhas');
         
-        // 🔧 Adicionar informação para debug
+        // 🔧 Manter informação para debug se necessário
         window.emptyListDetected = {
           id: lista._id,
           name: lista.name,
@@ -438,15 +437,15 @@ async function fetchListasParticipantes() {
       }
     });
     
-    // ✅ FILTRO DEFINITIVO: Listas do tipo "participante" COM participantes ativos
-    // Backend foi corrigido para sincronizar automaticamente participantes órfãos
+    // ✅ NOVO FILTRO FLEXÍVEL: Aceita listas com participantes OU indicadores
+    // Permitir reutilização de listas em múltiplas campanhas (duplicação real implementada)
     const filtradas = listas.filter(l => 
-      l.tipo === 'participante' && 
+      (l.tipo === 'participante' || l.tipo === 'indicador' || l.tipo === 'mista') && 
       Array.isArray(l.participants) && 
       l.participants.length > 0
     );
-    console.log('🔍 H1 - Listas após filtro (tipo participante + com participantes):', filtradas.length);
-    console.log('✅ H1 - CORREÇÃO DEFINITIVA: Backend auto-sincroniza participantes órfãos');
+    console.log('🔍 H1 - Listas após filtro (qualquer tipo + com participantes):', filtradas.length);
+    console.log('✅ H1 - DUPLICAÇÃO REAL: Sistema agora duplica participantes para permitir múltiplas campanhas');
     
     return filtradas;
   } catch (err) {

@@ -110,24 +110,17 @@ export class CampaignsService {
           console.log('[H3] DIAGNÓSTICO - Lista duplicada ID:', duplicatedList._id);
           console.log('[CREATE-CAMPAIGN] ✅ Lista duplicada:', duplicatedList._id);
           
-          // 2. Transformar participantes em indicadores
-          const participantIds = (duplicatedList.participants || []).map(p => p.toString());
-          console.log('[H3] DIAGNÓSTICO - IDs para transformação:', { 
-            participantIds: participantIds.slice(0, 3), // Primeiros 3 para debug
-            totalCount: participantIds.length 
+          // 2. ✅ NOVA IMPLEMENTAÇÃO: Participantes já foram duplicados como indicadores
+          const newIndicatorsCount = duplicatedList.participants?.length || 0;
+          console.log('[H3] REAL-DUPLICATION - Novos indicadores criados:', { 
+            count: newIndicatorsCount,
+            listId: duplicatedList._id
           });
           
-          if (participantIds.length > 0) {
-            const transformResult = await this.participantsService.transformToIndicators(
-              participantIds,
-              campaignId.toString(),
-              campaignName
-            );
-            
-            console.log('[H3] DIAGNÓSTICO - Resultado transformação:', transformResult);
-            console.log('[CREATE-CAMPAIGN] ✅ Participantes transformados:', transformResult.modifiedCount);
+          if (newIndicatorsCount > 0) {
+            console.log('[CREATE-CAMPAIGN] ✅ Novos participantes indicadores criados:', newIndicatorsCount);
           } else {
-            console.log('[H3] DIAGNÓSTICO - Nenhum participante para transformar - lista vazia');
+            console.log('[H3] REAL-DUPLICATION - Nenhum indicador criado - lista original estava vazia');
           }
           
           // 3. Atualizar a campanha com o ID da nova lista
