@@ -75,11 +75,25 @@ export class CampaignsService {
       // Processar diferentes tipos de campanha
       
       if (data.type === CAMPAIGN_TYPES.LISTA_PARTICIPANTES && data.selectedParticipantListId) {
+        console.log('[H3] DIAGNÓSTICO - Início criação campanha:', { 
+          type: data.type, 
+          selectedParticipantListId: data.selectedParticipantListId,
+          campaignId: campaignId.toString(),
+          campaignName: campaignName
+        });
+        
         // Buscar a lista de participantes
         const participantList = await this.participantListsService.findById(data.selectedParticipantListId);
         if (!participantList) {
+          console.error('[H3] DIAGNÓSTICO - ERRO: Lista de participantes não encontrada');
           throw new BadRequestException('Lista de participantes não encontrada');
         }
+
+        console.log('[H3] DIAGNÓSTICO - Lista original encontrada:', {
+          id: participantList._id,
+          name: participantList.name,
+          participantsCount: participantList.participants?.length || 0
+        });
 
         // 🚀 IMPLEMENTAÇÃO: Duplicar lista e transformar participantes em indicadores
         console.log('[CREATE-CAMPAIGN] 🚀 Duplicando lista e transformando participantes em indicadores...');
@@ -93,10 +107,16 @@ export class CampaignsService {
             data.clientId
           );
           
+          console.log('[H3] DIAGNÓSTICO - Lista duplicada ID:', duplicatedList._id);
           console.log('[CREATE-CAMPAIGN] ✅ Lista duplicada:', duplicatedList._id);
           
           // 2. Transformar participantes em indicadores
           const participantIds = (duplicatedList.participants || []).map(p => p.toString());
+          console.log('[H3] DIAGNÓSTICO - IDs para transformação:', { 
+            participantIds: participantIds.slice(0, 3), // Primeiros 3 para debug
+            totalCount: participantIds.length 
+          });
+          
           if (participantIds.length > 0) {
             const transformResult = await this.participantsService.transformToIndicators(
               participantIds,
@@ -104,7 +124,10 @@ export class CampaignsService {
               campaignName
             );
             
+            console.log('[H3] DIAGNÓSTICO - Resultado transformação:', transformResult);
             console.log('[CREATE-CAMPAIGN] ✅ Participantes transformados:', transformResult.modifiedCount);
+          } else {
+            console.log('[H3] DIAGNÓSTICO - Nenhum participante para transformar - lista vazia');
           }
           
           // 3. Atualizar a campanha com o ID da nova lista
@@ -113,9 +136,14 @@ export class CampaignsService {
           participantListId: participantListId
         });
 
+          console.log('[H3] DIAGNÓSTICO - Campanha atualizada com lista ID:', participantListId);
           console.log('[CREATE-CAMPAIGN] ✅ Campanha atualizada com nova lista de indicadores:', participantListId);
           
         } catch (error) {
+          console.error('[H3] DIAGNÓSTICO - ERRO na duplicação/transformação:', { 
+            error: error.message, 
+            stack: error.stack 
+          });
           console.error('[CREATE-CAMPAIGN] ❌ Erro na duplicação/transformação:', error.message);
           throw new BadRequestException('Erro ao processar lista de participantes: ' + error.message);
         }

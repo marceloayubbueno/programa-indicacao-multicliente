@@ -164,6 +164,22 @@ class APIClient {
 
         const data = await this.request(url);
         
+        // 🔍 H4 - DIAGNÓSTICO FILTROS E REQUISIÇÃO
+        console.log('[H4] DIAGNÓSTICO - Filtros aplicados:', filters);
+        console.log('[H4] DIAGNÓSTICO - URL requisição:', url);
+        console.log('[H4] DIAGNÓSTICO - Dados recebidos backend:', { 
+            total: data.total, 
+            participantsCount: data.participants?.length || 0,
+            hasParticipants: (data.participants?.length || 0) > 0
+        });
+        console.log('[H4] DIAGNÓSTICO - Indicadores na resposta:', data.participants?.filter(p => p.tipo === 'indicador').length || 0);
+        console.log('[H4] DIAGNÓSTICO - Participantes por tipo:', {
+            participante: data.participants?.filter(p => p.tipo === 'participante').length || 0,
+            indicador: data.participants?.filter(p => p.tipo === 'indicador').length || 0,
+            influenciador: data.participants?.filter(p => p.tipo === 'influenciador').length || 0,
+            undefined: data.participants?.filter(p => !p.tipo).length || 0
+        });
+        
         // 🔍 DEBUG H3 - API Response
         console.log('🔍 DEBUG H3 - API Response raw:', data);
         console.log('🔍 DEBUG H3 - Total participants returned:', data.participants?.length);

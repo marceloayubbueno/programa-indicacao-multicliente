@@ -322,15 +322,23 @@ export class ParticipantListsService {
    * Duplica uma lista de participantes para uma campanha, criando lista de indicadores
    */
   async duplicateListForCampaign(originalListId: string, campaignId: string, campaignName: string, clientId: string): Promise<ParticipantList> {
+    console.log('[H2] DIAGNÓSTICO - Duplicação iniciada:', { originalListId, campaignId, campaignName, clientId });
     console.log('[DUPLICATE-LIST] Duplicando lista para campanha...');
     console.log('[DUPLICATE-LIST] originalListId:', originalListId, 'campaignId:', campaignId);
     
     // Buscar a lista original
     const originalList = await this.participantListModel.findById(originalListId);
     if (!originalList) {
+      console.error('[H2] DIAGNÓSTICO - ERRO: Lista original não encontrada');
       throw new Error('Lista original não encontrada');
     }
     
+    console.log('[H2] DIAGNÓSTICO - Lista original:', { 
+      id: originalListId, 
+      name: originalList.name,
+      participantsCount: originalList.participants?.length || 0,
+      participantsIds: originalList.participants?.slice(0, 3) || [] // Primeiros 3 IDs para debug
+    });
     console.log('[DUPLICATE-LIST] Lista original encontrada:', originalList.name, 'com', originalList.participants?.length || 0, 'participantes');
     
     // Criar nova lista de indicadores
@@ -344,23 +352,51 @@ export class ParticipantListsService {
       campaignName: campaignName,
     };
     
+    console.log('[H2] DIAGNÓSTICO - Dados da lista duplicada antes de salvar:', {
+      name: duplicatedListData.name,
+      participantsCount: duplicatedListData.participants.length,
+      tipo: duplicatedListData.tipo,
+      campaignId: duplicatedListData.campaignId
+    });
+    
     const duplicatedList = new this.participantListModel(duplicatedListData);
     const savedList = await duplicatedList.save();
+    
+    console.log('[H2] DIAGNÓSTICO - Lista duplicada criada:', { 
+      id: savedList._id, 
+      name: savedList.name,
+      participantsCount: savedList.participants?.length || 0,
+      tipo: savedList.tipo,
+      campaignId: savedList.campaignId
+    });
     
     // Atualizar o campo 'lists' dos participantes para incluir a nova lista
     if (savedList.participants && savedList.participants.length > 0) {
       const participantIds = savedList.participants.map(id => new Types.ObjectId(id));
       console.log('[DUPLICATE-LIST] Atualizando', participantIds.length, 'participantes com nova lista');
+      console.log('[H2] DIAGNÓSTICO - IDs participantes para atualizar:', participantIds.slice(0, 3)); // Primeiros 3 para debug
       
       const updateResult = await this.participantModel.updateMany(
         { _id: { $in: participantIds } },
         { $addToSet: { lists: savedList._id } }
       );
       
+      console.log('[H2] DIAGNÓSTICO - UpdateMany resultado:', {
+        matchedCount: updateResult.matchedCount,
+        modifiedCount: updateResult.modifiedCount,
+        participantIdsCount: participantIds.length
+      });
       console.log('[DUPLICATE-LIST] ✅ Participantes atualizados:', updateResult.modifiedCount);
+    } else {
+      console.log('[H2] DIAGNÓSTICO - Lista sem participantes - nenhuma atualização necessária');
     }
     
     console.log('[DUPLICATE-LIST] ✅ Lista duplicada com sucesso:', savedList._id);
+    console.log('[H2] DIAGNÓSTICO - Resultado final duplicação:', { 
+      listaOriginalId: originalListId,
+      listaDuplicadaId: savedList._id,
+      participantesCopiados: savedList.participants?.length || 0
+    });
     return savedList;
   }
 } 

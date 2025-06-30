@@ -626,13 +626,17 @@ export class ParticipantsService {
   }
 
   async transformToIndicators(participantIds: string[], campaignId: string, campaignName: string) {
+    console.log('[H1] DIAGNÓSTICO - Transformação iniciada:', { participantIds, campaignId, campaignName });
     console.log('[PARTICIPANTS-SERVICE] Transformando', participantIds.length, 'participantes em indicadores...');
     
     // Verificar se os participantes existem
     const existingParticipants = await this.participantModel.find({ _id: { $in: participantIds } });
     
+    console.log('[H1] DIAGNÓSTICO - Participantes encontrados:', existingParticipants.length);
+    
     if (existingParticipants.length === 0) {
       console.error('[PARTICIPANTS-SERVICE] ❌ Nenhum participante encontrado com os IDs fornecidos!');
+      console.error('[H1] DIAGNÓSTICO - ERRO: Nenhum participante encontrado para transformar');
       return { modifiedCount: 0, matchedCount: 0 };
     }
     
@@ -643,6 +647,14 @@ export class ParticipantsService {
     
     for (const participant of existingParticipants) {
       try {
+        const beforeTransform = {
+          id: participant._id,
+          name: participant.name,
+          tipo: participant.tipo,
+          codigo: participant.uniqueReferralCode,
+          campaignId: participant.campaignId
+        };
+        
         participant.tipo = 'indicador';
         participant.campaignId = new Types.ObjectId(campaignId);
         participant.campaignName = campaignName;
@@ -653,13 +665,25 @@ export class ParticipantsService {
         await participant.save();
         modifiedCount++;
         
+        console.log('[H1] DIAGNÓSTICO - Participante ANTES da transformação:', beforeTransform);
+        console.log('[H1] DIAGNÓSTICO - Participante APÓS transformação:', { 
+          id: participant._id, 
+          name: participant.name, 
+          tipo: participant.tipo, 
+          codigo: participant.uniqueReferralCode,
+          campaignId: participant.campaignId,
+          campaignName: participant.campaignName
+        });
+        
         console.log(`[PARTICIPANTS-SERVICE] ✅ ${participant.name} transformado - Código: ${participant.uniqueReferralCode}`);
       } catch (error) {
         console.error(`[PARTICIPANTS-SERVICE] ❌ Erro ao transformar ${participant.name}:`, error);
+        console.error('[H1] DIAGNÓSTICO - ERRO na transformação:', { participantName: participant.name, error: error.message });
       }
     }
     
     console.log(`[PARTICIPANTS-SERVICE] ✅ ${modifiedCount} participantes transformados em indicadores com códigos gerados`);
+    console.log('[H1] DIAGNÓSTICO - Resultado final transformação:', { modifiedCount, matchedCount: existingParticipants.length });
     
     return { modifiedCount, matchedCount: existingParticipants.length };
   }

@@ -135,6 +135,19 @@ class ParticipantsManager {
 
     // 🎨 EXIBIÇÃO DE PARTICIPANTES
     displayParticipants() {
+        console.log('[H5] DIAGNÓSTICO - Participantes para exibir:', this.participants.length);
+        console.log('[H5] DIAGNÓSTICO - Indicadores para exibir:', this.participants.filter(p => p.tipo === 'indicador').length);
+        console.log('[H5] DIAGNÓSTICO - Filtros ativos:', this.currentFilters);
+        console.log('[H5] DIAGNÓSTICO - Breakdown por tipo:', {
+            participante: this.participants.filter(p => p.tipo === 'participante').length,
+            indicador: this.participants.filter(p => p.tipo === 'indicador').length,
+            influenciador: this.participants.filter(p => p.tipo === 'influenciador').length,
+            undefined: this.participants.filter(p => !p.tipo).length
+        });
+        console.log('[H5] DIAGNÓSTICO - Indicadores com códigos:', this.participants.filter(p => 
+            p.tipo === 'indicador' && p.uniqueReferralCode
+        ).length);
+        
         // 🔍 H4 - DIAGNÓSTICO EXIBIÇÃO
         console.log('🔍 H4 - Iniciando exibição de participantes');
         console.log('🔍 H4 - Participantes para exibir:', this.participants.length);
