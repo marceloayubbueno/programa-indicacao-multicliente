@@ -614,8 +614,10 @@ function resetQuiz() {
          rewardProduct.value = '';
          rewardProduct.required = false; // Garantir que required seja removido
     }
-    document.getElementById('rewardTypeSelect').style.display = 'none';
-    document.getElementById('rewardProductGroup').style.display = 'none';
+    const rewardTypeSelect = document.getElementById('rewardTypeSelect');
+    const rewardProductGroup = document.getElementById('rewardProductGroup');
+    if (rewardTypeSelect) rewardTypeSelect.style.display = 'none';
+    if (rewardProductGroup) rewardProductGroup.style.display = 'none';
 
     // Resetar contador de listas
     updateSelectedListsCount();
@@ -2156,16 +2158,26 @@ function loadAvailableFields() {
 }
 
 // Event listener para mostrar/esconder opções de campo
-document.getElementById('fieldType').addEventListener('change', function() {
-    const optionsGroup = document.getElementById('optionsGroup');
-    const showOptions = ['select', 'checkbox', 'radio'].includes(this.value);
-    optionsGroup.style.display = showOptions ? 'block' : 'none';
-});
+const fieldTypeElement = document.getElementById('fieldType');
+if (fieldTypeElement) {
+    fieldTypeElement.addEventListener('change', function() {
+        const optionsGroup = document.getElementById('optionsGroup');
+        if (optionsGroup) {
+            const showOptions = ['select', 'checkbox', 'radio'].includes(this.value);
+            optionsGroup.style.display = showOptions ? 'block' : 'none';
+        }
+    });
+}
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    loadTemplates();
-    loadFields();
+    // Verificar se estamos na página correta antes de executar funções específicas
+    if (document.querySelector('.templates-grid')) {
+        loadTemplates();
+    }
+    if (document.querySelector('.fields-list')) {
+        loadFields();
+    }
 });
 
 function showShareLinks() {
