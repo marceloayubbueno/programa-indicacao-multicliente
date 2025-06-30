@@ -75,30 +75,45 @@ export class CampaignsService {
       // Processar diferentes tipos de campanha
       
       if (data.type === CAMPAIGN_TYPES.LISTA_PARTICIPANTES && data.selectedParticipantListId) {
-        console.log('[H3] DIAGNÓSTICO - Início criação campanha:', { 
+        console.log('\n🎯 === INÍCIO CRIAÇÃO CAMPANHA COM LISTA ===');
+        console.log('[H3] CAMPAIGN-DEBUG - Dados da campanha:', { 
           type: data.type, 
           selectedParticipantListId: data.selectedParticipantListId,
           campaignId: campaignId.toString(),
-          campaignName: campaignName
+          campaignName: campaignName,
+          clientId: data.clientId,
+          timestamp: new Date().toISOString()
         });
         
         // Buscar a lista de participantes
+        console.log('[CAMPAIGN-DEBUG] 🔍 Buscando lista com ID:', data.selectedParticipantListId);
         const participantList = await this.participantListsService.findById(data.selectedParticipantListId);
         if (!participantList) {
-          console.error('[H3] DIAGNÓSTICO - ERRO: Lista de participantes não encontrada');
+          console.error('❌ [H3] CAMPAIGN-DEBUG - ERRO: Lista de participantes não encontrada');
+          console.error('[CAMPAIGN-DEBUG] ID que falhou:', data.selectedParticipantListId);
           throw new BadRequestException('Lista de participantes não encontrada');
         }
 
-        console.log('[H3] DIAGNÓSTICO - Lista original encontrada:', {
+        console.log('✅ [CAMPAIGN-DEBUG] Lista original encontrada:', {
           id: participantList._id,
           name: participantList.name,
-          participantsCount: participantList.participants?.length || 0
+          tipo: participantList.tipo,
+          participantsCount: participantList.participants?.length || 0,
+          clientId: participantList.clientId
         });
 
-        // 🚀 IMPLEMENTAÇÃO: Duplicar lista e transformar participantes em indicadores
-        console.log('[CREATE-CAMPAIGN] 🚀 Duplicando lista e transformando participantes em indicadores...');
+        // 🚀 IMPLEMENTAÇÃO: Duplicar lista e criar novos participantes indicadores
+        console.log('\n🚀 [CREATE-CAMPAIGN] Iniciando duplicação REAL de participantes...');
+        console.log('[CAMPAIGN-DEBUG] Parâmetros para duplicação:', {
+          originalListId: data.selectedParticipantListId,
+          campaignId: campaignId.toString(),
+          campaignName: campaignName,
+          clientId: data.clientId
+        });
         
         try {
+          console.log('[CAMPAIGN-DEBUG] 📞 Chamando duplicateListForCampaign...');
+          
           // 1. Duplicar a lista criando nova lista de indicadores
           const duplicatedList = await this.participantListsService.duplicateListForCampaign(
             data.selectedParticipantListId,
@@ -107,20 +122,27 @@ export class CampaignsService {
             data.clientId
           );
           
-          console.log('[H3] DIAGNÓSTICO - Lista duplicada ID:', duplicatedList._id);
-          console.log('[CREATE-CAMPAIGN] ✅ Lista duplicada:', duplicatedList._id);
+          console.log('🎉 [CAMPAIGN-DEBUG] duplicateListForCampaign retornou:', {
+            listId: duplicatedList._id,
+            listName: duplicatedList.name,
+            participantsCount: duplicatedList.participants?.length || 0,
+            participants: duplicatedList.participants
+          });
           
-          // 2. ✅ NOVA IMPLEMENTAÇÃO: Participantes já foram duplicados como indicadores
+          // 2. ✅ VERIFICAR RESULTADO DA DUPLICAÇÃO
           const newIndicatorsCount = duplicatedList.participants?.length || 0;
-          console.log('[H3] REAL-DUPLICATION - Novos indicadores criados:', { 
-            count: newIndicatorsCount,
-            listId: duplicatedList._id
+          console.log('[CAMPAIGN-DEBUG] ✅ Resultado da duplicação:', { 
+            listaDuplicadaId: duplicatedList._id,
+            listaDuplicadaNome: duplicatedList.name,
+            novosIndicadoresCriados: newIndicatorsCount,
+            idsNovosIndicadores: duplicatedList.participants,
+            sucessoCompleto: newIndicatorsCount > 0
           });
           
           if (newIndicatorsCount > 0) {
-            console.log('[CREATE-CAMPAIGN] ✅ Novos participantes indicadores criados:', newIndicatorsCount);
+            console.log('🎉 [CREATE-CAMPAIGN] ✅ Sucesso! Novos indicadores criados:', newIndicatorsCount);
           } else {
-            console.log('[H3] REAL-DUPLICATION - Nenhum indicador criado - lista original estava vazia');
+            console.error('🚨 [CREATE-CAMPAIGN] ❌ PROBLEMA: Nenhum indicador foi criado!');
           }
           
           // 3. Atualizar a campanha com o ID da nova lista
@@ -129,17 +151,21 @@ export class CampaignsService {
           participantListId: participantListId
         });
 
-          console.log('[H3] DIAGNÓSTICO - Campanha atualizada com lista ID:', participantListId);
-          console.log('[CREATE-CAMPAIGN] ✅ Campanha atualizada com nova lista de indicadores:', participantListId);
+          console.log('[CAMPAIGN-DEBUG] ✅ Campanha atualizada com nova lista:', participantListId);
           
         } catch (error) {
-          console.error('[H3] DIAGNÓSTICO - ERRO na duplicação/transformação:', { 
+          console.error('💥 [H3] CAMPAIGN-DEBUG - ERRO CRÍTICO na duplicação:', { 
             error: error.message, 
-            stack: error.stack 
+            stack: error.stack,
+            originalListId: data.selectedParticipantListId,
+            campaignId: campaignId.toString(),
+            campaignName: campaignName
           });
-          console.error('[CREATE-CAMPAIGN] ❌ Erro na duplicação/transformação:', error.message);
+          console.error('❌ [CREATE-CAMPAIGN] Falha na duplicação REAL:', error.message);
           throw new BadRequestException('Erro ao processar lista de participantes: ' + error.message);
         }
+        
+        console.log('🎯 === FIM CRIAÇÃO CAMPANHA COM LISTA ===\n');
       }
 
       // 🆕 NOVA FUNCIONALIDADE: Criar lista vazia de indicadores para LP de Indicadores

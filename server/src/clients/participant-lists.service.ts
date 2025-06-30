@@ -322,38 +322,67 @@ export class ParticipantListsService {
    * Duplica uma lista de participantes para uma campanha, criando lista de indicadores com participantes duplicados
    */
   async duplicateListForCampaign(originalListId: string, campaignId: string, campaignName: string, clientId: string): Promise<ParticipantList> {
-    console.log('[H2] REAL-DUPLICATION - Duplicação REAL iniciada:', { originalListId, campaignId, campaignName, clientId });
+    console.log('\n🚀=== INÍCIO DUPLICAÇÃO REAL ===');
+    console.log('[H2] REAL-DUPLICATION - Parâmetros recebidos:', { 
+      originalListId, 
+      campaignId, 
+      campaignName, 
+      clientId,
+      timestamp: new Date().toISOString()
+    });
     console.log('[DUPLICATE-LIST] Duplicando lista e CRIANDO novos participantes indicadores...');
     
     // Buscar a lista original
+    console.log('[DEBUG] 📋 Buscando lista original com ID:', originalListId);
     const originalList = await this.participantListModel.findById(originalListId);
     if (!originalList) {
-      console.error('[H2] REAL-DUPLICATION - ERRO: Lista original não encontrada');
+      console.error('❌ [H2] REAL-DUPLICATION - ERRO: Lista original não encontrada');
+      console.error('❌ [DEBUG] Lista ID que falhou:', originalListId);
       throw new Error('Lista original não encontrada');
     }
     
-    console.log('[H2] REAL-DUPLICATION - Lista original:', { 
+    console.log('✅ [DEBUG] Lista original encontrada:', { 
       id: originalListId, 
       name: originalList.name,
-      participantsCount: originalList.participants?.length || 0
+      tipo: originalList.tipo,
+      participantsCount: originalList.participants?.length || 0,
+      participantsArray: originalList.participants || [],
+      hasParticipants: !!(originalList.participants && originalList.participants.length > 0)
     });
     
     // 🚀 NOVA IMPLEMENTAÇÃO: Duplicar participantes reais
     const newParticipantIds: Types.ObjectId[] = [];
     
+    console.log('[DEBUG] 🔍 Verificando participantes da lista...');
+    console.log('[DEBUG] originalList.participants:', originalList.participants);
+    console.log('[DEBUG] É array?', Array.isArray(originalList.participants));
+    console.log('[DEBUG] Tamanho:', originalList.participants?.length);
+    
     if (originalList.participants && originalList.participants.length > 0) {
-      console.log('[H2] REAL-DUPLICATION - Iniciando duplicação de', originalList.participants.length, 'participantes...');
+      console.log('🚀 [H2] REAL-DUPLICATION - Iniciando duplicação de', originalList.participants.length, 'participantes...');
+      console.log('[DEBUG] IDs dos participantes a duplicar:', originalList.participants);
       
       for (const participantId of originalList.participants) {
         try {
+          console.log(`\n🔄 [DEBUG] Processando participante ID: ${participantId}`);
+          
           // Buscar participante original
           const originalParticipant = await this.participantModel.findById(participantId);
           if (!originalParticipant) {
-            console.warn('[H2] REAL-DUPLICATION - Participante não encontrado:', participantId);
+            console.warn('⚠️ [H2] REAL-DUPLICATION - Participante não encontrado:', participantId);
+            console.warn('[DEBUG] Pulando este participante...');
             continue;
           }
           
-          console.log('[H2] REAL-DUPLICATION - Duplicando participante:', originalParticipant.name);
+          console.log('✅ [DEBUG] Participante original encontrado:', {
+            id: originalParticipant._id,
+            name: originalParticipant.name,
+            email: originalParticipant.email,
+            tipo: originalParticipant.tipo,
+            clientId: originalParticipant.clientId
+          });
+          
+          console.log('🔄 [H2] REAL-DUPLICATION - Duplicando participante:', originalParticipant.name);
           
           // Criar novo participante indicador
           const { v4: uuidv4 } = await import('uuid');
@@ -396,20 +425,48 @@ export class ParticipantListsService {
             lists: []
           });
           
+          console.log('[DEBUG] 💾 Salvando novo participante...');
+          console.log('[DEBUG] Dados antes do save:', {
+            name: newParticipant.name,
+            email: newParticipant.email,
+            tipo: newParticipant.tipo,
+            campaignId: newParticipant.campaignId,
+            campaignName: newParticipant.campaignName,
+            originalParticipantId: newParticipant.originalParticipantId
+          });
+          
           // Salvar novo participante (hook gerará uniqueReferralCode)
           const savedParticipant = await newParticipant.save();
           newParticipantIds.push(savedParticipant._id);
           
-          console.log('[H2] REAL-DUPLICATION - ✅ Participante duplicado:', {
-            original: { id: originalParticipant._id, name: originalParticipant.name, tipo: originalParticipant.tipo },
-            novo: { id: savedParticipant._id, name: savedParticipant.name, tipo: savedParticipant.tipo, codigo: savedParticipant.uniqueReferralCode }
+          console.log('🎉 [H2] REAL-DUPLICATION - ✅ Participante duplicado COM SUCESSO!');
+          console.log('[DEBUG] Resultado:', {
+            original: { 
+              id: originalParticipant._id, 
+              name: originalParticipant.name, 
+              tipo: originalParticipant.tipo 
+            },
+            novo: { 
+              id: savedParticipant._id, 
+              name: savedParticipant.name, 
+              tipo: savedParticipant.tipo, 
+              codigo: savedParticipant.uniqueReferralCode,
+              campaignId: savedParticipant.campaignId,
+              campaignName: savedParticipant.campaignName
+            }
           });
           
         } catch (error) {
-          console.error('[H2] REAL-DUPLICATION - ❌ Erro ao duplicar participante:', error.message);
+          console.error('💥 [H2] REAL-DUPLICATION - ❌ ERRO ao duplicar participante:', error.message);
+          console.error('[DEBUG] Stack trace completo:', error.stack);
+          console.error('[DEBUG] Participante que falhou:', participantId);
           // Continua com os próximos participantes
         }
       }
+    } else {
+      console.warn('⚠️ [DEBUG] PROBLEMA: Lista não tem participantes para duplicar!');
+      console.warn('[DEBUG] originalList.participants:', originalList.participants);
+      console.warn('[DEBUG] Tipo da lista:', originalList.tipo);
     }
     
     // Criar nova lista de indicadores com os novos participantes
@@ -443,13 +500,23 @@ export class ParticipantListsService {
       console.log('[H2] REAL-DUPLICATION - ✅ Novos participantes associados à lista:', updateResult.modifiedCount);
     }
     
-    console.log('[H2] REAL-DUPLICATION - ✅ DUPLICAÇÃO REAL COMPLETA:', { 
+    console.log('\n🏁 [H2] REAL-DUPLICATION - ✅ DUPLICAÇÃO REAL COMPLETA!');
+    console.log('📊 [DEBUG] RESULTADO FINAL:', { 
       listaOriginalId: originalListId,
       listaDuplicadaId: savedList._id,
       participantesOriginais: originalList.participants?.length || 0,
       novosParticipantesCriados: newParticipantIds.length,
-      sucessoTotal: newParticipantIds.length === (originalList.participants?.length || 0)
+      idsNovosParticipantes: newParticipantIds,
+      sucessoTotal: newParticipantIds.length === (originalList.participants?.length || 0),
+      timestamp: new Date().toISOString()
     });
+    
+    if (newParticipantIds.length === 0) {
+      console.error('🚨 [DEBUG] PROBLEMA CRÍTICO: Nenhum participante foi duplicado!');
+      console.error('[DEBUG] Verifique os logs acima para identificar a causa');
+    }
+    
+    console.log('🚀=== FIM DUPLICAÇÃO REAL ===\n');
     
     return savedList;
   }
