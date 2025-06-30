@@ -1228,13 +1228,18 @@ async function salvarCampanhaBackend() {
     console.log('\n✅ [FRONTEND-DEBUG] CAMPANHA CRIADA COM SUCESSO!');
     console.log('[FRONTEND-DEBUG] ID da campanha:', data._id || data.id);
     console.log('[FRONTEND-DEBUG] Nome da campanha:', data.name);
-    console.log('[FRONTEND-DEBUG] Lista de participantes ID:', data.participantListId);
+    console.log('[FRONTEND-DEBUG] Lista de participantes (objeto completo):', data.participantListId);
+    console.log('[FRONTEND-DEBUG] Lista de participantes ID extraído:', data.participantListId?._id || data.participantListId);
     
     // 🔍 VERIFICAR SE A DUPLICAÇÃO FUNCIONOU
     if (data.participantListId) {
       console.log('\n🔍 [FRONTEND-DEBUG] VERIFICANDO LISTA DUPLICADA...');
       try {
-        const listResponse = await fetch(`${getApiUrl()}/participant-lists/${data.participantListId}`, {
+        // Extrair ID correto (pode ser objeto ou string)
+        const listId = data.participantListId._id || data.participantListId;
+        console.log('[FRONTEND-DEBUG] ID da lista para verificação:', listId);
+        
+        const listResponse = await fetch(`${getApiUrl()}/participant-lists/${listId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
