@@ -1185,6 +1185,13 @@ async function salvarCampanhaBackend() {
   }
 
   try {
+    console.log('\n🚀 [FRONTEND-DEBUG] ===== CRIAÇÃO DE CAMPANHA INICIADA =====');
+    console.log('[FRONTEND-DEBUG] Payload para backend:', JSON.stringify(payload, null, 2));
+    console.log('[FRONTEND-DEBUG] URL da API:', `${getApiUrl()}/campaigns`);
+    console.log('[FRONTEND-DEBUG] Token presente:', !!token);
+    console.log('[FRONTEND-DEBUG] ClientId:', clientId);
+    console.log('[FRONTEND-DEBUG] Lista selecionada (participantListId):', selectedListaId);
+    
     const response = await fetch(`${getApiUrl()}/campaigns`, {
       method: 'POST',
       headers: {
@@ -1193,13 +1200,105 @@ async function salvarCampanhaBackend() {
       },
       body: JSON.stringify(payload)
     });
-    const data = await response.json();
-    if (!response.ok || !data) throw new Error(data.message || 'Erro ao salvar campanha');
-    alert('Campanha criada com sucesso!');
-                window.location.href = 'campaigns.html';
+
+    console.log('[FRONTEND-DEBUG] Status da resposta:', response.status);
+    console.log('[FRONTEND-DEBUG] Response OK:', response.ok);
+    
+    // Capturar texto da resposta primeiro (para não consumir o stream)
+    const responseText = await response.text();
+    console.log('[FRONTEND-DEBUG] Resposta raw do backend (texto):', responseText);
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+      console.log('[FRONTEND-DEBUG] Resposta parseada como JSON:', data);
+    } catch (parseError) {
+      console.error('[FRONTEND-DEBUG] Erro ao parsear JSON da resposta:', parseError);
+      console.error('[FRONTEND-DEBUG] Resposta não é JSON válido:', responseText);
+      throw new Error('Resposta do servidor não é JSON válido: ' + responseText);
+    }
+    
+    if (!response.ok || !data) {
+      console.error('[FRONTEND-DEBUG] Erro na requisição - Response not OK ou data vazio');
+      console.error('[FRONTEND-DEBUG] Status:', response.status);
+      console.error('[FRONTEND-DEBUG] Data:', data);
+      throw new Error(data.message || 'Erro ao salvar campanha');
+    }
+    
+    console.log('\n✅ [FRONTEND-DEBUG] CAMPANHA CRIADA COM SUCESSO!');
+    console.log('[FRONTEND-DEBUG] ID da campanha:', data._id || data.id);
+    console.log('[FRONTEND-DEBUG] Nome da campanha:', data.name);
+    console.log('[FRONTEND-DEBUG] Lista de participantes ID:', data.participantListId);
+    
+    // 🔍 VERIFICAR SE A DUPLICAÇÃO FUNCIONOU
+    if (data.participantListId) {
+      console.log('\n🔍 [FRONTEND-DEBUG] VERIFICANDO LISTA DUPLICADA...');
+      try {
+        const listResponse = await fetch(`${getApiUrl()}/participant-lists/${data.participantListId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (listResponse.ok) {
+          const listText = await listResponse.text();
+          console.log('[FRONTEND-DEBUG] Lista duplicada - resposta raw:', listText);
+          
+          try {
+            const listData = JSON.parse(listText);
+            console.log('[FRONTEND-DEBUG] Lista duplicada - dados:', {
+              id: listData._id,
+              name: listData.name,
+              tipo: listData.tipo,
+              participantsCount: listData.participants?.length || 0,
+              participantsArray: listData.participants
+            });
+            
+            if (!listData.participants || listData.participants.length === 0) {
+              console.error('\n🚨 [FRONTEND-DEBUG] PROBLEMA CRÍTICO CONFIRMADO!');
+              console.error('[FRONTEND-DEBUG] Lista duplicada está vazia!');
+              console.error('[FRONTEND-DEBUG] ID da lista vazia:', listData._id);
+              console.error('[FRONTEND-DEBUG] Nome da lista vazia:', listData.name);
+              console.error('[FRONTEND-DEBUG] Isso confirma que a duplicação NÃO funcionou no backend!');
+              
+              // Guardar info da lista vazia para debug posterior
+              window.emptyListDetected = {
+                id: listData._id,
+                name: listData.name,
+                type: listData.tipo
+              };
+              
+              // Alert para o usuário
+              alert(`🚨 PROBLEMA DETECTADO!\n\nA campanha foi criada mas a lista "${listData.name}" está vazia.\n\nIsso indica que a duplicação de participantes não funcionou.\n\nVerifique os logs do servidor ou contacte o desenvolvedor.`);
+            } else {
+              console.log('\n✅ [FRONTEND-DEBUG] Lista duplicada tem participantes:', listData.participants.length);
+              console.log('[FRONTEND-DEBUG] Nomes dos participantes duplicados:');
+              listData.participants.forEach((p, index) => {
+                console.log(`[FRONTEND-DEBUG] ${index + 1}. ${p.name} (${p.email}) - Tipo: ${p.tipo}`);
+              });
+            }
+          } catch (listParseError) {
+            console.error('[FRONTEND-DEBUG] Erro ao parsear dados da lista:', listParseError);
+            console.error('[FRONTEND-DEBUG] Resposta da lista não é JSON:', listText);
+          }
+        } else {
+          console.error('[FRONTEND-DEBUG] Erro ao buscar lista duplicada:', listResponse.status);
+          console.error('[FRONTEND-DEBUG] Resposta da lista:', await listResponse.text());
+        }
+      } catch (listError) {
+        console.error('[FRONTEND-DEBUG] Erro ao verificar lista duplicada:', listError);
+      }
+    } else {
+      console.error('\n🚨 [FRONTEND-DEBUG] PROBLEMA: Campanha criada sem participantListId!');
+      console.error('[FRONTEND-DEBUG] Isso indica que nenhuma lista foi criada/duplicada');
+    }
+    
+    alert('🎉 Campanha criada com sucesso!\n\n📋 Verifique o console para logs detalhados da duplicação.');
+    window.location.href = 'campaigns.html';
   } catch (err) {
-    console.error('Erro ao salvar campanha:', err);
-    alert('Erro ao salvar campanha: ' + err.message);
+    console.error('\n❌ [FRONTEND-DEBUG] ERRO COMPLETO:', err);
+    console.error('[FRONTEND-DEBUG] Stack trace:', err.stack);
+    console.error('[FRONTEND-DEBUG] Mensagem:', err.message);
+    alert('❌ Erro ao salvar campanha: ' + err.message + '\n\n📋 Verifique o console para logs detalhados.');
+    
     if (finalizarBtn) {
       finalizarBtn.disabled = false;
       finalizarBtn.textContent = 'Finalizar';
