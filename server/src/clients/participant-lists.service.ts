@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 import { ParticipantList } from './entities/participant-list.schema';
 import { CreateParticipantListDto } from './dto/create-participant-list.dto';
 import { UpdateParticipantListDto } from './dto/update-participant-list.dto';
@@ -394,7 +395,6 @@ export class ParticipantListsService {
           console.log('🔄 [H2] REAL-DUPLICATION - Duplicando participante:', originalParticipant.name);
           
           // Criar novo participante indicador
-          const { v4: uuidv4 } = await import('uuid');
           const newParticipant = new this.participantModel({
             // Dados copiados do original
             name: originalParticipant.name,
