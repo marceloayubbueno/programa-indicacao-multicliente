@@ -295,6 +295,16 @@ export class ParticipantsService {
       email: p.email 
     })));
 
+    // 🔍 H3 - DIAGNÓSTICO: Verificar se listId foi fornecido
+    console.log('🔍 H3 - IMPORT SEM LISTID:', {
+      hasListId: !!dto.listId,
+      listIdValue: dto.listId || 'UNDEFINED',
+      participantsCount: dto.participants.length,
+      clientId: dto.clientId,
+      willCreateOrphans: !dto.listId,
+      timestamp: new Date().toISOString()
+    });
+
     try {
       // 🎯 DETECÇÃO DE DUPLICATAS: Verificar emails já existentes
       const incomingEmails = dto.participants.map(p => p.email.toLowerCase());
@@ -344,6 +354,15 @@ export class ParticipantsService {
         console.log('🔍 [BACKEND-SYNC] ListId fornecido:', dto.listId);
         console.log('🔍 [BACKEND-SYNC] Vai sincronizar novos + existentes');
         
+        // 🔍 H4 - DIAGNÓSTICO: Monitorar sincronização bidirecional
+        console.log('🔍 H4 - SINCRONIZAÇÃO BIDIRECIONAL INICIO:', {
+          listId: dto.listId,
+          newParticipantsCount: insertedParticipants.length,
+          existingParticipantsCount: existingParticipants.length,
+          totalToSync: insertedParticipants.length + existingParticipants.length,
+          timestamp: new Date().toISOString()
+        });
+        
         try {
           // Verificar se a lista existe
           const list = await this.participantListModel.findById(dto.listId);
@@ -362,6 +381,14 @@ export class ParticipantsService {
 
           console.log(`🔧 BACKEND Sincronizando ${allParticipantIds.length} participantes (${insertedParticipants.length} novos + ${existingParticipants.length} existentes)`);
           
+          // 🔍 H4 - DIAGNÓSTICO: Antes da sincronização
+          console.log('🔍 H4 - ANTES SINCRONIZAÇÃO:', {
+            listCurrentParticipants: list.participants?.length || 0,
+            participantsToAdd: allParticipantIds.length,
+            listName: list.name,
+            timestamp: new Date().toISOString()
+          });
+          
           // 1. Atualizar lista com TODOS os participantes (sem duplicatas)
           await this.participantListModel.findByIdAndUpdate(
             dto.listId,
@@ -379,14 +406,33 @@ export class ParticipantsService {
           // 3. VERIFICAÇÃO FINAL: Garantir que todos estão sincronizados
           console.log('🔍 BACKEND Verificação final...');
           
+          // 🔍 H5 - DIAGNÓSTICO: Verificar estado final dos participantes
           for (const participantId of allParticipantIds) {
             const participant = await this.participantModel.findById(participantId);
-            if (participant && (!participant.lists || !participant.lists.includes(dto.listId as any))) {
-              console.log(`⚠️ BACKEND Re-sincronizando participante ${participantId}...`);
-              await this.participantModel.findByIdAndUpdate(
-                participantId,
-                { $addToSet: { lists: dto.listId } }
-              );
+            if (participant) {
+              console.log(`🔍 H5 - ESTADO PARTICIPANTE ${participant.name}:`, {
+                id: participantId,
+                email: participant.email,
+                associatedLists: participant.lists?.length || 0,
+                listsIds: participant.lists?.map(l => l.toString()) || [],
+                hasTargetList: participant.lists?.includes(dto.listId as any),
+                timestamp: new Date().toISOString()
+              });
+              
+              if (!participant.lists || !participant.lists.includes(dto.listId as any)) {
+                console.log(`⚠️ BACKEND Re-sincronizando participante ${participantId}...`);
+                await this.participantModel.findByIdAndUpdate(
+                  participantId,
+                  { $addToSet: { lists: dto.listId } }
+                );
+                
+                console.log(`🔍 H5 - RE-SINCRONIZADO:`, {
+                  participantId: participantId,
+                  listId: dto.listId,
+                  action: 'FORCE_SYNC',
+                  timestamp: new Date().toISOString()
+                });
+              }
             }
           }
           
@@ -394,6 +440,16 @@ export class ParticipantsService {
           const finalList = await this.participantListModel.findById(dto.listId);
           if (finalList) {
             console.log(`✅ BACKEND Lista "${finalList.name}" agora tem ${finalList.participants?.length || 0} participantes`);
+            
+            // 🔍 H4 - DIAGNÓSTICO: Resultado final da sincronização
+            console.log('🔍 H4 - SINCRONIZAÇÃO FINAL COMPLETA:', {
+              listId: dto.listId,
+              listName: finalList.name,
+              finalParticipantsCount: finalList.participants?.length || 0,
+              expectedCount: allParticipantIds.length,
+              syncSuccessful: (finalList.participants?.length || 0) >= allParticipantIds.length,
+              timestamp: new Date().toISOString()
+            });
           }
           
         } catch (syncError) {
@@ -406,6 +462,22 @@ export class ParticipantsService {
         console.log('🔍 [BACKEND-NO-SYNC] Participantes criados:', insertedParticipants.length);
         console.log('🔍 [BACKEND-NO-SYNC] Participantes existentes:', existingParticipants.length);
         console.log('🔍 [BACKEND-NO-SYNC] Estes participantes não estão associados a nenhuma lista');
+        
+        // 🔍 H3 - DIAGNÓSTICO: Confirmar criação de órfãos
+        console.log('🔍 H3 - ÓRFÃOS CRIADOS:', {
+          newOrphansCount: insertedParticipants.length,
+          existingParticipantsCount: existingParticipants.length,
+          totalOrphansCreated: insertedParticipants.length,
+          listIdMissing: true,
+          willTriggerAutoFix: true,
+          orphansDetails: insertedParticipants.map(p => ({
+            id: p._id,
+            name: p.name,
+            email: p.email,
+            lists: p.lists || []
+          })),
+          timestamp: new Date().toISOString()
+        });
       }
 
       const result = {

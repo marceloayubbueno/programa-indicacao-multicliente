@@ -972,12 +972,22 @@ function handleImport(event) {
                     submitButton.textContent = originalButtonText;
                     return;
                 }
-                // 🔍 DIAGNÓSTICO: Log detalhado do processo de importação
-                console.log('🔍 [IMPORT-START] Iniciando importação de participantes:');
-                console.log('🔍 [IMPORT-DATA] ClientId:', clientId);
-                console.log('🔍 [IMPORT-DATA] Quantidade de participantes:', participants.length);
-                console.log('🔍 [IMPORT-DATA] Participantes:', participants.map(p => ({ name: p.name, email: p.email })));
-                console.log('🔍 [IMPORT-FLOW] Chamando /participants/import SEM listId');
+                // 🔍 H2 - DIAGNÓSTICO: Log detalhado do processo de importação
+                console.log('🔍 H2 - IMPORT FRONTEND INICIADO:', {
+                  step: 'IMPORT_START',
+                  clientId: clientId,
+                  participantsCount: participants.length,
+                  participantsData: participants.map(p => ({ name: p.name, email: p.email })),
+                  listIdWillBeProvided: false, // ❌ PROBLEMA: SEM LISTID
+                  timestamp: new Date().toISOString()
+                });
+                console.log('🔍 H2 - IMPORT SEM LISTID:', {
+                  problem: 'CALLING_IMPORT_WITHOUT_LISTID',
+                  willCreateOrphans: true,
+                  endpoint: '/participants/import',
+                  missingField: 'listId',
+                  timestamp: new Date().toISOString()
+                });
                 
                 // Enviar participantes para o backend
                 const importResp = await fetch(`${API_URL}/participants/import`, {
@@ -993,33 +1003,57 @@ function handleImport(event) {
                     throw new Error(data.message || 'Erro ao importar participantes');
                 }
                 
-                // 🔍 DIAGNÓSTICO: Verificar resposta da importação
+                // 🔍 H2 - DIAGNÓSTICO: Verificar resposta da importação
                 const importData = await importResp.json();
-                console.log('🔍 [IMPORT-RESPONSE] Status da importação:', importResp.status);
-                console.log('🔍 [IMPORT-RESPONSE] Dados retornados:', importData);
-                console.log('🔍 [IMPORT-RESPONSE] Participantes criados:', importData.participantsCreated || 'indefinido');
-                console.log('🔍 [IMPORT-RESPONSE] Total processados:', importData.totalProcessed || 'indefinido');
+                console.log('🔍 H2 - IMPORT RESPONSE:', {
+                  status: importResp.status,
+                  participantsCreated: importData.participantsCreated || 0,
+                  duplicatesFound: importData.duplicatesFound || 0,
+                  totalProcessed: importData.totalProcessed || 0,
+                  listAssociated: importData.listAssociated || false,
+                  autoSyncApplied: importData.autoSyncApplied || false,
+                  importData: importData,
+                  timestamp: new Date().toISOString()
+                });
                 
-                // 🔍 DIAGNÓSTICO: Buscar participantes importados
+                // 🔍 H2 - DIAGNÓSTICO: Buscar participantes recém-importados
                 const emails = participants.map(p => p.email);
-                console.log('🔍 [SEARCH-START] Buscando participantes recém-importados:');
-                console.log('🔍 [SEARCH-EMAILS] Emails para buscar:', emails);
+                console.log('🔍 H2 - BUSCAR PARTICIPANTES IMPORTADOS:', {
+                  emailsToSearch: emails,
+                  emailsCount: emails.length,
+                  searchPurpose: 'FIND_RECENTLY_IMPORTED',
+                  timestamp: new Date().toISOString()
+                });
                 
                 const searchResp = await fetch(`${API_URL}/participants?clientId=${clientId}&limit=1000`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const allData = await searchResp.json();
-                console.log('🔍 [SEARCH-RESULT] Status da busca:', searchResp.status);
-                console.log('🔍 [SEARCH-RESULT] Total participantes no cliente:', allData.participants?.length);
+                
+                // 🔍 H2 - DIAGNÓSTICO: Resultado da busca
+                console.log('🔍 H2 - SEARCH RESULT:', {
+                    searchStatus: searchResp.status,
+                    totalParticipantsFound: allData.participants?.length || 0,
+                    searchScope: 'ALL_CLIENT_PARTICIPANTS',
+                    timestamp: new Date().toISOString()
+                });
                 
                 const importedParticipants = (allData.participants || []).filter(p => emails.includes(p.email));
-                console.log('🔍 [FILTER-RESULT] Participantes encontrados por email:', importedParticipants.length);
-                console.log('🔍 [FILTER-RESULT] Participantes detalhados:', importedParticipants.map(p => ({ 
-                    id: p._id, 
-                    email: p.email, 
-                    lists: p.lists?.length || 0,
-                    listsIds: p.lists?.map(l => l._id || l) || []
-                })));
+                
+                // 🔍 H2 - DIAGNÓSTICO: Participantes filtrados
+                console.log('🔍 H2 - FILTER IMPORTED PARTICIPANTS:', {
+                    matchedByEmail: importedParticipants.length,
+                    expectedCount: emails.length,
+                    participantsDetails: importedParticipants.map(p => ({ 
+                        id: p._id, 
+                        email: p.email, 
+                        name: p.name,
+                        lists: p.lists?.length || 0,
+                        listsIds: p.lists?.map(l => l._id || l) || [],
+                        isOrphan: !p.lists || p.lists.length === 0
+                    })),
+                    timestamp: new Date().toISOString()
+                });
                 
                 // 🆕 CORREÇÃO: Permitir criar lista mesmo se alguns participantes falharam
                 // A lista será criada e os participantes válidos serão adicionados
@@ -1034,28 +1068,49 @@ function handleImport(event) {
                     return;
                 }
                 
-                // 🔍 DIAGNÓSTICO: Preparação para criação da lista
+                // 🔍 H2 - DIAGNÓSTICO: Preparação para criação da lista
                 const participantIds = importedParticipants
                     .map(p => p._id || p.id)
                     .filter(id => id); // Remove IDs undefined/null
                 
-                console.log('🔍 [LIST-PREP] Preparando criação da lista:');
-                console.log('🔍 [LIST-PREP] Nome da lista:', listName);
-                console.log('🔍 [LIST-PREP] Tipo da lista:', listTipo);
-                console.log('🔍 [LIST-PREP] IDs para associar:', participantIds);
-                console.log('🔍 [LIST-PREP] Quantidade a associar:', participantIds.length);
-                
-                // 🔍 DIAGNÓSTICO: Verificar se todos os participantes têm listas vazias
-                importedParticipants.forEach((p, idx) => {
-                    console.log(`🔍 [PARTICIPANT-${idx + 1}] ${p.email}:`, {
-                        id: p._id,
-                        listsCount: p.lists?.length || 0,
-                        lists: p.lists?.map(l => l._id || l) || []
-                    });
+                console.log('🔍 H2 - LIST CREATION PREP:', {
+                    listName: listName,
+                    listTipo: listTipo,
+                    participantIdsToAssociate: participantIds,
+                    participantIdsCount: participantIds.length,
+                    expectedParticipants: importedParticipants.length,
+                    allIdsValid: participantIds.length === importedParticipants.length,
+                    timestamp: new Date().toISOString()
                 });
                 
-                // Criar a lista
-                console.log('🔍 [LIST-CREATE] Chamando API para criar lista...');
+                // 🔍 H2 - DIAGNÓSTICO: Verificar estado das listas de cada participante
+                console.log('🔍 H2 - PARTICIPANTS LISTS STATE:', {
+                    totalParticipants: importedParticipants.length,
+                    participantsState: importedParticipants.map((p, idx) => ({
+                        index: idx + 1,
+                        email: p.email,
+                        id: p._id,
+                        listsCount: p.lists?.length || 0,
+                        lists: p.lists?.map(l => l._id || l) || [],
+                        isOrphan: !p.lists || p.lists.length === 0
+                    })),
+                    orphansCount: importedParticipants.filter(p => !p.lists || p.lists.length === 0).length,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // 🔍 H2 - DIAGNÓSTICO: Criar a lista
+                console.log('🔍 H2 - CREATE LIST API CALL:', {
+                    endpoint: '/participant-lists',
+                    method: 'POST',
+                    listName: listName,
+                    listDescription: listDescription,
+                    listTipo: listTipo,
+                    clientId: clientId,
+                    participantIds: participantIds,
+                    participantIdsCount: participantIds.length,
+                    timestamp: new Date().toISOString()
+                });
+                
                 const listResp = await fetch(`${API_URL}/participant-lists`, {
                     method: 'POST',
                     headers: {
@@ -1071,7 +1126,11 @@ function handleImport(event) {
                     })
                 });
                 
-                console.log('🔍 [LIST-RESPONSE] Status da criação:', listResp.status);
+                console.log('🔍 H2 - LIST CREATION RESPONSE:', {
+                    status: listResp.status,
+                    statusOk: listResp.ok,
+                    timestamp: new Date().toISOString()
+                });
                 
                 if (!listResp.ok) {
                     const data = await listResp.json();
@@ -1080,10 +1139,25 @@ function handleImport(event) {
                 }
                 
                 const listData = await listResp.json();
-                console.log('🔍 [LIST-SUCCESS] Lista criada com sucesso:', {
+                
+                // 🔍 H2 - DIAGNÓSTICO: Lista criada com sucesso
+                console.log('🔍 H2 - LIST CREATED SUCCESS:', {
                     listId: listData._id || listData.id,
-                    name: listData.name,
-                    participantsAssociated: participantIds.length
+                    listName: listData.name,
+                    participantsAssociated: participantIds.length,
+                    expectedParticipants: participants.length,
+                    associationComplete: participantIds.length === participants.length,
+                    listData: listData,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // 🔍 H3 - DIAGNÓSTICO: Verificar redirecionamento
+                console.log('🔍 H3 - REDIRECIONAMENTO:', {
+                    willCloseModal: true,
+                    willReloadLists: true,
+                    willReloadParticipants: true,
+                    shouldRedirectToListsPage: false, // ❌ PROBLEMA: SEM REDIRECIONAMENTO
+                    timestamp: new Date().toISOString()
                 });
                 
                 // Mensagem de sucesso personalizada baseada no resultado
@@ -1098,6 +1172,15 @@ function handleImport(event) {
                 closeImportModal();
                 loadLists();
                 loadParticipants();
+                
+                // 🔍 H3 - DIAGNÓSTICO: Pós-processamento completo
+                console.log('🔍 H3 - IMPORT PROCESS COMPLETED:', {
+                    modalClosed: true,
+                    listsReloaded: true,
+                    participantsReloaded: true,
+                    userStaysOnSamePage: true, // ❌ PROBLEMA: USUÁRIO NÃO É REDIRECIONADO
+                    timestamp: new Date().toISOString()
+                });
             } else {
                 console.error(new Error('Nenhum participante encontrado no arquivo. Verifique se o arquivo está no formato correto.'));
             }

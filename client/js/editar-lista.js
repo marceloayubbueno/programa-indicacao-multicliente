@@ -453,6 +453,14 @@ async function createList(formData) {
     return;
   }
 
+  // 🔍 H2 - DIAGNÓSTICO: Início da criação de lista
+  console.log('🔍 H2 - EDITAR-LISTA CRIACAO INICIADA:', {
+    step: 'CREATE_LIST_START',
+    formData: formData,
+    selectedParticipantsCount: selectedParticipants.size,
+    timestamp: new Date().toISOString()
+  });
+
   showNotification('Criando lista...', 'info', 2000);
 
   // Separar participantes novos dos existentes
@@ -464,9 +472,38 @@ async function createList(formData) {
     selectedArray.includes(p._id || p.id) && !(p.id && p.id.startsWith('tmp_'))
   );
 
+  // 🔍 H2 - DIAGNÓSTICO: Separação de participantes
+  console.log('🔍 H2 - SEPARACAO PARTICIPANTES:', {
+    newParticipantsCount: newParticipants.length,
+    existingParticipantsCount: existingParticipants.length,
+    totalSelected: selectedArray.length,
+    newParticipants: newParticipants.map(p => ({
+      id: p.id,
+      name: p.name,
+      email: p.email
+    })),
+    existingParticipants: existingParticipants.map(p => ({
+      id: p._id || p.id,
+      name: p.name,
+      email: p.email
+    })),
+    timestamp: new Date().toISOString()
+  });
+
   // 1. Importar novos participantes se houver
   let newParticipantIds = [];
   if (newParticipants.length > 0) {
+    // 🔍 H3 - DIAGNÓSTICO: Import sem listId - PROBLEMA IDENTIFICADO!
+    console.log('🔍 H3 - IMPORT SEM LISTID DETECTADO:', {
+      problem: 'CALLING_IMPORT_WITHOUT_LISTID',
+      endpoint: '/participants/import',
+      newParticipantsCount: newParticipants.length,
+      willCreateOrphans: true,
+      missingField: 'listId',
+      step: 'IMPORT_NEW_PARTICIPANTS',
+      timestamp: new Date().toISOString()
+    });
+
     try {
       // 🔧 CORREÇÃO: Adicionar campos obrigatórios do DTO
       const participantsWithRequiredFields = newParticipants.map(p => ({
@@ -478,6 +515,19 @@ async function createList(formData) {
         status: 'ativo' // 🔧 CORREÇÃO: Usar valor em português conforme schema
       }));
 
+      // 🔍 H3 - DIAGNÓSTICO: Payload de importação
+      console.log('🔍 H3 - IMPORT PAYLOAD SEM LISTID:', {
+        clientId: formData.clientId,
+        participantsCount: participantsWithRequiredFields.length,
+        participants: participantsWithRequiredFields.map(p => ({
+          name: p.name,
+          email: p.email,
+          tipo: p.tipo
+        })),
+        listIdProvided: false, // ❌ PROBLEMA CRÍTICO
+        timestamp: new Date().toISOString()
+      });
+
       const response = await fetch(`${getApiUrl()}/participants/import`, {
         method: 'POST',
         headers: {
@@ -487,6 +537,7 @@ async function createList(formData) {
         body: JSON.stringify({ 
           clientId: formData.clientId, 
           participants: participantsWithRequiredFields 
+          // ❌ LISTID FALTANDO AQUI - ÓRFÃOS SERÃO CRIADOS!
         })
       });
 
@@ -496,7 +547,29 @@ async function createList(formData) {
       }
 
       const data = await response.json();
+      
+      // 🔍 H3 - DIAGNÓSTICO: Resultado da importação sem listId
+      console.log('🔍 H3 - IMPORT RESULT SEM LISTID:', {
+        status: response.status,
+        participantsCreated: data.participantsCreated || 0,
+        duplicatesFound: data.duplicatesFound || 0,
+        totalProcessed: data.totalProcessed || 0,
+        listAssociated: data.listAssociated || false,
+        autoSyncApplied: data.autoSyncApplied || false,
+        orphansCreated: true, // ❌ CONFIRMADO: ÓRFÃOS CRIADOS
+        data: data,
+        timestamp: new Date().toISOString()
+      });
+
       newParticipantIds = (data.participants || []).map(p => p._id);
+      
+      // 🔍 H3 - DIAGNÓSTICO: IDs dos novos participantes órfãos
+      console.log('🔍 H3 - NOVOS PARTICIPANTES ORFAOS CRIADOS:', {
+        newParticipantIds: newParticipantIds,
+        count: newParticipantIds.length,
+        willTriggerAutoFix: true,
+        timestamp: new Date().toISOString()
+      });
       
       showNotification(`${newParticipants.length} novos participantes importados!`, 'success', 2000);
     } catch (error) {
@@ -509,6 +582,18 @@ async function createList(formData) {
     ...existingParticipants.map(p => p._id || p.id),
     ...newParticipantIds
   ];
+
+  // 🔍 H2 - DIAGNÓSTICO: Criação da lista
+  console.log('🔍 H2 - CRIAR LISTA COM PARTICIPANTES:', {
+    step: 'CREATE_LIST_WITH_PARTICIPANTS',
+    listName: formData.name,
+    listTipo: formData.tipo,
+    allParticipantIds: allParticipantIds,
+    participantCount: allParticipantIds.length,
+    existingIds: existingParticipants.map(p => p._id || p.id),
+    newIds: newParticipantIds,
+    timestamp: new Date().toISOString()
+  });
 
   const listPayload = {
     ...formData,
@@ -526,13 +611,42 @@ async function createList(formData) {
 
   if (!response.ok) {
     const errorData = await response.json();
+    console.log('🔍 H2 - ERRO CRIAR LISTA:', {
+      status: response.status,
+      error: errorData,
+      timestamp: new Date().toISOString()
+    });
     throw new Error(errorData.message || 'Erro ao criar lista');
   }
 
   const responseData = await response.json();
 
+  // 🔍 H2 - DIAGNÓSTICO: Lista criada com sucesso
+  console.log('🔍 H2 - LISTA CRIADA COM SUCESSO:', {
+    step: 'LIST_CREATED_SUCCESS',
+    listId: responseData._id || responseData.id,
+    listName: responseData.name,
+    participantsAssociated: allParticipantIds.length,
+    responseData: responseData,
+    timestamp: new Date().toISOString()
+  });
+
+  // 🔍 H3 - DIAGNÓSTICO: Redirecionamento
+  console.log('🔍 H3 - REDIRECIONAMENTO EDITAR-LISTA:', {
+    currentPage: 'editar-lista.html',
+    willRedirectTo: 'participant-lists.html',
+    redirectDelay: 1500,
+    redirectMethod: 'window.location.href',
+    timestamp: new Date().toISOString()
+  });
+
   showNotification('Lista criada com sucesso!', 'success');
   setTimeout(() => {
+    console.log('🔍 H3 - REDIRECIONAMENTO EXECUTADO:', {
+      action: 'REDIRECT_EXECUTED',
+      targetPage: 'participant-lists.html',
+      timestamp: new Date().toISOString()
+    });
     window.location.href = 'participant-lists.html';
   }, 1500);
 }

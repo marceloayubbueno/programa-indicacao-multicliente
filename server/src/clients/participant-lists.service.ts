@@ -96,6 +96,20 @@ export class ParticipantListsService {
         ]
       }).exec();
       
+      // 🔍 H1 - DIAGNÓSTICO: Detectar criação automática da Lista Geral
+      console.log('🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA:', {
+        clientId: clientId,
+        foundOrphans: orphanParticipants.length,
+        orphansDetails: orphanParticipants.map(p => ({
+          id: p._id,
+          name: p.name,
+          email: p.email,
+          createdAt: p.createdAt,
+          originSource: p.originSource
+        })),
+        timestamp: new Date().toISOString()
+      });
+      
       if (orphanParticipants.length > 0) {
         console.log(`🔍 [ORPHANS-FOUND] ============ ÓRFÃOS DETECTADOS ============`);
         console.log(`🔍 [ORPHANS-FOUND] Quantidade de órfãos: ${orphanParticipants.length}`);
@@ -124,7 +138,16 @@ export class ParticipantListsService {
         
         console.log('🔍 [DEFAULT-LIST] Lista Geral existente encontrada:', !!defaultList);
         
+        // 🔍 H1 - DIAGNÓSTICO: Monitorar criação da Lista Geral
         if (!defaultList) {
+          console.log('🔍 H1 - CRIAR LISTA GERAL AUTOMÁTICA:', {
+            trigger: 'AUTO_FIX_ORPHANS',
+            orphansCount: orphanParticipants.length,
+            clientId: clientId,
+            willCreateListGeral: true,
+            timestamp: new Date().toISOString()
+          });
+          
           console.log('🔍 [CREATE-GENERAL] ============ CRIANDO LISTA GERAL ============');
           console.log('🔍 [CREATE-GENERAL] Este é o momento onde "Lista Geral" é criada!');
           
@@ -137,6 +160,23 @@ export class ParticipantListsService {
           });
           defaultList = await defaultList.save();
           console.log('🔍 [CREATE-GENERAL] Lista Geral criada com ID:', defaultList._id);
+          
+          // 🔍 H1 - DIAGNÓSTICO: Confirmar criação
+          console.log('🔍 H1 - LISTA GERAL CRIADA AUTOMATICAMENTE:', {
+            listId: defaultList._id,
+            listName: defaultList.name,
+            clientId: defaultList.clientId,
+            autoCreated: true,
+            timestamp: new Date().toISOString()
+          });
+        } else {
+          console.log('🔍 H1 - LISTA GERAL JÁ EXISTE:', {
+            listId: defaultList._id,
+            listName: defaultList.name,
+            participantsCount: defaultList.participants?.length || 0,
+            reusingExisting: true,
+            timestamp: new Date().toISOString()
+          });
         }
         
         // Associar órfãos à lista padrão
@@ -154,11 +194,32 @@ export class ParticipantListsService {
         );
         
         console.log(`🔍 [ORPHAN-MOVED] ${orphanParticipants.length} participantes movidos para Lista Geral`);
+        
+        // 🔍 H1 - DIAGNÓSTICO: Resultado final
+        console.log('🔍 H1 - RESULTADO AUTO-FIX:', {
+          orphansFixed: orphanParticipants.length,
+          movedToListId: defaultList._id,
+          listGeneralFinalCount: (defaultList.participants?.length || 0) + orphanParticipants.length,
+          autoFixCompleted: true,
+          timestamp: new Date().toISOString()
+        });
       } else {
         console.log('🔍 [NO-ORPHANS] Nenhum participante órfão encontrado');
+        console.log('🔍 H1 - SEM ÓRFÃOS DETECTADOS:', {
+          clientId: clientId,
+          orphansFound: 0,
+          autoFixSkipped: true,
+          timestamp: new Date().toISOString()
+        });
       }
     } catch (autoFixError) {
       console.error('❌ AUTO-FIX: Erro na correção automática (continuando busca):', autoFixError);
+      console.log('🔍 H1 - ERRO NO AUTO-FIX:', {
+        error: autoFixError.message,
+        clientId: clientId,
+        autoFixFailed: true,
+        timestamp: new Date().toISOString()
+      });
     }
     
     // Busca as listas
