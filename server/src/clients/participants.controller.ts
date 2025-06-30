@@ -237,6 +237,29 @@ export class ParticipantsController {
     }
   }
 
+  @Post('fix-orphans')
+  @UseGuards(JwtClientAuthGuard)
+  async fixOrphanParticipants(@ClientId() clientId: string) {
+    try {
+      console.log('🔧 FIX-ORPHANS ENDPOINT - ClientId:', clientId);
+      
+      const result = await this.participantsService.fixOrphanParticipants(clientId);
+      
+      return {
+        success: true,
+        data: result,
+        message: `Correção concluída: ${result.fixed} participantes associados`
+      };
+    } catch (error) {
+      console.error('❌ ERRO no fix-orphans endpoint:', error);
+      return {
+        success: false,
+        error: error.message,
+        message: 'Erro ao corrigir participantes órfãos'
+      };
+    }
+  }
+
   // === ENDPOINTS GENÉRICOS (DEVEM VIR DEPOIS DOS ESPECÍFICOS) ===
 
   /**

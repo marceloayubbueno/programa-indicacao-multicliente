@@ -95,7 +95,7 @@ export class ParticipantsService {
     return this.participantModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
-  async findAll(clientId: string, page = 1, limit = 20, filter = {}) {
+  async findAll(clientId: string, page = 1, limit = 20, filter: any = {}) {
     // 🚀 CORREÇÃO CRÍTICA: Processar filtro listId corretamente
     const { listId, ...otherFilters } = filter;
     const query: any = { clientId, ...otherFilters };
@@ -237,21 +237,89 @@ export class ParticipantsService {
       .limit(limit)
       .exec();
     
-    // 🔍 H2 - DIAGNÓSTICO RELAÇÃO LISTA-PARTICIPANTES
-    console.log('🔍 H2 - Participantes retornados:', participants.length);
-    participants.forEach((p, idx) => {
-      if (idx < 3) { // Só os primeiros 3 para não sobrecarregar
-        console.log(`🔍 H2 - Participante ${idx + 1}:`, {
+    // 🔍 H2 - DIAGNÓSTICO MONGODB QUERY RESULT
+    console.log('🔍 H2 - RESULTADO QUERY MONGODB:', {
+      queryUsada: query,
+      participantsEncontrados: participants.length,
+      totalDocuments: total,
+      temFiltroLista: !!query.lists,
+      filtroListaValue: query.lists,
+      participantsComListas: participants.filter(p => p.lists && p.lists.length > 0).length,
+      participantsSemListas: participants.filter(p => !p.lists || p.lists.length === 0).length
+    });
+    
+    // 🔍 H3 - DIAGNÓSTICO ESPECÍFICO: Verificar campo lists dos participantes
+    if (participants.length > 0) {
+      console.log('🔍 H3 - SAMPLE PARTICIPANTES COM LISTAS:', participants.slice(0, 3).map(p => ({
+        id: p._id,
+        name: p.name,
+        email: p.email,
+        lists: p.lists?.map(l => ({ id: l._id, name: (l as any).name })) || [],
+        listsCount: p.lists?.length || 0,
+        listsField: p.lists || 'UNDEFINED'
+      })));
+    } else {
+      console.log('🔍 H3 - NENHUM PARTICIPANTE ENCONTRADO - Verificando todos participantes:');
+      
+      // Buscar TODOS os participantes deste cliente para diagnóstico
+      const allParticipants = await this.participantModel
+        .find({ clientId })
+        .select('_id name email lists')
+        .populate('lists', 'name _id')
+        .exec();
+      
+      console.log('🔍 H3 - TODOS PARTICIPANTES CLIENTE:', {
+        totalParticipants: allParticipants.length,
+        participantsComListas: allParticipants.filter(p => p.lists && p.lists.length > 0).length,
+        participantsSemListas: allParticipants.filter(p => !p.lists || p.lists.length === 0).length,
+        listIdProcurado: query.lists?.$in?.[0] || 'NENHUM',
+        amostraParticipantes: allParticipants.slice(0, 3).map(p => ({
           id: p._id,
           name: p.name,
-          email: p.email,
-          lists: p.lists?.length || 0,
-          listsIds: p.lists?.map(l => l._id) || [],
-          originSource: p.originSource,
-          campaignId: p.campaignId
-        });
+          lists: p.lists?.map(l => (l as any)._id?.toString()) || [],
+          temListaProcurada: p.lists?.some(l => (l as any)._id?.toString() === (query.lists?.$in?.[0] || ''))
+        }))
+      });
+      
+      // 🚨 CORREÇÃO AUTOMÁTICA: Se há participantes mas nenhum com listas, corrigir
+      const participantsSemListas = allParticipants.filter(p => !p.lists || p.lists.length === 0).length;
+      if (allParticipants.length > 0 && participantsSemListas > 0) {
+        console.log('🚨 [AUTO-FIX] Detectados participantes órfãos - executando correção automática...');
+        try {
+          const fixResult = await this.fixOrphanParticipants(clientId);
+          console.log('✅ [AUTO-FIX] Correção automática concluída:', fixResult);
+          
+          // Reexecutar query após correção
+          console.log('🔄 [AUTO-FIX] Reexecutando query após correção...');
+          const fixedParticipants = await this.participantModel
+            .find(query)
+            .populate({
+              path: 'lists',
+              model: 'ParticipantList',
+              select: 'name tipo description'
+            })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .exec();
+          
+          console.log('🔄 [AUTO-FIX] Participantes encontrados após correção:', fixedParticipants.length);
+          
+          if (fixedParticipants.length > 0) {
+            console.log('✅ [AUTO-FIX] Correção bem-sucedida! Retornando participantes corrigidos');
+            return { 
+              participants: fixedParticipants, 
+              page, 
+              totalPages: Math.ceil(fixedParticipants.length / limit),
+              autoFixed: true,
+              fixResult 
+            };
+          }
+        } catch (fixError) {
+          console.error('❌ [AUTO-FIX] Erro na correção automática:', fixError);
+          // Não falhar a consulta por erro na correção
+        }
       }
-    });
+    }
     
     // 🔍 H2 - Verificar listas existentes para este cliente
     const allLists = await this.participantListModel
@@ -830,13 +898,13 @@ export class ParticipantsService {
    * 🔧 CORREÇÃO AUTOMÁTICA: Detectar e corrigir participantes órfãos
    */
   async fixOrphanParticipants(clientId: string) {
+    console.log('🔧 [FIX-ORPHANS] ============ INICIANDO CORREÇÃO ============');
+    console.log('🔧 [FIX-ORPHANS] ClientId:', clientId);
+    
     try {
-      console.log('🔧 ORPHAN-FIX: Verificando participantes órfãos para cliente:', clientId);
-      
-      // Buscar participantes sem listas ou com listas vazias
+      // 1. Buscar todos os participantes órfãos (sem listas)
       const orphanParticipants = await this.participantModel.find({
         clientId: clientId,
-        tipo: 'participante', // Só participantes, não indicadores
         $or: [
           { lists: { $exists: false } },
           { lists: { $size: 0 } },
@@ -844,30 +912,67 @@ export class ParticipantsService {
         ]
       }).exec();
       
+      console.log('🔧 [FIX-ORPHANS] Participantes órfãos encontrados:', orphanParticipants.length);
+      
       if (orphanParticipants.length === 0) {
-        console.log('✅ ORPHAN-FIX: Nenhum participante órfão encontrado');
-        return { fixed: 0, message: 'Nenhum participante órfão' };
+        console.log('✅ [FIX-ORPHANS] Nenhum participante órfão encontrado');
+        return { success: true, message: 'Nenhum participante órfão', fixed: 0 };
       }
       
-      console.log(`🚨 ORPHAN-FIX: Encontrados ${orphanParticipants.length} participantes órfãos`);
+      // 2. Buscar ou criar lista padrão
+      let defaultList = await this.participantListModel.findOne({
+        clientId: clientId,
+        tipo: 'participante',
+        $or: [
+          { name: /^Lista Geral$/i },
+          { name: /^Participantes$/i },
+          { name: /^Lista Principal$/i }
+        ]
+      }).exec();
       
-      // Para cada participante órfão, associar à lista padrão
-      let fixedCount = 0;
-      for (const participant of orphanParticipants) {
-        try {
-          await this.autoAssociateToDefaultList(participant);
-          fixedCount++;
-        } catch (error) {
-          console.error(`❌ ORPHAN-FIX: Erro ao corrigir ${participant.name}:`, error);
-        }
+      if (!defaultList) {
+        console.log('🔧 [FIX-ORPHANS] Criando lista padrão...');
+        defaultList = new this.participantListModel({
+          name: 'Lista Geral',
+          description: 'Lista padrão criada automaticamente',
+          clientId: clientId,
+          tipo: 'participante',
+          participants: []
+        });
+        defaultList = await defaultList.save();
+        console.log('✅ [FIX-ORPHANS] Lista padrão criada:', defaultList._id);
       }
       
-      console.log(`✅ ORPHAN-FIX: ${fixedCount} participantes órfãos corrigidos`);
-      return { fixed: fixedCount, total: orphanParticipants.length };
+      // 3. Associar todos os órfãos à lista padrão
+      console.log('🔧 [FIX-ORPHANS] Associando órfãos à lista padrão...');
+      
+      const orphanIds = orphanParticipants.map(p => p._id);
+      
+      // Atualizar lista com os participantes
+      await this.participantListModel.findByIdAndUpdate(
+        defaultList._id,
+        { $addToSet: { participants: { $each: orphanIds } } }
+      );
+      
+      // Atualizar participantes com a lista
+      await this.participantModel.updateMany(
+        { _id: { $in: orphanIds } },
+        { $set: { lists: [defaultList._id] } }
+      );
+      
+      console.log(`✅ [FIX-ORPHANS] ${orphanParticipants.length} participantes associados à lista "${defaultList.name}"`);
+      
+      return {
+        success: true,
+        message: `${orphanParticipants.length} participantes associados à lista padrão`,
+        fixed: orphanParticipants.length,
+        listId: defaultList._id,
+        listName: defaultList.name
+      };
       
     } catch (error) {
-      console.error('❌ ORPHAN-FIX: Erro na correção de órfãos:', error);
-      return { fixed: 0, error: error.message };
+      console.error('❌ [FIX-ORPHANS] Erro na correção:', error);
+      throw error;
     }
   }
 } 
