@@ -96,11 +96,20 @@ export class ParticipantsService {
   }
 
   async findAll(clientId: string, page = 1, limit = 20, filter = {}) {
-    const query = { clientId, ...filter };
+    // 🚀 CORREÇÃO CRÍTICA: Processar filtro listId corretamente
+    const { listId, ...otherFilters } = filter;
+    const query: any = { clientId, ...otherFilters };
+    
+    // 🔧 FILTRO LISTID: Converter para query no campo "lists"
+    if (listId) {
+      console.log('🔧 LISTID FILTER: Aplicando filtro por lista:', listId);
+      query.lists = { $in: [listId] };
+    }
     
     // 🔍 DEBUG BACKEND SERVICE - Log da query
     console.log('🔍 DEBUG BACKEND SERVICE - ClientId:', clientId);
-    console.log('🔍 DEBUG BACKEND SERVICE - Query MongoDB:', query);
+    console.log('🔍 DEBUG BACKEND SERVICE - Original filter:', filter);
+    console.log('🔍 DEBUG BACKEND SERVICE - Query MongoDB CORRIGIDA:', query);
     console.log('🔍 DEBUG BACKEND SERVICE - Page:', page, 'Limit:', limit);
     
     // 🔍 H1 - DIAGNÓSTICO CLIENTID
