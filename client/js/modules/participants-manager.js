@@ -337,7 +337,27 @@ class ParticipantsManager {
 
     // 🔍 FILTROS E BUSCA
     async applyFilters(filters = {}) {
-        this.currentFilters = { ...this.currentFilters, ...filters };
+        // 🎯 AJUSTE FINO - Log detalhado da aplicação de filtros
+        console.log('🎯 AJUSTE FINO - Aplicando filtros:', {
+            newFilters: filters,
+            currentFilters: this.currentFilters,
+            isListFilter: !!filters.listId,
+            listIdValue: filters.listId || 'NENHUM'
+        });
+        
+        // 🎯 LIMPAR FILTROS ANTERIORES se for filtro de lista específica
+        if (filters.listId) {
+            console.log('🎯 AJUSTE FINO - Filtro de lista detectado, limpando filtros conflitantes');
+            this.currentFilters = {
+                listId: filters.listId
+            };
+        } else {
+            // Manter filtros existentes e adicionar novos
+            this.currentFilters = { ...this.currentFilters, ...filters };
+        }
+        
+        console.log('🎯 AJUSTE FINO - Filtros finais aplicados:', this.currentFilters);
+        
         this.currentPage = 1; // Reset para primeira página
         await this.loadParticipants({ filters: this.currentFilters, page: 1 });
     }

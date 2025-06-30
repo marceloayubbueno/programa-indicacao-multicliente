@@ -435,24 +435,56 @@ async function viewListParticipants(listId, listName) {
     console.log(`🔍 Visualizando participantes da lista: ${listName} (ID: ${listId})`);
     
     try {
-        // Carregar participantes específicos desta lista
-        const participants = await window.apiClient.getParticipants({ 
-            listId: listId,
-            limit: 1000 
+        // 🎯 AJUSTE FINO - Limpar todos os filtros antes de aplicar o filtro da lista
+        console.log('🎯 AJUSTE FINO - Limpando filtros existentes');
+        
+        // Limpar filtros de interface
+        const statusFilter = document.getElementById('statusFilter');
+        const emailFilter = document.getElementById('emailFilter');
+        const listFilter = document.getElementById('listFilter');
+        
+        if (statusFilter) statusFilter.value = '';
+        if (emailFilter) emailFilter.value = '';
+        
+        // Resetar botões de tipo
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('bg-gray-700', 'text-gray-200');
         });
         
-        // Trocar para aba de usuários
-        switchTab('users');
-        
-        // Filtrar participantes por esta lista específica
-        if (participantsManager) {
-            await participantsManager.applyFilters({ listId: listId });
+        // Ativar filtro "Todos"
+        const todosFilter = document.getElementById('filter-todos');
+        if (todosFilter) {
+            todosFilter.classList.add('bg-blue-600', 'text-white');
+            todosFilter.classList.remove('bg-gray-700', 'text-gray-200');
         }
         
-        // Atualizar o filtro de lista para mostrar a lista selecionada
-        const listFilter = document.getElementById('listFilter');
+        // 🎯 TROCAR PARA ABA DE USUÁRIOS PRIMEIRO
+        switchTab('users');
+        
+        // 🎯 AGUARDAR CARREGAMENTO DA ABA
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // 🎯 AJUSTE FINO - Aplicar APENAS filtro da lista selecionada
+        console.log(`🎯 AJUSTE FINO - Aplicando filtro exclusivo da lista: ${listName} (${listId})`);
+        
+        if (participantsManager) {
+            // Limpar filtros do manager
+            participantsManager.currentFilters = {};
+            
+            // Aplicar APENAS o filtro da lista
+            await participantsManager.applyFilters({ 
+                listId: listId,
+                // Garantir que outros filtros estão vazios
+                status: '',
+                email: '',
+                tipo: ''
+            });
+        }
+        
+        // 🎯 ATUALIZAR DROPDOWN DE LISTA
         if (listFilter) {
-            // Adicionar opção se não existir
+            // Verificar se a opção já existe
             let option = listFilter.querySelector(`option[value="${listId}"]`);
             if (!option) {
                 option = document.createElement('option');
@@ -463,11 +495,27 @@ async function viewListParticipants(listId, listName) {
             listFilter.value = listId;
         }
         
-        showNotification(`Exibindo ${participants.participants?.length || 0} participantes da lista "${listName}"`, 'info');
+        // 🎯 VERIFICAR RESULTADO
+        const participants = await window.apiClient.getParticipants({ 
+            listId: listId,
+            limit: 1000 
+        });
+        
+        console.log(`🎯 AJUSTE FINO - Participantes encontrados para lista "${listName}":`, participants.participants?.length || 0);
+        
+        // 🎯 FEEDBACK CLARO AO USUÁRIO
+        const count = participants.participants?.length || 0;
+        if (count > 0) {
+            showNotification(`✅ Exibindo ${count} participante${count !== 1 ? 's' : ''} da lista "${listName}"`, 'success');
+        } else {
+            showNotification(`⚠️ A lista "${listName}" não possui participantes`, 'warning');
+        }
+        
+        console.log(`✅ Filtro aplicado com sucesso para a lista: ${listName}`);
         
     } catch (error) {
         console.error('❌ Erro ao carregar participantes da lista:', error);
-        showNotification('Erro ao carregar participantes da lista', 'error');
+        showNotification(`❌ Erro ao carregar participantes da lista "${listName}"`, 'error');
     }
 }
 
