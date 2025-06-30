@@ -79,11 +79,12 @@ export class ParticipantListsService {
   }
 
   async findAll(clientId: string) {
-    console.log('🔧 FIND-ALL-LISTS: Buscando listas para cliente:', clientId);
+    console.log('🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============');
+    console.log('🔍 [LISTS-FIND] Cliente ID:', clientId);
     
     // 🚀 CORREÇÃO AUTOMÁTICA: Verificar e corrigir participantes órfãos
     try {
-      console.log('🔧 AUTO-FIX: Executando correção de órfãos antes de buscar listas...');
+      console.log('🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...');
       // Note: Usando this.participantModel diretamente já que está injetado
       const orphanParticipants = await this.participantModel.find({
         clientId: clientId,
@@ -96,7 +97,19 @@ export class ParticipantListsService {
       }).exec();
       
       if (orphanParticipants.length > 0) {
-        console.log(`🚨 AUTO-FIX: Encontrados ${orphanParticipants.length} participantes órfãos - corrigindo...`);
+        console.log(`🔍 [ORPHANS-FOUND] ============ ÓRFÃOS DETECTADOS ============`);
+        console.log(`🔍 [ORPHANS-FOUND] Quantidade de órfãos: ${orphanParticipants.length}`);
+        console.log('🔍 [ORPHANS-FOUND] Participantes órfãos:', orphanParticipants.map(p => ({
+          id: p._id,
+          name: p.name,
+          email: p.email,
+          listsCount: p.lists?.length || 0
+        })));
+        
+        // 🚨 PROBLEMA: Esta lógica cria "Lista Geral" automaticamente
+        console.log('🔍 [AUTO-FIX-PROBLEM] ============ PROBLEMA IDENTIFICADO ============');
+        console.log('🔍 [AUTO-FIX-PROBLEM] Este código vai criar "Lista Geral" automaticamente!');
+        console.log('🔍 [AUTO-FIX-PROBLEM] Isso é o que está causando o problema relatado!');
         
         // Buscar ou criar lista padrão
         let defaultList = await this.participantListModel.findOne({
@@ -109,7 +122,12 @@ export class ParticipantListsService {
           ]
         }).exec();
         
+        console.log('🔍 [DEFAULT-LIST] Lista Geral existente encontrada:', !!defaultList);
+        
         if (!defaultList) {
+          console.log('🔍 [CREATE-GENERAL] ============ CRIANDO LISTA GERAL ============');
+          console.log('🔍 [CREATE-GENERAL] Este é o momento onde "Lista Geral" é criada!');
+          
           defaultList = new this.participantListModel({
             name: 'Lista Geral',
             description: 'Lista padrão criada automaticamente para novos participantes',
@@ -118,11 +136,13 @@ export class ParticipantListsService {
             participants: []
           });
           defaultList = await defaultList.save();
-          console.log('✅ AUTO-FIX: Lista padrão criada:', defaultList._id);
+          console.log('🔍 [CREATE-GENERAL] Lista Geral criada com ID:', defaultList._id);
         }
         
         // Associar órfãos à lista padrão
         const orphanIds = orphanParticipants.map(p => p._id);
+        console.log('🔍 [ORPHAN-MOVE] Movendo órfãos para Lista Geral:', orphanIds);
+        
         await this.participantListModel.findByIdAndUpdate(
           defaultList._id,
           { $addToSet: { participants: { $each: orphanIds } } }
@@ -133,7 +153,9 @@ export class ParticipantListsService {
           { $addToSet: { lists: defaultList._id } }
         );
         
-        console.log(`✅ AUTO-FIX: ${orphanParticipants.length} participantes órfãos corrigidos automaticamente`);
+        console.log(`🔍 [ORPHAN-MOVED] ${orphanParticipants.length} participantes movidos para Lista Geral`);
+      } else {
+        console.log('🔍 [NO-ORPHANS] Nenhum participante órfão encontrado');
       }
     } catch (autoFixError) {
       console.error('❌ AUTO-FIX: Erro na correção automática (continuando busca):', autoFixError);

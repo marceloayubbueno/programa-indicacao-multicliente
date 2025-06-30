@@ -972,6 +972,13 @@ function handleImport(event) {
                     submitButton.textContent = originalButtonText;
                     return;
                 }
+                // 🔍 DIAGNÓSTICO: Log detalhado do processo de importação
+                console.log('🔍 [IMPORT-START] Iniciando importação de participantes:');
+                console.log('🔍 [IMPORT-DATA] ClientId:', clientId);
+                console.log('🔍 [IMPORT-DATA] Quantidade de participantes:', participants.length);
+                console.log('🔍 [IMPORT-DATA] Participantes:', participants.map(p => ({ name: p.name, email: p.email })));
+                console.log('🔍 [IMPORT-FLOW] Chamando /participants/import SEM listId');
+                
                 // Enviar participantes para o backend
                 const importResp = await fetch(`${API_URL}/participants/import`, {
                     method: 'POST',
@@ -986,23 +993,33 @@ function handleImport(event) {
                     throw new Error(data.message || 'Erro ao importar participantes');
                 }
                 
-                // 🔍 DEBUG: Verificar resposta da importação
+                // 🔍 DIAGNÓSTICO: Verificar resposta da importação
                 const importData = await importResp.json();
-                console.log('🔍 [DEBUG-IMPORT] Resposta da importação:', importData);
+                console.log('🔍 [IMPORT-RESPONSE] Status da importação:', importResp.status);
+                console.log('🔍 [IMPORT-RESPONSE] Dados retornados:', importData);
+                console.log('🔍 [IMPORT-RESPONSE] Participantes criados:', importData.participantsCreated || 'indefinido');
+                console.log('🔍 [IMPORT-RESPONSE] Total processados:', importData.totalProcessed || 'indefinido');
                 
-                // Obter os participantes importados (buscar por e-mail)
+                // 🔍 DIAGNÓSTICO: Buscar participantes importados
                 const emails = participants.map(p => p.email);
-                console.log('🔍 [DEBUG-SEARCH] Buscando participantes com emails:', emails);
+                console.log('🔍 [SEARCH-START] Buscando participantes recém-importados:');
+                console.log('🔍 [SEARCH-EMAILS] Emails para buscar:', emails);
                 
                 const searchResp = await fetch(`${API_URL}/participants?clientId=${clientId}&limit=1000`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const allData = await searchResp.json();
-                console.log('🔍 [DEBUG-SEARCH] Total participantes encontrados:', allData.participants?.length);
+                console.log('🔍 [SEARCH-RESULT] Status da busca:', searchResp.status);
+                console.log('🔍 [SEARCH-RESULT] Total participantes no cliente:', allData.participants?.length);
                 
                 const importedParticipants = (allData.participants || []).filter(p => emails.includes(p.email));
-                console.log('🔍 [DEBUG-FILTER] Participantes filtrados por email:', importedParticipants.length);
-                console.log('🔍 [DEBUG-FILTER] Participantes filtrados:', importedParticipants.map(p => ({ id: p._id, email: p.email })));
+                console.log('🔍 [FILTER-RESULT] Participantes encontrados por email:', importedParticipants.length);
+                console.log('🔍 [FILTER-RESULT] Participantes detalhados:', importedParticipants.map(p => ({ 
+                    id: p._id, 
+                    email: p.email, 
+                    lists: p.lists?.length || 0,
+                    listsIds: p.lists?.map(l => l._id || l) || []
+                })));
                 
                 // 🆕 CORREÇÃO: Permitir criar lista mesmo se alguns participantes falharam
                 // A lista será criada e os participantes válidos serão adicionados
@@ -1017,14 +1034,28 @@ function handleImport(event) {
                     return;
                 }
                 
-                // 🔧 CORREÇÃO CRÍTICA: Validar e mapear IDs corretamente
+                // 🔍 DIAGNÓSTICO: Preparação para criação da lista
                 const participantIds = importedParticipants
                     .map(p => p._id || p.id)
                     .filter(id => id); // Remove IDs undefined/null
                 
-                console.log('🔍 [DEBUG-IDS] IDs mapeados para lista:', participantIds);
+                console.log('🔍 [LIST-PREP] Preparando criação da lista:');
+                console.log('🔍 [LIST-PREP] Nome da lista:', listName);
+                console.log('🔍 [LIST-PREP] Tipo da lista:', listTipo);
+                console.log('🔍 [LIST-PREP] IDs para associar:', participantIds);
+                console.log('🔍 [LIST-PREP] Quantidade a associar:', participantIds.length);
                 
-                // Criar a lista (mesmo que vazia inicialmente)
+                // 🔍 DIAGNÓSTICO: Verificar se todos os participantes têm listas vazias
+                importedParticipants.forEach((p, idx) => {
+                    console.log(`🔍 [PARTICIPANT-${idx + 1}] ${p.email}:`, {
+                        id: p._id,
+                        listsCount: p.lists?.length || 0,
+                        lists: p.lists?.map(l => l._id || l) || []
+                    });
+                });
+                
+                // Criar a lista
+                console.log('🔍 [LIST-CREATE] Chamando API para criar lista...');
                 const listResp = await fetch(`${API_URL}/participant-lists`, {
                     method: 'POST',
                     headers: {
@@ -1040,12 +1071,20 @@ function handleImport(event) {
                     })
                 });
                 
+                console.log('🔍 [LIST-RESPONSE] Status da criação:', listResp.status);
+                
                 if (!listResp.ok) {
                     const data = await listResp.json();
+                    console.log('🔍 [LIST-ERROR] Erro na criação:', data);
                     throw new Error(data.message || 'Erro ao criar lista');
                 }
                 
-                console.log('🔍 [DEBUG-LIST] Lista criada com', participantIds.length, 'participantes associados');
+                const listData = await listResp.json();
+                console.log('🔍 [LIST-SUCCESS] Lista criada com sucesso:', {
+                    listId: listData._id || listData.id,
+                    name: listData.name,
+                    participantsAssociated: participantIds.length
+                });
                 
                 // Mensagem de sucesso personalizada baseada no resultado
                 if (participantIds.length === 0) {

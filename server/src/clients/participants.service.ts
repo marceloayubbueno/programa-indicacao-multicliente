@@ -283,12 +283,17 @@ export class ParticipantsService {
 
   // 🔧 MÉTODO MELHORADO: Importar participantes com detecção de duplicatas
   async importMany(dto: ImportParticipantsDto) {
-    console.log('🔧 BACKEND importMany MELHORADO chamado com:', {
+    console.log('🔍 [BACKEND-IMPORT] ============ INICIANDO IMPORTAÇÃO ============');
+    console.log('🔍 [BACKEND-IMPORT] DTO recebido:', {
       clientId: dto.clientId,
-      listId: dto.listId,
+      listId: dto.listId || 'NENHUM',
       tipoParticipante: dto.tipoParticipante,
       participantesCount: dto.participants.length
     });
+    console.log('🔍 [BACKEND-IMPORT] Participantes a importar:', dto.participants.map(p => ({ 
+      name: p.name, 
+      email: p.email 
+    })));
 
     try {
       // 🎯 DETECÇÃO DE DUPLICATAS: Verificar emails já existentes
@@ -298,13 +303,23 @@ export class ParticipantsService {
         email: { $in: incomingEmails }
       }).select('_id email name lists').exec();
 
-      console.log(`🔍 BACKEND Verificação de duplicatas: ${existingParticipants.length} já existem de ${dto.participants.length} enviados`);
+      console.log(`🔍 [BACKEND-DUPLICATES] Verificação de duplicatas: ${existingParticipants.length} já existem de ${dto.participants.length} enviados`);
+      
+      // 🔍 DIAGNÓSTICO: Verificar estado dos participantes existentes
+      console.log('🔍 [BACKEND-EXISTING] Participantes existentes encontrados:', existingParticipants.map(p => ({
+        id: p._id,
+        email: p.email,
+        name: p.name,
+        listsCount: p.lists?.length || 0,
+        lists: p.lists?.map(l => l.toString()) || []
+      })));
 
       // Separar novos dos existentes
       const existingEmails = existingParticipants.map(p => p.email.toLowerCase());
       const newParticipants = dto.participants.filter(p => !existingEmails.includes(p.email.toLowerCase()));
 
-      console.log(`📊 BACKEND ${newParticipants.length} novos participantes, ${existingParticipants.length} duplicatas`);
+      console.log(`🔍 [BACKEND-SPLIT] ${newParticipants.length} novos participantes, ${existingParticipants.length} duplicatas`);
+      console.log('🔍 [BACKEND-NEW] Novos participantes a criar:', newParticipants.map(p => ({ name: p.name, email: p.email })));
 
       // 🔧 CRIAR NOVOS PARTICIPANTES
       let insertedParticipants: any[] = [];
@@ -325,7 +340,9 @@ export class ParticipantsService {
 
       // 🚀 SOLUÇÃO DEFINITIVA: SEMPRE sincronizar TODOS (novos + existentes) se listId fornecido
       if (dto.listId) {
-        console.log('🔧 BACKEND SINCRONIZAÇÃO BIDIRECIONAL COMPLETA para lista:', dto.listId);
+        console.log('🔍 [BACKEND-SYNC] ============ INICIANDO SINCRONIZAÇÃO ============');
+        console.log('🔍 [BACKEND-SYNC] ListId fornecido:', dto.listId);
+        console.log('🔍 [BACKEND-SYNC] Vai sincronizar novos + existentes');
         
         try {
           // Verificar se a lista existe
@@ -380,12 +397,18 @@ export class ParticipantsService {
           }
           
         } catch (syncError) {
-          console.error('❌ BACKEND Erro na sincronização automática:', syncError);
+          console.error('🔍 [BACKEND-SYNC-ERROR] Erro na sincronização automática:', syncError);
           // Não falhar a importação por erro de sincronização
         }
+      } else {
+        console.log('🔍 [BACKEND-NO-SYNC] ============ NENHUMA SINCRONIZAÇÃO ============');
+        console.log('🔍 [BACKEND-NO-SYNC] ListId NÃO fornecido - participantes ficam órfãos!');
+        console.log('🔍 [BACKEND-NO-SYNC] Participantes criados:', insertedParticipants.length);
+        console.log('🔍 [BACKEND-NO-SYNC] Participantes existentes:', existingParticipants.length);
+        console.log('🔍 [BACKEND-NO-SYNC] Estes participantes não estão associados a nenhuma lista');
       }
 
-      return {
+      const result = {
         success: true,
         message: `${insertedParticipants.length} novos participantes criados, ${existingParticipants.length} duplicatas associadas à lista`,
         participantsCreated: insertedParticipants.length,
@@ -394,6 +417,11 @@ export class ParticipantsService {
         listAssociated: !!dto.listId,
         autoSyncApplied: !!dto.listId
       };
+      
+      console.log('🔍 [BACKEND-RESULT] ============ RESULTADO FINAL ============');
+      console.log('🔍 [BACKEND-RESULT] Resultado da importação:', result);
+      
+      return result;
 
     } catch (error) {
       console.error('❌ BACKEND Erro na importação:', error);
