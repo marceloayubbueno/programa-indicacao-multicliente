@@ -62,9 +62,6 @@
                 <button class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors" onclick="window.location.href='editar-lista.html'">
                   <i class="fas fa-plus mr-2"></i>Nova Lista
                 </button>
-                <button class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors" onclick="showImportModal()">
-                  <i class="fas fa-upload mr-2"></i>Importar Base
-                </button>
                 <button class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors" onclick="showBulkListActions()">
                   <i class="fas fa-tasks mr-2"></i>Ações em Lote
                 </button>
@@ -152,16 +149,7 @@
             
             <!-- Aba: Usuários -->
             <div id="tab-content-users" class="tab-content hidden">
-              <!-- Aviso sobre Importação -->
-              <div class="bg-blue-900/20 border border-blue-400/30 rounded-lg p-4 mb-6">
-                <div class="flex items-center gap-3">
-                  <i class="fas fa-info-circle text-blue-400"></i>
-                  <div>
-                    <h4 class="font-semibold text-blue-400">Importação de Participantes</h4>
-                    <p class="text-sm text-gray-300">Para importar participantes em lote, utilize a aba <strong>"Listas"</strong> e clique em "Importar Base". Isso criará uma nova lista com os participantes importados.</p>
-                  </div>
-                </div>
-              </div>
+
               
               <!-- Filtros por Tipo de Usuário -->
               <div class="flex gap-2 mb-6">
@@ -344,62 +332,6 @@
         </div>
       </div>
     </div>
-    
-    <!-- ✅ MODAL DE IMPORTAÇÃO COMPLETO COM DIAGNÓSTICO -->
-    <div id="importModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
-      <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-lg relative">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-gray-100">Importar Base de Usuários Participantes</h2>
-          <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closeImportModal()">&times;</button>
-        </div>
-        <form id="importForm" onsubmit="return handleImport(event)" class="flex flex-col gap-4">
-          <div>
-            <label for="listNameImport" class="block text-sm font-medium mb-1">Nome da Lista:*</label>
-            <input type="text" id="listNameImport" required placeholder="Digite o nome da lista para os usuários participantes importados" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
-          </div>
-          <div>
-            <label for="listDescriptionImport" class="block text-sm font-medium mb-1">Descrição da Lista:</label>
-            <textarea id="listDescriptionImport" rows="3" placeholder="Digite uma descrição para a lista" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2"></textarea>
-          </div>
-          <!-- ✅ CAMPO OBRIGATÓRIO: TIPO DA LISTA -->
-          <div>
-            <label for="listTipoImport" class="block text-sm font-medium mb-1">Tipo da Lista*:</label>
-            <select id="listTipoImport" name="listTipoImport" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
-              <option value="">Selecione o tipo</option>
-              <option value="participante">Participante</option>
-              <option value="indicador">Indicador</option>
-              <option value="influenciador">Influenciador</option>
-              <option value="mista">Mista</option>
-            </select>
-          </div>
-          <div>
-            <label for="importType" class="block text-sm font-medium mb-1">Tipo de Arquivo:</label>
-            <select id="importType" required onchange="toggleImportFields()" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
-              <option value="">Selecione o tipo</option>
-              <option value="excel">Excel (.xlsx)</option>
-              <option value="csv">CSV (.csv)</option>
-            </select>
-          </div>
-          <div>
-            <label for="importFile" class="block text-sm font-medium mb-1">Arquivo:</label>
-            <input type="file" id="importFile" accept=".xlsx,.csv" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
-            <small class="text-xs text-gray-400">Formatos aceitos: .xlsx, .csv</small>
-          </div>
-          <div>
-            <label for="importMapping" class="block text-sm font-medium mb-1">Mapeamento de Campos:</label>
-            <div id="importMapping" class="bg-gray-900 rounded-lg p-2 border border-gray-700"></div>
-          </div>
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="importUpdate" name="importUpdate" class="rounded border-gray-700 text-blue-400 focus:ring-blue-400">
-            <label for="importUpdate" class="text-sm font-medium">Atualizar registros existentes</label>
-          </div>
-          <div class="flex items-center justify-end gap-2 mt-4">
-            <button type="button" class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 shadow hover:bg-gray-600 transition-colors" onclick="closeImportModal()">Cancelar</button>
-            <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors">Importar</button>
-          </div>
-        </form>
-      </div>
-    </div>
     <!-- 🌟 MÓDULOS REFATORADOS COM ORDEM CORRIGIDA -->
     <script src="../js/config.js"></script>
     <script src="../js/auth.js"></script>
@@ -408,10 +340,6 @@
     <script src="../js/modules/participants-manager.js"></script>
     <script src="../js/participants-helpers.js"></script>
     <script src="../js/participants.js"></script>
-    
-    <!-- ✅ FUNCIONALIDADE DE IMPORTAÇÃO COMPLETA -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-    <script src="../js/participant-lists.js"></script>
     
     <!-- ✅ SISTEMA INTEGRADO v2.0 - PRONTO PARA 10.000+ USUÁRIOS -->
     <script>
