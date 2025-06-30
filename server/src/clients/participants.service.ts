@@ -104,6 +104,24 @@ export class ParticipantsService {
     if (listId) {
       console.log('🔧 LISTID FILTER: Aplicando filtro por lista:', listId);
       query.lists = { $in: [listId] };
+      
+      // 🔍 H2 - DIAGNÓSTICO FILTRO BACKEND DETALHADO
+      console.log('🔍 H2 - FILTRO BACKEND APLICADO:', {
+        originalFilter: filter,
+        extractedListId: listId,
+        listIdType: typeof listId,
+        finalQuery: query,
+        queryListsField: query.lists,
+        clientId: clientId
+      });
+    } else {
+      // 🔍 H2 - DIAGNÓSTICO QUANDO NÃO HÁ FILTRO
+      console.log('🔍 H2 - SEM FILTRO DE LISTA:', {
+        originalFilter: filter,
+        hasListId: !!listId,
+        listIdValue: listId || 'UNDEFINED',
+        finalQuery: query
+      });
     }
     
     // 🔍 DEBUG BACKEND SERVICE - Log da query

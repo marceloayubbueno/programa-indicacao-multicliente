@@ -59,10 +59,26 @@ export class ParticipantsController {
     console.log('🔍 DEBUG BACKEND CONTROLLER - Page:', page, 'Limit:', limit);
     console.log('🔍 DEBUG BACKEND CONTROLLER - Query params:', query);
     
+    // 🔍 H2 - DIAGNÓSTICO FILTROS RECEBIDOS BACKEND
+    console.log('🔍 H2 - FILTROS RECEBIDOS BACKEND:', {
+      allQueryParams: query,
+      hasListId: !!query.listId,
+      listIdValue: query.listId || 'VAZIO',
+      listIdType: typeof query.listId,
+      otherFilters: Object.keys(query).filter(key => !['clientId', 'page', 'limit'].includes(key))
+    });
+    
     // Remove parâmetros de paginação/filtro do filtro real
     const { clientId: cId, page: p, limit: l, ...filter } = query;
     
     console.log('🔍 DEBUG BACKEND CONTROLLER - Filter after cleanup:', filter);
+    
+    // 🔍 H2 - DIAGNÓSTICO FILTRO LIMPO
+    console.log('🔍 H2 - FILTRO APÓS LIMPEZA:', {
+      filterAfterCleanup: filter,
+      hasListIdAfterCleanup: !!filter.listId,
+      listIdAfterCleanup: filter.listId || 'VAZIO'
+    });
     
     // 🔒 SEGURANÇA: Usar clientId do JWT, ignorando qualquer tentativa de override via query
     const result = await this.participantsService.findAll(clientId, Number(page), Number(limit), filter);

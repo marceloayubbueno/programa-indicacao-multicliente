@@ -121,6 +121,15 @@ class APIClient {
 
         // 🔍 DEBUG H1 - URL completa
         console.log('🔍 DEBUG H1 - URL completa:', url);
+        
+        // 🔍 H2 - DIAGNÓSTICO URL COM FILTROS
+        console.log('🔍 H2 - URL COM FILTROS DETALHADA:', {
+            baseUrl: url,
+            filters: filters,
+            hasListIdFilter: !!filters.listId,
+            listIdValue: filters.listId || 'VAZIO',
+            allFilters: Object.keys(filters).map(key => ({ key, value: filters[key], hasValue: !!filters[key] }))
+        });
 
         // Verificar cache
         const cacheKey = this.getCacheKey(url);
@@ -129,11 +138,26 @@ class APIClient {
         console.log('🔍 DEBUG H4 - Cache key:', cacheKey);
         console.log('🔍 DEBUG H4 - Using cache?', useCache);
         
+        // 🔍 H4 - DIAGNÓSTICO CACHE STATUS
+        console.log('🔍 H4 - CACHE STATUS DETALHADO:', {
+            cacheKey: cacheKey,
+            useCache: useCache,
+            cacheHit: !!this.getCache(cacheKey),
+            cacheSize: this.cache.size,
+            cacheKeys: Array.from(this.cache.keys()).slice(0, 3) // Primeiras 3 chaves para não sobrecarregar
+        });
+        
         if (useCache) {
             const cached = this.getCache(cacheKey);
             console.log('🔍 DEBUG H4 - Cache hit:', !!cached);
             if (cached) {
                 console.log('📦 Cache hit:', url);
+                // 🔍 H4 - DADOS DO CACHE
+                console.log('🔍 H4 - DADOS RETORNADOS DO CACHE:', {
+                    participantsCount: cached.participants?.length || 0,
+                    hasParticipants: (cached.participants?.length || 0) > 0,
+                    sampleFromCache: cached.participants?.slice(0, 2).map(p => ({ id: p._id, name: p.name })) || []
+                });
                 return cached;
             }
         }

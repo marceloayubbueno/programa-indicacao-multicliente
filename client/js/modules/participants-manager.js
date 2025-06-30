@@ -82,11 +82,23 @@ class ParticipantsManager {
             
             // 🔍 H5 - DIAGNÓSTICO ANTES E APÓS ADAPTAÇÃO
             console.log('🔍 H5 - Participantes ANTES da adaptação:', data.participants?.length || 0);
+            console.log('🔍 H5 - Dados RAW sample (primeiros 2):', data.participants?.slice(0, 2).map(p => ({
+                id: p._id,
+                name: p.name,
+                lists: p.lists?.length || 0,
+                listsData: p.lists?.map(l => ({ id: l._id, name: l.name })) || []
+            })));
             
             // 🎯 Adaptar dados usando DataAdapter
             this.participants = data.participants?.map(p => DataAdapter.adaptParticipant(p)) || [];
             
             console.log('🔍 H5 - Participantes APÓS adaptação:', this.participants.length);
+            console.log('🔍 H5 - Dados ADAPTADOS sample (primeiros 2):', this.participants.slice(0, 2).map(p => ({
+                id: p.id,
+                name: p.name,
+                lists: p.lists?.length || 0,
+                listsData: p.lists?.map(l => typeof l === 'object' ? l.name : l) || []
+            })));
             console.log('🔍 H5 - Participantes perdidos na adaptação:', (data.participants?.length || 0) - this.participants.length);
             
             this.totalItems = data.total || this.participants.length;
@@ -129,6 +141,20 @@ class ParticipantsManager {
         console.log('🔍 H4 - Filtros ativos:', this.currentFilters);
         console.log('🔍 H4 - Página atual:', this.currentPage);
         console.log('🔍 H4 - Total de itens:', this.totalItems);
+        
+        // 🔍 H3 - DIAGNÓSTICO DADOS PARTICIPANTES: Verificar relação lista-participantes
+        console.log('🔍 H3 - DADOS PARTICIPANTES:', {
+            participantsWithLists: this.participants.filter(p => p.lists?.length > 0).length,
+            participantsWithoutLists: this.participants.filter(p => !p.lists || p.lists.length === 0).length,
+            totalParticipants: this.participants.length,
+            sampleParticipantLists: this.participants.slice(0, 3).map(p => ({
+                id: p.id,
+                name: p.name,
+                lists: p.lists?.length || 0,
+                listsIds: p.lists?.map(l => typeof l === 'object' ? l._id : l) || []
+            })),
+            currentListFilter: this.currentFilters?.listId || 'NENHUM'
+        });
         
         // 🔍 DEBUG - Display info
         console.log('🔍 DEBUG DISPLAY - Participants to display:', this.participants.length);

@@ -50,6 +50,14 @@ function initializeManagers() {
             const listFilter = document.getElementById('listFilter');
             if (!listFilter) return;
             
+            // 🔍 H1 - DIAGNÓSTICO FILTRO: Verificar população do filtro
+            console.log('🔍 H1 - DIAGNÓSTICO FILTRO:', {
+                listsManagerLists: this.lists?.length || 0,
+                listFilterElement: !!document.getElementById('listFilter'),
+                existingOptions: document.getElementById('listFilter')?.options?.length || 0,
+                listsData: this.lists?.map(l => ({ id: l._id, name: l.name })) || []
+            });
+            
             // Limpar opções existentes (exceto "Todas as listas")
             const options = listFilter.querySelectorAll('option:not([value=""])');
             options.forEach(option => option.remove());
@@ -60,6 +68,12 @@ function initializeManagers() {
                 option.value = list._id;
                 option.textContent = list.name;
                 listFilter.appendChild(option);
+            });
+            
+            // 🔍 H1 - DIAGNÓSTICO FILTRO: Verificar após população
+            console.log('🔍 H1 - FILTRO APÓS POPULAÇÃO:', {
+                finalOptionsCount: listFilter.options.length,
+                optionsValues: Array.from(listFilter.options).map(opt => ({ value: opt.value, text: opt.textContent }))
             });
             
             console.log(`✅ Filtro de listas atualizado com ${this.lists.length} opções`);
@@ -500,6 +514,16 @@ async function filterParticipants() {
         listId: document.getElementById('listFilter')?.value || '',
         email: document.getElementById('emailFilter')?.value || ''
     };
+    
+    // 🔍 H2 - DIAGNÓSTICO FILTROS ENVIADOS
+    console.log('🔍 H2 - FILTROS ENVIADOS FRONTEND:', {
+        filters: filters,
+        listIdFilter: filters.listId,
+        hasListId: !!filters.listId,
+        statusFilter: filters.status,
+        emailFilter: filters.email,
+        participantsManagerExists: !!participantsManager
+    });
     
     await participantsManager.applyFilters(filters);
 }
