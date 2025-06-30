@@ -4,6 +4,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Documentação (não expor)
+docs/
+
 # Arquivos de deploy e credenciais (CRÍTICO - NÃO COMMITAR)
 docs/deploy-credentials.md
 deploy-credentials.md
