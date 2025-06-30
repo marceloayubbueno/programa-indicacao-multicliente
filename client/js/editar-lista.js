@@ -490,43 +490,76 @@ async function createList(formData) {
     timestamp: new Date().toISOString()
   });
 
-  // 1. Importar novos participantes se houver
+  // 🚀 CORREÇÃO DEFINITIVA: INVERTER FLUXO - CRIAR LISTA PRIMEIRO
+  
+  // 1. PRIMEIRO: Criar lista (vazia inicialmente)
+  console.log('🔍 H2 - NOVO FLUXO: CRIAR LISTA PRIMEIRO:', {
+    step: 'CREATE_LIST_FIRST',
+    listName: formData.name,
+    listTipo: formData.tipo,
+    existingParticipantsCount: existingParticipants.length,
+    newParticipantsCount: newParticipants.length,
+    strategy: 'CREATE_EMPTY_LIST_THEN_IMPORT_WITH_LISTID',
+    timestamp: new Date().toISOString()
+  });
+
+  const initialListPayload = {
+    ...formData,
+    participants: existingParticipants.map(p => p._id || p.id) // Apenas existentes primeiro
+  };
+
+  const listResponse = await fetch(`${getApiUrl()}/participant-lists`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(initialListPayload)
+  });
+
+  if (!listResponse.ok) {
+    const errorData = await listResponse.json();
+    console.log('🔍 H2 - ERRO CRIAR LISTA PRIMEIRO:', {
+      status: listResponse.status,
+      error: errorData,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(errorData.message || 'Erro ao criar lista');
+  }
+
+  const createdList = await listResponse.json();
+  const listId = createdList._id || createdList.id;
+
+  console.log('🔍 H2 - LISTA CRIADA PRIMEIRO - SUCESSO:', {
+    listId: listId,
+    listName: createdList.name,
+    existingParticipantsAssociated: existingParticipants.length,
+    step: 'LIST_CREATED_FIRST',
+    timestamp: new Date().toISOString()
+  });
+
+  // 2. SEGUNDO: Importar novos participantes COM listId
   let newParticipantIds = [];
   if (newParticipants.length > 0) {
-    // 🔍 H3 - DIAGNÓSTICO: Import sem listId - PROBLEMA IDENTIFICADO!
-    console.log('🔍 H3 - IMPORT SEM LISTID DETECTADO:', {
-      problem: 'CALLING_IMPORT_WITHOUT_LISTID',
+    console.log('🔍 H3 - NOVO FLUXO: IMPORT COM LISTID:', {
+      listId: listId,
       endpoint: '/participants/import',
       newParticipantsCount: newParticipants.length,
-      willCreateOrphans: true,
-      missingField: 'listId',
-      step: 'IMPORT_NEW_PARTICIPANTS',
+      willCreateOrphans: false, // ✅ CORREÇÃO: COM LISTID
+      listIdProvided: true, // ✅ CORREÇÃO APLICADA
+      step: 'IMPORT_WITH_LISTID',
       timestamp: new Date().toISOString()
     });
 
     try {
-      // 🔧 CORREÇÃO: Adicionar campos obrigatórios do DTO
       const participantsWithRequiredFields = newParticipants.map(p => ({
         name: p.name,
         email: p.email,
         phone: p.phone,
         clientId: formData.clientId,
-        tipo: formData.tipo || 'participante', // 🚀 Campo obrigatório do DTO
-        status: 'ativo' // 🔧 CORREÇÃO: Usar valor em português conforme schema
+        tipo: formData.tipo || 'participante',
+        status: 'ativo'
       }));
-
-      // 🔍 H3 - DIAGNÓSTICO: Payload de importação
-      console.log('🔍 H3 - IMPORT PAYLOAD SEM LISTID:', {
-        clientId: formData.clientId,
-        participantsCount: participantsWithRequiredFields.length,
-        participants: participantsWithRequiredFields.map(p => ({
-          name: p.name,
-          email: p.email,
-          tipo: p.tipo
-        })),
-        listIdProvided: false, // ❌ PROBLEMA CRÍTICO
-        timestamp: new Date().toISOString()
-      });
 
       const response = await fetch(`${getApiUrl()}/participants/import`, {
         method: 'POST',
@@ -536,8 +569,8 @@ async function createList(formData) {
         },
         body: JSON.stringify({ 
           clientId: formData.clientId, 
-          participants: participantsWithRequiredFields 
-          // ❌ LISTID FALTANDO AQUI - ÓRFÃOS SERÃO CRIADOS!
+          participants: participantsWithRequiredFields,
+          listId: listId // ✅ CORREÇÃO: LISTID FORNECIDO!
         })
       });
 
@@ -548,93 +581,59 @@ async function createList(formData) {
 
       const data = await response.json();
       
-      // 🔍 H3 - DIAGNÓSTICO: Resultado da importação sem listId
-      console.log('🔍 H3 - IMPORT RESULT SEM LISTID:', {
+      console.log('🔍 H3 - IMPORT COM LISTID - SUCESSO:', {
         status: response.status,
         participantsCreated: data.participantsCreated || 0,
         duplicatesFound: data.duplicatesFound || 0,
         totalProcessed: data.totalProcessed || 0,
         listAssociated: data.listAssociated || false,
         autoSyncApplied: data.autoSyncApplied || false,
-        orphansCreated: true, // ❌ CONFIRMADO: ÓRFÃOS CRIADOS
+        orphansCreated: false, // ✅ CORREÇÃO: SEM ÓRFÃOS
+        associatedToList: listId,
         data: data,
         timestamp: new Date().toISOString()
       });
 
       newParticipantIds = (data.participants || []).map(p => p._id);
       
-      // 🔍 H3 - DIAGNÓSTICO: IDs dos novos participantes órfãos
-      console.log('🔍 H3 - NOVOS PARTICIPANTES ORFAOS CRIADOS:', {
-        newParticipantIds: newParticipantIds,
-        count: newParticipantIds.length,
-        willTriggerAutoFix: true,
-        timestamp: new Date().toISOString()
-      });
-      
-      showNotification(`${newParticipants.length} novos participantes importados!`, 'success', 2000);
+      showNotification(`${newParticipants.length} novos participantes importados e associados à lista!`, 'success', 2000);
     } catch (error) {
       throw new Error('Falha ao importar participantes: ' + error.message);
     }
   }
 
-  // 2. Criar lista com todos os IDs
+  // 3. RESULTADO FINAL
   const allParticipantIds = [
     ...existingParticipants.map(p => p._id || p.id),
     ...newParticipantIds
   ];
 
-  // 🔍 H2 - DIAGNÓSTICO: Criação da lista
-  console.log('🔍 H2 - CRIAR LISTA COM PARTICIPANTES:', {
-    step: 'CREATE_LIST_WITH_PARTICIPANTS',
-    listName: formData.name,
-    listTipo: formData.tipo,
-    allParticipantIds: allParticipantIds,
-    participantCount: allParticipantIds.length,
-    existingIds: existingParticipants.map(p => p._id || p.id),
-    newIds: newParticipantIds,
+  console.log('🔍 H2 - FLUXO CORRIGIDO FINALIZADO:', {
+    step: 'CORRECTED_FLOW_COMPLETED',
+    listId: listId,
+    listName: createdList.name,
+    totalParticipants: allParticipantIds.length,
+    existingParticipants: existingParticipants.length,
+    newParticipants: newParticipantIds.length,
+    orphansPrevented: true, // ✅ CORREÇÃO APLICADA
+    autoFixAvoided: true, // ✅ CORREÇÃO APLICADA  
     timestamp: new Date().toISOString()
   });
 
-  const listPayload = {
-    ...formData,
-    participants: allParticipantIds
-  };
-
-  const response = await fetch(`${getApiUrl()}/participant-lists`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(listPayload)
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.log('🔍 H2 - ERRO CRIAR LISTA:', {
-      status: response.status,
-      error: errorData,
-      timestamp: new Date().toISOString()
-    });
-    throw new Error(errorData.message || 'Erro ao criar lista');
-  }
-
-  const responseData = await response.json();
-
-  // 🔍 H2 - DIAGNÓSTICO: Lista criada com sucesso
+  // 🔍 H2 - DIAGNÓSTICO: Lista criada com sucesso (fluxo corrigido)
   console.log('🔍 H2 - LISTA CRIADA COM SUCESSO:', {
     step: 'LIST_CREATED_SUCCESS',
-    listId: responseData._id || responseData.id,
-    listName: responseData.name,
+    listId: createdList._id || createdList.id,
+    listName: createdList.name,
     participantsAssociated: allParticipantIds.length,
-    responseData: responseData,
+    responseData: createdList,
     timestamp: new Date().toISOString()
   });
 
   // 🔍 H3 - DIAGNÓSTICO: Redirecionamento
   console.log('🔍 H3 - REDIRECIONAMENTO EDITAR-LISTA:', {
     currentPage: 'editar-lista.html',
-    willRedirectTo: 'participant-lists.html',
+    willRedirectTo: 'participants.html',
     redirectDelay: 1500,
     redirectMethod: 'window.location.href',
     timestamp: new Date().toISOString()
@@ -644,10 +643,10 @@ async function createList(formData) {
   setTimeout(() => {
     console.log('🔍 H3 - REDIRECIONAMENTO EXECUTADO:', {
       action: 'REDIRECT_EXECUTED',
-      targetPage: 'participant-lists.html',
+      targetPage: 'participants.html',
       timestamp: new Date().toISOString()
     });
-    window.location.href = 'participant-lists.html';
+    window.location.href = 'participants.html';
   }, 1500);
 }
 
