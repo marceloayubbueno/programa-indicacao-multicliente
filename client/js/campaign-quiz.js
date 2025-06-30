@@ -391,14 +391,21 @@ async function fetchListasParticipantes() {
     }
     
     console.log('🔍 H1 - Total de listas encontradas:', listas.length);
-    console.log('🔍 H1 - Detalhes das listas:', listas.map(l => ({
-      id: l._id,
-      name: l.name,
-      tipo: l.tipo,
-      participantsLength: l.participants?.length || 0,
-      hasParticipants: Array.isArray(l.participants),
-      createdAt: l.createdAt
-    })));
+    
+    // 🔍 DIAGNÓSTICO DETALHADO - vamos ver EXATAMENTE o que vem do backend
+    listas.forEach((lista, index) => {
+      console.log(`🔍 H1 - LISTA ${index + 1} COMPLETA:`, lista);
+      console.log(`🔍 H1 - LISTA ${index + 1} CAMPOS:`, {
+        _id: lista._id,
+        name: lista.name,
+        tipo: lista.tipo,
+        type: lista.type, // Pode ter mudado para 'type'
+        participants: lista.participants,
+        participantIds: lista.participantIds, // Pode ter mudado o nome
+        participantCount: lista.participantCount,
+        allKeys: Object.keys(lista)
+      });
+    });
     
     // ✅ FILTRO CORRETO: tipo "participante" E com participantes ativos
     const filtradas = listas.filter(l => 
