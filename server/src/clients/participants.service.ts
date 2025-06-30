@@ -16,13 +16,79 @@ export class ParticipantsService {
   ) {}
 
   async create(dto: CreateParticipantDto) {
-    console.log('DTO recebido para criação:', dto);
+    console.log('🔧 BACKEND create participant chamado:', dto);
     const participant = new this.participantModel({
       ...dto,
       participantId: (dto as any).participantId || uuidv4()
     });
-    console.log('Objeto Participant a ser salvo:', participant);
-    return participant.save();
+    
+    const savedParticipant = await participant.save();
+    console.log('✅ BACKEND Participante criado:', savedParticipant._id);
+    
+    // 🚀 CORREÇÃO DEFINITIVA: Auto-associar participante a lista padrão
+    await this.autoAssociateToDefaultList(savedParticipant);
+    
+    return savedParticipant;
+  }
+
+  /**
+   * 🚀 CORREÇÃO DEFINITIVA: Auto-associar participante a lista padrão
+   */
+  private async autoAssociateToDefaultList(participant: any) {
+    try {
+      console.log('🔧 AUTO-ASSOCIATION: Buscando lista padrão para:', participant.clientId);
+      
+      // 1. Buscar lista padrão existente do tipo "participante"
+      let defaultList = await this.participantListModel.findOne({
+        clientId: participant.clientId,
+        tipo: 'participante',
+        $or: [
+          { name: /^Lista Geral$/i },
+          { name: /^Participantes$/i },
+          { name: /^Lista Principal$/i }
+        ]
+      }).exec();
+      
+      // 2. Se não existir, criar uma lista padrão
+      if (!defaultList) {
+        console.log('🔧 AUTO-ASSOCIATION: Criando lista padrão...');
+        
+        defaultList = new this.participantListModel({
+          name: 'Lista Geral',
+          description: 'Lista padrão criada automaticamente para novos participantes',
+          clientId: participant.clientId,
+          tipo: 'participante',
+          participants: []
+        });
+        
+        defaultList = await defaultList.save();
+        console.log('✅ AUTO-ASSOCIATION: Lista padrão criada:', defaultList._id);
+      }
+      
+      // 3. Verificar se o participante já está na lista
+      const isAlreadyInList = defaultList.participants.includes(participant._id);
+      if (isAlreadyInList) {
+        console.log('ℹ️ AUTO-ASSOCIATION: Participante já está na lista padrão');
+        return;
+      }
+      
+      // 4. Associar participante à lista (sincronização bidirecional)
+      await this.participantListModel.findByIdAndUpdate(
+        defaultList._id,
+        { $addToSet: { participants: participant._id } }
+      );
+      
+      await this.participantModel.findByIdAndUpdate(
+        participant._id,
+        { $addToSet: { lists: defaultList._id } }
+      );
+      
+      console.log(`✅ AUTO-ASSOCIATION: Participante ${participant.name} associado à lista "${defaultList.name}"`);
+      
+    } catch (error) {
+      console.error('❌ AUTO-ASSOCIATION: Erro na associação automática:', error);
+      // Não falhar a criação do participante por erro de associação
+    }
   }
 
   async update(id: string, dto: UpdateParticipantDto) {
@@ -631,5 +697,50 @@ export class ParticipantsService {
         }))
       }
     };
+  }
+
+  /**
+   * 🔧 CORREÇÃO AUTOMÁTICA: Detectar e corrigir participantes órfãos
+   */
+  async fixOrphanParticipants(clientId: string) {
+    try {
+      console.log('🔧 ORPHAN-FIX: Verificando participantes órfãos para cliente:', clientId);
+      
+      // Buscar participantes sem listas ou com listas vazias
+      const orphanParticipants = await this.participantModel.find({
+        clientId: clientId,
+        tipo: 'participante', // Só participantes, não indicadores
+        $or: [
+          { lists: { $exists: false } },
+          { lists: { $size: 0 } },
+          { lists: null }
+        ]
+      }).exec();
+      
+      if (orphanParticipants.length === 0) {
+        console.log('✅ ORPHAN-FIX: Nenhum participante órfão encontrado');
+        return { fixed: 0, message: 'Nenhum participante órfão' };
+      }
+      
+      console.log(`🚨 ORPHAN-FIX: Encontrados ${orphanParticipants.length} participantes órfãos`);
+      
+      // Para cada participante órfão, associar à lista padrão
+      let fixedCount = 0;
+      for (const participant of orphanParticipants) {
+        try {
+          await this.autoAssociateToDefaultList(participant);
+          fixedCount++;
+        } catch (error) {
+          console.error(`❌ ORPHAN-FIX: Erro ao corrigir ${participant.name}:`, error);
+        }
+      }
+      
+      console.log(`✅ ORPHAN-FIX: ${fixedCount} participantes órfãos corrigidos`);
+      return { fixed: fixedCount, total: orphanParticipants.length };
+      
+    } catch (error) {
+      console.error('❌ ORPHAN-FIX: Erro na correção de órfãos:', error);
+      return { fixed: 0, error: error.message };
+    }
   }
 } 

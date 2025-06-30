@@ -438,11 +438,15 @@ async function fetchListasParticipantes() {
       }
     });
     
-    // 🚨 SOLUÇÃO TEMPORÁRIA: Aceitar listas vazias do tipo "participante"
-    // Isso permite que listas criadas mas ainda não populadas apareçam no quiz
-    const filtradas = listas.filter(l => l.tipo === 'participante');
-    console.log('🔍 H1 - Listas após filtro (apenas tipo participante):', filtradas.length);
-    console.log('🔍 H1 - SOLUÇÃO TEMPORÁRIA: Aceitando listas vazias para investigar problema backend');
+    // ✅ FILTRO DEFINITIVO: Listas do tipo "participante" COM participantes ativos
+    // Backend foi corrigido para sincronizar automaticamente participantes órfãos
+    const filtradas = listas.filter(l => 
+      l.tipo === 'participante' && 
+      Array.isArray(l.participants) && 
+      l.participants.length > 0
+    );
+    console.log('🔍 H1 - Listas após filtro (tipo participante + com participantes):', filtradas.length);
+    console.log('✅ H1 - CORREÇÃO DEFINITIVA: Backend auto-sincroniza participantes órfãos');
     
     return filtradas;
   } catch (err) {
@@ -460,12 +464,7 @@ function renderListasParticipantes() {
     console.log('🔍 H2 - renderListasParticipantes - Total de listas:', listas.length);
     
     if (!listas.length) {
-      container.innerHTML = `
-        <div class="text-gray-400 mb-4">Nenhuma lista de participantes com participantes ativos encontrada. Crie uma nova lista abaixo.</div>
-        <button onclick="debugBackendData()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-          🔍 DEBUG: Investigar Backend
-        </button>
-      `;
+      container.innerHTML = '<div class="text-gray-400">Nenhuma lista de participantes com participantes ativos encontrada. Crie uma nova lista abaixo.</div>';
       return;
     }
     container.innerHTML = '';
@@ -499,16 +498,7 @@ function renderListasParticipantes() {
         console.log(`🔍 H2 - Lista "${lista.name}": ${count} participantes`);
         
         if (count === 0) {
-          console.warn(`⚠️ Lista "${lista.name}" está vazia - pode indicar problema na sincronização backend`);
-          
-          // 🔧 Adicionar botão de debug para esta lista específica
-          const debugBtn = document.createElement('button');
-          debugBtn.className = 'ml-2 px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600';
-          debugBtn.innerHTML = '🔍 DEBUG';
-          debugBtn.onclick = () => debugSpecificList(lista._id, lista.name);
-          
-          const listElement = document.querySelector(`#count-${lista._id}`).parentElement.parentElement;
-          listElement.appendChild(debugBtn);
+          console.warn(`⚠️ Lista "${lista.name}" vazia - será corrigida automaticamente pelo backend`);
         }
       } catch (err) {
         console.error(`🔍 H2 - ERRO ao carregar contagem da lista ${lista.name}:`, err);

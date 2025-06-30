@@ -79,6 +79,66 @@ export class ParticipantListsService {
   }
 
   async findAll(clientId: string) {
+    console.log('🔧 FIND-ALL-LISTS: Buscando listas para cliente:', clientId);
+    
+    // 🚀 CORREÇÃO AUTOMÁTICA: Verificar e corrigir participantes órfãos
+    try {
+      console.log('🔧 AUTO-FIX: Executando correção de órfãos antes de buscar listas...');
+      // Note: Usando this.participantModel diretamente já que está injetado
+      const orphanParticipants = await this.participantModel.find({
+        clientId: clientId,
+        tipo: 'participante',
+        $or: [
+          { lists: { $exists: false } },
+          { lists: { $size: 0 } },
+          { lists: null }
+        ]
+      }).exec();
+      
+      if (orphanParticipants.length > 0) {
+        console.log(`🚨 AUTO-FIX: Encontrados ${orphanParticipants.length} participantes órfãos - corrigindo...`);
+        
+        // Buscar ou criar lista padrão
+        let defaultList = await this.participantListModel.findOne({
+          clientId: clientId,
+          tipo: 'participante',
+          $or: [
+            { name: /^Lista Geral$/i },
+            { name: /^Participantes$/i },
+            { name: /^Lista Principal$/i }
+          ]
+        }).exec();
+        
+        if (!defaultList) {
+          defaultList = new this.participantListModel({
+            name: 'Lista Geral',
+            description: 'Lista padrão criada automaticamente para novos participantes',
+            clientId: clientId,
+            tipo: 'participante',
+            participants: []
+          });
+          defaultList = await defaultList.save();
+          console.log('✅ AUTO-FIX: Lista padrão criada:', defaultList._id);
+        }
+        
+        // Associar órfãos à lista padrão
+        const orphanIds = orphanParticipants.map(p => p._id);
+        await this.participantListModel.findByIdAndUpdate(
+          defaultList._id,
+          { $addToSet: { participants: { $each: orphanIds } } }
+        );
+        
+        await this.participantModel.updateMany(
+          { _id: { $in: orphanIds } },
+          { $addToSet: { lists: defaultList._id } }
+        );
+        
+        console.log(`✅ AUTO-FIX: ${orphanParticipants.length} participantes órfãos corrigidos automaticamente`);
+      }
+    } catch (autoFixError) {
+      console.error('❌ AUTO-FIX: Erro na correção automática (continuando busca):', autoFixError);
+    }
+    
     // Busca as listas
     const lists = await this.participantListModel.find({ clientId });
     
@@ -92,6 +152,7 @@ export class ParticipantListsService {
       })
     );
     
+    console.log(`✅ FIND-ALL-LISTS: Retornando ${listsWithCount.length} listas para cliente`);
     return listsWithCount;
   }
 
