@@ -53,7 +53,12 @@ window.submitReferralForm = async function(event, form) {
     try {
       // Tenta buscar do backend
       console.log('🌐 [REFERRAL-FORM] Buscando UTM params do backend...');
-      const res = await fetch(`${API_URL}/lp-divulgacao/${lpId}`);
+      const finalApiUrl = window.API_URL || 
+                         (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                         (window.location.hostname === 'localhost' ? 
+                          'http://localhost:3000/api' : 
+                          'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+      const res = await fetch(`${finalApiUrl}/lp-divulgacao/${lpId}`);
       if (res.ok) {
         const data = await res.json();
         if (data && data.data && data.data.utmParams) {
@@ -120,20 +125,21 @@ window.submitReferralForm = async function(event, form) {
   try {
     console.log('🚀 [REFERRAL-FORM] Enviando requisição para o backend...');
     
-    // === 🔍 DEBUG LOGS - HIPÓTESE 5 (CORS/Headers) ===
-    console.log('🔍 [DEBUG-H5] Fazendo requisição para:', `${API_URL}/lp-divulgacao/submit-referral`);
-    console.log('🔍 [DEBUG-H5] Headers enviados:', { 'Content-Type': 'application/json' });
-    console.log('🔍 [DEBUG-H5] Payload sendo enviado:', payload);
+    const finalApiUrl = window.API_URL || 
+                       (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                       (window.location.hostname === 'localhost' ? 
+                        'http://localhost:3000/api' : 
+                        'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+    const fullUrl = `${finalApiUrl}/lp-divulgacao/submit-referral`;
+    console.log('🔍 URL da requisição:', fullUrl);
     
-    const response = await fetch(`${API_URL}/lp-divulgacao/submit-referral`, {
+    const response = await fetch(fullUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     
-    // === 🔍 DEBUG LOGS - HIPÓTESE 5 (Response) ===
-    console.log('🔍 [DEBUG-H5] Response status:', response.status);
-    console.log('🔍 [DEBUG-H5] Response headers:', Object.fromEntries(response.headers.entries()));
+    console.log('📥 Response status:', response.status);
     
     const result = await response.json();
     console.log('📥 [REFERRAL-FORM] Resposta do backend:', result);
@@ -149,7 +155,7 @@ window.submitReferralForm = async function(event, form) {
       // Buscar redirectUrl da LP e redirecionar se existir
       try {
         console.log('🔍 [REFERRAL-FORM] Verificando URL de redirecionamento...');
-        const res = await fetch(`${API_URL}/lp-divulgacao/${lpId}`);
+        const res = await fetch(`${finalApiUrl}/lp-divulgacao/${lpId}`);
         if (res.ok) {
           const data = await res.json();
           const redirectUrl = data && data.data && data.data.redirectUrl;

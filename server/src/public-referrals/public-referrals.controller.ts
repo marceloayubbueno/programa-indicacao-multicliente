@@ -186,11 +186,10 @@ export class PublicReferralsController {
               ${personalizedHtml}
             </div>
             
-            <!-- ✅ CORREÇÃO: Script inline em vez de arquivo externo -->
+            <!-- Script de formulário inline -->
             <script>
               // === SCRIPT DE FORMULÁRIO INLINE ===
               window.submitReferralForm = async function(event, form) {
-                console.log('[INLINE-SCRIPT] 📝 Iniciando submit do formulário de referral');
                 event.preventDefault();
 
                 const feedback = form.querySelector('.feedback') || form.querySelector('[class*="feedback"]');
@@ -202,12 +201,9 @@ export class PublicReferralsController {
                 const phone = formData.get('phone') || '';
                 const company = formData.get('company') || '';
 
-                console.log('[INLINE-SCRIPT] 📋 Dados do formulário:', { name, email, phone, company });
-
                 // Validação básica
                 if (!name || !email) {
                   const message = 'Por favor, preencha nome e e-mail.';
-                  console.warn('[INLINE-SCRIPT] ⚠️ Validação falhou:', message);
                   if (feedback) { 
                     feedback.textContent = message; 
                     feedback.style.color = 'red'; 
@@ -217,10 +213,8 @@ export class PublicReferralsController {
 
                 // Buscar ID da LP
                 const lpId = localStorage.getItem('currentLpDivulgacaoId');
-                console.log('[INLINE-SCRIPT] 🆔 ID da LP:', lpId);
                 
                 if (!lpId) {
-                  console.error('[INLINE-SCRIPT] ❌ ID da LP não encontrado no localStorage');
                   if (feedback) { 
                     feedback.textContent = 'Erro: Contexto da LP não encontrado.'; 
                     feedback.style.color = 'red'; 
@@ -231,18 +225,11 @@ export class PublicReferralsController {
                 // Buscar informações do indicador do localStorage
                 const indicatorCode = localStorage.getItem('currentIndicatorCode');
                 const indicatorName = localStorage.getItem('currentIndicatorName');
-                
-                console.log('[INLINE-SCRIPT] 👤 Informações do Indicador:', {
-                  indicatorCode,
-                  indicatorName
-                });
 
                 // Captura dados de origem (UTM, referrer, userAgent, etc)
                 const urlParams = new URL(window.location.href).searchParams;
                 const indicatorCodeFromUrl = urlParams.get('ref') || '';
                 const finalIndicatorCode = indicatorCodeFromUrl || indicatorCode || '';
-                
-                console.log('[INLINE-SCRIPT] 🔗 Código do indicador final:', finalIndicatorCode);
 
                 // Monta payload com código do indicador
                 const payload = {
@@ -253,16 +240,10 @@ export class PublicReferralsController {
                   userAgent: navigator.userAgent,
                   language: navigator.language
                 };
-                
-                console.log('[INLINE-SCRIPT] 📦 Payload completo para envio:', payload);
 
                 try {
-                  console.log('[INLINE-SCRIPT] 🚀 Enviando requisição para o backend...');
-                  
                   const apiUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
                   const fullUrl = \`\${apiUrl}/lp-divulgacao/submit-referral\`;
-                  
-                  console.log('[INLINE-SCRIPT] 🔍 URL da requisição:', fullUrl);
                   
                   const response = await fetch(fullUrl, {
                     method: 'POST',
@@ -270,13 +251,9 @@ export class PublicReferralsController {
                     body: JSON.stringify(payload)
                   });
                   
-                  console.log('[INLINE-SCRIPT] 📥 Response status:', response.status);
-                  
                   const result = await response.json();
-                  console.log('[INLINE-SCRIPT] 📥 Response data:', result);
                   
                   if (response.ok && result.success) {
-                    console.log('[INLINE-SCRIPT] ✅ Formulário enviado com sucesso!');
                     if (feedback) { 
                       feedback.textContent = 'Envio concluído! Obrigado pela indicação.'; 
                       feedback.style.color = 'green'; 
@@ -291,14 +268,12 @@ export class PublicReferralsController {
                     }, 2000);
                     
                   } else {
-                    console.error('[INLINE-SCRIPT] ❌ Erro na resposta do backend:', result);
                     if (feedback) { 
                       feedback.textContent = result.message || 'Erro ao enviar indicação.'; 
                       feedback.style.color = 'red'; 
                     }
                   }
                 } catch (err) {
-                  console.error('[INLINE-SCRIPT] 💥 Erro de conexão:', err);
                   if (feedback) { 
                     feedback.textContent = 'Erro de conexão. Tente novamente.'; 
                     feedback.style.color = 'red'; 
@@ -309,24 +284,16 @@ export class PublicReferralsController {
 
               // === FUNÇÃO PARA AUTO-BIND DOS FORMULÁRIOS ===
               window.bindReferralForms = function() {
-                console.log('[INLINE-SCRIPT] 🔗 Executando bindReferralForms...');
                 const forms = document.querySelectorAll('.lp-referral-form, form[data-type="referral"], form');
-                console.log(\`[INLINE-SCRIPT] 📋 Formulários encontrados: \${forms.length}\`);
                 
                 forms.forEach((form, index) => {
-                  console.log(\`[INLINE-SCRIPT] 🔧 Configurando formulário \${index + 1}\`);
-                  
                   if (!form.onsubmit) {
                     form.onsubmit = function(event) {
-                      console.log(\`[INLINE-SCRIPT] 📝 Submit interceptado do formulário \${index + 1}\`);
                       return window.submitReferralForm(event, form);
                     };
-                    console.log(\`[INLINE-SCRIPT] ✅ Formulário \${index + 1} configurado\`);
                   }
                 });
               };
-
-              console.log('[INLINE-SCRIPT] ✅ Script carregado e pronto');
             </script>
             
             <script>
@@ -335,22 +302,11 @@ export class PublicReferralsController {
               localStorage.setItem('currentIndicatorName', '${indicador.name}');
               localStorage.setItem('currentLpDivulgacaoId', '${targetLP._id}');
               
-              console.log('🎯 LP carregada via indicador:', '${indicador.name}');
-              console.log('📊 Tracking configurado para código:', '${codigo}');
-              
-              // === 🔍 DEBUG LOGS ===
+              // Auto-bind dos formulários
               setTimeout(() => {
-                console.log('🔍 [DEBUG] Função submitReferralForm disponível:', typeof window.submitReferralForm);
-                console.log('🔍 [DEBUG] Scripts carregados na página:', Array.from(document.scripts).length);
-                
-                console.log('🔍 [DEBUG] Formulários encontrados:', document.querySelectorAll('form').length);
-                console.log('🔍 [DEBUG] Formulários com classe lp-referral-form:', document.querySelectorAll('.lp-referral-form').length);
-                
-                // Auto-bind dos formulários
                 if (window.bindReferralForms) {
                   window.bindReferralForms();
                 }
-                
               }, 100);
             </script>
           </body>
