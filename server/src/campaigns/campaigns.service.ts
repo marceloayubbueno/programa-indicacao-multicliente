@@ -112,15 +112,24 @@ export class CampaignsService {
         });
         
         try {
-          console.log('[CAMPAIGN-DEBUG] 📞 Chamando duplicateListForCampaign...');
+          console.log('[CAMPAIGN-DEBUG] 📞 ANTES de chamar duplicateListForCampaign...');
+          console.log('[CAMPAIGN-DEBUG] 🔍 DETALHES DA CHAMADA:', {
+            selectedParticipantListId: data.selectedParticipantListId,
+            campaignId: campaignId.toString(),
+            campaignName: campaignName,
+            clientId: data.clientId,
+            functionExists: typeof this.participantListsService.duplicateListForCampaign === 'function'
+          });
           
           // 1. Duplicar a lista criando nova lista de indicadores
+          console.log('[CAMPAIGN-DEBUG] 🚀 EXECUTANDO duplicateListForCampaign AGORA...');
           const duplicatedList = await this.participantListsService.duplicateListForCampaign(
             data.selectedParticipantListId,
             campaignId.toString(),
             campaignName,
             data.clientId
           );
+          console.log('[CAMPAIGN-DEBUG] 🏁 duplicateListForCampaign RETORNOU');
           
           console.log('🎉 [CAMPAIGN-DEBUG] duplicateListForCampaign retornou:', {
             listId: duplicatedList._id,

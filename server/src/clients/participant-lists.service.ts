@@ -323,6 +323,10 @@ export class ParticipantListsService {
    * Duplica uma lista de participantes para uma campanha, criando lista de indicadores com participantes duplicados
    */
   async duplicateListForCampaign(originalListId: string, campaignId: string, campaignName: string, clientId: string): Promise<ParticipantList> {
+    console.log('\n🚀🚀🚀 [BACKEND-DEBUG] FUNÇÃO duplicateListForCampaign FOI CHAMADA! 🚀🚀🚀');
+    console.log('[BACKEND-DEBUG] ===== CONFIRMAÇÃO DE EXECUÇÃO =====');
+    console.log('[BACKEND-DEBUG] Esta mensagem confirma que chegamos até aqui!');
+    console.log('[BACKEND-DEBUG] Timestamp:', new Date().toISOString());
     console.log('\n🚀=== INÍCIO DUPLICAÇÃO REAL ===');
     console.log('[H2] REAL-DUPLICATION - Parâmetros recebidos:', { 
       originalListId, 
