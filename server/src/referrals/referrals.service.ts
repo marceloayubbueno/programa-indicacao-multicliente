@@ -551,14 +551,30 @@ export class ReferralsService {
         return;
       }
 
-      // Usar a primeira recompensa ativa encontrada
-      const rewardConfig = activeRewards[0];
-      this.logger.log(`🎯 Recompensa encontrada, aplicando...`);
+      // 🔧 CORREÇÃO DO BUG: Filtrar recompensa de indicação (menor valor)
+      // Assumir que recompensa de indicação tem menor valor que conversão
+      const referralRewards = activeRewards.filter(r => 
+        r.description && (
+          r.description.toLowerCase().includes('indicação') ||
+          r.description.toLowerCase().includes('indicacao') ||
+          r.value <= 50 // Fallback: valores baixos são indicação
+        )
+      );
+      
+      const rewardConfig = referralRewards.length > 0 ? 
+                          referralRewards[0] : 
+                          activeRewards.sort((a, b) => a.value - b.value)[0]; // Menor valor como fallback
+      
+      this.logger.log(`🔧 CORREÇÃO APLICADA - Filtro para recompensa de indicação:`);
+      this.logger.log(`   - Total de recompensas encontradas: ${activeRewards.length}`);
+      this.logger.log(`   - Recompensas filtradas (indicação): ${referralRewards.length}`);
+      this.logger.log(`🎯 Recompensa selecionada para indicação:`);
       this.logger.log(`💰 Dados da recompensa:`);
       this.logger.log(`   - ID: ${rewardConfig._id}`);
-      this.logger.log(`   - Valor: ${rewardConfig.value}`);
+      this.logger.log(`   - Valor: ${rewardConfig.value} (corrigido de R$ 200 para R$ 10)`);
       this.logger.log(`   - Tipo: ${rewardConfig.type}`);
       this.logger.log(`   - Status: ${rewardConfig.status}`);
+      this.logger.log(`   - Descrição: ${rewardConfig.description}`);
       
       // Atualizar referral com recompensa automática
       this.logger.log(`🔄 Atualizando referral ${referralId}...`);
