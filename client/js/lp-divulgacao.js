@@ -136,20 +136,20 @@ function renderLPList() {
   tbody.innerHTML = lpDivulgacaoList.map((lp, index) => {
     console.log(`🔍 [LP-DIV] LP ${index}:`, lp);
     
-    // Status toggle button - CORRIGIDO para usar status 'ativo'/'inativo'
+    // Status toggle button - CORRIGIDO para usar status backend correto
     const statusToggle = `
       <div class="flex items-center gap-2">
         <button 
-          onclick="toggleLPStatus('${lp._id || lp.id}', '${lp.status || 'inativo'}')" 
+          onclick="toggleLPStatus('${lp._id || lp.id}', '${lp.status || 'draft'}')" 
           class="flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all duration-200 ${
-            lp.status === 'ativo' 
+            lp.status === 'published' 
               ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
               : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
           }"
-          title="Clique para ${lp.status === 'ativo' ? 'desativar' : 'ativar'}"
+          title="Clique para ${lp.status === 'published' ? 'despublicar' : 'publicar'}"
         >
-          <i class="fas ${lp.status === 'ativo' ? 'fa-eye' : 'fa-eye-slash'} text-xs"></i>
-          <span class="text-xs font-medium">${lp.status === 'ativo' ? 'Ativo' : 'Inativo'}</span>
+          <i class="fas ${lp.status === 'published' ? 'fa-eye' : 'fa-eye-slash'} text-xs"></i>
+          <span class="text-xs font-medium">${lp.status === 'published' ? 'Publicado' : 'Rascunho'}</span>
         </button>
       </div>
     `;
@@ -288,15 +288,18 @@ window.toggleLPStatus = async function(lpId, currentStatus) {
     
     console.log(`🔄 [LP-DIV] Alterando status da LP ${lpId}: ${currentStatus}`);
     
+    // Determinar ação baseada no status atual
+    const action = currentStatus === 'published' ? 'unpublish' : 'publish';
+    
     // Feedback visual imediato - desabilitar botão
     const button = event.target.closest('button');
     const originalContent = button.innerHTML;
     button.disabled = true;
     button.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i><span class="text-xs">Alterando...</span>';
     
-    // 🆕 USAR NOVO ENDPOINT toggle-status
-    const response = await fetch(`${API_URL}/lp-divulgacao/${lpId}/toggle-status`, {
-      method: 'PATCH',
+    // 🔧 CORREÇÃO: Usar endpoints publish/unpublish como as LPs de Indicadores
+    const response = await fetch(`${API_URL}/lp-divulgacao/${lpId}/${action}`, {
+      method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -310,7 +313,7 @@ window.toggleLPStatus = async function(lpId, currentStatus) {
       console.log(`✅ [LP-DIV] Status alterado para: ${result.data.status}`);
       
       showNotification(
-        `Status alterado para: ${result.data.status}`, 
+        `LP ${action === 'publish' ? 'publicada' : 'despublicada'} com sucesso!`, 
         'success'
       );
       
