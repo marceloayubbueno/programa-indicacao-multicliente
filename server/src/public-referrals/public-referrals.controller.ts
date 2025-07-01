@@ -186,8 +186,148 @@ export class PublicReferralsController {
               ${personalizedHtml}
             </div>
             
-            <!-- 🔍 DEBUG: Inclusão do script de formulário -->
-            <script src="/client/js/lp-referral-form-public.js"></script>
+            <!-- ✅ CORREÇÃO: Script inline em vez de arquivo externo -->
+            <script>
+              // === SCRIPT DE FORMULÁRIO INLINE ===
+              window.submitReferralForm = async function(event, form) {
+                console.log('[INLINE-SCRIPT] 📝 Iniciando submit do formulário de referral');
+                event.preventDefault();
+
+                const feedback = form.querySelector('.feedback') || form.querySelector('[class*="feedback"]');
+                
+                // Capturar dados do formulário
+                const formData = new FormData(form);
+                const name = formData.get('name') || '';
+                const email = formData.get('email') || '';
+                const phone = formData.get('phone') || '';
+                const company = formData.get('company') || '';
+
+                console.log('[INLINE-SCRIPT] 📋 Dados do formulário:', { name, email, phone, company });
+
+                // Validação básica
+                if (!name || !email) {
+                  const message = 'Por favor, preencha nome e e-mail.';
+                  console.warn('[INLINE-SCRIPT] ⚠️ Validação falhou:', message);
+                  if (feedback) { 
+                    feedback.textContent = message; 
+                    feedback.style.color = 'red'; 
+                  }
+                  return false;
+                }
+
+                // Buscar ID da LP
+                const lpId = localStorage.getItem('currentLpDivulgacaoId');
+                console.log('[INLINE-SCRIPT] 🆔 ID da LP:', lpId);
+                
+                if (!lpId) {
+                  console.error('[INLINE-SCRIPT] ❌ ID da LP não encontrado no localStorage');
+                  if (feedback) { 
+                    feedback.textContent = 'Erro: Contexto da LP não encontrado.'; 
+                    feedback.style.color = 'red'; 
+                  }
+                  return false;
+                }
+
+                // Buscar informações do indicador do localStorage
+                const indicatorCode = localStorage.getItem('currentIndicatorCode');
+                const indicatorName = localStorage.getItem('currentIndicatorName');
+                
+                console.log('[INLINE-SCRIPT] 👤 Informações do Indicador:', {
+                  indicatorCode,
+                  indicatorName
+                });
+
+                // Captura dados de origem (UTM, referrer, userAgent, etc)
+                const urlParams = new URL(window.location.href).searchParams;
+                const indicatorCodeFromUrl = urlParams.get('ref') || '';
+                const finalIndicatorCode = indicatorCodeFromUrl || indicatorCode || '';
+                
+                console.log('[INLINE-SCRIPT] 🔗 Código do indicador final:', finalIndicatorCode);
+
+                // Monta payload com código do indicador
+                const payload = {
+                  name, email, phone, company, lpId,
+                  indicatorCode: finalIndicatorCode || null,
+                  indicatorName: indicatorName || null,
+                  referrerUrl: document.referrer,
+                  userAgent: navigator.userAgent,
+                  language: navigator.language
+                };
+                
+                console.log('[INLINE-SCRIPT] 📦 Payload completo para envio:', payload);
+
+                try {
+                  console.log('[INLINE-SCRIPT] 🚀 Enviando requisição para o backend...');
+                  
+                  const apiUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+                  const fullUrl = \`\${apiUrl}/lp-divulgacao/submit-referral\`;
+                  
+                  console.log('[INLINE-SCRIPT] 🔍 URL da requisição:', fullUrl);
+                  
+                  const response = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                  });
+                  
+                  console.log('[INLINE-SCRIPT] 📥 Response status:', response.status);
+                  
+                  const result = await response.json();
+                  console.log('[INLINE-SCRIPT] 📥 Response data:', result);
+                  
+                  if (response.ok && result.success) {
+                    console.log('[INLINE-SCRIPT] ✅ Formulário enviado com sucesso!');
+                    if (feedback) { 
+                      feedback.textContent = 'Envio concluído! Obrigado pela indicação.'; 
+                      feedback.style.color = 'green'; 
+                    }
+                    form.reset();
+                    
+                    // Redirecionar se necessário
+                    setTimeout(() => {
+                      if (result.data && result.data.redirectUrl) {
+                        window.location.href = result.data.redirectUrl;
+                      }
+                    }, 2000);
+                    
+                  } else {
+                    console.error('[INLINE-SCRIPT] ❌ Erro na resposta do backend:', result);
+                    if (feedback) { 
+                      feedback.textContent = result.message || 'Erro ao enviar indicação.'; 
+                      feedback.style.color = 'red'; 
+                    }
+                  }
+                } catch (err) {
+                  console.error('[INLINE-SCRIPT] 💥 Erro de conexão:', err);
+                  if (feedback) { 
+                    feedback.textContent = 'Erro de conexão. Tente novamente.'; 
+                    feedback.style.color = 'red'; 
+                  }
+                }
+                return false;
+              };
+
+              // === FUNÇÃO PARA AUTO-BIND DOS FORMULÁRIOS ===
+              window.bindReferralForms = function() {
+                console.log('[INLINE-SCRIPT] 🔗 Executando bindReferralForms...');
+                const forms = document.querySelectorAll('.lp-referral-form, form[data-type="referral"], form');
+                console.log(\`[INLINE-SCRIPT] 📋 Formulários encontrados: \${forms.length}\`);
+                
+                forms.forEach((form, index) => {
+                  console.log(\`[INLINE-SCRIPT] 🔧 Configurando formulário \${index + 1}\`);
+                  
+                  if (!form.onsubmit) {
+                    form.onsubmit = function(event) {
+                      console.log(\`[INLINE-SCRIPT] 📝 Submit interceptado do formulário \${index + 1}\`);
+                      return window.submitReferralForm(event, form);
+                    };
+                    console.log(\`[INLINE-SCRIPT] ✅ Formulário \${index + 1} configurado\`);
+                  }
+                });
+              };
+
+              console.log('[INLINE-SCRIPT] ✅ Script carregado e pronto');
+            </script>
             
             <script>
               // Configurar dados do indicador para rastreamento
@@ -198,24 +338,20 @@ export class PublicReferralsController {
               console.log('🎯 LP carregada via indicador:', '${indicador.name}');
               console.log('📊 Tracking configurado para código:', '${codigo}');
               
-              // === 🔍 DEBUG LOGS - HIPÓTESE 1 ===
+              // === 🔍 DEBUG LOGS ===
               setTimeout(() => {
-                console.log('🔍 [DEBUG-H1] Função submitReferralForm disponível:', typeof window.submitReferralForm);
-                console.log('🔍 [DEBUG-H1] Scripts carregados na página:', Array.from(document.scripts).map(s => s.src || 'inline'));
+                console.log('🔍 [DEBUG] Função submitReferralForm disponível:', typeof window.submitReferralForm);
+                console.log('🔍 [DEBUG] Scripts carregados na página:', Array.from(document.scripts).length);
                 
-                // === 🔍 DEBUG LOGS - HIPÓTESE 2 ===
-                console.log('🔍 [DEBUG-H2] Formulários encontrados:', document.querySelectorAll('form').length);
-                console.log('🔍 [DEBUG-H2] Formulários com classe lp-referral-form:', document.querySelectorAll('.lp-referral-form').length);
-                console.log('🔍 [DEBUG-H2] Event listeners nos formulários:', Array.from(document.querySelectorAll('form')).map(f => !!f.onsubmit));
+                console.log('🔍 [DEBUG] Formulários encontrados:', document.querySelectorAll('form').length);
+                console.log('🔍 [DEBUG] Formulários com classe lp-referral-form:', document.querySelectorAll('.lp-referral-form').length);
                 
-                // === 🔍 DEBUG LOGS - HIPÓTESE 3 ===
-                console.log('🔍 [DEBUG-H3] LocalStorage:', {
-                  lpId: localStorage.getItem('currentLpDivulgacaoId'),
-                  indicatorCode: localStorage.getItem('currentIndicatorCode'),
-                  indicatorName: localStorage.getItem('currentIndicatorName')
-                });
-                console.log('🔍 [DEBUG-H3] URL Params ref:', new URL(window.location.href).searchParams.get('ref'));
-              }, 500);
+                // Auto-bind dos formulários
+                if (window.bindReferralForms) {
+                  window.bindReferralForms();
+                }
+                
+              }, 100);
             </script>
           </body>
           </html>
