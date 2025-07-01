@@ -323,19 +323,8 @@ export class ParticipantListsService {
    * Duplica uma lista de participantes para uma campanha, criando lista de indicadores com participantes duplicados
    */
   async duplicateListForCampaign(originalListId: string, campaignId: string, campaignName: string, clientId: string): Promise<ParticipantList> {
-    console.log('\n🚀🚀🚀 [BACKEND-DEBUG] FUNÇÃO duplicateListForCampaign FOI CHAMADA! 🚀🚀🚀');
-    console.log('[BACKEND-DEBUG] ===== CONFIRMAÇÃO DE EXECUÇÃO =====');
-    console.log('[BACKEND-DEBUG] Esta mensagem confirma que chegamos até aqui!');
-    console.log('[BACKEND-DEBUG] Timestamp:', new Date().toISOString());
-    console.log('\n🚀=== INÍCIO DUPLICAÇÃO REAL ===');
-    console.log('[H2] REAL-DUPLICATION - Parâmetros recebidos:', { 
-      originalListId, 
-      campaignId, 
-      campaignName, 
-      clientId,
-      timestamp: new Date().toISOString()
-    });
-    console.log('[DUPLICATE-LIST] Duplicando lista e CRIANDO novos participantes indicadores...');
+    console.log('\n🚀 [DUPLICATE-LIST] Iniciando duplicação de lista para campanha');
+    console.log('[DUPLICATE-LIST] Parâmetros:', { originalListId, campaignId, campaignName, clientId });
     
     // Buscar a lista original
     console.log('[DEBUG] 📋 Buscando lista original com ID:', originalListId);
@@ -364,19 +353,12 @@ export class ParticipantListsService {
     console.log('[DEBUG] Tamanho:', originalList.participants?.length);
     
     if (originalList.participants && originalList.participants.length > 0) {
-      console.log('🚀 [BACKEND-DEBUG] ENTRANDO NO LOOP DE DUPLICAÇÃO');
-      console.log('[BACKEND-DEBUG] Quantidade de participantes:', originalList.participants.length);
-      console.log('[BACKEND-DEBUG] IDs dos participantes:', originalList.participants);
-      console.log('[BACKEND-DEBUG] Tipo do array:', typeof originalList.participants);
-      console.log('[BACKEND-DEBUG] É array?', Array.isArray(originalList.participants));
+      console.log(`🔄 [DUPLICATE-LIST] Duplicando ${originalList.participants.length} participantes...`);
       
-      let loopCount = 0;
+      let processedCount = 0;
       for (const participantId of originalList.participants) {
-        loopCount++;
-        console.log(`\n🔄 [BACKEND-DEBUG] === LOOP ${loopCount}/${originalList.participants.length} ===`);
-        console.log(`[BACKEND-DEBUG] Processando participante ID: ${participantId}`);
-        console.log(`[BACKEND-DEBUG] Tipo do participantId: ${typeof participantId}`);
-        console.log(`[BACKEND-DEBUG] Value do participantId:`, participantId);
+        processedCount++;
+        console.log(`[DUPLICATE-LIST] Processando ${processedCount}/${originalList.participants.length}: ${participantId}`);
         try {
           console.log(`\n🔄 [DEBUG] Processando participante ID: ${participantId}`);
           
@@ -470,25 +452,14 @@ export class ParticipantListsService {
           });
           
         } catch (error) {
-          console.error(`💥 [BACKEND-DEBUG] ❌ ERRO LOOP ${loopCount}:`, error.message);
-          console.error(`[BACKEND-DEBUG] Stack trace LOOP ${loopCount}:`, error.stack);
-          console.error(`[BACKEND-DEBUG] Participante que falhou LOOP ${loopCount}:`, participantId);
+          console.error(`❌ [DUPLICATE-LIST] Erro ao duplicar participante ${processedCount}:`, error.message);
           // Continua com os próximos participantes
         }
-        
-        console.log(`✅ [BACKEND-DEBUG] FIM LOOP ${loopCount} - Novos participantes até agora: ${newParticipantIds.length}`);
       }
       
-      console.log('\n🏁 [BACKEND-DEBUG] LOOP COMPLETO!');
-      console.log('[BACKEND-DEBUG] Total de loops executados:', loopCount);
-      console.log('[BACKEND-DEBUG] Novos participantes criados:', newParticipantIds.length);
-      console.log('[BACKEND-DEBUG] IDs dos novos participantes:', newParticipantIds);
+      console.log(`✅ [DUPLICATE-LIST] Duplicação concluída: ${newParticipantIds.length}/${originalList.participants.length} participantes criados`);
     } else {
-      console.warn('⚠️ [BACKEND-DEBUG] PROBLEMA: Lista não tem participantes para duplicar!');
-      console.warn('[BACKEND-DEBUG] originalList.participants:', originalList.participants);
-      console.warn('[BACKEND-DEBUG] Tipo da lista:', originalList.tipo);
-      console.warn('[BACKEND-DEBUG] Length do array:', originalList.participants?.length);
-      console.warn('[BACKEND-DEBUG] Truthy check:', !!(originalList.participants && originalList.participants.length > 0));
+      console.warn('⚠️ [DUPLICATE-LIST] Lista original não tem participantes para duplicar');
     }
     
     // Criar nova lista de indicadores com os novos participantes
