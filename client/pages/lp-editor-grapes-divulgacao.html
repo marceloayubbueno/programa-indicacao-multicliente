@@ -573,12 +573,8 @@
         let url = (window.location.hostname === "localhost" ? "http://localhost:3000/api" : "https://programa-indicacao-multicliente-production.up.railway.app/api") + "/lp-divulgacao";
         let method = 'POST';
         if (lpId) {
-          // 🔍 DEBUG: Verificar URL na edição
-          console.log('🔍 [DEBUG] Modo edição - Hostname:', window.location.hostname);
-          console.log('🔍 [DEBUG] URL hardcoded (PROBLEMA):', `http://localhost:3000/api/lp-divulgacao/${lpId}`);
-          
+          // 🔧 CORREÇÃO: URL dinâmica para edição
           const correctUrl = (window.location.hostname === "localhost" ? "http://localhost:3000/api" : "https://programa-indicacao-multicliente-production.up.railway.app/api") + `/lp-divulgacao/${lpId}`;
-          console.log('🔍 [DEBUG] URL correta deveria ser:', correctUrl);
           
           url = correctUrl;
           method = 'PUT';
@@ -1468,10 +1464,8 @@
       const lpId = getUrlParam('id');
       if (lpId) {
         try {
-          // 🔍 DEBUG: Verificar URL na busca de dados para edição
-          console.log('🔍 [DEBUG] Buscando dados da LP para edição - Hostname:', window.location.hostname);
+          // 🔧 CORREÇÃO: URL dinâmica para busca de dados
           const correctApiUrl = window.location.hostname === "localhost" ? "http://localhost:3000/api" : "https://programa-indicacao-multicliente-production.up.railway.app/api";
-          console.log('🔧 [CORREÇÃO] URL corrigida sendo usada:', `${correctApiUrl}/lp-divulgacao/${lpId}`);
           
           const res = await fetch(`${correctApiUrl}/lp-divulgacao/${lpId}`);
           const data = await res.json();

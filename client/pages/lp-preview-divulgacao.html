@@ -61,28 +61,20 @@
       if (indicatorName) localStorage.setItem('currentIndicatorName', indicatorName);
       
       try {
-        // 🔍 DEBUG: Verificar URLs e ambiente
-        console.log('🔍 [DEBUG] Hostname atual:', window.location.hostname);
-        console.log('🔍 [DEBUG] URL hardcoded (PROBLEMA):', `http://localhost:3000/api/lp-divulgacao/${id}`);
-        
+        // 🔧 CORREÇÃO: Detecção de ambiente para API
         const apiUrl = window.location.hostname === "localhost" ? 
           "http://localhost:3000/api" : 
           "https://programa-indicacao-multicliente-production.up.railway.app/api";
-        console.log('🔍 [DEBUG] URL correta deveria ser:', `${apiUrl}/lp-divulgacao/${id}`);
         
-        // 🔍 DEBUG: Verificar autenticação
+        // 🔧 CORREÇÃO: Headers de autenticação
         const token = localStorage.getItem('clientToken') || localStorage.getItem('token');
-        console.log('🔍 [DEBUG] Token disponível:', !!token);
-        
         const headers = {};
         if (token) {
           headers['Authorization'] = `Bearer ${token}`;
         }
-        console.log('🔍 [DEBUG] Headers que serão enviados:', headers);
         
         console.log('🌐 [LP-DIVULGACAO] Fazendo requisição para o backend...');
         const finalUrl = `${apiUrl}/lp-divulgacao/${id}`;
-        console.log('🔧 [CORREÇÃO] URL final sendo usada:', finalUrl);
         const res = await fetch(finalUrl, { headers });
         const data = await res.json();
         
