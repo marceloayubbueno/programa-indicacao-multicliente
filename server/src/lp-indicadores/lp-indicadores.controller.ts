@@ -105,6 +105,148 @@ export class LPIndicadoresController {
          ...(lp.trackingCodes?.customScripts || []).map(script => `<script>${script}</script>`)
        ].filter(Boolean).join('\n    ');
        
+       // 🔧 CORREÇÃO: JavaScript completo para funcionamento do formulário de LP de indicadores
+       const lpFormJS = `
+        // Configuração do contexto da LP
+        localStorage.setItem('currentLpId', '${(lp as any)._id}');
+        localStorage.setItem('currentLpName', '${lp.name.replace(/'/g, "\\'")}');
+        localStorage.setItem('currentClientId', '${lp.clientId}');
+        
+        // Configuração de API
+        window.APP_CONFIG = {
+          API_URL: '${process.env.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app'}/api',
+          CLIENT_URL: '${process.env.CLIENT_BASE_URL || 'https://programa-indicacao-multicliente.vercel.app'}'
+        };
+        
+        // JavaScript do formulário de indicadores
+        window.submitIndicadorForm = async function(event, form) {
+          event.preventDefault();
+          const nameInput = form.querySelector('input[name="name"]');
+          const emailInput = form.querySelector('input[name="email"]');
+          const phoneInput = form.querySelector('input[name="phone"]') || form.querySelector('input[name="whatsapp"]');
+          const companyInput = form.querySelector('input[name="company"]');
+
+          const name = nameInput ? nameInput.value.trim() : '';
+          const email = emailInput ? emailInput.value.trim() : '';
+          const phone = phoneInput ? phoneInput.value.trim() : '';
+          const company = companyInput ? companyInput.value.trim() : undefined;
+          const lpId = localStorage.getItem('currentLpId');
+          const clientId = localStorage.getItem('currentClientId');
+          const feedback = form.querySelector('.lp-indicador-feedback') || form.querySelector('.feedback');
+          if (!feedback) {
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = 'lp-indicador-feedback';
+            feedbackDiv.style.cssText = 'margin-top:8px;font-size:0.95em;';
+            form.appendChild(feedbackDiv);
+          }
+          const feedbackEl = form.querySelector('.lp-indicador-feedback') || form.querySelector('.feedback');
+          feedbackEl.textContent = '';
+
+          // Validação simples de e-mail no frontend
+          const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+          if (!emailRegex.test(email)) {
+            feedbackEl.textContent = 'Por favor, informe um e-mail válido.';
+            feedbackEl.style.color = 'red';
+            return false;
+          }
+          if (!name) {
+            feedbackEl.textContent = 'Por favor, informe seu nome.';
+            feedbackEl.style.color = 'red';
+            return false;
+          }
+          if (!phone) {
+            feedbackEl.textContent = 'Por favor, informe seu telefone.';
+            feedbackEl.style.color = 'red';
+            return false;
+          }
+          if (!lpId) {
+            feedbackEl.textContent = 'Erro: dados de contexto não encontrados. Recarregue a página.';
+            feedbackEl.style.color = 'red';
+            return false;
+          }
+          
+          // Captura dados de origem
+          const urlParams = new URL(window.location.href).searchParams;
+          const utmSource = urlParams.get('utm_source') || '';
+          const utmMedium = urlParams.get('utm_medium') || '';
+          const utmCampaign = urlParams.get('utm_campaign') || '';
+          const utmTerm = urlParams.get('utm_term') || '';
+          const utmContent = urlParams.get('utm_content') || '';
+          const referrerUrl = document.referrer;
+          const userAgent = navigator.userAgent;
+          const language = navigator.language;
+          
+          const payload = {
+            name, email, phone, company, lpId,
+            utmSource, utmMedium, utmCampaign, utmTerm, utmContent,
+            referrerUrl, userAgent, language
+          };
+          
+          try {
+            feedbackEl.textContent = 'Enviando...';
+            feedbackEl.style.color = 'blue';
+            
+            const response = await fetch(window.APP_CONFIG.API_URL + '/lp-indicadores/submit-form', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+              feedbackEl.textContent = 'Cadastro realizado com sucesso! Você receberá seu link de indicação em breve.';
+              feedbackEl.style.color = 'green';
+              form.reset();
+              
+              // Opcional: Redirecionar após sucesso
+              const participantId = result.participantId || result.data?._id;
+              if (participantId) {
+                setTimeout(() => {
+                  window.location.href = window.APP_CONFIG.CLIENT_URL + '/client/pages/lp-indicadores-success.html?id=' + participantId;
+                }, 2000);
+              }
+            } else {
+              feedbackEl.textContent = result.message || 'Erro ao cadastrar indicador.';
+              feedbackEl.style.color = 'red';
+            }
+          } catch (err) {
+            feedbackEl.textContent = 'Erro de conexão. Tente novamente.';
+            feedbackEl.style.color = 'red';
+          }
+          return false;
+        };
+
+        // Função para associar formulários à submissão
+        window.bindIndicadorForms = function() {
+          document.querySelectorAll('.lp-indicador-form, form').forEach(form => {
+            // Verificar se o formulário tem campos de indicador
+            const hasNameField = form.querySelector('input[name="name"]');
+            const hasEmailField = form.querySelector('input[name="email"]');
+            if (hasNameField && hasEmailField) {
+              form.onsubmit = function(event) { return window.submitIndicadorForm(event, form); };
+              form.classList.add('lp-indicador-form');
+              
+              // Adicionar elemento de feedback se não existir
+              if (!form.querySelector('.lp-indicador-feedback, .feedback')) {
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.className = 'lp-indicador-feedback';
+                feedbackDiv.style.cssText = 'margin-top:8px;font-size:0.95em;';
+                form.appendChild(feedbackDiv);
+              }
+            }
+          });
+        };
+        
+        // Executar após o DOM carregar
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', window.bindIndicadorForms);
+        } else {
+          window.bindIndicadorForms();
+        }
+        
+        // Executar também após um pequeno delay para garantir
+        setTimeout(window.bindIndicadorForms, 100);`;
+       
        const fullHTML = `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -121,6 +263,9 @@ export class LPIndicadoresController {
 <body>
     ${lp.compiledOutput?.html || '<p>Conteúdo da LP não disponível</p>'}
     
+    <script>
+        ${lpFormJS}
+    </script>
     <script>
         ${lp.customJS || ''}
     </script>
