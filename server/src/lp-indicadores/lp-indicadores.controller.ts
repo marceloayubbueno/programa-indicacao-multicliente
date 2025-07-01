@@ -94,9 +94,7 @@ export class LPIndicadoresController {
     try {
       const lp = await this.lpIndicadoresService.findBySlug(slug);
       
-      // 🔧 CORREÇÃO: Retornar HTML renderizado da LP em vez de JSON
-      console.log('[LP-RENDER] 🎯 Servindo LP como HTML:', slug);
-      console.log('[LP-RENDER] LP encontrada:', lp.name);
+      // Retornar HTML renderizado da LP
       
              // Construir HTML completo da LP
        const trackingScripts = [
@@ -272,14 +270,14 @@ export class LPIndicadoresController {
 </body>
 </html>`;
       
-      console.log('[LP-RENDER] ✅ HTML gerado com sucesso, tamanho:', fullHTML.length);
+      // HTML gerado com sucesso
       
       // Retornar como HTML
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.send(fullHTML);
       
     } catch (error) {
-      console.error('[LP-RENDER] ❌ Erro ao servir LP:', error.message);
+      console.error('Erro ao servir LP:', error.message);
       // Em caso de erro, retornar página de erro HTML
       const errorHTML = `
 <!DOCTYPE html>

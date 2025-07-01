@@ -1057,19 +1057,11 @@ function closeLPIndicadoresModal() {
 // Copiar link da LP
 async function copyLPLink(url) {
     try {
-        // 🔧 CORREÇÃO: URL já vem absoluta do backend, usar diretamente
-        console.log('[FIXED-COPY] 🔧 Copiando link ABSOLUTO da LP:');
-        console.log('[FIXED-COPY] URL absoluta recebida do backend:', url);
-        
-        // Verificar se a URL já é absoluta (começa com http:// ou https://)
-        const isAbsoluteUrl = url && (url.startsWith('http://') || url.startsWith('https://'));
-        
-        if (isAbsoluteUrl) {
-            console.log('[FIXED-COPY] ✅ URL já é absoluta, usando diretamente:', url);
+        // URL já vem absoluta do backend
+        if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
             await navigator.clipboard.writeText(url);
             alert('Link copiado para a área de transferência!');
         } else {
-            console.log('[FIXED-COPY] ❌ URL não é absoluta, erro no backend!');
             alert('Erro: URL da LP não foi gerada corretamente pelo sistema.');
         }
     } catch (error) {

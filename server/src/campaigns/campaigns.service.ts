@@ -302,28 +302,14 @@ export class CampaignsService {
           throw new BadRequestException('LP não encontrada ou não pertence ao cliente');
         }
         
-        // 🔧 CORREÇÃO: Gerar URLs ABSOLUTAS corretas baseadas na função real de cada URL
+        // 🔧 Gerar URLs absolutas corretas para LP de Indicadores
         const API_BASE_URL = process.env.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app';
         const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL || 'https://programa-indicacao-multicliente.vercel.app';
         
-        console.log('[FIXED-URL] 🔧 Gerando URLs corretas da LP de Indicadores:');
-        console.log('[FIXED-URL] LP ID:', (lp as any)._id?.toString());
-        console.log('[FIXED-URL] LP Slug:', lp.slug);
-        console.log('[FIXED-URL] LP Status:', lp.status);
-        console.log('[FIXED-URL] API_BASE_URL:', API_BASE_URL);
-        console.log('[FIXED-URL] CLIENT_BASE_URL:', CLIENT_BASE_URL);
-        
-        // 🎯 URLs CORRETAS baseadas na função real:
-        // publicUrl: Para acesso público da LP renderizada como HTML (via endpoint slug)
+        // URLs corretas baseadas na função real:
         const publicUrl = lp.status === 'published' ? `${API_BASE_URL}/api/lp-indicadores/slug/${lp.slug}` : null;
-        // editUrl: Para editar no GrapesJS (frontend)
         const editUrl = `${CLIENT_BASE_URL}/client/pages/lp-editor-grapes.html?id=${(lp as any)._id?.toString()}`;
-        // previewUrl: Para preview no frontend
         const previewUrl = `${CLIENT_BASE_URL}/client/pages/lp-preview.html?id=${(lp as any)._id?.toString()}`;
-        
-        console.log('[FIXED-URL] publicUrl CORRIGIDA:', publicUrl);
-        console.log('[FIXED-URL] editUrl CORRIGIDA:', editUrl);
-        console.log('[FIXED-URL] previewUrl CORRIGIDA:', previewUrl);
 
         return {
           campaign: {
