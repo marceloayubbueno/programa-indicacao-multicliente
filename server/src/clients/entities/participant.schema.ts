@@ -43,7 +43,7 @@ export class Participant extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Campaign', required: false })
   originCampaignId?: Types.ObjectId;
 
-  @Prop({ required: false, enum: ['landing-page', 'manual', 'import', 'api', 'bulk-upload'], default: 'manual' })
+  @Prop({ required: false, enum: ['landing-page', 'manual', 'import', 'api', 'bulk-upload', 'campaign-duplication'], default: 'manual' })
   originSource: string;
 
   @Prop({ type: Object, required: false })
@@ -160,9 +160,10 @@ ParticipantSchema.virtual('originInfo').get(function() {
   return {
     type: this.originSource === 'manual' ? 'Cadastro Manual' : 
           this.originSource === 'import' ? 'Importação' :
-          this.originSource === 'api' ? 'API' : 'Outros',
+          this.originSource === 'api' ? 'API' :
+          this.originSource === 'campaign-duplication' ? 'Duplicação de Campanha' : 'Outros',
     name: 'N/A',
-    campaign: 'N/A',
+    campaign: this.campaignName || 'N/A',
     date: this.createdAt
   };
 }); 
