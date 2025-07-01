@@ -102,17 +102,10 @@ export class ReferralsService {
             const conversionRewardConfig = campaign.rewardOnConversion as any;
 
             
-            // 🔍 DIAGNÓSTICO H1: Log dos valores antes do cálculo
+            // Calcular valor total (recompensa existente + recompensa de conversão)
             const currentReward = referral.rewardValue || 0;
             const conversionReward = conversionRewardConfig.value;
-            this.logger.log(`🔍 DIAGNÓSTICO H1 - ANTES DO CÁLCULO:`);
-            this.logger.log(`   - Referral ID: ${referralId}`);
-            this.logger.log(`   - Valor atual (indicação): R$ ${currentReward}`);
-            this.logger.log(`   - Valor conversão: R$ ${conversionReward}`);
-            
             const totalReward = currentReward + conversionReward;
-            this.logger.log(`   - Valor total calculado: R$ ${totalReward}`);
-            this.logger.log(`🔍 DIAGNÓSTICO H1 - POSSÍVEL BUG: Sistema está somando indicação + conversão`);
             
 
             
@@ -273,25 +266,12 @@ export class ReferralsService {
       .exec();
 
       return referrals.map(ref => {
-        // 🔍 DIAGNÓSTICO H2: Log dos campos de classificação
-        const refData = ref as any;
-        this.logger.log(`🔍 DIAGNÓSTICO H2 - CLASSIFICAÇÃO DE RECOMPENSA:`);
-        this.logger.log(`   - Referral ID: ${ref._id}`);
-        this.logger.log(`   - Lead: ${ref.leadName}`);
-        this.logger.log(`   - rewardType: ${refData.rewardType}`);
-        this.logger.log(`   - conversionRewardId: ${refData.conversionRewardId || 'não definido'}`);
-        this.logger.log(`   - conversionRewardValue: ${refData.conversionRewardValue || 'não definido'}`);
-        this.logger.log(`   - rewardValue: ${refData.rewardValue}`);
-        
-        // ✅ NOVO: Determinar categoria da recompensa
+        // ✅ Determinar categoria da recompensa
         const isConversionReward = (ref as any).rewardType === 'conversion_bonus' || 
                                   (ref as any).conversionRewardId || 
                                   (ref as any).conversionRewardValue;
         
         const rewardCategory = isConversionReward ? 'Recompensa por Conversão' : 'Recompensa por Indicação';
-        
-        this.logger.log(`   - Classificação resultante: ${rewardCategory}`);
-        this.logger.log(`🔍 DIAGNÓSTICO H2 - FIM DA CLASSIFICAÇÃO`);
         
         return {
           _id: ref._id,
@@ -629,15 +609,11 @@ export class ReferralsService {
         this.logger.log(`🎯 Recompensa encontrada, processando...`);
         const rewardConfig = campaign.rewardOnReferral as any;
 
-        // 🔍 DIAGNÓSTICO H3: Log detalhado do valor da recompensa por indicação
-        this.logger.log(`🔍 DIAGNÓSTICO H3 - VALOR INICIAL RECOMPENSA INDICAÇÃO:`);
-        this.logger.log(`   - Referral ID: ${referralId}`);
-        this.logger.log(`   - Campaign ID: ${campaignId}`);
-        this.logger.log(`   - Reward Config ID: ${rewardConfig._id}`);
-        this.logger.log(`   - Valor configurado: R$ ${rewardConfig.value}`);
+        this.logger.log(`💰 Dados da recompensa:`);
+        this.logger.log(`   - ID: ${rewardConfig._id}`);
+        this.logger.log(`   - Valor: ${rewardConfig.value}`);
         this.logger.log(`   - Tipo: ${rewardConfig.type}`);
         this.logger.log(`   - Status: ${rewardConfig.status}`);
-        this.logger.log(`🔍 DIAGNÓSTICO H3 - VERIFICAR SE VALOR ESTÁ CORRETO (deveria ser R$ 10)`);
         
         // Atualizar referral com recompensa automática
         this.logger.log(`🔄 Atualizando referral ${referralId}...`);

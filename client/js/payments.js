@@ -72,22 +72,7 @@ async function loadRewardsFromBackend() {
             currentRewards = data.data || [];
             console.log('[H4] ✅ DIAGNÓSTICO - Recompensas carregadas:', currentRewards.length);
             
-            // 🔍 DIAGNÓSTICO H5: Log detalhado das recompensas no frontend
-            console.log('🔍 DIAGNÓSTICO H5 - DADOS DAS RECOMPENSAS NO FRONTEND:');
-            currentRewards.forEach((reward, index) => {
-                console.log(`   - Recompensa ${index + 1}:`);
-                console.log(`     * ID: ${reward._id}`);
-                console.log(`     * Lead: ${reward.leadName}`);
-                console.log(`     * Indicador: ${reward.indicatorName}`);
-                console.log(`     * Valor: R$ ${reward.rewardValue}`);
-                console.log(`     * Categoria: ${reward.rewardCategory}`);
-                console.log(`     * Tipo: ${reward.rewardType}`);
-                console.log(`     * Status: ${reward.rewardStatus}`);
-                console.log(`     * Campanha: ${reward.campaignName}`);
-                if (reward.rewardValue > 100) {
-                    console.log(`     🚨 POSSÍVEL BUG: Valor muito alto para indicação simples!`);
-                }
-            });
+
             
             updateFinancialStatistics();
             populateFiltersPayments();
