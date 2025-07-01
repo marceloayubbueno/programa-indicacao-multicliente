@@ -37,19 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Carregar recompensas do backend
 async function loadRewardsFromBackend() {
-    console.log('[H4] 🔍 DIAGNÓSTICO - loadRewardsFromBackend iniciado');
     
     try {
         const token = localStorage.getItem('clientToken');
         const clientId = localStorage.getItem('clientId');
         
-        console.log('[H4] 🔍 DIAGNÓSTICO - Token exists:', !!token);
-        console.log('[H4] 🔍 DIAGNÓSTICO - ClientId:', clientId);
-        console.log('[H4] 🔍 DIAGNÓSTICO - Token preview:', token ? token.substring(0, 20) + '...' : 'null');
+
         
         // Verificar se há autenticação
         if (!token || !clientId) {
-            console.log('[H4] ❌ DIAGNÓSTICO - Sem token ou clientId');
             currentRewards = [];
             return;
         }
@@ -61,17 +57,13 @@ async function loadRewardsFromBackend() {
                    'http://localhost:3000/api' : 
                    'https://programa-indicacao-multicliente-production.up.railway.app/api');
     const url = `${apiUrl}/referrals/payments?clientId=${clientId}`;
-        console.log('[H4] 🔍 DIAGNÓSTICO - URL da requisição:', url);
         
         const headers = {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         };
-        console.log('[H4] 🔍 DIAGNÓSTICO - Headers enviados:', headers);
         
         const response = await fetch(url, { headers });
-        console.log('[H4] 🔍 DIAGNÓSTICO - Response status:', response.status);
-        console.log('[H4] 🔍 DIAGNÓSTICO - Response ok:', response.ok);
         
         const data = await response.json();
         console.log('[H4] 🔍 DIAGNÓSTICO - Response data:', data);
@@ -79,15 +71,33 @@ async function loadRewardsFromBackend() {
         if (data.success) {
             currentRewards = data.data || [];
             console.log('[H4] ✅ DIAGNÓSTICO - Recompensas carregadas:', currentRewards.length);
+            
+            // 🔍 DIAGNÓSTICO H5: Log detalhado das recompensas no frontend
+            console.log('🔍 DIAGNÓSTICO H5 - DADOS DAS RECOMPENSAS NO FRONTEND:');
+            currentRewards.forEach((reward, index) => {
+                console.log(`   - Recompensa ${index + 1}:`);
+                console.log(`     * ID: ${reward._id}`);
+                console.log(`     * Lead: ${reward.leadName}`);
+                console.log(`     * Indicador: ${reward.indicatorName}`);
+                console.log(`     * Valor: R$ ${reward.rewardValue}`);
+                console.log(`     * Categoria: ${reward.rewardCategory}`);
+                console.log(`     * Tipo: ${reward.rewardType}`);
+                console.log(`     * Status: ${reward.rewardStatus}`);
+                console.log(`     * Campanha: ${reward.campaignName}`);
+                if (reward.rewardValue > 100) {
+                    console.log(`     🚨 POSSÍVEL BUG: Valor muito alto para indicação simples!`);
+                }
+            });
+            
             updateFinancialStatistics();
             populateFiltersPayments();
             renderCurrentTab();
         } else {
             currentRewards = [];
-            console.error('[H4] ❌ DIAGNÓSTICO - API retornou erro:', data.message);
+            console.error('API retornou erro:', data.message);
         }
     } catch (error) {
-        console.error('[H4] ❌ DIAGNÓSTICO - Erro na requisição:', error);
+        console.error('Erro na requisição:', error);
         currentRewards = [];
     }
 }

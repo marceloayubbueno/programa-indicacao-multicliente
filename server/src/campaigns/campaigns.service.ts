@@ -461,6 +461,19 @@ export class CampaignsService {
         assignedRewards = await this.rewardsService['rewardModel'].find({
           _id: { $in: indicator.assignedRewards }
         });
+        
+        // 🔍 DIAGNÓSTICO H4: Log das recompensas configuradas
+        console.log(`🔍 DIAGNÓSTICO H4 - CONFIGURAÇÃO DAS RECOMPENSAS:`);
+        console.log(`   - Indicador ID: ${indicatorId}`);
+        console.log(`   - Total de recompensas atribuídas: ${assignedRewards.length}`);
+        assignedRewards.forEach((reward, index) => {
+          console.log(`   - Recompensa ${index + 1}:`);
+          console.log(`     * ID: ${reward._id}`);
+          console.log(`     * Tipo: ${reward.type}`);
+          console.log(`     * Valor: R$ ${reward.value}`);
+          console.log(`     * Trigger: ${reward.trigger}`);
+          console.log(`     * Status: ${reward.status}`);
+        });
       }
 
       // Calcular recompensas devidas

@@ -53,27 +53,19 @@ export class ReferralsController {
    */
   @Get('payments')
   async getPaymentsData(@Query('clientId') clientId?: string) {
-    console.log('[H1] 🔍 DIAGNÓSTICO - Endpoint /referrals/payments chamado');
-    console.log('[H1] 🔍 DIAGNÓSTICO - clientId query param:', clientId);
-    console.log('[H1] 🔍 DIAGNÓSTICO - Sem autenticação JWT aplicada neste endpoint!');
-    
     this.logger.log('Buscando dados para página de pagamentos');
     
     try {
       const rewardsData = await this.referralsService.getRewardsForPayments(clientId);
-      console.log('[H1] 🔍 DIAGNÓSTICO - Total recompensas retornadas do service:', rewardsData.length);
       
       // Filtrar apenas recompensas com valor > 0
       const rewardsWithValue = rewardsData.filter(r => r.rewardValue && r.rewardValue > 0);
-      console.log('[H1] 🔍 DIAGNÓSTICO - Recompensas com valor > 0:', rewardsWithValue.length);
-      console.log('[H1] 🔍 DIAGNÓSTICO - Exemplo de dados:', rewardsWithValue.slice(0, 2));
 
       return {
         success: true,
         data: rewardsWithValue
       };
     } catch (error) {
-      console.log('[H1] ❌ DIAGNÓSTICO - Erro na API payments:', error.message);
       this.logger.error('Erro ao buscar dados de pagamentos:', error);
       return {
         success: false,
