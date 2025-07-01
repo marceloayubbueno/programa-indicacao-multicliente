@@ -1,10 +1,22 @@
 // 🔧 CORREÇÃO: Função para obter API_URL de forma segura
 function getApiUrl() {
-    return window.API_URL || 
+    // 🔍 DEBUG: Logs para verificar detecção de ambiente
+    console.log('[DEBUG-API] 🔍 Calculando API URL:');
+    console.log('[DEBUG-API] window.API_URL:', window.API_URL);
+    console.log('[DEBUG-API] window.APP_CONFIG:', window.APP_CONFIG);
+    console.log('[DEBUG-API] window.APP_CONFIG?.API_URL:', window.APP_CONFIG?.API_URL);
+    console.log('[DEBUG-API] window.location.hostname:', window.location.hostname);
+    
+    const finalApiUrl = window.API_URL || 
            (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
            (window.location.hostname === 'localhost' ? 
             'http://localhost:3000/api' : 
             'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+    
+    console.log('[DEBUG-API] 🎯 URL final da API calculada:', finalApiUrl);
+    console.log('[DEBUG-API] 🔍 Verificar se esta API está correta!');
+    
+    return finalApiUrl;
 }
 
 // Variáveis globais
@@ -15,6 +27,15 @@ let formData = {
     campaignType: null,
     rewardType: null
 };
+
+// 🔍 DEBUG: Verificar cache/localStorage que pode estar causando problemas
+console.log('[DEBUG-CACHE] 🔍 Verificando cache/localStorage:');
+console.log('[DEBUG-CACHE] clientToken:', localStorage.getItem('clientToken'));
+console.log('[DEBUG-CACHE] token:', localStorage.getItem('token'));
+console.log('[DEBUG-CACHE] API_URL no localStorage:', localStorage.getItem('API_URL'));
+console.log('[DEBUG-CACHE] CLIENT_URL no localStorage:', localStorage.getItem('CLIENT_URL'));
+console.log('[DEBUG-CACHE] Todas as chaves no localStorage:', Object.keys(localStorage));
+console.log('[DEBUG-CACHE] localStorage completo:', localStorage);
 
 // Funções para gerenciamento de páginas replicáveis
 let currentPages = [];
@@ -926,6 +947,18 @@ async function accessLPIndicadores(campaignId) {
         
         const result = await response.json();
         
+        // 🔍 DEBUG: Verificar dados recebidos do backend
+        console.log('[DEBUG-ACCESS] 🔍 Dados recebidos do backend:');
+        console.log('[DEBUG-ACCESS] response.ok:', response.ok);
+        console.log('[DEBUG-ACCESS] result.success:', result.success);
+        console.log('[DEBUG-ACCESS] result.data completo:', result.data);
+        if (result.data && result.data.lpIndicadores) {
+            console.log('[DEBUG-ACCESS] URLs da LP recebidas:');
+            console.log('[DEBUG-ACCESS] publicUrl:', result.data.lpIndicadores.publicUrl);
+            console.log('[DEBUG-ACCESS] editUrl:', result.data.lpIndicadores.editUrl);
+            console.log('[DEBUG-ACCESS] previewUrl:', result.data.lpIndicadores.previewUrl);
+        }
+        
         if (!response.ok || !result.success) {
             throw new Error(result.message || 'Erro ao buscar LP de Indicadores');
         }
@@ -1057,19 +1090,35 @@ function closeLPIndicadoresModal() {
 // Copiar link da LP
 async function copyLPLink(url) {
     try {
+        // 🔍 DEBUG: Logs para identificar problema de construção de URL
+        console.log('[DEBUG-COPY] 🔍 Copiando link da LP:');
+        console.log('[DEBUG-COPY] URL recebida do backend:', url);
+        console.log('[DEBUG-COPY] window.APP_CONFIG:', window.APP_CONFIG);
+        console.log('[DEBUG-COPY] window.APP_CONFIG?.CLIENT_URL:', window.APP_CONFIG?.CLIENT_URL);
+        console.log('[DEBUG-COPY] window.location.hostname:', window.location.hostname);
+        console.log('[DEBUG-COPY] window.location.origin:', window.location.origin);
+        
         // 🔧 CORREÇÃO: Usar configuração dinâmica em vez de window.location.origin
         let baseUrl;
         if (window.APP_CONFIG && window.APP_CONFIG.CLIENT_URL) {
             baseUrl = window.APP_CONFIG.CLIENT_URL;
+            console.log('[DEBUG-COPY] ✅ Usando APP_CONFIG.CLIENT_URL:', baseUrl);
         } else {
             // Fallback baseado no ambiente
             if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                 baseUrl = 'http://localhost:5501';
+                console.log('[DEBUG-COPY] ⚠️ Usando fallback localhost:', baseUrl);
             } else {
                 baseUrl = 'https://programa-indicacao-multicliente.vercel.app';
+                console.log('[DEBUG-COPY] ⚠️ Usando fallback produção:', baseUrl);
             }
         }
-        await navigator.clipboard.writeText(baseUrl + url);
+        
+        const finalUrl = baseUrl + url;
+        console.log('[DEBUG-COPY] 🎯 URL final calculada:', finalUrl);
+        console.log('[DEBUG-COPY] 🔍 Verificar se esta URL está correta!');
+        
+        await navigator.clipboard.writeText(finalUrl);
         alert('Link copiado para a área de transferência!');
     } catch (error) {
         console.error('Erro ao copiar link:', error);

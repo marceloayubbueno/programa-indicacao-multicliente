@@ -302,6 +302,16 @@ export class CampaignsService {
           throw new BadRequestException('LP não encontrada ou não pertence ao cliente');
         }
         
+        // 🔍 DEBUG: Logs para identificar problema de URLs
+        console.log('[DEBUG-URL] 🔍 Gerando URLs da LP de Indicadores:');
+        console.log('[DEBUG-URL] LP ID:', (lp as any)._id?.toString());
+        console.log('[DEBUG-URL] LP Slug:', lp.slug);
+        console.log('[DEBUG-URL] LP Status:', lp.status);
+        console.log('[DEBUG-URL] publicUrl gerada:', lp.status === 'published' ? `/lp/indicadores/${lp.slug}` : null);
+        console.log('[DEBUG-URL] editUrl gerada:', `/client/pages/lp-editor-grapes.html?id=${(lp as any)._id?.toString()}`);
+        console.log('[DEBUG-URL] previewUrl gerada:', `/client/pages/lp-preview.html?id=${(lp as any)._id?.toString()}`);
+        console.log('[DEBUG-URL] Todas as URLs são RELATIVAS - pode ser o problema!');
+
         return {
           campaign: {
             id: campaign._id,
