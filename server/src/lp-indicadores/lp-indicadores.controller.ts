@@ -9,7 +9,8 @@ import {
   Query, 
   HttpStatus,
   HttpCode,
-  UseGuards
+  UseGuards,
+  Res
 } from '@nestjs/common';
 import { LPIndicadoresService } from './lp-indicadores.service';
 import { CreateLPIndicadoresDto } from './dto/create-lp-indicadores.dto';
@@ -89,12 +90,71 @@ export class LPIndicadoresController {
   }
 
   @Get('slug/:slug')
-  async findBySlug(@Param('slug') slug: string) {
-    return {
-      success: true,
-      data: await this.lpIndicadoresService.findBySlug(slug),
-      message: 'LP encontrada'
-    };
+  async findBySlug(@Param('slug') slug: string, @Res() res: any) {
+    try {
+      const lp = await this.lpIndicadoresService.findBySlug(slug);
+      
+      // 🔧 CORREÇÃO: Retornar HTML renderizado da LP em vez de JSON
+      console.log('[LP-RENDER] 🎯 Servindo LP como HTML:', slug);
+      console.log('[LP-RENDER] LP encontrada:', lp.name);
+      
+             // Construir HTML completo da LP
+       const trackingScripts = [
+         lp.trackingCodes?.googleAnalytics ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${lp.trackingCodes.googleAnalytics}"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${lp.trackingCodes.googleAnalytics}');</script>` : '',
+         lp.trackingCodes?.facebookPixel ? `<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init', '${lp.trackingCodes.facebookPixel}');fbq('track', 'PageView');</script>` : '',
+         ...(lp.trackingCodes?.customScripts || []).map(script => `<script>${script}</script>`)
+       ].filter(Boolean).join('\n    ');
+       
+       const fullHTML = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${lp.name || 'LP de Indicadores'}</title>
+    <style>
+        ${lp.compiledOutput?.css || ''}
+        ${lp.customCSS || ''}
+    </style>
+    ${trackingScripts}
+</head>
+<body>
+    ${lp.compiledOutput?.html || '<p>Conteúdo da LP não disponível</p>'}
+    
+    <script>
+        ${lp.customJS || ''}
+    </script>
+</body>
+</html>`;
+      
+      console.log('[LP-RENDER] ✅ HTML gerado com sucesso, tamanho:', fullHTML.length);
+      
+      // Retornar como HTML
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.send(fullHTML);
+      
+    } catch (error) {
+      console.error('[LP-RENDER] ❌ Erro ao servir LP:', error.message);
+      // Em caso de erro, retornar página de erro HTML
+      const errorHTML = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LP não encontrada</title>
+</head>
+<body>
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h1>LP de Indicadores não encontrada</h1>
+        <p>A landing page solicitada não foi encontrada ou não está publicada.</p>
+        <p>Código de erro: ${error.message}</p>
+    </div>
+</body>
+</html>`;
+      res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.send(errorHTML);
+    }
   }
 
   @UseGuards(JwtClientAuthGuard)

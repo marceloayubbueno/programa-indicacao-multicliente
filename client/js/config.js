@@ -21,32 +21,18 @@ const ENV = {
 function detectEnvironment() {
     const hostname = window.location.hostname;
     
-    // 🔍 DEBUG: Logs para verificar detecção de ambiente
-    console.log('[DEBUG-ENV] 🔍 Detectando ambiente:');
-    console.log('[DEBUG-ENV] hostname:', hostname);
-    console.log('[DEBUG-ENV] window.location:', window.location);
-    
     // Se estiver em localhost, é development
     if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('localhost')) {
-        console.log('[DEBUG-ENV] ✅ Ambiente detectado: development');
         return 'development';
     }
     
     // Caso contrário, é production
-    console.log('[DEBUG-ENV] ✅ Ambiente detectado: production');
     return 'production';
 }
 
 // 📦 Configuração ativa baseada no ambiente
 const CURRENT_ENV = detectEnvironment();
 const config = ENV[CURRENT_ENV];
-
-// 🔍 DEBUG: Logs para verificar configuração final
-console.log('[DEBUG-CONFIG] 🔍 Configuração aplicada:');
-console.log('[DEBUG-CONFIG] CURRENT_ENV:', CURRENT_ENV);
-console.log('[DEBUG-CONFIG] config selecionado:', config);
-console.log('[DEBUG-CONFIG] API_URL final:', config.API_URL);
-console.log('[DEBUG-CONFIG] CLIENT_URL final:', config.CLIENT_URL);
 
 // 🌐 Exportar configurações
 window.APP_CONFIG = {

@@ -302,15 +302,28 @@ export class CampaignsService {
           throw new BadRequestException('LP não encontrada ou não pertence ao cliente');
         }
         
-        // 🔍 DEBUG: Logs para identificar problema de URLs
-        console.log('[DEBUG-URL] 🔍 Gerando URLs da LP de Indicadores:');
-        console.log('[DEBUG-URL] LP ID:', (lp as any)._id?.toString());
-        console.log('[DEBUG-URL] LP Slug:', lp.slug);
-        console.log('[DEBUG-URL] LP Status:', lp.status);
-        console.log('[DEBUG-URL] publicUrl gerada:', lp.status === 'published' ? `/lp/indicadores/${lp.slug}` : null);
-        console.log('[DEBUG-URL] editUrl gerada:', `/client/pages/lp-editor-grapes.html?id=${(lp as any)._id?.toString()}`);
-        console.log('[DEBUG-URL] previewUrl gerada:', `/client/pages/lp-preview.html?id=${(lp as any)._id?.toString()}`);
-        console.log('[DEBUG-URL] Todas as URLs são RELATIVAS - pode ser o problema!');
+        // 🔧 CORREÇÃO: Gerar URLs ABSOLUTAS corretas baseadas na função real de cada URL
+        const API_BASE_URL = process.env.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app';
+        const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL || 'https://programa-indicacao-multicliente.vercel.app';
+        
+        console.log('[FIXED-URL] 🔧 Gerando URLs corretas da LP de Indicadores:');
+        console.log('[FIXED-URL] LP ID:', (lp as any)._id?.toString());
+        console.log('[FIXED-URL] LP Slug:', lp.slug);
+        console.log('[FIXED-URL] LP Status:', lp.status);
+        console.log('[FIXED-URL] API_BASE_URL:', API_BASE_URL);
+        console.log('[FIXED-URL] CLIENT_BASE_URL:', CLIENT_BASE_URL);
+        
+        // 🎯 URLs CORRETAS baseadas na função real:
+        // publicUrl: Para acesso público da LP renderizada como HTML (via endpoint slug)
+        const publicUrl = lp.status === 'published' ? `${API_BASE_URL}/api/lp-indicadores/slug/${lp.slug}` : null;
+        // editUrl: Para editar no GrapesJS (frontend)
+        const editUrl = `${CLIENT_BASE_URL}/client/pages/lp-editor-grapes.html?id=${(lp as any)._id?.toString()}`;
+        // previewUrl: Para preview no frontend
+        const previewUrl = `${CLIENT_BASE_URL}/client/pages/lp-preview.html?id=${(lp as any)._id?.toString()}`;
+        
+        console.log('[FIXED-URL] publicUrl CORRIGIDA:', publicUrl);
+        console.log('[FIXED-URL] editUrl CORRIGIDA:', editUrl);
+        console.log('[FIXED-URL] previewUrl CORRIGIDA:', previewUrl);
 
         return {
           campaign: {
@@ -323,9 +336,9 @@ export class CampaignsService {
             name: lp.name,
             slug: lp.slug,
             status: lp.status,
-            publicUrl: lp.status === 'published' ? `/lp/indicadores/${lp.slug}` : null,
-            editUrl: `/client/pages/lp-editor-grapes.html?id=${(lp as any)._id?.toString()}`,
-            previewUrl: `/client/pages/lp-preview.html?id=${(lp as any)._id?.toString()}`,
+            publicUrl: publicUrl,
+            editUrl: editUrl,
+            previewUrl: previewUrl,
             statistics: lp.statistics
           }
         };
