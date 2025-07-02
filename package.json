@@ -1,4 +1,20 @@
 {
+  "name": "programa-indicacao-multicliente",
+  "version": "1.0.0",
+  "description": "Sistema de programa de indicação multicliente",
+  "scripts": {
+    "dev": "cd server && npm run start:dev",
+    "build": "cd server && npm run build",
+    "start": "cd server && npm run start:prod",
+    "deploy": "node scripts/deploy.js",
+    "redeploy": "node scripts/redeploy.js",
+    "commit": "node scripts/commit.js",
+    "quick-commit": "node scripts/quick-commit.js",
+    "status": "node scripts/status.js",
+    "test-prod": "node scripts/test-production.js",
+    "setup": "cd server && npm install",
+    "logs": "echo 'Acesse: https://railway.app/dashboard para ver logs'"
+  },
   "dependencies": {
     "@nestjs/common": "^11.1.0",
     "@nestjs/config": "^4.0.2",
