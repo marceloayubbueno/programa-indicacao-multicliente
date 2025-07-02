@@ -200,7 +200,7 @@ export class LPIndicadoresController {
               const participantId = result.participantId || result.data?._id;
               if (participantId) {
                 setTimeout(() => {
-                  window.location.href = window.APP_CONFIG.CLIENT_URL + '/client/pages/lp-indicadores-success.html?id=' + participantId;
+                  window.location.href = window.APP_CONFIG.CLIENT_URL + '/pages/lp-indicadores-success.html?id=' + participantId;
                 }, 2000);
               }
             } else {
