@@ -82,16 +82,7 @@ export class LPIndicadoresController {
       lpClientId = (lp.clientId as any)?.toString();
     }
     
-    // 🐛 DEBUG: Logs para diagnóstico detalhado
-    console.log('[DEBUG] Análise detalhada do clientId da LP:', {
-      lpClientIdRaw: lp.clientId,
-      lpClientIdType: typeof lp.clientId,
-      lpClientIdIsObject: typeof lp.clientId === 'object',
-      lpClientIdExtracted: lpClientId,
-      lpClientIdLength: lpClientId?.length,
-      tokenClientId: clientId,
-      tokenClientIdLength: clientId?.length
-    });
+
     
     // 🔒 SEGURANÇA: Verificar se a LP pertence ao cliente
     if (lpClientId !== clientId) {
@@ -336,13 +327,7 @@ export class LPIndicadoresController {
       lpClientIdUpdate = (lp.clientId as any)?.toString();
     }
     
-    // 🐛 DEBUG: Logs para diagnóstico do update
-    console.log('[DEBUG UPDATE] Análise detalhada do clientId:', {
-      lpClientIdRaw: lp.clientId,
-      lpClientIdExtracted: lpClientIdUpdate,
-      tokenClientId: clientId,
-      isMatch: lpClientIdUpdate === clientId
-    });
+
     
     if (lpClientIdUpdate !== clientId) {
       return {
