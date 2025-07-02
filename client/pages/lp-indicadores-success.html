@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="../css/tailwind.output.css">
     <link rel="stylesheet" href="../css/lp-indicadores-success.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8fafc; color: #222; text-align: center; padding: 40px; }
+        .success-box { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #0001; display: inline-block; padding: 32px 48px; margin-top: 40px; }
+        h1 { color: #16a34a; }
+        .id-box { margin-top: 16px; font-size: 1.1em; color: #555; }
+        .btn { margin-top: 32px; background: #16a34a; color: #fff; border: none; border-radius: 6px; padding: 12px 32px; font-size: 1em; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background: #15803d; }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-blue-900 via-gray-900 to-green-900 min-h-screen flex items-center justify-center">
     
@@ -178,5 +186,10 @@
     </div>
 
     <script src="../js/lp-indicadores-success.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById('id').textContent = params.get('id') || 'N/A';
+        console.log('[LP-SUCCESS] Página carregada com ID:', params.get('id'));
+    </script>
 </body>
 </html> 
