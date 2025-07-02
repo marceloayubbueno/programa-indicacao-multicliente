@@ -1803,19 +1803,7 @@
                 window.currentStatus = lp.status || 'draft';
                 window.currentClientId = lp.clientId?._id || lp.clientId || localStorage.getItem('clientId');
                 
-                // 🐛 DEBUG: Logs para diagnóstico do carregamento inicial
-                console.log('[DEBUG] Dados carregados da LP:', {
-                  lpId: lp._id,
-                  lpName: lp.name,
-                  lpSlug: lp.slug,
-                  lpStatus: lp.status,
-                  lpClientId: lp.clientId,
-                  lpClientIdType: typeof lp.clientId,
-                  currentSlug: window.currentSlug,
-                  currentClientId: window.currentClientId,
-                  currentStatus: window.currentStatus,
-                  localStorageClientId: localStorage.getItem('clientId')
-                });
+
                 
                 // Opcional: preencher o editor com os dados da LP
                 if (window.editor && lp.compiledOutput) {
@@ -1836,12 +1824,7 @@
     // Função global para salvar a LP no backend
     window.saveLP = async function() {
       try {
-        // 🐛 DEBUG: Estado do localStorage no início
-        console.log('[DEBUG] Estado do localStorage:', {
-          clientId: localStorage.getItem('clientId'),
-          clientToken: localStorage.getItem('clientToken') ? 'presente' : 'ausente',
-          hasValidToken: !!localStorage.getItem('clientToken')
-        });
+
         
         const html = editor.getHtml();
         const css = editor.getCss();
@@ -1902,15 +1885,6 @@
         const method = isEdit ? 'PATCH' : 'POST';
         const token = localStorage.getItem('clientToken');
         
-        // 🐛 DEBUG: Payload e requisição
-        console.log('[DEBUG] Payload montado:', {
-          payload,
-          endpoint,
-          method,
-          hasToken: !!token,
-          tokenPreview: token ? token.substring(0, 20) + '...' : 'nenhum'
-        });
-        
         const response = await fetch(endpoint, {
           method,
           headers: {
@@ -1920,13 +1894,6 @@
           body: JSON.stringify(payload)
         });
         const result = await response.json();
-        
-        // 🐛 DEBUG: Resposta do servidor
-        console.log('[DEBUG] Resposta do servidor:', {
-          status: response.status,
-          ok: response.ok,
-          result
-        });
         
         if (response.ok && result.success) {
           alert('LP salva com sucesso no sistema!');

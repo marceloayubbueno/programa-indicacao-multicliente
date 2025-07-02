@@ -73,28 +73,28 @@ export class LPIndicadoresController {
     const lp = await this.lpIndicadoresService.findOne(id);
     
     // 🔧 FIX: Extrair clientId corretamente (pode ser populated object ou string)  
-    const lpClientId = (lp?.clientId as any)?._id?.toString() || lp?.clientId?.toString();
+    let lpClientId: string;
+    if (typeof lp.clientId === 'object' && lp.clientId !== null) {
+      // Cliente populado com dados completos
+      lpClientId = (lp.clientId as any)._id?.toString() || (lp.clientId as any).toString();
+    } else {
+      // Cliente como string simples
+      lpClientId = (lp.clientId as any)?.toString();
+    }
     
-    // 🐛 DEBUG: Logs para diagnóstico do problema de ownership
-    console.log('[DEBUG] LP encontrada:', { 
-      lpId: (lp as any)._id, 
-      lpClientId: lp.clientId, 
+    // 🐛 DEBUG: Logs para diagnóstico detalhado
+    console.log('[DEBUG] Análise detalhada do clientId da LP:', {
+      lpClientIdRaw: lp.clientId,
       lpClientIdType: typeof lp.clientId,
-      lpClientIdPopulated: !!(lp.clientId as any)?._id 
-    });
-    console.log('[DEBUG] ClientId do token:', { 
-      clientId, 
-      clientIdType: typeof clientId 
-    });
-    console.log('[DEBUG] Comparação:', { 
-      lpClientIdExtracted: lpClientId, 
-      tokenClientId: clientId, 
-      isMatch: lpClientId === clientId 
+      lpClientIdIsObject: typeof lp.clientId === 'object',
+      lpClientIdExtracted: lpClientId,
+      lpClientIdLength: lpClientId?.length,
+      tokenClientId: clientId,
+      tokenClientIdLength: clientId?.length
     });
     
     // 🔒 SEGURANÇA: Verificar se a LP pertence ao cliente
     if (lpClientId !== clientId) {
-      console.log('[DEBUG] FALHA na validação de ownership - LP rejeitada');
       return {
         success: false,
         message: 'LP não encontrada ou não pertence ao cliente'
@@ -328,20 +328,23 @@ export class LPIndicadoresController {
     // 🔒 SEGURANÇA: Verificar se a LP pertence ao cliente antes de atualizar
     const lp = await this.lpIndicadoresService.findOne(id);
     
-    // 🐛 DEBUG: Logs para diagnóstico do problema de ownership no update
-    console.log('[DEBUG UPDATE] LP encontrada para update:', { 
-      lpId: (lp as any)._id, 
-      lpClientId: lp.clientId, 
-      lpClientIdType: typeof lp.clientId 
-    });
-    console.log('[DEBUG UPDATE] ClientId do token:', { 
-      clientId, 
-      clientIdType: typeof clientId 
-    });
-    console.log('[DEBUG UPDATE] Payload recebido:', updateLPIndicadoresDto);
+    // 🔧 FIX: Extrair clientId corretamente no update também
+    let lpClientIdUpdate: string;
+    if (typeof lp.clientId === 'object' && lp.clientId !== null) {
+      lpClientIdUpdate = (lp.clientId as any)._id?.toString() || (lp.clientId as any).toString();
+    } else {
+      lpClientIdUpdate = (lp.clientId as any)?.toString();
+    }
     
-    if (lp.clientId.toString() !== clientId) {
-      console.log('[DEBUG UPDATE] FALHA na validação de ownership - Update rejeitado');
+    // 🐛 DEBUG: Logs para diagnóstico do update
+    console.log('[DEBUG UPDATE] Análise detalhada do clientId:', {
+      lpClientIdRaw: lp.clientId,
+      lpClientIdExtracted: lpClientIdUpdate,
+      tokenClientId: clientId,
+      isMatch: lpClientIdUpdate === clientId
+    });
+    
+    if (lpClientIdUpdate !== clientId) {
       return {
         success: false,
         message: 'LP não encontrada ou não pertence ao cliente'
