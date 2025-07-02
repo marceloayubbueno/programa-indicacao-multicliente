@@ -250,7 +250,7 @@ function updateFormPreview() {
     const form = container.querySelector('#indicatorForm');
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+        console.log('[LP-PUBLIC] Iniciando submit do formulário de indicador');
         const formData = {
             nome: form.querySelector('#name').value,
             email: form.querySelector('#email').value,
@@ -259,7 +259,7 @@ function updateFormPreview() {
             cargo: form.querySelector('#position')?.value,
             departamento: form.querySelector('#department')?.value,
             linkedin: form.querySelector('#linkedin')?.value,
-            listaId: '${selectedList}'
+            listaId: \`${selectedList}\`
         };
 
         try {
@@ -267,7 +267,7 @@ function updateFormPreview() {
             const apiUrl = window.location.hostname === 'localhost' ? 
                            'http://localhost:3000/api' : 
                            'https://programa-indicacao-multicliente-production.up.railway.app/api';
-            const response = await fetch(\`\${apiUrl}/participants/external\`, {
+            const response = await fetch(`${apiUrl}/participants/external`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -275,11 +275,20 @@ function updateFormPreview() {
                 body: JSON.stringify(formData)
             });
 
+            const data = await response.json();
+            console.log('[LP-PUBLIC] Resposta da API:', data);
             if (response.ok) {
-                alert('${successMessage}');
+                // Se a API retornar um ID de participante, logar e preparar para redirecionamento
+                if (data && (data.participantId || data._id || (data.data && data.data._id))) {
+                    const participantId = data.participantId || data._id || (data.data && data.data._id);
+                    const url = \`https://programa-indicacao-multicliente.vercel.app/client/pages/lp-indicadores-success.html?id=${participantId}\`;
+                    console.log('[LP-PUBLIC] Cadastro realizado, redirecionando para:', url);
+                    // window.location.href = url; // Descomentar para ativar redirecionamento real
+                } else {
+                    alert('${successMessage}');
+                }
                 form.reset();
             } else {
-                const data = await response.json();
                 throw new Error(data.message || 'Erro ao enviar formulário');
             }
         } catch (error) {
@@ -587,3 +596,4 @@ function bindIndicadorForms() {
 // (Removida referência à função renderPreview que não existe)
 
 // (Funções movidas para o topo do arquivo) 
+console.log('Versão LP Indicadores: 20240607'); 
