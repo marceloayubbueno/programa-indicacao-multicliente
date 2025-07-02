@@ -435,37 +435,83 @@ function copyEmbedCodeView() {
     alert('Código copiado!');
 }
 
-document.addEventListener('DOMContentLoaded', renderFormsList);
+// document.addEventListener('DOMContentLoaded', renderFormsList); // COMENTADO: Função substituída por loadLPsFromBackend
 
 // MVP: Listagem de LPs salvas pelo GrapesJS (apenas 1 por enquanto)
 
 // NOVO: Carregar LPs do backend e renderizar na tabela
 async function loadLPsFromBackend() {
+  console.log('[DEBUG-LP] 🚀 Iniciando loadLPsFromBackend');
+  
   const tbody = document.getElementById('formsListBody');
   tbody.innerHTML = '';
+  
   const clientId = localStorage.getItem('clientId');
   const token = localStorage.getItem('clientToken');
+  
+  // 🔐 LOGS DE AUTENTICAÇÃO
+  console.log('[DEBUG-LP] 🔐 ClientId:', clientId);
+  console.log('[DEBUG-LP] 🎫 Token existe:', !!token);
+  console.log('[DEBUG-LP] 🎫 Token (primeiros 20 chars):', token?.substring(0, 20));
+  
   if (!clientId || !token) {
+    console.log('[DEBUG-LP] ❌ Erro de autenticação: clientId ou token ausentes');
     tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Erro de autenticação. Faça login novamente.</td></tr>';
     return;
   }
+  
   try {
-            // 🌍 USAR CONFIGURAÇÃO DINÂMICA
-        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                      (window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/api' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
-        const response = await fetch(`${apiUrl}/lp-indicadores?clientId=${clientId}` , {
+    // 🌍 LOGS DE CONFIGURAÇÃO DA API
+    console.log('[DEBUG-LP] 🌐 Window.location.hostname:', window.location.hostname);
+    console.log('[DEBUG-LP] 🔧 APP_CONFIG existe:', !!window.APP_CONFIG);
+    console.log('[DEBUG-LP] 🔧 APP_CONFIG.API_URL:', window.APP_CONFIG?.API_URL);
+    
+    // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                  (window.location.hostname === 'localhost' ? 
+                   'http://localhost:3000/api' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+                   
+    console.log('[DEBUG-LP] 📡 URL da API definida:', apiUrl);
+    console.log('[DEBUG-LP] 📤 Fazendo requisição para:', `${apiUrl}/lp-indicadores?clientId=${clientId}`);
+    
+    const response = await fetch(`${apiUrl}/lp-indicadores?clientId=${clientId}` , {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    if (!response.ok) throw new Error('Erro ao buscar LPs');
+    
+    console.log('[DEBUG-LP] 📨 Resposta HTTP status:', response.status);
+    console.log('[DEBUG-LP] 📨 Resposta HTTP ok:', response.ok);
+    
+    if (!response.ok) {
+      console.log('[DEBUG-LP] ❌ Resposta não OK, tentando ler erro...');
+      const errorText = await response.text();
+      console.log('[DEBUG-LP] ❌ Erro da API:', errorText);
+      throw new Error('Erro ao buscar LPs');
+    }
+    
     const data = await response.json();
+    console.log('[DEBUG-LP] 📦 Dados recebidos completos:', data);
+    console.log('[DEBUG-LP] 📋 data.data existe:', !!data.data);
+    console.log('[DEBUG-LP] 📋 data.data.length:', data.data?.length);
+    console.log('[DEBUG-LP] 📋 Primeiro item:', data.data?.[0]);
+    
     const lps = data.data || [];
+    console.log('[DEBUG-LP] 📋 LPs processadas:', lps.length);
+    
     if (!lps.length) {
+      console.log('[DEBUG-LP] ⚠️ Nenhuma LP encontrada, mostrando estado vazio');
       tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-clipboard-list"></i><h3>Nenhuma LP cadastrada</h3><p>Crie sua primeira LP de indicadores para começar</p></td></tr>';
       return;
     }
-    lps.forEach(lp => {
+    console.log('[DEBUG-LP] 🎨 Iniciando renderização das LPs na tabela');
+    lps.forEach((lp, index) => {
+      console.log(`[DEBUG-LP] 🎯 Renderizando LP ${index + 1}:`, {
+        id: lp._id,
+        name: lp.name,
+        status: lp.status,
+        createdAt: lp.createdAt
+      });
+      
       const tr = document.createElement('tr');
       tr.className = 'hover:bg-gray-800 transition-colors';
       const safeName = encodeURIComponent(lp.name || '');
@@ -540,7 +586,11 @@ async function loadLPsFromBackend() {
       `;
       tbody.appendChild(tr);
     });
+    console.log('[DEBUG-LP] ✅ Renderização das LPs concluída com sucesso');
   } catch (err) {
+    console.log('[DEBUG-LP] ❌ Erro no catch:', err);
+    console.log('[DEBUG-LP] ❌ Erro message:', err.message);
+    console.log('[DEBUG-LP] ❌ Erro stack:', err.stack);
     tbody.innerHTML = `<tr><td colspan='4' class='empty-state'>Erro ao carregar LPs: ${err.message}</td></tr>`;
   }
 }
@@ -575,7 +625,10 @@ window.showEmbedCodeBackend = function(id) {
 
 // Substituir chamada antiga por nova
 // document.addEventListener('DOMContentLoaded', renderLPList);
-document.addEventListener('DOMContentLoaded', loadLPsFromBackend);
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('[DEBUG-LP] 🎬 DOMContentLoaded executado - inicializando página LP Indicadores');
+  loadLPsFromBackend();
+});
 
 // Funções utilitárias para LP de Indicadores
 
