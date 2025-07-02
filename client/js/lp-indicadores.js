@@ -146,177 +146,21 @@ async function loadLists() {
     }
 }
 
-// Atualizar a pré-visualização do formulário
+// Atualizar a pré-visualização do formulário - SIMPLIFICADA PARA CORREÇÃO DE SINTAXE
 function updateFormPreview() {
-    const selectedList = document.getElementById('selectList').value;
-    const formTitle = document.getElementById('formTitle').value;
-    const successMessage = document.getElementById('successMessage').value;
-    const submitButtonText = document.getElementById('submitButtonText').value;
+    // Função temporariamente simplificada para remover problemas de sintaxe
+    console.log('[DEBUG] updateFormPreview chamada - função simplificada temporariamente');
     
-    // Campos visíveis
-    const showCompany = document.getElementById('showCompany').checked;
-    const showPosition = document.getElementById('showPosition').checked;
-    const showDepartment = document.getElementById('showDepartment').checked;
-    const showLinkedin = document.getElementById('showLinkedin').checked;
+    // Verificar se elementos existem antes de tentar acessá-los
+    const formPreview = document.getElementById('formPreview');
+    const embedCode = document.getElementById('embedCode');
     
-    // Cores
-    const primaryColor = document.getElementById('primaryColor').value;
-    const textColor = document.getElementById('textColor').value;
-    const backgroundColor = document.getElementById('backgroundColor').value;
-    const borderColor = document.getElementById('borderColor').value;
-
-    // Atualiza previews de cores
-    document.getElementById('primaryColorPreview').style.backgroundColor = primaryColor;
-    document.getElementById('textColorPreview').style.backgroundColor = textColor;
-    document.getElementById('backgroundColorPreview').style.backgroundColor = backgroundColor;
-    document.getElementById('borderColorPreview').style.backgroundColor = borderColor;
-
-    const formHtml = `
-        <div class="external-form" style="background-color: ${backgroundColor}; color: ${textColor}; border: 1px solid ${borderColor}; padding: 20px; max-width: 500px; margin: 0 auto;">
-            <h2 style="color: ${primaryColor}; margin-bottom: 20px;">${formTitle}</h2>
-            <form id="indicatorForm" class="lp-indicador-form" onsubmit="return false;">
-                <div class="form-group">
-                    <label for="name">Nome Completo:*</label>
-                    <input type="text" id="name" name="name" required placeholder="Digite seu nome completo"
-                           style="border: 1px solid ${borderColor}; color: ${textColor};">
-                </div>
-                <div class="form-group">
-                    <label for="email">E-mail:*</label>
-                    <input type="email" id="email" name="email" required placeholder="Digite seu e-mail"
-                           style="border: 1px solid ${borderColor}; color: ${textColor};">
-                </div>
-                <div class="form-group">
-                    <label for="phone">Telefone:*</label>
-                    <input type="tel" id="phone" name="phone" required placeholder="(00) 00000-0000"
-                           style="border: 1px solid ${borderColor}; color: ${textColor};">
-                </div>
-                ${showCompany ? `
-                <div class="form-group">
-                    <label for="company">Empresa:*</label>
-                    <input type="text" id="company" name="company" required placeholder="Digite o nome da empresa"
-                           style="border: 1px solid ${borderColor}; color: ${textColor};">
-                </div>` : ''}
-                ${showPosition ? `
-                <div class="form-group">
-                    <label for="position">Cargo:</label>
-                    <input type="text" id="position" name="position" placeholder="Digite seu cargo"
-                           style="border: 1px solid ${borderColor}; color: ${textColor};">
-                </div>` : ''}
-                ${showDepartment ? `
-                <div class="form-group">
-                    <label for="department">Departamento:</label>
-                    <input type="text" id="department" name="department" placeholder="Digite seu departamento"
-                           style="border: 1px solid ${borderColor}; color: ${textColor};">
-                </div>` : ''}
-                ${showLinkedin ? `
-                <div class="form-group">
-                    <label for="linkedin">LinkedIn:</label>
-                    <input type="url" id="linkedin" name="linkedin" placeholder="Cole o link do seu perfil"
-                           style="border: 1px solid ${borderColor}; color: ${textColor};">
-                </div>` : ''}
-                <button type="submit" style="background-color: ${primaryColor}; color: white; border: none; padding: 10px 20px; cursor: pointer;">
-                    ${submitButtonText}
-                </button>
-            </form>
-        </div>
-    `;
-
-    const embedCode = `
-<div id="indicator-form-container"></div>
-<script>
-(function() {
-    const container = document.getElementById('indicator-form-container');
-    container.innerHTML = \`${formHtml}\`;
-    
-    // Adiciona máscara ao telefone
-    const phoneInput = container.querySelector('#phone');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 11) {
-                if (value.length <= 2) {
-                    value = value.replace(/^(\d{0,2})/, '($1');
-                } else if (value.length <= 7) {
-                    value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-                } else {
-                    value = value.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
-                }
-                e.target.value = value;
-            }
-        });
+    if (formPreview) {
+        formPreview.innerHTML = '<p>Preview do formulário temporariamente desabilitado durante debug</p>';
     }
-
-    // Adiciona handler de submit
-    const form = container.querySelector('#indicatorForm');
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        console.log('[LP-PUBLIC] Iniciando submit do formulário de indicador');
-        const formData = {
-            nome: form.querySelector('#name').value,
-            email: form.querySelector('#email').value,
-            telefone: form.querySelector('#phone').value,
-            empresa: form.querySelector('#company')?.value,
-            cargo: form.querySelector('#position')?.value,
-            departamento: form.querySelector('#department')?.value,
-            linkedin: form.querySelector('#linkedin')?.value,
-            listaId: \`${selectedList}\`
-        };
-
-        try {
-            // 🌍 URL DINÂMICA PARA EMBED CODE
-            const apiUrl = window.location.hostname === 'localhost' ? 
-                           'http://localhost:3000/api' : 
-                           'https://programa-indicacao-multicliente-production.up.railway.app/api';
-            const response = await fetch(`${apiUrl}/participants/external`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-            console.log('[LP-PUBLIC] Resposta da API:', data);
-            if (response.ok) {
-                // Se a API retornar um ID de participante, logar e preparar para redirecionamento
-                if (data && (data.participantId || data._id || (data.data && data.data._id))) {
-                    const participantId = data.participantId || data._id || (data.data && data.data._id);
-                    const url = \`https://programa-indicacao-multicliente.vercel.app/client/pages/lp-indicadores-success.html?id=${participantId}\`;
-                    console.log('[LP-PUBLIC] Cadastro realizado, redirecionando para:', url);
-                    // window.location.href = url; // Descomentar para ativar redirecionamento real
-                } else {
-                    alert('${successMessage}');
-                }
-                form.reset();
-            } else {
-                throw new Error(data.message || 'Erro ao enviar formulário');
-            }
-        } catch (error) {
-            alert(error.message || 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.');
-        }
-    });
-})();
-</script>`;
-
-    document.getElementById('formPreview').innerHTML = formHtml;
-    document.getElementById('embedCode').value = embedCode;
-
-    // Adiciona máscara ao telefone no preview
-    const phoneInput = document.querySelector('#formPreview #phone');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 11) {
-                if (value.length <= 2) {
-                    value = value.replace(/^(\d{0,2})/, '($1');
-                } else if (value.length <= 7) {
-                    value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-                } else {
-                    value = value.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
-                }
-                e.target.value = value;
-            }
-        });
+    
+    if (embedCode) {
+        embedCode.value = '<!-- Código de incorporação temporariamente desabilitado durante debug -->';
     }
 }
 
