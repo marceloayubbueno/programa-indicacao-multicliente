@@ -826,37 +826,16 @@ export class LPIndicadoresService {
         throw new BadRequestException('Participante não é um indicador válido');
       }
 
-      // 🔍 LOGS DE DIAGNÓSTICO - INVESTIGAÇÃO DO BUG DO LINK
-      console.log('[DEBUG-URL] ===== DIAGNÓSTICO DO LINK DE INDICAÇÃO =====');
-      console.log('[DEBUG-URL] NODE_ENV:', process.env.NODE_ENV);
-      console.log('[DEBUG-URL] PORT:', process.env.PORT);
-      console.log('[DEBUG-URL] process.env.BASE_URL:', process.env.BASE_URL);
-      console.log('[DEBUG-URL] process.env.API_BASE_URL:', process.env.API_BASE_URL);
-      console.log('[DEBUG-URL] process.env.CLIENT_URL:', process.env.CLIENT_URL);
-      console.log('[DEBUG-URL] process.env.REFERRAL_BASE_URL:', process.env.REFERRAL_BASE_URL);
-      console.log('[DEBUG-URL] process.env.SERVER_URL:', process.env.SERVER_URL);
-      console.log('[DEBUG-URL] process.env.RAILWAY_URL:', process.env.RAILWAY_URL);
-      console.log('[DEBUG-URL] Todas as variáveis de ambiente relacionadas a URL:', {
-        BASE_URL: process.env.BASE_URL,
-        API_BASE_URL: process.env.API_BASE_URL,
-        CLIENT_URL: process.env.CLIENT_URL,
-        REFERRAL_BASE_URL: process.env.REFERRAL_BASE_URL,
-        SERVER_URL: process.env.SERVER_URL,
-        RAILWAY_URL: process.env.RAILWAY_URL,
-        RAILWAY_STATIC_URL: process.env.RAILWAY_STATIC_URL,
-        RAILWAY_PUBLIC_DOMAIN: process.env.RAILWAY_PUBLIC_DOMAIN
-      });
-      console.log('[DEBUG-URL] uniqueReferralCode:', indicator.uniqueReferralCode);
-
       // Gerar link de compartilhamento se não existir
       let referralLink: string | null = null;
       if (indicator.uniqueReferralCode) {
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-        referralLink = `${baseUrl}/indicacao/${indicator.uniqueReferralCode}`;
+        // 🔧 CORREÇÃO: Usar variáveis do Railway ou fallback para localhost
+        const baseUrl = process.env.BASE_URL || 
+                       (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null) ||
+                       (process.env.RAILWAY_STATIC_URL ? `https://${process.env.RAILWAY_STATIC_URL}` : null) ||
+                       'http://localhost:3000';
         
-        console.log('[DEBUG-URL] Base URL usada:', baseUrl);
-        console.log('[DEBUG-URL] Link final gerado:', referralLink);
-        console.log('[DEBUG-URL] ===== FIM DO DIAGNÓSTICO =====');
+        referralLink = `${baseUrl}/indicacao/${indicator.uniqueReferralCode}`;
       }
 
       // Buscar informações da campanha se disponível
