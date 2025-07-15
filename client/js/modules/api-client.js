@@ -6,7 +6,7 @@ class APIClient {
     constructor(baseURL = null) {
         // 🌍 URL DINÂMICA PARA API CLIENT
                 this.baseURL = baseURL || (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
-                           'http://localhost:3000/api');
+                           window.API_URL);
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutos
     }

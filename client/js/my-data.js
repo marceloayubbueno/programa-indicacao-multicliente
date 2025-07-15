@@ -9,7 +9,7 @@ async function loadCompanyData() {
 
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA
     const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                  'http://localhost:3000/api';
+                  window.API_URL;
     const response = await fetch(`${apiUrl}/clients/me`, {
             method: 'GET',
             headers: {
@@ -137,7 +137,7 @@ async function saveCompanyData() {
 
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA
         const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                      'http://localhost:3000/api';
+                      window.API_URL;
         const response = await fetch(`${apiUrl}/clients/${clientId}`, {
             method: 'PUT',
             headers: {
