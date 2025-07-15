@@ -24,7 +24,9 @@
           headers['Authorization'] = `Bearer ${token}`;
         }
         
-        const res = await fetch(`${window.location.hostname === "localhost" ? "http://localhost:3000/api" : "http://localhost:3000/api"}/lp-indicadores/${id}`, {
+        // CORREÇÃO: usar API dinâmica
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+        const res = await fetch(`${apiUrl}/lp-indicadores/${id}`, {
           headers: headers
         });
         const data = await res.json();
