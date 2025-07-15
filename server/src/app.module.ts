@@ -18,6 +18,7 @@ import { LPIndicadoresModule } from './lp-indicadores/lp-indicadores.module';
 import { LPDivulgacaoModule } from './lp-divulgacao/lp-divulgacao.module';
 import { PublicReferralsModule } from './public-referrals/public-referrals.module';
 import { IndicatorAuthModule } from './indicator-auth/indicator-auth.module';
+import { FinanceModule } from './finance/finance.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { IndicatorAuthModule } from './indicator-auth/indicator-auth.module';
     LPDivulgacaoModule,
     PublicReferralsModule,
     IndicatorAuthModule,
+    FinanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

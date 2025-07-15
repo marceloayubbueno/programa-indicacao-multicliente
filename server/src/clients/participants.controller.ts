@@ -278,7 +278,7 @@ export class ParticipantsController {
       }
 
       // Construir URL completa do link
-      const baseUrl = process.env.BACKEND_URL || 'https://programa-indicacao-multicliente-production.up.railway.app';
+      const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
       const referralLink = `${baseUrl}/indicacao/${referralCode}`;
 
       return {

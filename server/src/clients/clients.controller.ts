@@ -151,4 +151,15 @@ export class ClientsController {
     console.log(`[NOTIFICAÇÃO] Cliente Trial completou cadastro: ${client.companyName} (${client.accessEmail})`);
     return { message: 'Cadastro completado com sucesso', client: updated };
   }
+
+  @UseGuards(JwtClientAuthGuard)
+  @Patch('me/webhook-make')
+  async updateWebhookMake(@Req() req, @Body('webhookUrl') webhookUrl: string) {
+    const id = req.user?._id || req.user?.sub || req.user?.clientId;
+    if (!webhookUrl || typeof webhookUrl !== 'string') {
+      throw new BadRequestException('URL do webhook é obrigatória');
+    }
+    const updated = await this.clientsService.update(id, { webhookMakeUrl: webhookUrl });
+    return { message: 'Webhook Make.com atualizado com sucesso', webhookMakeUrl: updated.webhookMakeUrl };
+  }
 } 

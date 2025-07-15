@@ -121,8 +121,8 @@ export class LPIndicadoresController {
         
         // Configuração de API
         window.APP_CONFIG = {
-          API_URL: '${process.env.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app'}/api',
-          CLIENT_URL: '${process.env.CLIENT_BASE_URL || 'https://programa-indicacao-multicliente.vercel.app'}'
+          API_URL: '${process.env.API_BASE_URL || 'http://localhost:3000'}/api',
+          CLIENT_URL: '${process.env.CLIENT_BASE_URL || 'http://localhost:5501'}'
         };
         
         // JavaScript do formulário de indicadores

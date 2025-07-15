@@ -66,6 +66,9 @@ export class Client {
   @Prop({ required: false, default: true })
   profileComplete?: boolean;
 
+  @Prop({ required: false })
+  webhookMakeUrl?: string;
+
   @Prop({ default: Date.now })
   createdAt?: Date;
 }

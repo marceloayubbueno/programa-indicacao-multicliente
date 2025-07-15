@@ -66,8 +66,12 @@ export class UpdateClientDto {
   password?: string;
 
   @IsString()
-  @IsNotEmpty()
-  plan: string;
+  @IsOptional()
+  webhookMakeUrl?: string;
+
+  @IsString()
+  @IsOptional()
+  plan?: string;
 
   @IsString()
   @IsIn(['pendente', 'ativo', 'inativo'])

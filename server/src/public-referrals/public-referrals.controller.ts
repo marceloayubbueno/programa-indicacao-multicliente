@@ -242,7 +242,7 @@ export class PublicReferralsController {
                 };
 
                 try {
-                  const apiUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+                  const apiUrl = process.env.API_BASE_URL || 'http://localhost:3000/api';
                   const fullUrl = \`\${apiUrl}/lp-divulgacao/submit-referral\`;
                   
                   const response = await fetch(fullUrl, {

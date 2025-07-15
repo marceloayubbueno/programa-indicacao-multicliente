@@ -303,8 +303,8 @@ export class CampaignsService {
         }
         
         // 🔧 Gerar URLs absolutas corretas para LP de Indicadores
-        const API_BASE_URL = process.env.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app';
-        const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL || 'https://programa-indicacao-multicliente.vercel.app';
+        const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
+        const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL || 'http://localhost:5501';
         
         // URLs corretas baseadas na função real:
         const publicUrl = lp.status === 'published' ? `${API_BASE_URL}/api/lp-indicadores/slug/${lp.slug}` : null;
