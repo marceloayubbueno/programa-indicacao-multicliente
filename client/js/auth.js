@@ -6,7 +6,7 @@
 //                 'https://programa-indicacao-multicliente-production.up.railway.app/api');
 
 // 🔧 USAR CONFIGURAÇÃO GLOBAL
-const API_URL = window.APP_CONFIG?.API_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+const API_URL = window.APP_CONFIG?.API_URL || 'http://localhost:3000/api';
 
 // Função para fazer login
 async function handleLogin(event) {

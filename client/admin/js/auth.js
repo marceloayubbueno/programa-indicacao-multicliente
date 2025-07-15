@@ -69,18 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function checkAdminAuth() {
-    try {
-        const token = localStorage.getItem('adminToken');
-        const adminRaw = localStorage.getItem('adminData');
-        if (!token || !adminRaw) throw new Error('Sessão expirada');
-        const admin = JSON.parse(adminRaw);
-        if (!admin || !admin.role) throw new Error('Sessão expirada');
-    } catch (e) {
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminData');
-        alert('Sessão expirada ou acesso não autorizado. Faça login novamente.');
-        window.location.href = '/admin/pages/login.html';
+    const token = localStorage.getItem('adminToken');
+    console.log('[DEPURACAO] checkAdminAuth token:', token);
+    if (!token) {
+        console.log('[DEPURACAO] Redirecionando para login.html');
+        window.location.href = 'login.html'; // ou dashboard.html, conforme fluxo
     }
+    // Opcional: validar expiração do token, etc.
 }
 
 // Executar verificação ao carregar páginas administrativas

@@ -1,10 +1,8 @@
 // 🔧 CORREÇÃO: Função para obter API_URL de forma segura
 function getApiUrl() {
-    return window.API_URL || 
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-           (window.location.hostname === 'localhost' ? 
-            'http://localhost:3000/api' : 
-            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+    return window.API_URL ||
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
+           'http://localhost:3000/api');
 }
 
 let currentStep = 0;
@@ -20,7 +18,7 @@ let selectedRewardOnConversion = null;
 
 function showStep(step) {
   console.log('🔍 H4 - showStep chamado:', step, 'selectedSourceType:', selectedSourceType);
-  
+
   // Oculta todas as etapas
   const steps = document.querySelectorAll('.quiz-step');
   steps.forEach((el) => (el.style.display = 'none'));
@@ -200,10 +198,10 @@ async function renderLPIndicadoresModelos() {
   const container = document.getElementById('lpIndicadoresModelos');
   container.innerHTML = '<div class="text-gray-400">Carregando modelos...</div>';
   const allLps = await fetchLPIndicadoresBackend();
-  
+
   // Filtrar LPs que NÃO têm campanha (somente templates/modelos disponíveis)
   const lps = allLps.filter(lp => !lp.campaignId && !lp.campaignName);
-  
+
   window.lpIndicadoresModelos = lps; // Salva os dados globalmente
   container.innerHTML = '';
   if (lps.length) {
@@ -228,10 +226,10 @@ async function renderLPIndicadoresModelos() {
       container.appendChild(card);
     });
   } else {
-    const message = allLps.length > 0 ? 
+    const message = allLps.length > 0 ?
       'Todas as LPs de Indicadores já estão vinculadas a campanhas.<br>Crie uma nova LP para usar como modelo.' :
       'Nenhuma LP de Indicadores encontrada.<br>Crie sua LP agora para usar nesta campanha!';
-    
+
     container.innerHTML = `
       <div class="rounded-xl p-8 bg-gray-800 text-center text-gray-400 flex flex-col items-center justify-center">
         <i class="fas fa-clipboard-list text-4xl mb-4 text-gray-600"></i>
@@ -284,10 +282,10 @@ async function renderLPDivulgacaoModelos() {
   const container = document.getElementById('lpDivulgacaoModelos');
   container.innerHTML = '<div class="text-gray-400">Carregando modelos...</div>';
   const allLps = await fetchLPDivulgacaoBackend();
-  
+
   // Filtrar LPs que NÃO têm campanha (somente templates/modelos disponíveis)
   const lps = allLps.filter(lp => !lp.campaignId && !lp.campaignName);
-  
+
   window.lpDivulgacaoModelos = lps; // Salva os dados globalmente
   container.innerHTML = '';
   if (lps.length) {
@@ -312,10 +310,10 @@ async function renderLPDivulgacaoModelos() {
       container.appendChild(card);
     });
   } else {
-    const message = allLps.length > 0 ? 
+    const message = allLps.length > 0 ?
       'Todas as LPs de Divulgação já estão vinculadas a campanhas.<br>Crie uma nova LP para usar como modelo.' :
       'Nenhuma LP de Divulgação encontrada.<br>Crie sua LP agora para usar nesta campanha!';
-    
+
     container.innerHTML = `
       <div class="rounded-xl p-8 bg-gray-800 text-center text-gray-400 flex flex-col items-center justify-center">
         <i class="fas fa-bullhorn text-4xl mb-4 text-gray-600"></i>
@@ -354,44 +352,44 @@ let selectedListaId = null;
 async function fetchListasParticipantes() {
   const clientId = localStorage.getItem('clientId');
   const token = localStorage.getItem('clientToken');
-  
-  // 🔍 H1 - LOG DE DEPURAÇÃO
+
+  // �� H1 - LOG DE DEPURAÇÃO
   console.log('🔍 H1 - fetchListasParticipantes iniciada');
   console.log('🔍 H1 - clientId:', clientId);
   console.log('🔍 H1 - token presente:', !!token);
-  
+
   if (!clientId || !token) {
     console.log('🔍 H1 - ERRO: clientId ou token ausente');
     return [];
   }
-  
+
   try {
     const url = `${getApiUrl()}/participant-lists?clientId=${clientId}`;
     console.log('🔍 H1 - URL da requisição:', url);
-    
+
     const response = await fetch(url, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    
+
     console.log('🔍 H1 - Status da resposta:', response.status);
-    
+
     if (!response.ok) {
       console.error('🔍 H1 - ERRO: Resposta não ok:', response.status, response.statusText);
       return [];
     }
-    
+
     const data = await response.json();
     console.log('🔍 H1 - Dados brutos do backend:', data);
-    
+
     let listas = [];
     if (Array.isArray(data)) {
       listas = data;
     } else if (Array.isArray(data.data)) {
       listas = data.data;
     }
-    
+
     console.log('🔍 H1 - Total de listas encontradas:', listas.length);
-    
+
     // 🔍 DIAGNÓSTICO DETALHADO - vamos ver EXATAMENTE o que vem do backend
     listas.forEach((lista, index) => {
       console.log(`🔍 H1 - LISTA ${index + 1} COMPLETA:`, lista);
@@ -406,14 +404,14 @@ async function fetchListasParticipantes() {
         allKeys: Object.keys(lista)
       });
     });
-    
-    // 🔍 DIAGNÓSTICO: Vamos ver cada condição separadamente  
+
+    // 🔍 DIAGNÓSTICO: Vamos ver cada condição separadamente
     listas.forEach((lista, index) => {
       const tipoOk = ['participante', 'indicador', 'mista'].includes(lista.tipo);
       const isArray = Array.isArray(lista.participants);
       const hasLength = lista.participants && lista.participants.length > 0;
-      
-      console.log(`🔍 H1 - LISTA ${index + 1} FILTRO:`, {
+
+      console.log(`�� H1 - LISTA ${index + 1} FILTRO:`, {
         name: lista.name,
         tipoValue: lista.tipo,
         tipoOk: tipoOk,
@@ -422,12 +420,12 @@ async function fetchListasParticipantes() {
         hasLength: hasLength,
         passaFiltro: tipoOk && isArray && hasLength
       });
-      
+
       // 🔍 INFO: Lista pode ser reutilizada agora com duplicação real
       if (tipoOk && isArray && !hasLength) {
         console.warn(`⚠️ Lista "${lista.name}" está vazia mas será aceita se tiver participantes`);
         console.log('ℹ️ Com duplicação real, listas podem ser reutilizadas em múltiplas campanhas');
-        
+
         // 🔧 Manter informação para debug se necessário
         window.emptyListDetected = {
           id: lista._id,
@@ -436,17 +434,17 @@ async function fetchListasParticipantes() {
         };
       }
     });
-    
+
     // ✅ NOVO FILTRO FLEXÍVEL: Aceita listas com participantes OU indicadores
     // Permitir reutilização de listas em múltiplas campanhas (duplicação real implementada)
-    const filtradas = listas.filter(l => 
-      (l.tipo === 'participante' || l.tipo === 'indicador' || l.tipo === 'mista') && 
-      Array.isArray(l.participants) && 
+    const filtradas = listas.filter(l =>
+      (l.tipo === 'participante' || l.tipo === 'indicador' || l.tipo === 'mista') &&
+      Array.isArray(l.participants) &&
       l.participants.length > 0
     );
     console.log('🔍 H1 - Listas após filtro (qualquer tipo + com participantes):', filtradas.length);
     console.log('✅ H1 - DUPLICAÇÃO REAL: Sistema agora duplica participantes para permitir múltiplas campanhas');
-    
+
     return filtradas;
   } catch (err) {
     console.error('🔍 H1 - ERRO na requisição:', err);
@@ -459,9 +457,9 @@ function renderListasParticipantes() {
   container.innerHTML = '<div class="text-gray-400">Carregando listas...</div>';
   fetchListasParticipantes().then(async listas => {
     window.listasParticipantes = listas; // Salva os dados globalmente
-    
+
     console.log('🔍 H2 - renderListasParticipantes - Total de listas:', listas.length);
-    
+
     if (!listas.length) {
       container.innerHTML = '<div class="text-gray-400">Nenhuma lista de participantes com participantes ativos encontrada. Crie uma nova lista abaixo.</div>';
       return;
@@ -489,13 +487,13 @@ function renderListasParticipantes() {
         });
         const data = await resp.json();
         const count = data.count ?? 0;
-        const countText = count === 0 ? 
-          '⚠️ (VAZIA - problema backend)' : 
+        const countText = count === 0 ?
+          '⚠️ (VAZIA - problema backend)' :
           `(${count} participante${count !== 1 ? 's' : ''})`;
         document.getElementById(`count-${lista._id}`).textContent = countText;
-        
+
         console.log(`🔍 H2 - Lista "${lista.name}": ${count} participantes`);
-        
+
         if (count === 0) {
           console.warn(`⚠️ Lista "${lista.name}" vazia - será corrigida automaticamente pelo backend`);
         }
@@ -804,10 +802,10 @@ async function fetchRewardsBackend() {
 // Renderiza as recompensas para cada bloco
 async function renderRewards() {
   const rewards = await fetchRewardsBackend();
-  
+
   // Renderiza recompensas para indicação
   renderRewardsForBlock('rewardsOnReferral', rewards, selectedRewardOnReferral, 'referral');
-  
+
   // Renderiza recompensas para conversão
   renderRewardsForBlock('rewardsOnConversion', rewards, selectedRewardOnConversion, 'conversion');
 }
@@ -818,7 +816,7 @@ function renderRewardsForBlock(containerId, rewards, selectedId, type) {
   container.innerHTML = '';
 
   // Filtrar recompensas que NÃO têm campanha (somente templates/modelos disponíveis)
-  const availableRewards = rewards.filter(reward => 
+  const availableRewards = rewards.filter(reward =>
     !reward.campaignId && !reward.campaignName
   );
 
@@ -890,7 +888,7 @@ window.selecionarNenhumaRecompensa = function(type) {
 window.criarNovaRecompensa = function(type) {
   // Salva o tipo de recompensa sendo criado para usar após retorno
   localStorage.setItem('creatingRewardFor', type);
-  
+
   // Abre página de criação de recompensa em nova aba
   window.open('rewards-form.html', '_blank');
 };
@@ -899,37 +897,37 @@ window.criarNovaRecompensa = function(type) {
 window.debugBackendData = async function() {
   const clientId = localStorage.getItem('clientId');
   const token = localStorage.getItem('clientToken');
-  
+
   console.log('🔍 DEBUG - Investigando dados do backend...');
-  
+
   try {
     // 1. Verificar endpoint debug de participantes
     const debugResp = await fetch(`${getApiUrl()}/participants/debug`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    
+
     if (debugResp.ok) {
       const debugData = await debugResp.json();
       console.log('🔍 DEBUG - Dados do backend:', debugData);
-      
+
       // 2. Verificar se há participantes que deveriam estar na lista vazia
       if (window.emptyListDetected) {
         console.log('🔍 DEBUG - Lista vazia detectada:', window.emptyListDetected);
-        
+
         // 3. Verificar participantes específicos deste cliente
         const participantsResp = await fetch(`${getApiUrl()}/participants?limit=100`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+
         if (participantsResp.ok) {
           const participantsData = await participantsResp.json();
           console.log('🔍 DEBUG - Participantes do cliente:', participantsData);
-          
+
           const participantsCount = participantsData.participants?.length || 0;
-          
+
           if (participantsCount > 0) {
             console.log('🚨 PROBLEMA CONFIRMADO: Existem', participantsCount, 'participantes mas a lista está vazia!');
-            
+
             if (confirm(`PROBLEMA DETECTADO!\n\nExistem ${participantsCount} participantes no banco mas a lista "${window.emptyListDetected.name}" está vazia.\n\nDeseja tentar corrigir automaticamente?`)) {
               await fixListSynchronization(window.emptyListDetected.id, participantsData.participants);
             }
@@ -952,46 +950,46 @@ window.debugBackendData = async function() {
 
 window.debugSpecificList = async function(listId, listName) {
   console.log(`🔍 DEBUG - Investigando lista específica: ${listName} (${listId})`);
-  
+
   const token = localStorage.getItem('clientToken');
-  
+
   try {
     // 1. Verificar detalhes da lista
     const listResp = await fetch(`${getApiUrl()}/participant-lists/${listId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    
+
     if (listResp.ok) {
       const listData = await listResp.json();
       console.log('🔍 DEBUG - Detalhes da lista:', listData);
     }
-    
+
     // 2. Verificar contagem via endpoint específico
     const countResp = await fetch(`${getApiUrl()}/participant-lists/${listId}/participants/count`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    
+
     if (countResp.ok) {
       const countData = await countResp.json();
       console.log('🔍 DEBUG - Contagem via endpoint:', countData);
     }
-    
+
     // 3. Buscar todos os participantes do cliente
     const participantsResp = await fetch(`${getApiUrl()}/participants?limit=100`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    
+
     if (participantsResp.ok) {
       const participantsData = await participantsResp.json();
       console.log('🔍 DEBUG - Participantes do cliente:', participantsData.participants?.length || 0);
-      
+
       if (participantsData.participants?.length > 0) {
         if (confirm(`Lista "${listName}" está vazia mas existem ${participantsData.participants.length} participantes.\n\nDeseja tentar associar os participantes a esta lista?`)) {
           await fixListSynchronization(listId, participantsData.participants);
         }
       }
     }
-    
+
   } catch (error) {
     console.error('🚨 DEBUG - Erro na investigação da lista:', error);
     alert('Erro na investigação: ' + error.message);
@@ -1000,9 +998,9 @@ window.debugSpecificList = async function(listId, listName) {
 
 async function fixListSynchronization(listId, participants) {
   console.log('🔧 CORREÇÃO - Tentando corrigir sincronização da lista:', listId);
-  
+
   const token = localStorage.getItem('clientToken');
-  
+
   try {
     // Para cada participante, tentar associar à lista
     for (const participant of participants) {
@@ -1011,7 +1009,7 @@ async function fixListSynchronization(listId, participants) {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+
         if (resp.ok) {
           console.log(`✅ Participante ${participant.name} associado à lista`);
         } else {
@@ -1021,12 +1019,12 @@ async function fixListSynchronization(listId, participants) {
         console.error(`❌ Erro ao associar ${participant.name}:`, error);
       }
     }
-    
+
     alert('Correção tentada! Recarregue a página para ver se a lista agora tem participantes.');
-    
+
     // Recarregar as listas
     renderListasParticipantes();
-    
+
   } catch (error) {
     console.error('🚨 CORREÇÃO - Erro ao corrigir sincronização:', error);
     alert('Erro na correção: ' + error.message);
@@ -1156,7 +1154,7 @@ async function salvarCampanhaBackend() {
   if (type === 'lista-participantes' && selectedListaId) {
     payload.selectedParticipantListId = selectedListaId;
   }
-  
+
   // Adicionar campos de template baseados nas seleções atuais
   if (selectedRewardOnReferral && selectedRewardOnReferral !== 'none') {
     payload.rewardOnReferralTemplateId = selectedRewardOnReferral;
@@ -1191,7 +1189,7 @@ async function salvarCampanhaBackend() {
     console.log('[FRONTEND-DEBUG] Token presente:', !!token);
     console.log('[FRONTEND-DEBUG] ClientId:', clientId);
     console.log('[FRONTEND-DEBUG] Lista selecionada (participantListId):', selectedListaId);
-    
+
     const response = await fetch(`${getApiUrl()}/campaigns`, {
       method: 'POST',
       headers: {
@@ -1203,11 +1201,11 @@ async function salvarCampanhaBackend() {
 
     console.log('[FRONTEND-DEBUG] Status da resposta:', response.status);
     console.log('[FRONTEND-DEBUG] Response OK:', response.ok);
-    
+
     // Capturar texto da resposta primeiro (para não consumir o stream)
     const responseText = await response.text();
     console.log('[FRONTEND-DEBUG] Resposta raw do backend (texto):', responseText);
-    
+
     let data;
     try {
       data = JSON.parse(responseText);
@@ -1217,20 +1215,20 @@ async function salvarCampanhaBackend() {
       console.error('[FRONTEND-DEBUG] Resposta não é JSON válido:', responseText);
       throw new Error('Resposta do servidor não é JSON válido: ' + responseText);
     }
-    
+
     if (!response.ok || !data) {
       console.error('[FRONTEND-DEBUG] Erro na requisição - Response not OK ou data vazio');
       console.error('[FRONTEND-DEBUG] Status:', response.status);
       console.error('[FRONTEND-DEBUG] Data:', data);
       throw new Error(data.message || 'Erro ao salvar campanha');
     }
-    
+
     console.log('\n✅ [FRONTEND-DEBUG] CAMPANHA CRIADA COM SUCESSO!');
     console.log('[FRONTEND-DEBUG] ID da campanha:', data._id || data.id);
     console.log('[FRONTEND-DEBUG] Nome da campanha:', data.name);
     console.log('[FRONTEND-DEBUG] Lista de participantes (objeto completo):', data.participantListId);
     console.log('[FRONTEND-DEBUG] Lista de participantes ID extraído:', data.participantListId?._id || data.participantListId);
-    
+
     // 🔍 VERIFICAR SE A DUPLICAÇÃO FUNCIONOU
     if (data.participantListId) {
       console.log('\n🔍 [FRONTEND-DEBUG] VERIFICANDO LISTA DUPLICADA...');
@@ -1238,15 +1236,15 @@ async function salvarCampanhaBackend() {
         // Extrair ID correto (pode ser objeto ou string)
         const listId = data.participantListId._id || data.participantListId;
         console.log('[FRONTEND-DEBUG] ID da lista para verificação:', listId);
-        
+
         const listResponse = await fetch(`${getApiUrl()}/participant-lists/${listId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+
         if (listResponse.ok) {
           const listText = await listResponse.text();
           console.log('[FRONTEND-DEBUG] Lista duplicada - resposta raw:', listText);
-          
+
           try {
             const listData = JSON.parse(listText);
             console.log('[FRONTEND-DEBUG] Lista duplicada - dados:', {
@@ -1256,21 +1254,21 @@ async function salvarCampanhaBackend() {
               participantsCount: listData.participants?.length || 0,
               participantsArray: listData.participants
             });
-            
+
             if (!listData.participants || listData.participants.length === 0) {
               console.error('\n🚨 [FRONTEND-DEBUG] PROBLEMA CRÍTICO CONFIRMADO!');
               console.error('[FRONTEND-DEBUG] Lista duplicada está vazia!');
               console.error('[FRONTEND-DEBUG] ID da lista vazia:', listData._id);
               console.error('[FRONTEND-DEBUG] Nome da lista vazia:', listData.name);
               console.error('[FRONTEND-DEBUG] Isso confirma que a duplicação NÃO funcionou no backend!');
-              
+
               // Guardar info da lista vazia para debug posterior
               window.emptyListDetected = {
                 id: listData._id,
                 name: listData.name,
                 type: listData.tipo
               };
-              
+
               // Alert para o usuário
               alert(`🚨 PROBLEMA DETECTADO!\n\nA campanha foi criada mas a lista "${listData.name}" está vazia.\n\nIsso indica que a duplicação de participantes não funcionou.\n\nVerifique os logs do servidor ou contacte o desenvolvedor.`);
             } else {
@@ -1295,7 +1293,7 @@ async function salvarCampanhaBackend() {
       console.error('\n🚨 [FRONTEND-DEBUG] PROBLEMA: Campanha criada sem participantListId!');
       console.error('[FRONTEND-DEBUG] Isso indica que nenhuma lista foi criada/duplicada');
     }
-    
+
     alert('🎉 Campanha criada com sucesso!\n\n📋 Verifique o console para logs detalhados da duplicação.');
     window.location.href = 'campaigns.html';
   } catch (err) {
@@ -1303,7 +1301,7 @@ async function salvarCampanhaBackend() {
     console.error('[FRONTEND-DEBUG] Stack trace:', err.stack);
     console.error('[FRONTEND-DEBUG] Mensagem:', err.message);
     alert('❌ Erro ao salvar campanha: ' + err.message + '\n\n📋 Verifique o console para logs detalhados.');
-    
+
     if (finalizarBtn) {
       finalizarBtn.disabled = false;
       finalizarBtn.textContent = 'Finalizar';

@@ -9,11 +9,9 @@ let editingRewardTypeId = null;
 // 🔧 CORREÇÃO: API_URL será obtida do auth.js (carregado depois)
 // Função para obter API_URL de forma segura
 function getApiUrl() {
-    return window.API_URL || 
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-           (window.location.hostname === 'localhost' ? 
-            'http://localhost:3000/api' : 
-            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+    return window.API_URL ||
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
+           'http://localhost:3000/api');
 }
 
 // Funções de Navegação

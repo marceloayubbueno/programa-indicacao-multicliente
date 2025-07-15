@@ -5,10 +5,8 @@
 class APIClient {
     constructor(baseURL = null) {
         // 🌍 URL DINÂMICA PARA API CLIENT
-        this.baseURL = baseURL || (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                      (window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/api' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+                this.baseURL = baseURL || (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
+                           'http://localhost:3000/api');
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutos
     }

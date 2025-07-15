@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurações - Área do Cliente</title>
+    <title>Configurar Webhook Make.com - Integrações</title>
     <link rel="stylesheet" href="../css/tailwind.output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -50,7 +50,7 @@
                   <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="integracoesArrow" style="transform: rotate(0deg);"></i>
                 </div>
                 <ul id="integracoesMenu" class="ml-8 mt-1 space-y-1 hidden">
-                  <li><a href="webhook-make.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-link mr-2"></i> Webhooks Make.com</a></li>
+                  <li><a href="webhook-make.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700" id="webhookMakeMenuItem"><i class="fas fa-link mr-2"></i> Webhooks Make.com</a></li>
                 </ul>
               </li>
               <!-- Fim do submenu Integrações -->
@@ -64,16 +64,29 @@
       <!-- Main Content -->
       <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
         <header class="px-8 py-6 bg-gray-900 flex items-center shadow-sm">
-          <h1 class="text-3xl font-bold text-blue-400">Configurações</h1>
+          <h1 class="text-3xl font-bold text-blue-400">Integrações - Webhook Make.com</h1>
         </header>
         <main class="flex-1 p-8 flex items-center justify-center">
-          <div class="text-gray-400 text-lg">Em breve, opções de configuração estarão disponíveis aqui.</div>
+          <form id="webhookForm" class="bg-gray-800 rounded-lg shadow-lg p-8 w-full max-w-lg">
+            <div class="mb-6">
+              <label for="webhookUrl" class="block text-gray-300 text-lg font-semibold mb-2">URL do Webhook Make.com</label>
+              <input type="url" id="webhookUrl" name="webhookUrl" class="w-full px-4 py-2 rounded bg-gray-900 border border-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="https://hook.us2.make.com/xxxxxxx" required>
+              <p id="webhookError" class="text-red-400 text-sm mt-2 hidden">Insira uma URL válida.</p>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors">Salvar Webhook</button>
+            <p id="webhookSuccess" class="text-green-400 text-center mt-4 hidden">Webhook salvo com sucesso!</p>
+            <p id="webhookFail" class="text-red-400 text-center mt-4 hidden">Erro ao salvar o webhook. Tente novamente.</p>
+          </form>
         </main>
       </div>
     </div>
-    <script src="../js/auth.js"></script>
+    <script src="../js/auth.js" onload="console.log('auth.js carregado')"></script>
     <script>
+    // Log inicial ao carregar a página
+    console.log('[DEBUG] Token no localStorage ao carregar página:', getToken());
     checkAuth();
+    // Log após checkAuth
+    console.log('[DEBUG] Token após checkAuth:', getToken());
     // Script para expandir/colapsar o menu Financeiro
     function toggleFinanceMenu() {
       const menu = document.getElementById('financeMenu');
@@ -107,6 +120,53 @@
         arrow.style.transform = 'rotate(90deg)';
       }
     }
+    // Deixar o menu Configurações e Integrações abertos por padrão nesta página e destacar o item ativo
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('configuracoesMenu').classList.remove('hidden');
+      document.getElementById('configuracoesArrow').style.transform = 'rotate(90deg)';
+      document.getElementById('integracoesMenu').classList.remove('hidden');
+      document.getElementById('integracoesArrow').style.transform = 'rotate(90deg)';
+      var item = document.getElementById('webhookMakeMenuItem');
+      item.classList.add('bg-gray-800', 'text-blue-400', 'font-semibold', 'hover:bg-gray-700');
+    });
+    // Validação e feedback do formulário + chamada à API
+    document.getElementById('webhookForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const url = document.getElementById('webhookUrl').value.trim();
+      const error = document.getElementById('webhookError');
+      const success = document.getElementById('webhookSuccess');
+      const fail = document.getElementById('webhookFail');
+      error.classList.add('hidden');
+      success.classList.add('hidden');
+      fail.classList.add('hidden');
+      // Validação simples de URL
+      try {
+        new URL(url);
+      } catch {
+        error.classList.remove('hidden');
+        return;
+      }
+      // Chamada à API para salvar o webhook
+      try {
+        const token = getToken();
+        console.log('[DEBUG] Token antes do fetch:', token);
+        const response = await fetch('http://localhost:3000/api/clients/me/webhook-make', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ webhookUrl: url })
+        });
+        if (response.ok) {
+          success.classList.remove('hidden');
+        } else {
+          fail.classList.remove('hidden');
+        }
+      } catch (err) {
+        fail.classList.remove('hidden');
+      }
+    });
     </script>
 </body>
 </html> 

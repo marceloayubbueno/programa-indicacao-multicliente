@@ -64,7 +64,7 @@
         // 🔧 CORREÇÃO: Detecção de ambiente para API
         const apiUrl = window.location.hostname === "localhost" ? 
           "http://localhost:3000/api" : 
-          "https://programa-indicacao-multicliente-production.up.railway.app/api";
+          "http://localhost:3000/api";
         
         // 🔧 CORREÇÃO: Headers de autenticação
         const token = localStorage.getItem('clientToken') || localStorage.getItem('token');

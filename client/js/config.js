@@ -1,6 +1,12 @@
 /**
  * 🔧 CONFIGURAÇÃO CENTRALIZADA DO FRONTEND
  * Arquivo que centraliza todas as configurações do sistema
+ * 
+ * Este arquivo é responsável por:
+ * - Detectar automaticamente o ambiente (development/production)
+ * - Centralizar URLs e configurações por ambiente
+ * - Expor configurações via window.APP_CONFIG
+ * - Manter compatibilidade com arquivos existentes
  */
 
 // 🌍 Configuração de ambiente
@@ -61,7 +67,7 @@ window.APP_CONFIG = {
     // Logs
     DEBUG_MODE: CURRENT_ENV === 'development',
     
-    // Mensagens
+    // Mensagens padronizadas
     MESSAGES: {
         ERROR_GENERIC: 'Ocorreu um erro inesperado. Tente novamente.',
         ERROR_NETWORK: 'Erro de conexão. Verifique sua internet.',
@@ -102,5 +108,5 @@ if (CURRENT_ENV === 'development') {
 }
 
 // 🔄 Compatibilidade com arquivos existentes
-// Exporta API_URL para compatibilidade com arquivos antigos
+// Exporta API_URL para compatibilidade com arquivos antigos que ainda usam window.API_URL
 window.API_URL = config.API_URL; 

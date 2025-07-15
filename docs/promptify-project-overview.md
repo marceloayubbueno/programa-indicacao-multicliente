@@ -4,9 +4,99 @@
 
 # Project Overview – Programa de Indicação
 
-> **Atenção:** Sempre consulte o [Checklist de Desenvolvimento](./dev-checklist.md) ao iniciar ou finalizar qualquer tarefa para garantir qualidade, padronização e documentação completa.
+> **Este é o documento central de referência do projeto. Sempre consulte este overview para localizar rapidamente qualquer informação, padrão ou documentação detalhada.**
 
-Este documento centraliza a visão geral do projeto, servindo como referência rápida para desenvolvedores, colaboradores e ferramentas automatizadas.
+---
+
+## Documentação Central e Referências
+
+- [README.md (docs)](./README.md): Sumário e estrutura da documentação.
+- [Estrutura do Projeto](./estrutura_do_projeto.md): Organização detalhada de pastas e responsabilidades.
+- [Funcionamento do Backend](./como_funciona_o_backend.md): Arquitetura, entidades e funcionamento do backend.
+- [Funcionamento do Frontend](./como_funciona_o_frontend.md): Estrutura e funcionamento do frontend.
+- [Variáveis de Ambiente](./README_VARIAVEIS_DE_AMBIENTE.md): Guia completo de variáveis e exemplos.
+- [Checklist de Deploy](./DEPLOY-CHECKLIST.md): Passo a passo para deploy seguro.
+- [Contratos de Dados](./padroes-dados.md): Padrões e exemplos de payloads frontend/backend.
+- [Glossário e Conceitos](./conceitos.md): Definições dos principais termos do sistema.
+- [Roadmap de Funcionalidades](./roadmap-funcionalidades.md): Funcionalidades planejadas e em desenvolvimento.
+- [Documentação de API](./api/): Endpoints, exemplos e contratos.
+- [FAQ Dev](./faq-dev.md): Perguntas frequentes para desenvolvedores.
+- [Planejamento Técnico](./BACKEND-ROADMAP.md), [docs/planejamento/](./planejamento/): Planejamento e integrações.
+- [UX e Padrões Visuais](./padroes-tabelas-ux.md), [tema-base.md](./tema-base.md): Padrões de tabelas, temas e UX.
+- [Análises Técnicas](./sistema-campanhas-analise-completa.md), [sistema-participantes-completo.md](./sistema-participantes-completo.md): Análises detalhadas de módulos críticos.
+- [Outros fluxos e soluções](./fluxo-trial.md), [CORRECAO-AUTO-INICIALIZACAO.md](./CORRECAO-AUTO-INICIALIZACAO.md), etc.
+
+> **Sempre consulte este sumário antes de buscar qualquer informação!**
+
+---
+
+## Funcionamento do Backend
+Consulte [`como_funciona_o_backend.md`](./como_funciona_o_backend.md) para detalhes completos sobre arquitetura, entidades, schemas, autenticação, integrações e padrões do backend.
+
+## Funcionamento do Frontend
+Consulte [`como_funciona_o_frontend.md`](./como_funciona_o_frontend.md) para entender a estrutura, tecnologias, navegação e integração do frontend.
+
+## Estrutura do Projeto
+A estrutura detalhada de pastas, módulos e responsabilidades está em [`estrutura_do_projeto.md`](./estrutura_do_projeto.md).
+
+## Variáveis de Ambiente
+O padrão completo, exemplos e dicas de segurança estão em [`README_VARIAVEIS_DE_AMBIENTE.md`](./README_VARIAVEIS_DE_AMBIENTE.md). Sempre use o template `server/ENV.EXAMPLE` para criar seu `.env` local.
+
+## Checklist de Deploy
+O processo completo, com validações, exemplos e dicas, está em [`DEPLOY-CHECKLIST.md`](./DEPLOY-CHECKLIST.md).
+
+## Contratos de Dados
+Os padrões de payloads, enums, erros e integrações estão em [`padroes-dados.md`](./padroes-dados.md).
+
+## Glossário
+Definições dos principais termos do sistema em [`conceitos.md`](./conceitos.md).
+
+## API
+Documentação detalhada de todos os endpoints na pasta [`api/`](./api/).
+
+## FAQ Dev
+Dúvidas comuns e soluções rápidas em [`faq-dev.md`](./faq-dev.md).
+
+## Planejamento Técnico
+Planejamento, integrações e tarefas em [`BACKEND-ROADMAP.md`](./BACKEND-ROADMAP.md) e [`planejamento/`](./planejamento/).
+
+## UX e Padrões Visuais
+Padrões de tabelas, temas e UX em [`padroes-tabelas-ux.md`](./padroes-tabelas-ux.md) e [`tema-base.md`](./tema-base.md).
+
+## Análises Técnicas
+Análises detalhadas de módulos críticos em [`sistema-campanhas-analise-completa.md`](./sistema-campanhas-analise-completa.md) e [`sistema-participantes-completo.md`](./sistema-participantes-completo.md).
+
+## Outros fluxos e soluções
+Fluxos de negócio, correções e soluções em [`fluxo-trial.md`](./fluxo-trial.md), [`CORRECAO-AUTO-INICIALIZACAO.md`](./CORRECAO-AUTO-INICIALIZACAO.md), etc.
+
+---
+
+> **Sempre que criar ou atualizar um documento relevante, adicione o link e um breve resumo nesta seção para manter o overview centralizado e atualizado.**
+
+---
+
+## Variáveis de Ambiente e Configuração
+
+> **Atenção:** O uso correto das variáveis de ambiente é obrigatório para rodar o sistema localmente e em produção.  
+> Consulte sempre o arquivo [`README_VARIAVEIS_DE_AMBIENTE.md`](./README_VARIAVEIS_DE_AMBIENTE.md) para a lista completa, exemplos e instruções de configuração.
+
+### Backend (NestJS/Node.js)
+
+- As variáveis ficam no arquivo `.env` na raiz da pasta `server/`.
+- Exemplo mínimo:
+  ```env
+  MONGODB_URI=mongodb://localhost:27017/programa_indicacao
+  PORT=3000
+  JWT_SECRET=sua-chave-secreta-aqui
+  ```
+- Veja o template completo em `server/ENV.EXAMPLE`.
+
+### Frontend (HTML/JS)
+
+- As configurações dinâmicas (ex: URL da API) são centralizadas no arquivo `client/js/config.js`.
+- Nunca use URLs hardcoded! Sempre utilize as variáveis e padrões definidos.
+
+> Antes de rodar localmente ou fazer deploy, valide as variáveis conforme o checklist em [`DEPLOY-CHECKLIST.md`](./DEPLOY-CHECKLIST.md). Em caso de dúvidas, consulte o doc de variáveis ou peça revisão ao time.
 
 ---
 

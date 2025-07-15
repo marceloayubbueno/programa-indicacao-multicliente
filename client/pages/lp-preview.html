@@ -24,7 +24,7 @@
           headers['Authorization'] = `Bearer ${token}`;
         }
         
-        const res = await fetch(`${window.location.hostname === "localhost" ? "http://localhost:3000/api" : "https://programa-indicacao-multicliente-production.up.railway.app/api"}/lp-indicadores/${id}`, {
+        const res = await fetch(`${window.location.hostname === "localhost" ? "http://localhost:3000/api" : "http://localhost:3000/api"}/lp-indicadores/${id}`, {
           headers: headers
         });
         const data = await res.json();

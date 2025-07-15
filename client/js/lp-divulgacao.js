@@ -2,11 +2,9 @@
 
 // 🔧 CORREÇÃO: Função para obter API_URL de forma segura (similar ao rewards.js)
 function getApiUrl() {
-    return window.API_URL || 
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-           (window.location.hostname === 'localhost' ? 
-            'http://localhost:3000/api' : 
-            'https://programa-indicacao-multicliente-production.up.railway.app/api'));
+    return window.API_URL ||
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
+           'http://localhost:3000/api');
 }
 
 // 🔧 CORREÇÃO: Variável global para armazenar lista de LPs
