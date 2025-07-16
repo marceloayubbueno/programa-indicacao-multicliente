@@ -1,3 +1,10 @@
+// [LOG DIAGNÓSTICO] Início do script
+console.log('[DEBUG] APP_CONFIG:', window.APP_CONFIG);
+if (!window.APP_CONFIG) {
+  console.error('[ERRO CRÍTICO] window.APP_CONFIG está undefined! Verifique se config.js foi carregado corretamente.');
+}
+console.log('[DEBUG] Location:', window.location.href, 'Base:', window.location.origin);
+
 // Função principal para submeter formulário de referral da LP de Divulgação
 window.submitReferralForm = async function(event, form) {
   console.log('📝 [REFERRAL-FORM] Iniciando submit do formulário de referral');
