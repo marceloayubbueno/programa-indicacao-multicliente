@@ -337,7 +337,7 @@ export class LPDivulgacaoService {
 
       // Validações básicas
       if (!name || !email || !phone || !lpId) {
-        const missingFields = [];
+        const missingFields: string[] = [];
         if (!name) missingFields.push('name');
         if (!email) missingFields.push('email');
         if (!phone) missingFields.push('phone');
