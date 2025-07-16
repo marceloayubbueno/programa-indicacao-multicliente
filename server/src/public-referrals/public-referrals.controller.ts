@@ -180,7 +180,26 @@ export class PublicReferralsController {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${lpCompleta.metaTitle || lpCompleta.name}</title>
             <style>${lpCompleta.compiledOutput.css || ''}</style>
-            <script src="/js/config.js"></script>
+            
+            <!-- DIAGNOSIS H4: Config script primeiro -->
+            <script>
+              console.log('[DIAGNOSIS-H4] 🚀 Config script inline carregando...');
+              console.log('[DIAGNOSIS-H4] Timestamp:', new Date().toISOString());
+              
+              // Configuração de API
+              window.APP_CONFIG = {
+                API_URL: '${process.env.API_BASE_URL || 'http://localhost:3000'}/api',
+                CLIENT_URL: '${process.env.CLIENT_BASE_URL || 'http://localhost:5501'}',
+                environment: '${process.env.NODE_ENV || 'development'}'
+              };
+              
+              console.log('[DIAGNOSIS-H4] ✅ window.APP_CONFIG definido:', window.APP_CONFIG);
+              console.log('[DIAGNOSIS-H4] process.env values:', {
+                API_BASE_URL: '${process.env.API_BASE_URL || 'UNDEFINED'}',
+                CLIENT_BASE_URL: '${process.env.CLIENT_BASE_URL || 'UNDEFINED'}',
+                NODE_ENV: '${process.env.NODE_ENV || 'UNDEFINED'}'
+              });
+            </script>
           </head>
           <body>
             <div id="lp-container">
@@ -189,8 +208,11 @@ export class PublicReferralsController {
             
             <!-- Script de formulário inline -->
             <script>
+              console.log('[DIAGNOSIS-H4] 📝 Script de formulário inline carregando...');
+              
               // === SCRIPT DE FORMULÁRIO INLINE ===
               window.submitReferralForm = async function(event, form) {
+                console.log('[DIAGNOSIS-H4] 🚀 submitReferralForm inline chamada');
                 event.preventDefault();
 
                 const feedback = form.querySelector('.feedback') || form.querySelector('[class*="feedback"]');
@@ -202,9 +224,12 @@ export class PublicReferralsController {
                 const phone = formData.get('phone') || '';
                 const company = formData.get('company') || '';
 
+                console.log('[DIAGNOSIS-H4] 📋 Dados capturados:', { name, email, phone, company });
+
                 // Validação básica
                 if (!name || !email) {
                   const message = 'Por favor, preencha nome e e-mail.';
+                  console.warn('[DIAGNOSIS-H4] ⚠️ Validação falhou:', message);
                   if (feedback) { 
                     feedback.textContent = message; 
                     feedback.style.color = 'red'; 
@@ -214,8 +239,10 @@ export class PublicReferralsController {
 
                 // Buscar ID da LP
                 const lpId = localStorage.getItem('currentLpDivulgacaoId');
+                console.log('[DIAGNOSIS-H4] 🆔 LP ID do localStorage:', lpId);
                 
                 if (!lpId) {
+                  console.error('[DIAGNOSIS-H4] ❌ LP ID não encontrado');
                   if (feedback) { 
                     feedback.textContent = 'Erro: Contexto da LP não encontrado.'; 
                     feedback.style.color = 'red'; 
@@ -227,10 +254,17 @@ export class PublicReferralsController {
                 const indicatorCode = localStorage.getItem('currentIndicatorCode');
                 const indicatorName = localStorage.getItem('currentIndicatorName');
 
+                console.log('[DIAGNOSIS-H4] 👤 Dados do indicador:', {
+                  indicatorCode,
+                  indicatorName
+                });
+
                 // Captura dados de origem (UTM, referrer, userAgent, etc)
                 const urlParams = new URL(window.location.href).searchParams;
                 const indicatorCodeFromUrl = urlParams.get('ref') || '';
                 const finalIndicatorCode = indicatorCodeFromUrl || indicatorCode || '';
+
+                console.log('[DIAGNOSIS-H4] 🔗 Código do indicador final:', finalIndicatorCode);
 
                 // Monta payload com código do indicador
                 const payload = {
@@ -242,9 +276,18 @@ export class PublicReferralsController {
                   language: navigator.language
                 };
 
+                console.log('[DIAGNOSIS-H4] 📦 Payload construído:', payload);
+
                 try {
-                  const apiUrl = process.env.API_BASE_URL || 'http://localhost:3000/api';
+                  // Determinar URL da API
+                  const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                                (window.location.hostname === 'localhost' ? 
+                                 'http://localhost:3000/api' : 
+                                 'https://programa-indicacao-multicliente-production.up.railway.app/api');
                   const fullUrl = \`\${apiUrl}/lp-divulgacao/submit-referral\`;
+                  
+                  console.log('[DIAGNOSIS-H4] 🌐 API URL determinada:', apiUrl);
+                  console.log('[DIAGNOSIS-H4] 🔗 URL completa:', fullUrl);
                   
                   const response = await fetch(fullUrl, {
                     method: 'POST',
@@ -252,9 +295,14 @@ export class PublicReferralsController {
                     body: JSON.stringify(payload)
                   });
                   
+                  console.log('[DIAGNOSIS-H4] 📥 Response status:', response.status);
+                  console.log('[DIAGNOSIS-H4] 📥 Response ok:', response.ok);
+                  
                   const result = await response.json();
+                  console.log('[DIAGNOSIS-H4] 📄 Response data:', result);
                   
                   if (response.ok && result.success) {
+                    console.log('[DIAGNOSIS-H4] ✅ Sucesso!');
                     if (feedback) { 
                       feedback.textContent = 'Envio concluído! Obrigado pela indicação.'; 
                       feedback.style.color = 'green'; 
@@ -264,17 +312,20 @@ export class PublicReferralsController {
                     // Redirecionar se necessário
                     setTimeout(() => {
                       if (result.data && result.data.redirectUrl) {
+                        console.log('[DIAGNOSIS-H4] 🚀 Redirecionando para:', result.data.redirectUrl);
                         window.location.href = result.data.redirectUrl;
                       }
                     }, 2000);
                     
                   } else {
+                    console.error('[DIAGNOSIS-H4] ❌ Erro na resposta:', result);
                     if (feedback) { 
                       feedback.textContent = result.message || 'Erro ao enviar indicação.'; 
                       feedback.style.color = 'red'; 
                     }
                   }
                 } catch (err) {
+                  console.error('[DIAGNOSIS-H4] 💥 Erro de requisição:', err);
                   if (feedback) { 
                     feedback.textContent = 'Erro de conexão. Tente novamente.'; 
                     feedback.style.color = 'red'; 
@@ -285,30 +336,51 @@ export class PublicReferralsController {
 
               // === FUNÇÃO PARA AUTO-BIND DOS FORMULÁRIOS ===
               window.bindReferralForms = function() {
+                console.log('[DIAGNOSIS-H4] 🔗 bindReferralForms inline chamada');
                 const forms = document.querySelectorAll('.lp-referral-form, form[data-type="referral"], form');
+                console.log('[DIAGNOSIS-H4] 📋 Forms encontrados:', forms.length);
                 
                 forms.forEach((form, index) => {
+                  console.log('[DIAGNOSIS-H4] 🔧 Configurando form', index + 1, form);
                   if (!form.onsubmit) {
                     form.onsubmit = function(event) {
+                      console.log('[DIAGNOSIS-H4] 📝 Submit interceptado form', index + 1);
                       return window.submitReferralForm(event, form);
                     };
+                    console.log('[DIAGNOSIS-H4] ✅ Form', index + 1, 'configurado');
                   }
                 });
               };
+              
+              console.log('[DIAGNOSIS-H4] ✅ Funções inline definidas');
             </script>
             
             <script>
+              console.log('[DIAGNOSIS-H4] 🔧 Script de configuração final executando...');
+              
               // Configurar dados do indicador para rastreamento
               localStorage.setItem('currentIndicatorCode', '${codigo}');
               localStorage.setItem('currentIndicatorName', '${indicador.name}');
               localStorage.setItem('currentLpDivulgacaoId', '${targetLP._id}');
               
+              console.log('[DIAGNOSIS-H4] 💾 LocalStorage configurado:', {
+                currentIndicatorCode: '${codigo}',
+                currentIndicatorName: '${indicador.name}',
+                currentLpDivulgacaoId: '${targetLP._id}'
+              });
+              
               // Auto-bind dos formulários
               setTimeout(() => {
+                console.log('[DIAGNOSIS-H4] ⏰ Auto-bind timeout executando...');
                 if (window.bindReferralForms) {
+                  console.log('[DIAGNOSIS-H4] 🔗 Chamando bindReferralForms...');
                   window.bindReferralForms();
+                } else {
+                  console.error('[DIAGNOSIS-H4] ❌ bindReferralForms não encontrada!');
                 }
               }, 100);
+              
+              console.log('[DIAGNOSIS-H4] ✅ Script final configurado');
             </script>
           </body>
           </html>

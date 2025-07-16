@@ -308,7 +308,17 @@ export class LPDivulgacaoService {
 
   async submitReferralForm(submitReferralFormDto: any): Promise<any> {
     try {
-      this.logger.log('Iniciando submitReferralForm');
+      // === 🔍 DIAGNOSIS H3: Logs detalhados do backend ===
+      this.logger.log('[DIAGNOSIS-H3] 🚀 === INÍCIO submitReferralForm ===');
+      this.logger.log('[DIAGNOSIS-H3] 📥 Payload recebido:', JSON.stringify(submitReferralFormDto, null, 2));
+      this.logger.log('[DIAGNOSIS-H3] 🕐 Timestamp:', new Date().toISOString());
+      this.logger.log('[DIAGNOSIS-H3] 🌍 Environment:', process.env.NODE_ENV);
+      this.logger.log('[DIAGNOSIS-H3] 🔍 Variáveis críticas:', {
+        MONGODB_URI: process.env.MONGODB_URI ? 'DEFINIDA' : 'AUSENTE',
+        JWT_SECRET: process.env.JWT_SECRET ? 'DEFINIDA' : 'AUSENTE',
+        CLIENT_URL: process.env.CLIENT_URL || 'AUSENTE',
+        API_BASE_URL: process.env.API_BASE_URL || 'AUSENTE'
+      });
 
       const {
         name,
@@ -318,32 +328,61 @@ export class LPDivulgacaoService {
         indicatorCode
       } = submitReferralFormDto;
 
+      this.logger.log('[DIAGNOSIS-H3] 📝 Dados extraídos do payload:');
+      this.logger.log('[DIAGNOSIS-H3]   name:', name);
+      this.logger.log('[DIAGNOSIS-H3]   email:', email);
+      this.logger.log('[DIAGNOSIS-H3]   phone:', phone);
+      this.logger.log('[DIAGNOSIS-H3]   lpId:', lpId);
+      this.logger.log('[DIAGNOSIS-H3]   indicatorCode:', indicatorCode);
+
       // Validações básicas
       if (!name || !email || !phone || !lpId) {
-        throw new Error('Dados obrigatórios ausentes: name, email, phone, lpId');
+        const missingFields = [];
+        if (!name) missingFields.push('name');
+        if (!email) missingFields.push('email');
+        if (!phone) missingFields.push('phone');
+        if (!lpId) missingFields.push('lpId');
+        
+        this.logger.error('[DIAGNOSIS-H3] ❌ Campos obrigatórios ausentes:', missingFields);
+        throw new Error(`Dados obrigatórios ausentes: ${missingFields.join(', ')}`);
       }
 
+      this.logger.log('[DIAGNOSIS-H3] ✅ Validação básica passou');
+
       // Buscar a LP de divulgação
+      this.logger.log('[DIAGNOSIS-H3] 🔍 Buscando LP de divulgação no banco...');
       const lp = await this.lpDivulgacaoModel.findById(lpId)
         .populate('campaignId')
         .populate('clientId')
         .exec();
 
       if (!lp) {
+        this.logger.error('[DIAGNOSIS-H3] ❌ LP de divulgação não encontrada:', lpId);
         throw new Error('LP de divulgação não encontrada');
       }
 
-      this.logger.log(`LP encontrada: ${lp.name}`);
+      this.logger.log('[DIAGNOSIS-H3] ✅ LP encontrada:', {
+        id: lp._id,
+        name: lp.name,
+        campaignId: lp.campaignId?._id || lp.campaignId,
+        clientId: lp.clientId?._id || lp.clientId
+      });
 
       // Extrair IDs necessários
       const campaignId = lp.campaignId?._id?.toString() || lp.campaignId?.toString() || lp.campaignId;
       const clientId = lp.clientId?._id?.toString() || lp.clientId?.toString() || lp.clientId;
+
+      this.logger.log('[DIAGNOSIS-H3] 🔗 IDs extraídos:', {
+        campaignId,
+        clientId
+      });
 
       // Buscar indicador pelo código único (se fornecido)
       let indicadorId = null;
       let indicadorData = null;
 
       if (indicatorCode) {
+        this.logger.log('[DIAGNOSIS-H3] 👤 Buscando indicador pelo código:', indicatorCode);
         indicadorData = await this.participantModel.findOne({
           uniqueReferralCode: indicatorCode,
           tipo: { $in: ['indicador', 'influenciador'] }
@@ -351,14 +390,21 @@ export class LPDivulgacaoService {
 
         if (indicadorData) {
           indicadorId = (indicadorData as any)._id.toString();
-          this.logger.log(`Indicador encontrado: ${(indicadorData as any).name} (${indicatorCode})`);
+          this.logger.log('[DIAGNOSIS-H3] ✅ Indicador encontrado:', {
+            id: indicadorId,
+            name: (indicadorData as any).name,
+            email: (indicadorData as any).email,
+            code: indicatorCode
+          });
         } else {
-          this.logger.warn(`Indicador não encontrado para código: ${indicatorCode}`);
+          this.logger.warn('[DIAGNOSIS-H3] ⚠️ Indicador não encontrado para código:', indicatorCode);
         }
+      } else {
+        this.logger.log('[DIAGNOSIS-H3] ℹ️ Nenhum código de indicador fornecido');
       }
 
       // ✅ CORREÇÃO: Usar sistema unificado de criação de referrals
-      this.logger.log('🔄 Usando sistema unificado de referrals para garantir processamento de recompensas');
+      this.logger.log('[DIAGNOSIS-H3] 🔄 Preparando dados para sistema unificado de referrals...');
       
       const referralData = {
         leadName: name,
@@ -375,37 +421,69 @@ export class LPDivulgacaoService {
         lpDivulgacaoId: lpId
       };
 
+      this.logger.log('[DIAGNOSIS-H3] 📦 Dados do referral a serem enviados:', JSON.stringify(referralData, null, 2));
+
       // 🎯 USAR SISTEMA UNIFICADO que inclui logs H2/H3 e processamento automático de recompensas
-      const referralResult = await this.referralsService.createReferral(referralData);
-      const savedReferral = referralResult.data;
-      this.logger.log(`✅ Referral criado via sistema unificado: ${savedReferral._id}`);
-
-      // Atualizar estatísticas da LP
-      await this.lpDivulgacaoModel.findByIdAndUpdate(
-        submitReferralFormDto.lpId,
-        { 
-          $inc: { 
-            'statistics.totalSubmissions': 1
-          },
-          $set: { 'statistics.lastSubmissionAt': new Date() }
-        }
-      ).exec();
-      this.logger.log('Estatísticas da LP atualizadas');
-
-      return {
-        success: true,
-        message: 'Indicação enviada com sucesso',
-        referralId: savedReferral._id,
-        data: {
+      this.logger.log('[DIAGNOSIS-H3] 🚀 Chamando referralsService.createReferral...');
+      
+      try {
+        const referralResult = await this.referralsService.createReferral(referralData);
+        const savedReferral = referralResult.data;
+        
+        this.logger.log('[DIAGNOSIS-H3] ✅ Referral criado via sistema unificado:', {
+          id: savedReferral._id,
           leadName: savedReferral.leadName,
           leadEmail: savedReferral.leadEmail,
-          indicatorName: (indicadorData as any)?.name || null,
-          campaignName: (lp.campaignId as any)?.name || 'LP Divulgacao'
-        }
-      };
+          indicatorName: savedReferral.indicatorName,
+          status: savedReferral.status
+        });
+
+        // Atualizar estatísticas da LP
+        this.logger.log('[DIAGNOSIS-H3] 📊 Atualizando estatísticas da LP...');
+        const updateResult = await this.lpDivulgacaoModel.findByIdAndUpdate(
+          submitReferralFormDto.lpId,
+          { 
+            $inc: { 
+              'statistics.totalSubmissions': 1
+            },
+            $set: { 'statistics.lastSubmissionAt': new Date() }
+          }
+        ).exec();
+        
+        this.logger.log('[DIAGNOSIS-H3] ✅ Estatísticas da LP atualizadas:', {
+          lpId: submitReferralFormDto.lpId,
+          updateApplied: !!updateResult
+        });
+
+        this.logger.log('[DIAGNOSIS-H3] 🎉 === SUCESSO TOTAL ===');
+        
+        return {
+          success: true,
+          message: 'Indicação enviada com sucesso',
+          referralId: savedReferral._id,
+          data: {
+            leadName: savedReferral.leadName,
+            leadEmail: savedReferral.leadEmail,
+            indicatorName: (indicadorData as any)?.name || null,
+            campaignName: (lp.campaignId as any)?.name || 'LP Divulgacao'
+          }
+        };
+        
+      } catch (referralError) {
+        this.logger.error('[DIAGNOSIS-H3] ❌ Erro ao criar referral:', {
+          message: referralError.message,
+          stack: referralError.stack,
+          referralData: JSON.stringify(referralData, null, 2)
+        });
+        throw new Error(`Erro ao processar referral: ${referralError.message}`);
+      }
 
     } catch (error) {
-      this.logger.error(`Erro em submitReferralForm: ${error.message}`);
+      this.logger.error('[DIAGNOSIS-H3] 💥 ERRO GERAL em submitReferralForm:', {
+        message: error.message,
+        stack: error.stack,
+        payload: JSON.stringify(submitReferralFormDto, null, 2)
+      });
       throw error;
     }
   }
