@@ -180,6 +180,7 @@ export class PublicReferralsController {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${lpCompleta.metaTitle || lpCompleta.name}</title>
             <style>${lpCompleta.compiledOutput.css || ''}</style>
+            <script src="/js/config.js"></script>
           </head>
           <body>
             <div id="lp-container">
