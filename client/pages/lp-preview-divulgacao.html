@@ -5,6 +5,7 @@
   <title>Preview da LP de Divulgação</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>body { margin: 0; background: #f5f6fa; }</style>
+  <script src="../js/config.js"></script>
 </head>
 <body>
   <div id="lp-container" style="min-height:100vh"></div>
@@ -17,109 +18,106 @@
   </div>
 
   <script>
-    async function loadLP() {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
-      
-      // 🔍 LOGGING: Capturar e exibir parâmetros de debugging
-      console.log('🔗 [LP-DIVULGACAO] Carregando LP de Divulgação');
-      console.log('📋 [LP-DIVULGACAO] Parâmetros da URL:', Object.fromEntries(params.entries()));
-      
-      // Extrair informações do indicador
-      const ref = params.get('ref');
-      const indicatorName = params.get('indicator_name');
-      const utmSource = params.get('utm_source');
-      const utmContent = params.get('utm_content');
-      const utmCampaign = params.get('utm_campaign');
-      
-      // Atualizar painel de debug
-      const debugInfo = document.getElementById('debug-info');
-      debugInfo.innerHTML = `
-        <strong>ID da LP:</strong> ${id || 'N/A'}<br>
-        <strong>Código do Indicador:</strong> ${ref || 'N/A'}<br>
-        <strong>Nome do Indicador:</strong> ${indicatorName || 'N/A'}<br>
-        <strong>UTM Source:</strong> ${utmSource || 'N/A'}<br>
-        <strong>UTM Content:</strong> ${utmContent || 'N/A'}<br>
-        <strong>UTM Campaign:</strong> ${utmCampaign || 'N/A'}<br>
-      `;
-      
-      console.log('👤 [LP-DIVULGACAO] Informações do Indicador:', {
-        ref, indicatorName, utmSource, utmContent, utmCampaign
-      });
-      
-      if (!id) {
-        console.error('❌ [LP-DIVULGACAO] ID da LP não informado na URL');
-        document.getElementById('lp-container').innerHTML = '<p>ID da LP não informado.</p>';
-        return;
-      }
-      
-      // Salva o contexto da LP de Divulgação no localStorage
-      localStorage.setItem('currentLpDivulgacaoId', id);
-      
-      // 🆕 NOVO: Salvar informações do indicador no localStorage para uso do formulário
-      if (ref) localStorage.setItem('currentIndicatorCode', ref);
-      if (indicatorName) localStorage.setItem('currentIndicatorName', indicatorName);
-      
-      try {
-        // 🔧 CORREÇÃO: Detecção de ambiente para API
-        const apiUrl = window.location.hostname === "localhost" ? 
-          "http://localhost:3000/api" : 
-          "http://localhost:3000/api";
+    document.addEventListener('DOMContentLoaded', function() {
+      async function loadLP() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
         
-        // 🔧 CORREÇÃO: Headers de autenticação
-        const token = localStorage.getItem('clientToken') || localStorage.getItem('token');
-        const headers = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+        // 🔍 LOGGING: Capturar e exibir parâmetros de debugging
+        console.log('🔗 [LP-DIVULGACAO] Carregando LP de Divulgação');
+        console.log('📋 [LP-DIVULGACAO] Parâmetros da URL:', Object.fromEntries(params.entries()));
+        
+        // Extrair informações do indicador
+        const ref = params.get('ref');
+        const indicatorName = params.get('indicator_name');
+        const utmSource = params.get('utm_source');
+        const utmContent = params.get('utm_content');
+        const utmCampaign = params.get('utm_campaign');
+        
+        // Atualizar painel de debug
+        const debugInfo = document.getElementById('debug-info');
+        debugInfo.innerHTML = `
+          <strong>ID da LP:</strong> ${id || 'N/A'}<br>
+          <strong>Código do Indicador:</strong> ${ref || 'N/A'}<br>
+          <strong>Nome do Indicador:</strong> ${indicatorName || 'N/A'}<br>
+          <strong>UTM Source:</strong> ${utmSource || 'N/A'}<br>
+          <strong>UTM Content:</strong> ${utmContent || 'N/A'}<br>
+          <strong>UTM Campaign:</strong> ${utmCampaign || 'N/A'}<br>
+        `;
+        
+        console.log('👤 [LP-DIVULGACAO] Informações do Indicador:', {
+          ref, indicatorName, utmSource, utmContent, utmCampaign
+        });
+        
+        if (!id) {
+          console.error('❌ [LP-DIVULGACAO] ID da LP não informado na URL');
+          document.getElementById('lp-container').innerHTML = '<p>ID da LP não informado.</p>';
+          return;
         }
         
-        console.log('🌐 [LP-DIVULGACAO] Fazendo requisição para o backend...');
-        const finalUrl = `${apiUrl}/lp-divulgacao/${id}`;
-        const res = await fetch(finalUrl, { headers });
-        const data = await res.json();
+        // Salva o contexto da LP de Divulgação no localStorage
+        localStorage.setItem('currentLpDivulgacaoId', id);
         
-        console.log('📦 [LP-DIVULGACAO] Resposta do backend:', data);
+        // 🆕 NOVO: Salvar informações do indicador no localStorage para uso do formulário
+        if (ref) localStorage.setItem('currentIndicatorCode', ref);
+        if (indicatorName) localStorage.setItem('currentIndicatorName', indicatorName);
         
-        if (!data.success || !data.data) throw new Error('LP não encontrada');
-        
-        console.log('✅ [LP-DIVULGACAO] LP carregada com sucesso:', data.data.name);
-        
-        // Renderiza HTML salvo
-        document.getElementById('lp-container').innerHTML = data.data.compiledOutput.html || '<p>LP sem conteúdo.</p>';
-        
-        // Injeta CSS salvo, se houver
-        if (data.data.compiledOutput.css) {
-          const style = document.createElement('style');
-          style.innerHTML = data.data.compiledOutput.css;
-          document.head.appendChild(style);
-          console.log('🎨 [LP-DIVULGACAO] CSS da LP aplicado');
-        }
-        
-        // Força o bind do submit do formulário após o JS público ser carregado
-        setTimeout(() => {
-          console.log('🔗 [LP-DIVULGACAO] Vinculando formulários...');
-          if (window.bindReferralForms) {
-            window.bindReferralForms();
-            console.log('✅ [LP-DIVULGACAO] bindReferralForms executado');
+        try {
+          // CORREÇÃO: usar API dinâmica
+          const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+          const token = localStorage.getItem('clientToken') || localStorage.getItem('token');
+          const headers = {};
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          console.log('🌐 [LP-DIVULGACAO] Fazendo requisição para o backend...');
+          const finalUrl = `${apiUrl}/lp-divulgacao/${id}`;
+          const res = await fetch(finalUrl, { headers });
+          const data = await res.json();
+          
+          console.log('📦 [LP-DIVULGACAO] Resposta do backend:', data);
+          
+          if (!data.success || !data.data) throw new Error('LP não encontrada');
+          
+          console.log('✅ [LP-DIVULGACAO] LP carregada com sucesso:', data.data.name);
+          
+          // Renderiza HTML salvo
+          document.getElementById('lp-container').innerHTML = data.data.compiledOutput.html || '<p>LP sem conteúdo.</p>';
+          
+          // Injeta CSS salvo, se houver
+          if (data.data.compiledOutput.css) {
+            const style = document.createElement('style');
+            style.innerHTML = data.data.compiledOutput.css;
+            document.head.appendChild(style);
+            console.log('🎨 [LP-DIVULGACAO] CSS da LP aplicado');
           }
           
-          // Fallback: força o bind manualmente se necessário
-          const forms = document.querySelectorAll('.lp-referral-form');
-          console.log(`🔍 [LP-DIVULGACAO] Formulários encontrados: ${forms.length}`);
-          forms.forEach((form, index) => {
-            form.onsubmit = function(event) { 
-              console.log(`📝 [LP-DIVULGACAO] Submit do formulário ${index + 1}`);
-              return window.submitReferralForm(event, form); 
-            };
-          });
-        }, 200);
-        
-      } catch (err) {
-        console.error('💥 [LP-DIVULGACAO] Erro ao carregar LP:', err);
-        document.getElementById('lp-container').innerHTML = '<p>Erro ao carregar LP: ' + err.message + '</p>';
+          // Força o bind do submit do formulário após o JS público ser carregado
+          setTimeout(() => {
+            console.log('🔗 [LP-DIVULGACAO] Vinculando formulários...');
+            if (window.bindReferralForms) {
+              window.bindReferralForms();
+              console.log('✅ [LP-DIVULGACAO] bindReferralForms executado');
+            }
+            
+            // Fallback: força o bind manualmente se necessário
+            const forms = document.querySelectorAll('.lp-referral-form');
+            console.log(`🔍 [LP-DIVULGACAO] Formulários encontrados: ${forms.length}`);
+            forms.forEach((form, index) => {
+              form.onsubmit = function(event) { 
+                console.log(`📝 [LP-DIVULGACAO] Submit do formulário ${index + 1}`);
+                return window.submitReferralForm(event, form); 
+              };
+            });
+          }, 200);
+          
+        } catch (err) {
+          console.error('💥 [LP-DIVULGACAO] Erro ao carregar LP:', err);
+          document.getElementById('lp-container').innerHTML = '<p>Erro ao carregar LP: ' + err.message + '</p>';
+        }
       }
-    }
-    loadLP();
+      loadLP();
+    });
   </script>
   <!-- IMPORTANTE: O JS público deve ser importado DEPOIS do script acima -->
   <script src="../js/lp-referral-form-public.js"></script>
