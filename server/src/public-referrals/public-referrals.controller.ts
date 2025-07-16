@@ -284,7 +284,7 @@ export class PublicReferralsController {
                                 (window.location.hostname === 'localhost' ? 
                                  'http://localhost:3000/api' : 
                                  'https://programa-indicacao-multicliente-production.up.railway.app/api');
-                  const fullUrl = \`\${apiUrl}/lp-divulgacao/submit-referral\`;
+                  const fullUrl = apiUrl + '/lp-divulgacao/submit-referral';
                   
                   console.log('[DIAGNOSIS-H4] 🌐 API URL determinada:', apiUrl);
                   console.log('[DIAGNOSIS-H4] 🔗 URL completa:', fullUrl);
