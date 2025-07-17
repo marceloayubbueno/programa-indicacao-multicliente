@@ -143,47 +143,8 @@
             }
         });
 
-        // Enhanced Form Handling
-        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const loginButton = document.getElementById('loginButton');
-            const loginText = document.getElementById('loginText');
-            const loginLoading = document.getElementById('loginLoading');
-            const errorDiv = document.getElementById('loginError');
-            const successDiv = document.getElementById('loginSuccess');
-            const errorText = document.getElementById('errorText');
-            
-            // Show loading state
-            loginButton.disabled = true;
-            loginText.classList.add('hidden');
-            loginLoading.classList.remove('hidden');
-            errorDiv.classList.add('hidden');
-            successDiv.classList.add('hidden');
-            
-            // Simulate API call delay
-            setTimeout(() => {
-                // Here you would make the actual API call
-                // For now, let's simulate success/error
-                
-                // Reset button state
-                loginButton.disabled = false;
-                loginText.classList.remove('hidden');
-                loginLoading.classList.add('hidden');
-                
-                // Check for errors (this would come from your API)
-                if (window.lastLoginError) {
-                    errorText.textContent = window.lastLoginError;
-                    errorDiv.classList.remove('hidden');
-                } else {
-                    // Success case
-                    successDiv.classList.remove('hidden');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1500);
-                }
-            }, 1000);
-        });
+        // Form handling is now managed by admin-login.js
+        // This prevents duplicate event listeners
 
         // Focus management
         document.addEventListener('DOMContentLoaded', function() {
