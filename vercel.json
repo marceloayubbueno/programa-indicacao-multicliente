@@ -7,7 +7,12 @@
   ],
   "routes": [
     {
-      "src": "/indicacao/([^/]+)/?",
+      "src": "/indicacao/debug-proxy-test",
+      "dest": "https://programa-indicacao-multicliente-production.up.railway.app/indicacao/debug-proxy-test",
+      "status": 307
+    },
+    {
+      "src": "/indicacao/([^/]+)",
       "dest": "https://programa-indicacao-multicliente-production.up.railway.app/indicacao/$1",
       "status": 307
     },
