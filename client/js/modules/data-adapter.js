@@ -200,7 +200,7 @@ class DataAdapter {
         const baseUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
                        (window.location.hostname === 'localhost' ? 
                         'http://localhost:3000/indicacao' : 
-                        'https://programa-indicacao-multicliente-production.up.railway.app/indicacao');
+                        'https://app.virallead.com.br/indicacao');
         return `${baseUrl}/${participant.uniqueReferralCode}`;
     }
 
@@ -209,7 +209,7 @@ class DataAdapter {
         const baseUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
                        (window.location.hostname === 'localhost' ? 
                         'http://localhost:3000/indicacao' : 
-                        'https://programa-indicacao-multicliente-production.up.railway.app/indicacao');
+                        'https://app.virallead.com.br/indicacao');
         return `${baseUrl}/${participant.shareLink}`;
     }
 
