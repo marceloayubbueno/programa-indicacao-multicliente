@@ -1,0 +1,28 @@
+{
+  "builds": [
+    {
+      "src": "client/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/indicacao/([^/]+)/?",
+      "dest": "https://programa-indicacao-multicliente-production.up.railway.app/indicacao/$1",
+      "status": 307
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "https://programa-indicacao-multicliente-production.up.railway.app/api/$1",
+      "status": 307
+    },
+    {
+      "src": "/client/(.*)",
+      "dest": "/client/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/$1"
+    }
+  ]
+} 

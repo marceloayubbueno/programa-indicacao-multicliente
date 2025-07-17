@@ -278,7 +278,7 @@ export class ParticipantsController {
       }
 
       // Construir URL completa do link
-      const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
+      const baseUrl = process.env.CLIENT_URL || 'http://localhost:5501';
       const referralLink = `${baseUrl}/indicacao/${referralCode}`;
 
       return {
