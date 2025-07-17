@@ -829,11 +829,8 @@ export class LPIndicadoresService {
       // Gerar link de compartilhamento se não existir
       let referralLink: string | null = null;
       if (indicator.uniqueReferralCode) {
-        // 🔧 CORREÇÃO: Usar variáveis do Railway ou fallback para localhost
-        const baseUrl = process.env.BASE_URL || 
-                       (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null) ||
-                       (process.env.RAILWAY_STATIC_URL ? `https://${process.env.RAILWAY_STATIC_URL}` : null) ||
-                       'http://localhost:3000';
+        // 🔧 CORREÇÃO: Usar CLIENT_URL (frontend) ao invés de backend para links de indicação
+        const baseUrl = process.env.CLIENT_URL || 'http://localhost:5501';
         
         referralLink = `${baseUrl}/indicacao/${indicator.uniqueReferralCode}`;
       }

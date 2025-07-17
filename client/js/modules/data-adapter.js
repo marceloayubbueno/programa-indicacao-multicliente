@@ -196,18 +196,20 @@ class DataAdapter {
     }
 
     static generateReferralLink(participant) {
-        // 🌍 URL DINÂMICA PARA LINKS DE INDICAÇÃO
-        const baseUrl = window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/indicacao' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+        // 🌍 URL DINÂMICA PARA LINKS DE INDICAÇÃO - USANDO CONFIG CENTRALIZADO
+        const baseUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
+                       (window.location.hostname === 'localhost' ? 
+                        'http://localhost:3000/indicacao' : 
+                        'https://programa-indicacao-multicliente-production.up.railway.app/indicacao');
         return `${baseUrl}/${participant.uniqueReferralCode}`;
     }
 
     static generateShareLink(participant) {
-        // 🌍 URL DINÂMICA PARA LINKS DE COMPARTILHAMENTO
-        const baseUrl = window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/indicacao' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/indicacao';
+        // 🌍 URL DINÂMICA PARA LINKS DE COMPARTILHAMENTO - USANDO CONFIG CENTRALIZADO
+        const baseUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
+                       (window.location.hostname === 'localhost' ? 
+                        'http://localhost:3000/indicacao' : 
+                        'https://programa-indicacao-multicliente-production.up.railway.app/indicacao');
         return `${baseUrl}/${participant.shareLink}`;
     }
 
