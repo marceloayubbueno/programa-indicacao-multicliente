@@ -29,6 +29,37 @@ export class ClientsController {
     return this.clientsService.findAll();
   }
 
+  // === 🔍 ENDPOINT DE DIAGNÓSTICO DIRETO ===
+  @Get('debug/all')
+  async debugAllClients() {
+    console.log('[DIAGNOSIS-CLIENTS] 🔍 === LISTANDO TODOS OS CLIENTES ===');
+    
+    const clients = await this.clientsService.findAll();
+    
+    const clientsDebug = clients.clients.map(client => ({
+      id: (client as any)._id,
+      companyName: client.companyName,
+      accessEmail: client.accessEmail,
+      responsibleEmail: client.responsibleEmail,
+      status: client.status,
+      plan: client.plan,
+      createdAt: client.createdAt,
+      profileComplete: client.profileComplete,
+      cnpj: client.cnpj || 'SEM_CNPJ'
+    }));
+
+    console.log('[DIAGNOSIS-CLIENTS] 📊 Clientes encontrados:', clientsDebug.length);
+    clientsDebug.forEach((client, index) => {
+      console.log(`[DIAGNOSIS-CLIENTS] Cliente ${index + 1}:`, client);
+    });
+
+    return {
+      success: true,
+      totalClients: clientsDebug.length,
+      clients: clientsDebug
+    };
+  }
+
   @UseGuards(JwtClientAuthGuard)
   @Get('me')
   async getMe(@Req() req) {
@@ -161,5 +192,40 @@ export class ClientsController {
     }
     const updated = await this.clientsService.update(id, { webhookMakeUrl: webhookUrl });
     return { message: 'Webhook Make.com atualizado com sucesso', webhookMakeUrl: updated.webhookMakeUrl };
+  }
+
+  // === 🔧 CORREÇÃO RÁPIDA: ATIVAR CLIENTE ===
+  @Patch(':id/activate')
+  async activateClient(@Param('id') id: string) {
+    console.log('[DIAGNOSIS-FIX] 🔧 Ativando cliente:', id);
+    
+    const client = await this.clientsService.findOne(id);
+    if (!client) {
+      throw new BadRequestException('Cliente não encontrado');
+    }
+
+    console.log('[DIAGNOSIS-FIX] Cliente antes:', {
+      id: (client as any)._id || id,
+      status: client.status,
+      companyName: client.companyName
+    });
+
+    const updatedClient = await this.clientsService.update(id, { status: 'ativo' });
+    
+    console.log('[DIAGNOSIS-FIX] ✅ Cliente ativado:', {
+      id: (updatedClient as any)._id || id,
+      status: updatedClient.status,
+      companyName: updatedClient.companyName
+    });
+
+    return {
+      success: true,
+      message: 'Cliente ativado com sucesso',
+      client: {
+        id: (updatedClient as any)._id || id,
+        companyName: updatedClient.companyName,
+        status: updatedClient.status
+      }
+    };
   }
 } 

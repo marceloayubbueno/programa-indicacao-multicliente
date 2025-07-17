@@ -175,6 +175,11 @@ function renderClientsTable() {
                     <button class="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors text-sm" onclick="editClient('${client._id}')" title="Editar">
                         <i class="fas fa-edit"></i>
                     </button>
+                    ${client.status !== 'ativo' ? `
+                    <button class="p-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors text-sm" onclick="quickActivateClient('${client._id}', '${client.companyName}')" title="🔧 Ativar Cliente">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    ` : ''}
                     <button class="p-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors text-sm" onclick="deleteClient('${client._id}')" title="Excluir">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -656,3 +661,83 @@ window.onload = function () {
         });
     }
 }; 
+
+// === 🔧 CORREÇÃO RÁPIDA: ATIVAR CLIENTE ===
+async function quickActivateClient(clientId, clientName) {
+    if (!confirm(`Ativar cliente "${clientName}"?`)) return;
+    
+    try {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            clearSessionAndRedirect();
+            return;
+        }
+
+        console.log(`[QUICK-FIX] Ativando cliente ${clientId}...`);
+        
+        const response = await fetch(`${API_URL}/${clientId}/activate`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao ativar cliente');
+        }
+
+        const result = await response.json();
+        console.log('[QUICK-FIX] ✅ Cliente ativado:', result);
+        
+        showSuccess(`Cliente "${clientName}" ativado com sucesso!`);
+        loadClients(); // Recarregar lista
+        
+    } catch (error) {
+        console.error('[QUICK-FIX] Erro:', error);
+        showError('Erro ao ativar cliente: ' + error.message);
+    }
+}
+
+// === 🔍 DIAGNÓSTICO RÁPIDO: LISTAR CLIENTES ===
+async function quickDiagnosis() {
+    try {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            clearSessionAndRedirect();
+            return;
+        }
+
+        const response = await fetch(`${API_URL}/debug/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro no diagnóstico');
+        }
+
+        const result = await response.json();
+        console.log('📊 [DIAGNOSIS] Todos os clientes:', result);
+        
+        const inactiveClients = result.clients.filter(c => c.status !== 'ativo');
+        const activeClients = result.clients.filter(c => c.status === 'ativo');
+        
+        console.log('✅ [DIAGNOSIS] Clientes ativos:', activeClients.length);
+        console.log('❌ [DIAGNOSIS] Clientes inativos:', inactiveClients.length);
+        
+        if (inactiveClients.length > 0) {
+            console.log('🔧 [DIAGNOSIS] Clientes que precisam ser ativados:', inactiveClients);
+            alert(`Encontrados ${inactiveClients.length} clientes inativos. Verifique o console para detalhes.`);
+        } else {
+            alert('Todos os clientes estão ativos!');
+        }
+        
+    } catch (error) {
+        console.error('[DIAGNOSIS] Erro:', error);
+        showError('Erro no diagnóstico: ' + error.message);
+    }
+}
+
+// Função para adicionar botões de ação nas linhas da tabela

@@ -146,38 +146,11 @@ export class LPDivulgacaoController {
   @Post('submit-referral')
   @HttpCode(HttpStatus.CREATED)
   async submitReferralForm(@Body() body: any) {
-    // === DIAGNOSIS H5: Logs do controller ===
-    console.log('[DIAGNOSIS-H5] 🚀 === REQUEST CHEGOU AO CONTROLLER ===');
-    console.log('[DIAGNOSIS-H5] 📥 Request recebido em /api/lp-divulgacao/submit-referral');
-    console.log('[DIAGNOSIS-H5] 🕐 Timestamp:', new Date().toISOString());
-    console.log('[DIAGNOSIS-H5] 📦 Body recebido:', JSON.stringify(body, null, 2));
-    console.log('[DIAGNOSIS-H5] 📊 Body size:', JSON.stringify(body).length);
-    
-    try {
-      console.log('[DIAGNOSIS-H5] 🔄 Chamando lpDivulgacaoService.submitReferralForm...');
-      const result = await this.lpDivulgacaoService.submitReferralForm(body);
-      
-      console.log('[DIAGNOSIS-H5] ✅ Service executado com sucesso');
-      console.log('[DIAGNOSIS-H5] 📤 Retornando resposta:', {
-        success: true,
-        message: 'Indicação enviada com sucesso',
-        dataKeys: result.data ? Object.keys(result.data) : 'no data'
-      });
-      
-      return {
-        success: true,
-        data: result,
-        message: 'Indicação enviada com sucesso'
-      };
-    } catch (error) {
-      console.error('[DIAGNOSIS-H5] ❌ Erro no controller:', {
-        message: error.message,
-        stack: error.stack,
-        bodyReceived: JSON.stringify(body, null, 2)
-      });
-      
-      throw error;
-    }
+    return {
+      success: true,
+      data: await this.lpDivulgacaoService.submitReferralForm(body),
+      message: 'Indicação enviada com sucesso'
+    };
   }
 
   // === TEMPLATES ===

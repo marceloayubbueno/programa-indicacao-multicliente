@@ -6,7 +6,7 @@ NODE_ENV=production
 PORT=3000
 JWT_SECRET=gerar-chave-256-bits-aqui
 MONGODB_URI=mongodb+srv://marceloayubbueno:6o6TsTwpr8AQPleQ@cluster0.glmogtu.mongodb.net/programa-indicacao?retryWrites=true&w=majority&appName=Cluster0
-CLIENT_URL=https://programa-indicacao.vercel.app
+CLIENT_URL=https://app.virallead.com.br
 BREVO_API_KEY=placeholder
 ADMIN_NAME=Administrador
 ADMIN_EMAIL=admin@programa-indicacao.com

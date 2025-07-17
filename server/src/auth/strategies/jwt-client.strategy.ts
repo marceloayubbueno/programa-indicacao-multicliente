@@ -24,12 +24,18 @@ export class JwtClientStrategy extends PassportStrategy(Strategy, 'jwt-client') 
     }
 
     const client = await this.clientModel.findById(payload.sub);
+    
     if (!client) {
       throw new UnauthorizedException('Cliente não encontrado');
     }
 
     if (client.status !== 'ativo') {
-      throw new UnauthorizedException('Cliente inativo');
+      console.log('[JWT-AUTH] ❌ Cliente com status inativo:', {
+        clientId: client._id,
+        companyName: client.companyName,
+        status: client.status
+      });
+      throw new UnauthorizedException(`Cliente inativo (status: ${client.status}). Entre em contato com o suporte.`);
     }
 
     // 🔒 SEGURANÇA: Retorna objeto user com clientId explícito para isolamento de dados

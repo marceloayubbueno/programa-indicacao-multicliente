@@ -8,9 +8,10 @@ async function loadCompanyData() {
         }
 
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA
-    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                  window.API_URL;
-    const response = await fetch(`${apiUrl}/clients/me`, {
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      window.API_URL;
+        
+        const response = await fetch(`${apiUrl}/clients/me`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`

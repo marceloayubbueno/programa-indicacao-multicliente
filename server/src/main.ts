@@ -93,23 +93,22 @@ async function bootstrap() {
   // Filtro global para logar qualquer erro
   app.useGlobalFilters(new GlobalExceptionLogger());
 
-  // Configuração CORS dinâmica - SEMPRE incluir Vercel e Railway
+  // Configuração CORS dinâmica - SEMPRE incluir domínio personalizado e Railway
   const allowedOrigins: string[] = [
     'http://localhost:5501', 
     'http://127.0.0.1:5501',
-    'https://programa-indicacao-multicliente.vercel.app', // ✅ FIXO: Vercel sempre permitido
+    'https://app.virallead.com.br', // ✅ FIXO: Domínio personalizado sempre permitido
     'https://programa-indicacao-multicliente-production.up.railway.app', // ✅ FIXO: Railway sempre permitido
     ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [])
   ];
 
   app.enableCors({
     origin: (origin, callback) => {
-      // ✅ CORS mais permissivo: aceitar Vercel e Railway sempre
+      // ✅ CORS mais permissivo: aceitar domínio personalizado e Railway sempre
       if (!origin || 
           allowedOrigins.includes(origin) || 
-          origin.includes('programa-indicacao-multicliente.vercel.app') ||
+          origin.includes('app.virallead.com.br') ||
           origin.includes('programa-indicacao-multicliente-production.up.railway.app') ||
-          origin.includes('vercel.app') ||
           origin.includes('railway.app')) {
         callback(null, true);
       } else {

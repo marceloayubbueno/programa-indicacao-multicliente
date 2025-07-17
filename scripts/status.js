@@ -109,9 +109,9 @@ function main() {
     log('  • GitHub: https://github.com/marceloayubbueno/programa-indicacao-multicliente', colors.reset);
 
     log('\n🌐 Aplicações:', colors.yellow);
-    log('  • Frontend: https://programa-indicacao-multicliente.vercel.app/', colors.reset);
+    log('  • Frontend: https://app.virallead.com.br/', colors.reset);
     log('  • Backend: https://programa-indicacao-multicliente-production.up.railway.app/api', colors.reset);
-    log('  • Admin: https://programa-indicacao-multicliente.vercel.app/admin/pages/login.html', colors.reset);
+    log('  • Admin: https://app.virallead.com.br/admin/pages/login.html', colors.reset);
 
     // Últimas alterações
     log('\n📈 ÚLTIMOS COMMITS:', colors.cyan);

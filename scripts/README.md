@@ -189,9 +189,9 @@ npm run redeploy
 - [GitHub Repository](https://github.com/marceloayubbueno/programa-indicacao-multicliente)
 
 ### 🌐 **Aplicações**
-- [Frontend](https://programa-indicacao-multicliente.vercel.app/)
+- [Frontend](https://app.virallead.com.br/)
 - [Backend API](https://programa-indicacao-multicliente-production.up.railway.app/api)
-- [Admin Panel](https://programa-indicacao-multicliente.vercel.app/admin/pages/login.html)
+- [Admin Panel](https://app.virallead.com.br/admin/pages/login.html)
 
 ---
 

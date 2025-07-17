@@ -456,7 +456,7 @@ Deploy do frontend com CDN global e otimizações de performance.
 > 
 > **URL de Produção Final:**
 > ```
-> https://programa-indicacao.vercel.app
+> https://app.virallead.com.br
 > ```
 > ```
 

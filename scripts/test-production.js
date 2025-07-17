@@ -110,22 +110,22 @@ async function main() {
     },
     {
       name: 'Frontend (Home)',
-      url: 'https://programa-indicacao-multicliente.vercel.app/',
+      url: 'https://app.virallead.com.br/',
       expectedStatus: 200
     },
     {
       name: 'Frontend (Login)',
-      url: 'https://programa-indicacao-multicliente.vercel.app/pages/login.html',
+      url: 'https://app.virallead.com.br/pages/login.html',
       expectedStatus: 200
     },
     {
       name: 'Admin (Login)',
-      url: 'https://programa-indicacao-multicliente.vercel.app/admin/pages/login.html',
+      url: 'https://app.virallead.com.br/admin/pages/login.html',
       expectedStatus: 200
     },
     {
       name: 'LP Indicadores',
-      url: 'https://programa-indicacao-multicliente.vercel.app/pages/lp-indicadores.html',
+      url: 'https://app.virallead.com.br/pages/lp-indicadores.html',
       expectedStatus: 200
     }
   ];

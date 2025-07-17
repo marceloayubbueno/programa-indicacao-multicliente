@@ -73,9 +73,9 @@ npx serve -p 8080
 ```
 
 ## 🌐 URLs de Produção (Sempre Online)
-- **Frontend**: `https://programa-indicacao-multicliente.vercel.app`
+- **Frontend**: `https://app.virallead.com.br`
 - **Backend**: `https://programa-indicacao-multicliente-production.up.railway.app`
-- **Admin**: `https://programa-indicacao-multicliente.vercel.app/admin/pages/login.html`
+- **Admin**: `https://app.virallead.com.br/admin/pages/login.html`
 
 ## 🔀 Configuração Automática de URLs
 
