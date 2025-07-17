@@ -12,6 +12,21 @@ export class PublicReferralsController {
     private readonly lpDivulgacaoService: LPDivulgacaoService,
   ) {}
 
+  /**
+   * 🚨 ENDPOINT DE DEBUG - TESTAR SE PROXY FUNCIONA
+   */
+  @Get('debug-proxy-test')
+  async debugProxyTest(@Res() res: Response) {
+    console.log(`🚨 [DEBUG-PROXY-TEST] ENDPOINT FUNCIONANDO! Timestamp: ${new Date().toISOString()}`);
+    return res.json({
+      success: true,
+      message: 'PROXY FUNCIONANDO! Request chegou no Railway.',
+      timestamp: new Date().toISOString(),
+      clientUrl: process.env.CLIENT_URL,
+      environment: process.env.NODE_ENV
+    });
+  }
+
 
 
 
@@ -108,18 +123,30 @@ export class PublicReferralsController {
     @Query() queryParams: any,
     @Res() res: Response,
   ) {
+    console.log(`🚨 [DEBUG-PROXY] REQUEST CHEGOU NO RAILWAY! Código: ${codigo}`);
+    console.log(`🚨 [DEBUG-PROXY] Headers: ${JSON.stringify(res.req.headers)}`);
+    console.log(`🚨 [DEBUG-PROXY] Query Params: ${JSON.stringify(queryParams)}`);
+    console.log(`🚨 [DEBUG-PROXY] CLIENT_URL atual: ${process.env.CLIENT_URL}`);
     this.logger.log(`🔗 Acesso via link de indicação: ${codigo}`);
 
     try {
       // 1. Validar código do indicador
+      console.log(`🚨 [DEBUG-VALIDATION] Iniciando validação do código: ${codigo}`);
       const validation = await this.participantsService.validateReferralCode(codigo);
+      console.log(`🚨 [DEBUG-VALIDATION] Resultado da validação:`, validation);
       
       if (!validation.valid) {
+        console.log(`🚨 [DEBUG-VALIDATION] ❌ CÓDIGO INVÁLIDO! Erro: ${validation.error}`);
         this.logger.warn(`❌ Código inválido: ${codigo} - ${validation.error}`);
         return res.status(HttpStatus.NOT_FOUND).json({
           success: false,
           error: 'Link de indicação inválido ou expirado',
-          message: 'Verifique se o link está correto ou solicite um novo link ao indicador.'
+          message: 'Verifique se o link está correto ou solicite um novo link ao indicador.',
+          debug: {
+            codigo,
+            validationResult: validation,
+            timestamp: new Date().toISOString()
+          }
         });
       }
 
