@@ -1,4 +1,5 @@
 {
+  "_comment": "Força redeploy - teste proxy 2024-01-24",
   "builds": [
     {
       "src": "client/**/*",
