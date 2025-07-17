@@ -102,24 +102,15 @@ async function bootstrap() {
     ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [])
   ];
 
+  // 🔧 CORS CONFIGURAÇÃO TEMPORÁRIA - PERMISSIVA PARA RESOLVER PROBLEMA
   app.enableCors({
-    origin: (origin, callback) => {
-      // ✅ CORS mais permissivo: aceitar domínio personalizado e Railway sempre
-      if (!origin || 
-          allowedOrigins.includes(origin) || 
-          origin.includes('app.virallead.com.br') ||
-          origin.includes('programa-indicacao-multicliente-production.up.railway.app') ||
-          origin.includes('railway.app')) {
-        callback(null, true);
-      } else {
-        console.log(`[CORS] ❌ Origem bloqueada: ${origin}`);
-        callback(new Error('Não permitido pelo CORS'), false);
-      }
-    },
+    origin: true, // Permitir todas as origens temporariamente
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   });
+  
+  console.log(`[BOOT] 🌐 CORS configurado para: PERMITIR TODAS AS ORIGENS (TEMPORÁRIO)`);
 
   console.log(`[BOOT] 🌐 CORS configurado para:`, allowedOrigins);
 
