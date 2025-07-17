@@ -196,12 +196,34 @@ class DataAdapter {
     }
 
     static generateReferralLink(participant) {
+        // 🚨 [H4] DIAGNÓSTICO URLS FRONTEND - Geração de links
+        console.log(`🚨 [H4-FRONTEND] ========== GERANDO LINK DE INDICAÇÃO ==========`);
+        console.log(`🚨 [H4-FRONTEND] Timestamp: ${new Date().toISOString()}`);
+        console.log(`🚨 [H4-FRONTEND] Participant:`, {
+            name: participant?.name,
+            email: participant?.email,
+            uniqueReferralCode: participant?.uniqueReferralCode
+        });
+        
         // 🌍 URL DINÂMICA PARA LINKS DE INDICAÇÃO - USANDO CONFIG CENTRALIZADO
         const baseUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
                        (window.location.hostname === 'localhost' ? 
                         'http://localhost:3000/indicacao' : 
                         'https://app.virallead.com.br/indicacao');
-        return `${baseUrl}/${participant.uniqueReferralCode}`;
+        
+        console.log(`🚨 [H4-FRONTEND] Configurações de URL:`, {
+            hasAppConfig: !!window.APP_CONFIG,
+            appConfigReferralUrl: window.APP_CONFIG?.REFERRAL_BASE_URL,
+            hostname: window.location.hostname,
+            selectedBaseUrl: baseUrl,
+            fullWindowLocation: window.location.href
+        });
+        
+        const finalLink = `${baseUrl}/${participant.uniqueReferralCode}`;
+        
+        console.log(`🚨 [H4-FRONTEND] Link final gerado: "${finalLink}"`);
+        
+        return finalLink;
     }
 
     static generateShareLink(participant) {

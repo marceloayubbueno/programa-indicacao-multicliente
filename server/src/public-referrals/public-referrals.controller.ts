@@ -123,6 +123,28 @@ export class PublicReferralsController {
     @Query() queryParams: any,
     @Res() res: Response,
   ) {
+    // 🚨 [H1] DIAGNÓSTICO PROXY VERCEL - Verificar se requisições chegam ao Railway
+    console.log(`🚨 [H1-PROXY] ========== NOVA REQUISIÇÃO ==========`);
+    console.log(`🚨 [H1-PROXY] Timestamp: ${new Date().toISOString()}`);
+    console.log(`🚨 [H1-PROXY] Código recebido: ${codigo}`);
+    console.log(`🚨 [H1-PROXY] Method: ${res.req.method}`);
+    console.log(`🚨 [H1-PROXY] URL completa: ${res.req.url}`);
+    console.log(`🚨 [H1-PROXY] Protocol: ${res.req.protocol}`);
+    console.log(`🚨 [H1-PROXY] Host: ${res.req.get('host')}`);
+    
+    // 🚨 [H5] DIAGNÓSTICO CORS/HEADERS - Headers detalhados
+    console.log(`🚨 [H5-CORS] ========== HEADERS RECEBIDOS ==========`);
+    Object.keys(res.req.headers).forEach(key => {
+      console.log(`🚨 [H5-CORS] ${key}: ${res.req.headers[key]}`);
+    });
+    
+    // 🚨 [H4] DIAGNÓSTICO URLs - Variáveis de ambiente
+    console.log(`🚨 [H4-URLS] ========== CONFIGURAÇÕES DE AMBIENTE ==========`);
+    console.log(`🚨 [H4-URLS] CLIENT_URL: ${process.env.CLIENT_URL}`);
+    console.log(`🚨 [H4-URLS] API_BASE_URL: ${process.env.API_BASE_URL}`);
+    console.log(`🚨 [H4-URLS] NODE_ENV: ${process.env.NODE_ENV}`);
+    console.log(`🚨 [H4-URLS] PORT: ${process.env.PORT}`);
+    
     console.log(`🚨 [DEBUG-PROXY] REQUEST CHEGOU NO RAILWAY! Código: ${codigo}`);
     console.log(`🚨 [DEBUG-PROXY] Headers: ${JSON.stringify(res.req.headers)}`);
     console.log(`🚨 [DEBUG-PROXY] Query Params: ${JSON.stringify(queryParams)}`);
@@ -160,14 +182,64 @@ export class PublicReferralsController {
       const clientIdString = indicador.clientId._id ? indicador.clientId._id.toString() : indicador.clientId.toString();
       this.logger.log(`🔍 Buscando LPs para cliente: ${clientIdString}`);
       
+      // 🚨 [H3] DIAGNÓSTICO LP DIVULGAÇÃO - Busca detalhada
+      console.log(`🚨 [H3-LP] ========== BUSCANDO LP DE DIVULGAÇÃO ==========`);
+      console.log(`🚨 [H3-LP] Timestamp: ${new Date().toISOString()}`);
+      console.log(`🚨 [H3-LP] Cliente ID: ${clientIdString}`);
+      console.log(`🚨 [H3-LP] Indicador: ${indicador.name} (${indicador.email})`);
+      console.log(`🚨 [H3-LP] Indicador ClientId original:`, indicador.clientId);
+      
       try {
+        console.log(`🚨 [H3-LP] 🔍 Chamando lpDivulgacaoService.findAll(${clientIdString})...`);
         const lpsFromClient = await this.lpDivulgacaoService.findAll(clientIdString);
         
+        console.log(`🚨 [H3-LP] LPs encontradas:`, {
+          total: lpsFromClient?.length || 0,
+          lps: lpsFromClient?.map(lp => ({
+            name: lp.name,
+            slug: lp.slug,
+            status: lp.status
+          })) || []
+        });
+        
         if (lpsFromClient && lpsFromClient.length > 0) {
-          targetLP = lpsFromClient.find(lp => lp.status === 'published') || null;
+          const publishedLPs = lpsFromClient.filter(lp => lp.status === 'published');
+          console.log(`🚨 [H3-LP] LPs publicadas:`, {
+            total: publishedLPs.length,
+            lps: publishedLPs.map(lp => ({
+              name: lp.name,
+              slug: lp.slug,
+              status: lp.status
+            }))
+          });
+          
+          targetLP = publishedLPs[0] || null;
+          console.log(`🚨 [H3-LP] LP selecionada:`, {
+            selected: !!targetLP,
+            lpName: targetLP?.name,
+            lpSlug: targetLP?.slug
+          });
+          
           this.logger.log(`🎯 LP encontrada: ${targetLP?.name || 'Nenhuma publicada'}`);
+        } else {
+          console.log(`🚨 [H3-LP] ❌ NENHUMA LP ENCONTRADA para cliente: ${clientIdString}`);
+          
+          // 🚨 [H3] DIAGNÓSTICO EXTRA: Verificar se existem LPs para outros clientes
+          try {
+            const allLPs = await this.lpDivulgacaoService.findAll('');
+            console.log(`🚨 [H3-LP] Total de LPs no sistema: ${allLPs?.length || 0}`);
+            
+            if (allLPs && allLPs.length > 0) {
+              const distinctClients = [...new Set(allLPs.map(lp => lp.clientId?.toString()))];
+              console.log(`🚨 [H3-LP] Clientes com LP: ${distinctClients.length}`, distinctClients);
+            }
+          } catch (allLpsError) {
+            console.log(`🚨 [H3-LP] Erro ao buscar todas as LPs:`, allLpsError.message);
+          }
         }
       } catch (error) {
+        console.error(`🚨 [H3-LP] 💥 ERRO AO BUSCAR LPs:`, error);
+        console.error(`🚨 [H3-LP] Stack trace:`, error.stack);
         this.logger.error(`❌ Erro ao buscar LPs: ${error.message}`);
       }
 

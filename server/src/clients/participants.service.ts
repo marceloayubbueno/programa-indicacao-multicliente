@@ -756,24 +756,79 @@ export class ParticipantsService {
    * Valida se um código de referral é válido e ativo
    */
   async validateReferralCode(code: string): Promise<{ valid: boolean; participant?: Participant; error?: string }> {
+    // 🚨 [H2] DIAGNÓSTICO VALIDAÇÃO CÓDIGOS - Início da validação
+    console.log(`🚨 [H2-VALIDATION] ========== VALIDANDO CÓDIGO ==========`);
+    console.log(`🚨 [H2-VALIDATION] Timestamp: ${new Date().toISOString()}`);
+    console.log(`🚨 [H2-VALIDATION] Código recebido: "${code}"`);
+    console.log(`🚨 [H2-VALIDATION] Tipo do código: ${typeof code}`);
+    console.log(`🚨 [H2-VALIDATION] Comprimento: ${code?.length || 0}`);
+    
     try {
       if (!code || code.length < 6) {
+        console.log(`🚨 [H2-VALIDATION] ❌ CÓDIGO MUITO CURTO: "${code}" (length: ${code?.length || 0})`);
         return { valid: false, error: 'Código inválido' };
       }
 
+      console.log(`🚨 [H2-VALIDATION] 🔍 Buscando no banco de dados...`);
+      
+      // 🚨 [H2] Log da query no MongoDB
+      const queryConditions = { 
+        uniqueReferralCode: code,
+        tipo: { $in: ['indicador', 'influenciador'] },
+        status: 'ativo'
+      };
+      console.log(`🚨 [H2-VALIDATION] Query MongoDB:`, queryConditions);
+      
       const participant = await this.findByReferralCode(code);
       
+      console.log(`🚨 [H2-VALIDATION] Resultado da busca:`, {
+        found: !!participant,
+        participantId: participant?._id,
+        participantName: participant?.name,
+        participantEmail: participant?.email,
+        participantTipo: participant?.tipo,
+        participantStatus: participant?.status,
+        participantCanIndicate: participant?.canIndicate,
+        participantClientId: participant?.clientId
+      });
+      
       if (!participant) {
+        console.log(`🚨 [H2-VALIDATION] ❌ PARTICIPANTE NÃO ENCONTRADO para código: "${code}"`);
+        
+        // 🚨 [H2] DIAGNÓSTICO EXTRA: Buscar códigos similares
+        const similarCodes = await this.participantModel
+          .find({ uniqueReferralCode: { $regex: code.substring(0, 3), $options: 'i' } })
+          .select('uniqueReferralCode name email tipo status')
+          .limit(5)
+          .exec();
+        
+        console.log(`🚨 [H2-VALIDATION] Códigos similares encontrados:`, similarCodes.map(p => ({
+          code: p.uniqueReferralCode,
+          name: p.name,
+          tipo: p.tipo,
+          status: p.status
+        })));
+        
+        // 🚨 [H2] DIAGNÓSTICO EXTRA: Contar total de indicadores
+        const totalIndicators = await this.participantModel.countDocuments({
+          tipo: { $in: ['indicador', 'influenciador'] },
+          uniqueReferralCode: { $exists: true, $ne: null }
+        });
+        console.log(`🚨 [H2-VALIDATION] Total de indicadores com código: ${totalIndicators}`);
+        
         return { valid: false, error: 'Código não encontrado ou indicador inativo' };
       }
 
       if (!participant.canIndicate) {
+        console.log(`🚨 [H2-VALIDATION] ❌ INDICADOR NÃO AUTORIZADO: ${participant.name} (canIndicate: ${participant.canIndicate})`);
         return { valid: false, error: 'Indicador não autorizado a fazer indicações' };
       }
 
+      console.log(`🚨 [H2-VALIDATION] ✅ CÓDIGO VÁLIDO: ${participant.name} (${participant.email})`);
       return { valid: true, participant };
     } catch (error) {
-      console.error('Erro na validação do código de referral:', error);
+      console.error(`🚨 [H2-VALIDATION] 💥 ERRO NA VALIDAÇÃO:`, error);
+      console.error(`🚨 [H2-VALIDATION] Stack trace:`, error.stack);
       return { valid: false, error: 'Erro interno na validação' };
     }
   }
