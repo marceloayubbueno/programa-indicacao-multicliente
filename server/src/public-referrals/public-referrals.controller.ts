@@ -27,6 +27,25 @@ export class PublicReferralsController {
     });
   }
 
+  /**
+   * 🚨 ENDPOINT DE TESTE - VERIFICAR SE ROTAS ESTÃO FUNCIONANDO
+   */
+  @Get('test-route')
+  async testRoute() {
+    console.log(`🚨 [TEST-ROUTE] Endpoint de teste acessado!`);
+    return {
+      success: true,
+      message: 'Rota de indicação funcionando!',
+      timestamp: new Date().toISOString(),
+      routes: [
+        '/indicacao/test-route',
+        '/indicacao/debug-proxy-test',
+        '/indicacao/:codigo/preview',
+        '/indicacao/:codigo'
+      ]
+    };
+  }
+
 
 
 
