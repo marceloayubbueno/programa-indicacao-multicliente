@@ -76,11 +76,12 @@ async function bootstrap() {
     }
   });
   
-  // Configurar prefixo global, mas excluir rotas públicas de indicação
+  // 🔧 CORREÇÃO: Configurar prefixo global, mas excluir rotas públicas de indicação
   app.setGlobalPrefix('api', {
     exclude: [
       { path: 'indicacao', method: RequestMethod.GET },
       { path: 'indicacao/*', method: RequestMethod.GET },
+      { path: 'indicacao/*/preview', method: RequestMethod.GET },
     ],
   });
   
@@ -93,15 +94,6 @@ async function bootstrap() {
   // Filtro global para logar qualquer erro
   app.useGlobalFilters(new GlobalExceptionLogger());
 
-  // Configuração CORS dinâmica - SEMPRE incluir domínio personalizado e Railway
-  const allowedOrigins: string[] = [
-    'http://localhost:5501', 
-    'http://127.0.0.1:5501',
-    'https://app.virallead.com.br', // ✅ FIXO: Domínio personalizado sempre permitido
-    'https://programa-indicacao-multicliente-production.up.railway.app', // ✅ FIXO: Railway sempre permitido
-    ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [])
-  ];
-
   // 🔧 CORS CONFIGURAÇÃO TEMPORÁRIA - PERMISSIVA PARA RESOLVER PROBLEMA
   app.enableCors({
     origin: true, // Permitir todas as origens temporariamente
@@ -112,12 +104,18 @@ async function bootstrap() {
   
   console.log(`[BOOT] 🌐 CORS configurado para: PERMITIR TODAS AS ORIGENS (TEMPORÁRIO)`);
 
-  console.log(`[BOOT] 🌐 CORS configurado para:`, allowedOrigins);
+  // 🚨 DIAGNÓSTICO: Log de configuração de rotas
+  console.log(`[BOOT] 🛣️ CONFIGURAÇÃO DE ROTAS:`);
+  console.log(`[BOOT] 🛣️ - Prefixo global: /api`);
+  console.log(`[BOOT] 🛣️ - Rotas excluídas: /indicacao/*, /indicacao/*/preview`);
+  console.log(`[BOOT] 🛣️ - Rotas públicas acessíveis diretamente`);
 
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
   console.log(`\n[BOOT] 🚀 Backend rodando na porta ${port}`);
   console.log(`[BOOT] 🌐 API disponível em: /api/`);
-  console.log(`[BOOT] 🔗 Environment: ${process.env.NODE_ENV || 'development'}\n`);
+  console.log(`[BOOT] 🔗 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`[BOOT] 🌐 CLIENT_URL: ${process.env.CLIENT_URL || 'NÃO CONFIGURADO'}`);
+  console.log(`[BOOT] 🛣️ ROTAS PÚBLICAS: /indicacao/* (excluídas do prefixo /api)\n`);
 }
 bootstrap();

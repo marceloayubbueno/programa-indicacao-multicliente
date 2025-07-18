@@ -7,19 +7,22 @@
   ],
   "routes": [
     {
-      "src": "/indicacao/debug-proxy-test",
-      "dest": "https://programa-indicacao-multicliente-production.up.railway.app/indicacao/debug-proxy-test",
-      "status": 307
-    },
-    {
-      "src": "/indicacao/([^/]+)",
+      "src": "/indicacao/(.*)",
       "dest": "https://programa-indicacao-multicliente-production.up.railway.app/indicacao/$1",
-      "status": 307
+      "status": 307,
+      "headers": {
+        "X-Forwarded-Host": "app.virallead.com.br",
+        "X-Forwarded-Proto": "https"
+      }
     },
     {
       "src": "/api/(.*)",
       "dest": "https://programa-indicacao-multicliente-production.up.railway.app/api/$1",
-      "status": 307
+      "status": 307,
+      "headers": {
+        "X-Forwarded-Host": "app.virallead.com.br",
+        "X-Forwarded-Proto": "https"
+      }
     },
     {
       "src": "/client/(.*)",

@@ -131,6 +131,8 @@ export class PublicReferralsController {
     console.log(`🚨 [H1-PROXY] URL completa: ${res.req.url}`);
     console.log(`🚨 [H1-PROXY] Protocol: ${res.req.protocol}`);
     console.log(`🚨 [H1-PROXY] Host: ${res.req.get('host')}`);
+    console.log(`🚨 [H1-PROXY] User-Agent: ${res.req.get('user-agent')}`);
+    console.log(`🚨 [H1-PROXY] Referer: ${res.req.get('referer')}`);
     
     // 🚨 [H5] DIAGNÓSTICO CORS/HEADERS - Headers detalhados
     console.log(`🚨 [H5-CORS] ========== HEADERS RECEBIDOS ==========`);
@@ -144,6 +146,7 @@ export class PublicReferralsController {
     console.log(`🚨 [H4-URLS] API_BASE_URL: ${process.env.API_BASE_URL}`);
     console.log(`🚨 [H4-URLS] NODE_ENV: ${process.env.NODE_ENV}`);
     console.log(`🚨 [H4-URLS] PORT: ${process.env.PORT}`);
+    console.log(`🚨 [H4-URLS] RAILWAY_PUBLIC_DOMAIN: ${process.env.RAILWAY_PUBLIC_DOMAIN}`);
     
     console.log(`🚨 [DEBUG-PROXY] REQUEST CHEGOU NO RAILWAY! Código: ${codigo}`);
     console.log(`🚨 [DEBUG-PROXY] Headers: ${JSON.stringify(res.req.headers)}`);
