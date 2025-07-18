@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Template de E-mail - Engajamentos</title>
+  <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/tailwind.output.css">
+  <script src="../js/config.js"></script>
+  <style>
+    body { 
+      background: #f5f6fa; 
+      margin: 0; 
+      padding: 15px; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .editor-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .editor-header h1 { 
+      font-size: 1.4rem; 
+      margin: 0; 
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    .editor-header .actions { display: flex; gap: 12px; align-items: center; }
+    .btn { 
+      padding: 10px 20px; 
+      border-radius: 6px; 
+      border: none; 
+      font-weight: 500; 
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    .btn-primary { 
+      background: #3498db; 
+      color: #fff; 
+    }
+    .btn-primary:hover {
+      background: #2980b9;
+    }
+    .btn-secondary { 
+      background: #95a5a6; 
+      color: #fff; 
+    }
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+    .btn-success {
+      background: #27ae60;
+      color: #fff;
+    }
+    .btn-success:hover {
+      background: #229954;
+    }
+    
+    .editor-row { 
+      display: flex; 
+      gap: 15px;
+      height: calc(100vh - 140px);
+    }
+    .editor-canvas { 
+      flex: 1;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    #gjs { 
+      height: 100%;
+      border: none;
+    }
+    
+    .editor-sidebar {
+      width: 300px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    
+    .panel__header {
+      background: #34495e;
+      color: white;
+      padding: 15px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .panel__tabs {
+      display: flex;
+      background: #2c3e50;
+    }
+    
+    .panel__tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      color: #bdc3c7;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .panel__tab.active {
+      background: #34495e;
+      color: white;
+    }
+    
+    .panel__content {
+      height: calc(100% - 100px);
+      overflow-y: auto;
+    }
+    
+    .panel__tab-content {
+      display: none;
+      padding: 15px;
+    }
+    
+    .panel__tab-content.active {
+      display: block;
+    }
+    
+    .blocks-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .gjs-block {
+      border: 2px solid #ecf0f1;
+      border-radius: 6px;
+      padding: 15px;
+      text-align: center;
+      cursor: grab;
+      transition: all 0.2s ease;
+      background: #f8f9fa;
+    }
+    
+    .gjs-block:hover {
+      border-color: #3498db;
+      background: #e3f2fd;
+    }
+    
+    .gjs-block i {
+      font-size: 24px;
+      color: #7f8c8d;
+      margin-bottom: 8px;
+      display: block;
+    }
+    
+    .gjs-block-label {
+      font-size: 11px;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+    
+    .template-info {
+      background: #e8f5e8;
+      border: 1px solid #27ae60;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .template-info h3 {
+      margin: 0 0 10px 0;
+      color: #27ae60;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .template-info p {
+      margin: 5px 0;
+      font-size: 12px;
+      color: #2c3e50;
+    }
+    
+    .variable-tag {
+      background: #3498db;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="editor-header">
+    <div>
+      <h1 id="editorTitle">
+        <i class="fas fa-envelope mr-2 text-blue-500"></i>
+        Editor de Template de E-mail
+      </h1>
+      <p id="templateType" class="text-sm text-gray-600 mt-1">Configurando template de e-mail</p>
+    </div>
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="previewEmail()">
+        <i class="fas fa-eye mr-2"></i>Visualizar
+      </button>
+      <button class="btn btn-primary" onclick="saveTemplate()">
+        <i class="fas fa-save mr-2"></i>Salvar Template
+      </button>
+      <button class="btn btn-success" onclick="testEmail()">
+        <i class="fas fa-paper-plane mr-2"></i>Testar E-mail
+      </button>
+    </div>
+  </div>
+
+  <div class="editor-row">
+    <div class="editor-canvas">
+      <div id="gjs"></div>
+    </div>
+    
+    <div class="editor-sidebar">
+      <div class="panel__header">
+        <i class="fas fa-tools mr-2"></i>Ferramentas do Editor
+      </div>
+      
+      <div class="panel__tabs">
+        <div class="panel__tab active" onclick="switchTab('blocks')">
+          <i class="fas fa-cubes mr-1"></i>Blocos
+        </div>
+        <div class="panel__tab" onclick="switchTab('styles')">
+          <i class="fas fa-palette mr-1"></i>Estilos
+        </div>
+        <div class="panel__tab" onclick="switchTab('traits')">
+          <i class="fas fa-cog mr-1"></i>Propriedades
+        </div>
+      </div>
+      
+      <div class="panel__content">
+        <div class="panel__tab-content active" id="tab-blocks">
+          <div class="template-info">
+            <h3><i class="fas fa-info-circle mr-1"></i>Variáveis Disponíveis</h3>
+            <p><span class="variable-tag">{{nome}}</span> - Nome do indicador</p>
+            <p><span class="variable-tag">{{email}}</span> - E-mail do indicador</p>
+            <p><span class="variable-tag">{{linkIndicacao}}</span> - Link exclusivo de indicação</p>
+            <p><span class="variable-tag">{{campanha}}</span> - Nome da campanha</p>
+            <p><span class="variable-tag">{{empresa}}</span> - Nome da empresa</p>
+          </div>
+          <div class="blocks-container">
+            <!-- Blocos serão inseridos aqui automaticamente -->
+          </div>
+        </div>
+        
+        <div class="panel__tab-content" id="tab-styles">
+          <div class="styles-container">
+            <!-- Estilos serão inseridos aqui automaticamente -->
+          </div>
+        </div>
+        
+        <div class="panel__tab-content" id="tab-traits">
+          <div class="traits-container">
+            <!-- Propriedades serão inseridas aqui automaticamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/grapesjs"></script>
+  <script>
+    console.log('[Email Editor] Iniciando configuração do editor...');
+    
+    // Detectar tipo de template da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const templateType = urlParams.get('type') || 'welcome';
+    const listId = urlParams.get('listId');
+    const isPreview = urlParams.get('preview') === 'true';
+    
+    // Atualizar título baseado no tipo
+    const editorTitle = document.getElementById('editorTitle');
+    const templateTypeText = document.getElementById('templateType');
+    
+    if (templateType === 'welcome') {
+      editorTitle.innerHTML = '<i class="fas fa-handshake mr-2 text-green-500"></i>E-mail de Boas-vindas';
+      templateTypeText.textContent = 'Template enviado automaticamente aos novos indicadores';
+    } else {
+      editorTitle.innerHTML = '<i class="fas fa-bullhorn mr-2 text-purple-500"></i>Campanha de E-mail';
+      templateTypeText.textContent = 'Template para campanha personalizada';
+    }
+    
+    try {
+      const editor = grapesjs.init({
+        container: '#gjs',
+        fromElement: false,
+        height: '100%',
+        width: 'auto',
+        storageManager: false,
+        showOffsets: true,
+        noticeOnUnload: false,
+        panels: { 
+          defaults: []
+        },
+        blockManager: {
+          appendTo: '#tab-blocks .blocks-container'
+        },
+        selectorManager: {
+          appendTo: '#tab-styles .styles-container'
+        },
+        styleManager: {
+          appendTo: '#tab-styles .styles-container',
+          sectors: [
+            { 
+              name: '📦 Container & Espaçamento', 
+              open: true, 
+              buildProps: [
+                'width', 'height', 'max-width', 'min-height',
+                'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+                'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+                'box-sizing'
+              ]
+            },
+            { 
+              name: '🖼️ Fundo & Cores', 
+              open: true, 
+              buildProps: [
+                'background-color', 'background-image', 'background-size',
+                'background-repeat', 'background-position', 'background-attachment'
+              ]
+            },
+            { 
+              name: '✏️ Fontes & Tipografia', 
+              open: true, 
+              buildProps: [
+                'font-family', 'font-size', 'font-weight', 'font-style',
+                'line-height', 'letter-spacing', 'color',
+                'text-align', 'text-decoration', 'text-transform'
+              ]
+            },
+            { 
+              name: '🔲 Bordas & Efeitos', 
+              open: false, 
+              buildProps: [
+                'border', 'border-width', 'border-style', 'border-color',
+                'border-radius', 'box-shadow', 'outline'
+              ]
+            }
+          ]
+        },
+        traitManager: {
+          appendTo: '#tab-traits .traits-container'
+        },
+        canvas: {
+          styles: [
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
+          ]
+        }
+      });
+      window.editor = editor;
+
+      console.log('[Email Editor] Editor inicializado com sucesso:', editor);
+
+      // Blocos específicos para e-mail
+      console.log('[Email Editor] Adicionando blocos de e-mail...');
+      
+      editor.BlockManager.add('email-header', {
+        label: 'Cabeçalho',
+        content: `
+          <div style="background: #f8f9fa; padding: 20px; text-align: center; border-bottom: 3px solid #3498db;">
+            <img src="https://via.placeholder.com/200x60/3498db/ffffff?text=LOGO" alt="Logo" style="height: 60px; width: auto;">
+            <h1 style="color: #2c3e50; margin: 10px 0; font-size: 24px;">{{empresa}}</h1>
+          </div>
+        `,
+        category: 'Estrutura',
+        attributes: { class: 'fas fa-header' }
+      });
+      
+      editor.BlockManager.add('email-content', {
+        label: 'Conteúdo',
+        content: `
+          <div style="padding: 30px 20px; background: #ffffff;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 20px;">Olá {{nome}}!</h2>
+            <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+              Bem-vindo ao nosso programa de indicação! Estamos muito felizes em tê-lo conosco.
+            </p>
+            <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+              Para começar a indicar amigos e ganhar recompensas, clique no botão abaixo:
+            </p>
+          </div>
+        `,
+        category: 'Conteúdo',
+        attributes: { class: 'fas fa-envelope-open' }
+      });
+      
+      editor.BlockManager.add('email-button', {
+        label: 'Botão CTA',
+        content: `
+          <div style="text-align: center; padding: 30px 20px; background: #ffffff;">
+            <a href="{{linkIndicacao}}" style="background: #3498db; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+              Começar a Indicar
+            </a>
+          </div>
+        `,
+        category: 'Conteúdo',
+        attributes: { class: 'fas fa-mouse-pointer' }
+      });
+      
+      editor.BlockManager.add('email-footer', {
+        label: 'Rodapé',
+        content: `
+          <div style="background: #34495e; color: white; padding: 20px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 10px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+            <p style="margin: 0 0 10px 0;">
+              <a href="#" style="color: #3498db; text-decoration: none;">Cancelar inscrição</a> | 
+              <a href="#" style="color: #3498db; text-decoration: none;">Política de Privacidade</a>
+            </p>
+          </div>
+        `,
+        category: 'Estrutura',
+        attributes: { class: 'fas fa-shoe-prints' }
+      });
+      
+      editor.BlockManager.add('email-text', {
+        label: 'Texto',
+        content: '<p style="color: #555; line-height: 1.6; margin: 15px 0;">Digite seu texto aqui. Use {{nome}} para personalizar.</p>',
+        category: 'Conteúdo',
+        attributes: { class: 'fas fa-font' }
+      });
+      
+      editor.BlockManager.add('email-image', {
+        label: 'Imagem',
+        content: `
+          <div style="text-align: center; margin: 20px 0;">
+            <img src="https://via.placeholder.com/600x300/3498db/ffffff?text=Imagem+do+Email" style="max-width: 100%; height: auto; border-radius: 8px;" alt="Imagem">
+          </div>
+        `,
+        category: 'Conteúdo',
+        attributes: { class: 'fas fa-image' }
+      });
+      
+      editor.BlockManager.add('email-divider', {
+        label: 'Divisor',
+        content: '<hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">',
+        category: 'Estrutura',
+        attributes: { class: 'fas fa-minus' }
+      });
+
+      // Carregar template existente se for edição
+      if (isPreview) {
+        loadExistingTemplate();
+      } else {
+        // Template padrão baseado no tipo
+        if (templateType === 'welcome') {
+          loadWelcomeTemplate();
+        } else {
+          loadCampaignTemplate();
+        }
+      }
+
+      console.log('[Email Editor] Configuração completa!');
+      
+    } catch (error) {
+      console.error('[Email Editor] Erro ao inicializar editor:', error);
+    }
+
+    // Funções auxiliares
+    function switchTab(tabName) {
+      // Remover active de todas as tabs
+      document.querySelectorAll('.panel__tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.panel__tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Adicionar active na tab selecionada
+      document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    function loadWelcomeTemplate() {
+      const welcomeTemplate = `
+        <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
+          <div style="background: #f8f9fa; padding: 20px; text-align: center; border-bottom: 3px solid #27ae60;">
+            <img src="https://via.placeholder.com/200x60/27ae60/ffffff?text=LOGO" alt="Logo" style="height: 60px; width: auto;">
+            <h1 style="color: #2c3e50; margin: 10px 0; font-size: 24px;">{{empresa}}</h1>
+          </div>
+          
+          <div style="padding: 30px 20px; background: #ffffff;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 20px;">Olá {{nome}}!</h2>
+            <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+              Bem-vindo ao nosso programa de indicação! Estamos muito felizes em tê-lo conosco.
+            </p>
+            <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+              Para começar a indicar amigos e ganhar recompensas, clique no botão abaixo:
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="{{linkIndicacao}}" style="background: #27ae60; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                Começar a Indicar
+              </a>
+            </div>
+            
+            <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+              Seu link exclusivo de indicação: <a href="{{linkIndicacao}}" style="color: #27ae60;">{{linkIndicacao}}</a>
+            </p>
+          </div>
+          
+          <div style="background: #34495e; color: white; padding: 20px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 10px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+            <p style="margin: 0 0 10px 0;">
+              <a href="#" style="color: #3498db; text-decoration: none;">Cancelar inscrição</a> | 
+              <a href="#" style="color: #3498db; text-decoration: none;">Política de Privacidade</a>
+            </p>
+          </div>
+        </div>
+      `;
+      
+      window.editor.setComponents(welcomeTemplate);
+    }
+
+    function loadCampaignTemplate() {
+      const campaignTemplate = `
+        <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
+          <div style="background: #f8f9fa; padding: 20px; text-align: center; border-bottom: 3px solid #9b59b6;">
+            <img src="https://via.placeholder.com/200x60/9b59b6/ffffff?text=LOGO" alt="Logo" style="height: 60px; width: auto;">
+            <h1 style="color: #2c3e50; margin: 10px 0; font-size: 24px;">{{empresa}}</h1>
+          </div>
+          
+          <div style="padding: 30px 20px; background: #ffffff;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 20px;">Olá {{nome}}!</h2>
+            <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+              Temos uma novidade especial para você na campanha <strong>{{campanha}}</strong>!
+            </p>
+            <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+              Não perca essa oportunidade de ganhar ainda mais recompensas.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="{{linkIndicacao}}" style="background: #9b59b6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                Ver Detalhes
+              </a>
+            </div>
+          </div>
+          
+          <div style="background: #34495e; color: white; padding: 20px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 10px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+            <p style="margin: 0 0 10px 0;">
+              <a href="#" style="color: #3498db; text-decoration: none;">Cancelar inscrição</a> | 
+              <a href="#" style="color: #3498db; text-decoration: none;">Política de Privacidade</a>
+            </p>
+          </div>
+        </div>
+      `;
+      
+      window.editor.setComponents(campaignTemplate);
+    }
+
+    function loadExistingTemplate() {
+      // Carregar template salvo (implementar quando tiver backend)
+      console.log('[Email Editor] Carregando template existente...');
+    }
+
+    // Funções globais
+    window.previewEmail = function() {
+      const html = window.editor.getHtml();
+      const css = window.editor.getCss();
+      
+      // Abrir preview em nova janela
+      const previewWindow = window.open('', '_blank');
+      previewWindow.document.write(`
+        <html>
+          <head>
+            <title>Preview do E-mail</title>
+            <style>${css}</style>
+          </head>
+          <body style="margin: 0; padding: 20px; background: #f5f5f5;">
+            <div style="max-width: 600px; margin: 0 auto; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+              ${html}
+            </div>
+          </body>
+        </html>
+      `);
+    };
+
+    window.saveTemplate = function() {
+      const html = window.editor.getHtml();
+      const css = window.editor.getCss();
+      
+      // Salvar no localStorage por enquanto
+      localStorage.setItem(`emailTemplate_${templateType}`, JSON.stringify({
+        html,
+        css,
+        type: templateType,
+        listId,
+        updatedAt: new Date().toISOString()
+      }));
+      
+      alert('Template salvo com sucesso!');
+    };
+
+    window.testEmail = function() {
+      const html = window.editor.getHtml();
+      const css = window.editor.getCss();
+      
+      // Simular envio de teste
+      alert('Funcionalidade de teste será implementada na próxima fase!');
+    };
+  </script>
+</body>
+</html> 

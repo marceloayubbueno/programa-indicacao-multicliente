@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Engajamentos - E-mail Marketing</title>
+    <title>E-mail Marketing - Engajamentos</title>
     <link rel="stylesheet" href="../css/tailwind.output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -44,107 +44,129 @@
       <main class="flex-1 p-8">
         <!-- Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-white mb-2">
-            <i class="fas fa-envelope mr-3 text-blue-400"></i>
-            E-mail Marketing
-          </h1>
-          <p class="text-gray-400">Gerencie campanhas de e-mail e automatize o engajamento com seus indicadores</p>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-blue-500/20">
-                <i class="fas fa-paper-plane text-blue-400 text-xl"></i>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-400">E-mails Enviados</p>
-                <p id="totalEmails" class="text-2xl font-bold text-white">0</p>
-              </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-3xl font-bold text-white mb-2">
+                <i class="fas fa-envelope mr-3 text-blue-400"></i>
+                E-mail Marketing
+              </h1>
+              <p class="text-gray-400">Configure e gerencie suas campanhas de e-mail para engajar indicadores</p>
             </div>
-          </div>
-
-          <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-green-500/20">
-                <i class="fas fa-eye text-green-400 text-xl"></i>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-400">Taxa de Abertura</p>
-                <p id="openRate" class="text-2xl font-bold text-white">0%</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-purple-500/20">
-                <i class="fas fa-mouse-pointer text-purple-400 text-xl"></i>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-400">Taxa de Clique</p>
-                <p id="clickRate" class="text-2xl font-bold text-white">0%</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-orange-500/20">
-                <i class="fas fa-users text-orange-400 text-xl"></i>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-400">Indicadores Ativos</p>
-                <p id="activeIndicators" class="text-2xl font-bold text-white">0</p>
-              </div>
+            <div class="flex space-x-3">
+              <button onclick="backToEngagements()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Voltar
+              </button>
+              <button onclick="createWelcomeEmail()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <i class="fas fa-envelope mr-2"></i>E-mail Boas-vindas
+              </button>
+              <button onclick="createEmailCampaign()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <i class="fas fa-bullhorn mr-2"></i>Nova Campanha
+              </button>
+              <button onclick="createEmailFlow()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <i class="fas fa-project-diagram mr-2"></i>Fluxo Automático
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Quick Actions -->
+        <!-- Email Templates Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <!-- E-mail de Boas-vindas -->
+          <!-- Welcome Email Template -->
           <div class="bg-gray-800 rounded-lg p-6">
-            <h3 class="text-xl font-bold text-white mb-4">
-              <i class="fas fa-handshake mr-2 text-green-400"></i>
-              E-mail de Boas-vindas
-            </h3>
-            <p class="text-gray-400 mb-4">Configure o e-mail automático enviado aos novos indicadores</p>
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-300">Status:</span>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-white">
+                <i class="fas fa-handshake mr-2 text-green-400"></i>
+                E-mail de Boas-vindas
+              </h3>
+              <div class="flex items-center space-x-2">
                 <span id="welcomeEmailStatus" class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-400">Ativo</span>
+                <button onclick="toggleWelcomeEmail()" class="text-gray-400 hover:text-white">
+                  <i class="fas fa-toggle-on"></i>
+                </button>
               </div>
+            </div>
+            
+            <p class="text-gray-400 mb-4">E-mail automático enviado aos novos indicadores com instruções e link exclusivo</p>
+            
+            <div class="space-y-3 mb-4">
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-300">Enviados hoje:</span>
                 <span id="welcomeEmailsToday" class="text-sm text-white">0</span>
               </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-300">Taxa de abertura:</span>
+                <span id="welcomeOpenRate" class="text-sm text-white">0%</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-300">Última atualização:</span>
+                <span id="welcomeLastUpdate" class="text-sm text-gray-400">Nunca</span>
+              </div>
             </div>
-            <button onclick="configureWelcomeEmail()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors">
-              <i class="fas fa-edit mr-2"></i>Configurar Template
-            </button>
+            
+            <div class="flex space-x-3">
+              <button onclick="editWelcomeTemplate()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors">
+                <i class="fas fa-edit mr-2"></i>Editar Template
+              </button>
+              <button onclick="previewWelcomeEmail()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition-colors">
+                <i class="fas fa-eye mr-2"></i>Visualizar
+              </button>
+            </div>
           </div>
 
-          <!-- Campanhas de E-mail -->
+          <!-- Campaign Templates -->
           <div class="bg-gray-800 rounded-lg p-6">
-            <h3 class="text-xl font-bold text-white mb-4">
-              <i class="fas fa-bullhorn mr-2 text-purple-400"></i>
-              Campanhas de E-mail
-            </h3>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-white">
+                <i class="fas fa-bullhorn mr-2 text-purple-400"></i>
+                Campanhas de E-mail
+              </h3>
+              <span class="px-2 py-1 text-xs rounded-full bg-purple-500/20 text-purple-400">
+                <span id="activeCampaignsCount">0</span> ativas
+              </span>
+            </div>
+            
             <p class="text-gray-400 mb-4">Crie campanhas personalizadas para engajar seus indicadores</p>
-            <div class="space-y-3">
+            
+            <div class="space-y-3 mb-4">
               <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-300">Campanhas ativas:</span>
-                <span id="activeCampaigns" class="text-sm text-white">0</span>
+                <span class="text-sm text-gray-300">Total de campanhas:</span>
+                <span id="totalCampaigns" class="text-sm text-white">0</span>
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-300">Última campanha:</span>
-                <span id="lastCampaign" class="text-sm text-gray-400">Nunca</span>
+                <span id="lastCampaignDate" class="text-sm text-gray-400">Nunca</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-300">Taxa média de abertura:</span>
+                <span id="avgOpenRate" class="text-sm text-white">0%</span>
               </div>
             </div>
-            <button onclick="createEmailCampaign()" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors">
-              <i class="fas fa-plus mr-2"></i>Nova Campanha
+            
+            <div class="flex space-x-3">
+              <button onclick="createNewCampaign()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors">
+                <i class="fas fa-plus mr-2"></i>Nova Campanha
+              </button>
+              <button onclick="viewAllCampaigns()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition-colors">
+                <i class="fas fa-list mr-2"></i>Ver Todas
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email Lists Section -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-8">
+          <h3 class="text-xl font-bold text-white mb-4">
+            <i class="fas fa-users mr-2 text-blue-400"></i>
+            Listas de Indicadores
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="emailLists">
+            <!-- Lista será carregada dinamicamente -->
+          </div>
+          
+          <div class="mt-4 text-center">
+            <button onclick="refreshLists()" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition-colors">
+              <i class="fas fa-sync-alt mr-2"></i>Atualizar Listas
             </button>
           </div>
         </div>
@@ -155,37 +177,8 @@
             <i class="fas fa-history mr-2 text-blue-400"></i>
             Atividade Recente
           </h3>
-          <div id="recentActivity" class="space-y-3">
-            <div class="flex items-center justify-between py-2 border-b border-gray-700">
-              <div class="flex items-center">
-                <i class="fas fa-paper-plane text-blue-400 mr-3"></i>
-                <div>
-                  <p class="text-white">E-mail de boas-vindas enviado</p>
-                  <p class="text-sm text-gray-400">Para: joao@exemplo.com</p>
-                </div>
-              </div>
-              <span class="text-sm text-gray-400">2 min atrás</span>
-            </div>
-            <div class="flex items-center justify-between py-2 border-b border-gray-700">
-              <div class="flex items-center">
-                <i class="fas fa-eye text-green-400 mr-3"></i>
-                <div>
-                  <p class="text-white">E-mail aberto</p>
-                  <p class="text-sm text-gray-400">Por: maria@exemplo.com</p>
-                </div>
-              </div>
-              <span class="text-sm text-gray-400">5 min atrás</span>
-            </div>
-            <div class="flex items-center justify-between py-2">
-              <div class="flex items-center">
-                <i class="fas fa-mouse-pointer text-purple-400 mr-3"></i>
-                <div>
-                  <p class="text-white">Link clicado</p>
-                  <p class="text-sm text-gray-400">Por: pedro@exemplo.com</p>
-                </div>
-              </div>
-              <span class="text-sm text-gray-400">10 min atrás</span>
-            </div>
+          <div id="recentEmailActivity" class="space-y-3">
+            <!-- Atividade será carregada dinamicamente -->
           </div>
         </div>
       </main>
@@ -193,7 +186,7 @@
 
     <script src="../js/config.js"></script>
     <script src="../js/auth.js"></script>
-    <script src="../js/engagements.js"></script>
+    <script src="../js/engajamento-email-marketing.js"></script>
     <script>
       // Toggle Finance Menu
       function toggleFinanceMenu() {
@@ -209,15 +202,6 @@
         localStorage.removeItem('clientData');
         localStorage.removeItem('clientId');
         window.location.href = 'login.html';
-      }
-
-      // Quick action functions
-      function configureWelcomeEmail() {
-        window.location.href = 'engajamento-email-template-editor.html?type=welcome';
-      }
-
-      function createEmailCampaign() {
-        window.location.href = 'engajamento-email-template-editor.html?type=campaign';
       }
     </script>
 </body>
