@@ -307,7 +307,7 @@ export class CampaignsService {
         const CLIENT_BASE_URL = process.env.CLIENT_BASE_URL || 'http://localhost:5501';
         
         // URLs corretas baseadas na função real:
-        const publicUrl = lp.status === 'published' ? `https://lp.virallead.com.br/api/lp-indicadores/slug/${lp.slug}` : null;
+        const publicUrl = lp.status === 'published' ? `${API_BASE_URL}/api/lp-indicadores/slug/${lp.slug}` : null;
         const editUrl = `${CLIENT_BASE_URL}/client/pages/lp-editor-grapes.html?id=${(lp as any)._id?.toString()}`;
         const previewUrl = `${CLIENT_BASE_URL}/client/pages/lp-preview.html?id=${(lp as any)._id?.toString()}`;
 
