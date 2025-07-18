@@ -171,6 +171,17 @@
         arrow.style.transform = 'rotate(90deg)';
       }
     }
+    // Toggle Engagement Menu
+    function toggleEngagementMenu() {
+      const menu = document.getElementById('engagementMenu');
+      const arrow = document.getElementById('engagementArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
   </script>
 </body>
 </html> 

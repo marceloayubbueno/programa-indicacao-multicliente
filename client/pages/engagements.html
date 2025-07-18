@@ -22,7 +22,17 @@
           <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
           <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
           <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
-          <li><a href="engagements.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-chart-bar mr-2"></i> Engajamentos</a></li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold cursor-pointer group" onclick="toggleEngagementMenu()">
+              <i class="fas fa-chart-bar mr-2"></i> Engajamentos
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementArrow" style="transform: rotate(90deg);"></i>
+            </div>
+            <ul id="engagementMenu" class="ml-8 mt-1 space-y-1">
+              <li><a href="engajamento-email-welcome.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail Boas-vindas</a></li>
+              <li><a href="engajamento-email-campaigns.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> E-mail de Campanha</a></li>
+              <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
+            </ul>
+          </li>
           <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de Leads</a></li>
           <!-- Início do novo menu Financeiro -->
           <li>
@@ -44,150 +54,63 @@
       <main class="flex-1 p-8">
         <!-- Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-white mb-2">
-            <i class="fas fa-envelope mr-3 text-blue-400"></i>
-            E-mail Marketing
-          </h1>
-          <p class="text-gray-400">Gerencie campanhas de e-mail e automatize o engajamento com seus indicadores</p>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-blue-500/20">
-                <i class="fas fa-paper-plane text-blue-400 text-xl"></i>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-400">E-mails Enviados</p>
-                <p id="totalEmails" class="text-2xl font-bold text-white">0</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-green-500/20">
-                <i class="fas fa-eye text-green-400 text-xl"></i>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-400">Taxa de Abertura</p>
-                <p id="openRate" class="text-2xl font-bold text-white">0%</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-purple-500/20">
-                <i class="fas fa-mouse-pointer text-purple-400 text-xl"></i>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-400">Taxa de Clique</p>
-                <p id="clickRate" class="text-2xl font-bold text-white">0%</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-orange-500/20">
-                <i class="fas fa-users text-orange-400 text-xl"></i>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-400">Indicadores Ativos</p>
-                <p id="activeIndicators" class="text-2xl font-bold text-white">0</p>
-              </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-3xl font-bold text-white mb-2">
+                <i class="fas fa-chart-bar mr-3 text-blue-400"></i>
+                Engajamentos
+              </h1>
+              <p class="text-gray-400">Gerencie campanhas de e-mail e automatize o engajamento com seus indicadores</p>
             </div>
           </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <!-- E-mail de Boas-vindas -->
-          <div class="bg-gray-800 rounded-lg p-6">
-            <h3 class="text-xl font-bold text-white mb-4">
-              <i class="fas fa-handshake mr-2 text-green-400"></i>
-              E-mail de Boas-vindas
-            </h3>
-            <p class="text-gray-400 mb-4">Configure o e-mail automático enviado aos novos indicadores</p>
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-300">Status:</span>
-                <span id="welcomeEmailStatus" class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-400">Ativo</span>
+        <!-- Navigation Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- E-mail Boas-vindas -->
+          <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-700 transition-colors cursor-pointer" onclick="window.location.href='engajamento-email-welcome.html'">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mr-4">
+                <i class="fas fa-envelope text-green-400 text-xl"></i>
               </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-300">Enviados hoje:</span>
-                <span id="welcomeEmailsToday" class="text-sm text-white">0</span>
+              <div>
+                <h3 class="text-lg font-semibold text-white">E-mail Boas-vindas</h3>
+                <p class="text-gray-400 text-sm">Configure e-mails automáticos</p>
               </div>
             </div>
-            <button onclick="configureWelcomeEmail()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors">
-              <i class="fas fa-edit mr-2"></i>Configurar Template
-            </button>
+            <p class="text-gray-300 text-sm">Crie e gerencie templates de e-mail de boas-vindas enviados automaticamente aos novos indicadores.</p>
           </div>
 
-          <!-- Campanhas de E-mail -->
-          <div class="bg-gray-800 rounded-lg p-6">
-            <h3 class="text-xl font-bold text-white mb-4">
-              <i class="fas fa-bullhorn mr-2 text-purple-400"></i>
-              Campanhas de E-mail
-            </h3>
-            <p class="text-gray-400 mb-4">Crie campanhas personalizadas para engajar seus indicadores</p>
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-300">Campanhas ativas:</span>
-                <span id="activeCampaigns" class="text-sm text-white">0</span>
+          <!-- E-mail de Campanha -->
+          <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-700 transition-colors cursor-pointer" onclick="window.location.href='engajamento-email-campaigns.html'">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mr-4">
+                <i class="fas fa-bullhorn text-purple-400 text-xl"></i>
               </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-300">Última campanha:</span>
-                <span id="lastCampaign" class="text-sm text-gray-400">Nunca</span>
+              <div>
+                <h3 class="text-lg font-semibold text-white">E-mail de Campanha</h3>
+                <p class="text-gray-400 text-sm">Campanhas personalizadas</p>
               </div>
             </div>
-            <button onclick="createEmailCampaign()" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors">
-              <i class="fas fa-plus mr-2"></i>Nova Campanha
-            </button>
+            <p class="text-gray-300 text-sm">Crie campanhas de e-mail personalizadas para engajar seus indicadores de forma estratégica.</p>
+          </div>
+
+          <!-- Fluxos de E-mail -->
+          <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-700 transition-colors cursor-pointer" onclick="window.location.href='engajamento-email-flows.html'">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mr-4">
+                <i class="fas fa-project-diagram text-orange-400 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-white">Fluxos de E-mail</h3>
+                <p class="text-gray-400 text-sm">Automação inteligente</p>
+              </div>
+            </div>
+            <p class="text-gray-300 text-sm">Configure fluxos automatizados de e-mail com triggers e sequências personalizadas.</p>
           </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="bg-gray-800 rounded-lg p-6">
-          <h3 class="text-xl font-bold text-white mb-4">
-            <i class="fas fa-history mr-2 text-blue-400"></i>
-            Atividade Recente
-          </h3>
-          <div id="recentActivity" class="space-y-3">
-            <div class="flex items-center justify-between py-2 border-b border-gray-700">
-              <div class="flex items-center">
-                <i class="fas fa-paper-plane text-blue-400 mr-3"></i>
-                <div>
-                  <p class="text-white">E-mail de boas-vindas enviado</p>
-                  <p class="text-sm text-gray-400">Para: joao@exemplo.com</p>
-                </div>
-              </div>
-              <span class="text-sm text-gray-400">2 min atrás</span>
-            </div>
-            <div class="flex items-center justify-between py-2 border-b border-gray-700">
-              <div class="flex items-center">
-                <i class="fas fa-eye text-green-400 mr-3"></i>
-                <div>
-                  <p class="text-white">E-mail aberto</p>
-                  <p class="text-sm text-gray-400">Por: maria@exemplo.com</p>
-                </div>
-              </div>
-              <span class="text-sm text-gray-400">5 min atrás</span>
-            </div>
-            <div class="flex items-center justify-between py-2">
-              <div class="flex items-center">
-                <i class="fas fa-mouse-pointer text-purple-400 mr-3"></i>
-                <div>
-                  <p class="text-white">Link clicado</p>
-                  <p class="text-sm text-gray-400">Por: pedro@exemplo.com</p>
-                </div>
-              </div>
-              <span class="text-sm text-gray-400">10 min atrás</span>
-            </div>
-          </div>
-        </div>
+
       </main>
     </div>
 
@@ -203,6 +126,14 @@
         arrow.style.transform = menu.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(90deg)';
       }
 
+      // Toggle Engagement Menu
+      function toggleEngagementMenu() {
+        const menu = document.getElementById('engagementMenu');
+        const arrow = document.getElementById('engagementArrow');
+        menu.classList.toggle('hidden');
+        arrow.style.transform = menu.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(90deg)';
+      }
+
       // Logout function
       function logout() {
         localStorage.removeItem('clientToken');
@@ -211,14 +142,7 @@
         window.location.href = 'login.html';
       }
 
-      // Quick action functions
-      function configureWelcomeEmail() {
-        window.location.href = 'engajamento-email-template-editor.html?type=welcome';
-      }
 
-      function createEmailCampaign() {
-        window.location.href = 'engajamento-email-template-editor.html?type=campaign';
-      }
     </script>
 </body>
 </html> 

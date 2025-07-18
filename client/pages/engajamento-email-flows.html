@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LPs de Divulgação - Área do Cliente</title>
+    <title>Fluxos de E-mail - Engajamentos</title>
     <link rel="stylesheet" href="../css/tailwind.output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="../js/config.js"></script>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
     <div class="flex min-h-screen">
@@ -21,17 +20,17 @@
           <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
           <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
           <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
-          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
           <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
           <li>
-            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementMenu()">
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold cursor-pointer group" onclick="toggleEngagementMenu()">
               <i class="fas fa-chart-bar mr-2"></i> Engajamentos
-              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementArrow" style="transform: rotate(0deg);"></i>
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementArrow" style="transform: rotate(90deg);"></i>
             </div>
-            <ul id="engagementMenu" class="ml-8 mt-1 space-y-1 hidden">
+            <ul id="engagementMenu" class="ml-8 mt-1 space-y-1">
               <li><a href="engajamento-email-welcome.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail Boas-vindas</a></li>
               <li><a href="engajamento-email-campaigns.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> E-mail de Campanha</a></li>
-              <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
+              <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
             </ul>
           </li>
           <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de Leads</a></li>
@@ -55,10 +54,10 @@
       <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
         <div class="flex-1 flex flex-col">
           <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
-            <h1 class="text-3xl font-bold text-blue-400">Minhas LPs de Divulgação</h1>
+            <h1 class="text-3xl font-bold text-blue-400">Fluxos de E-mail</h1>
             <div class="flex items-center gap-4">
-              <button class="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors" onclick="window.location.href='lp-editor-grapes-divulgacao.html'">
-                <i class="fas fa-plus"></i> Nova LP de Divulgação
+              <button class="px-5 py-2 rounded-lg bg-orange-600 text-white font-semibold shadow hover:bg-orange-700 transition-colors" onclick="createEmailFlow()">
+                <i class="fas fa-plus"></i> Novo Fluxo
               </button>
             </div>
           </header>
@@ -67,64 +66,55 @@
               <table class="min-w-full divide-y divide-gray-700">
                 <thead class="bg-gray-800">
                   <tr>
-                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Nome da LP</th>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Nome do Fluxo</th>
                     <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Data de Criação</th>
                     <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">E-mails no Fluxo</th>
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Participantes Ativos</th>
                     <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Ações</th>
                   </tr>
                 </thead>
-                <tbody id="formsListBodyDivulgacao" class="bg-gray-900 divide-y divide-gray-800">
-                  <!-- Linhas de formulários serão inseridas via JS -->
+                <tbody id="emailFlowsListBody" class="bg-gray-900 divide-y divide-gray-800">
+                  <!-- Linhas de fluxos serão inseridas via JS -->
                 </tbody>
               </table>
-            </div>
-            <!-- Modal/Área para exibir código de incorporação -->
-            <div id="embedCodeModalDivulgacao" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
-              <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-lg relative">
-                <div class="flex items-center justify-between mb-4">
-                  <h2 class="text-xl font-bold text-gray-100">Código para Incorporação</h2>
-                  <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closeEmbedCodeModalDivulgacao()">&times;</button>
-                </div>
-                <div class="mb-4">
-                  <textarea id="embedCodeViewDivulgacao" readonly class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2"></textarea>
-                </div>
-                <div class="flex items-center justify-end gap-2">
-                  <button class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 shadow hover:bg-gray-600 transition-colors" onclick="copyEmbedCodeViewDivulgacao()">
-                    <i class="fas fa-copy"></i> Copiar Código
-                  </button>
-                </div>
-              </div>
             </div>
           </main>
         </div>
       </div>
     </div>
-    <script src="../js/lp-referral-form-public.js"></script>
+    <script src="../js/config.js"></script>
     <script src="../js/auth.js"></script>
-    <script>checkAuth();
-    // Script para expandir/colapsar o menu Financeiro
-    function toggleFinanceMenu() {
-      const menu = document.getElementById('financeMenu');
-      const arrow = document.getElementById('financeArrow');
-      menu.classList.toggle('hidden');
-      if (menu.classList.contains('hidden')) {
-        arrow.style.transform = 'rotate(0deg)';
-      } else {
-        arrow.style.transform = 'rotate(90deg)';
+    <script src="../js/engajamento-email-flows.js"></script>
+    <script>
+      // Toggle Finance Menu
+      function toggleFinanceMenu() {
+        const menu = document.getElementById('financeMenu');
+        const arrow = document.getElementById('financeArrow');
+        menu.classList.toggle('hidden');
+        arrow.style.transform = menu.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(90deg)';
       }
-    }
-    // Toggle Engagement Menu
-    function toggleEngagementMenu() {
-      const menu = document.getElementById('engagementMenu');
-      const arrow = document.getElementById('engagementArrow');
-      menu.classList.toggle('hidden');
-      if (menu.classList.contains('hidden')) {
-        arrow.style.transform = 'rotate(0deg)';
-      } else {
-        arrow.style.transform = 'rotate(90deg)';
+
+      // Toggle Engagement Menu
+      function toggleEngagementMenu() {
+        const menu = document.getElementById('engagementMenu');
+        const arrow = document.getElementById('engagementArrow');
+        menu.classList.toggle('hidden');
+        arrow.style.transform = menu.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(90deg)';
       }
-    }
+
+      // Logout function
+      function logout() {
+        localStorage.removeItem('clientToken');
+        localStorage.removeItem('clientData');
+        localStorage.removeItem('clientId');
+        window.location.href = 'login.html';
+      }
+
+      // Create email flow
+      function createEmailFlow() {
+        window.location.href = 'engajamento-email-flow-editor.html';
+      }
     </script>
-    <script src="../js/lp-divulgacao.js"></script>
 </body>
 </html> 

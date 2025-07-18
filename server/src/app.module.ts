@@ -19,6 +19,7 @@ import { LPDivulgacaoModule } from './lp-divulgacao/lp-divulgacao.module';
 import { PublicReferralsModule } from './public-referrals/public-referrals.module';
 import { IndicatorAuthModule } from './indicator-auth/indicator-auth.module';
 import { FinanceModule } from './finance/finance.module';
+import { EmailTemplatesModule } from './email-templates/email-templates.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { FinanceModule } from './finance/finance.module';
     PublicReferralsModule,
     IndicatorAuthModule,
     FinanceModule,
+    EmailTemplatesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
