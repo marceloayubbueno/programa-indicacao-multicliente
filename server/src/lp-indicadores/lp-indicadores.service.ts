@@ -273,7 +273,7 @@ export class LPIndicadoresService {
       {
         status: 'published',
         publishedAt: new Date(),
-        publishedUrl: `/lp/indicadores/${lp.slug}`
+        publishedUrl: `https://lp.virallead.com.br/api/lp-indicadores/slug/${lp.slug}`
       },
       { new: true }
     ).exec();
