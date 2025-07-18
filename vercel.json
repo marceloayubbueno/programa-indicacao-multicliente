@@ -12,7 +12,18 @@
       "status": 307,
       "headers": {
         "X-Forwarded-Host": "app.virallead.com.br",
-        "X-Forwarded-Proto": "https"
+        "X-Forwarded-Proto": "https",
+        "Cache-Control": "no-cache, no-store, must-revalidate"
+      }
+    },
+    {
+      "src": "/indicacao",
+      "dest": "https://programa-indicacao-multicliente-production.up.railway.app/indicacao",
+      "status": 307,
+      "headers": {
+        "X-Forwarded-Host": "app.virallead.com.br",
+        "X-Forwarded-Proto": "https",
+        "Cache-Control": "no-cache, no-store, must-revalidate"
       }
     },
     {
