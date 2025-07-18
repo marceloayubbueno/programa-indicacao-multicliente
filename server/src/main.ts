@@ -76,15 +76,7 @@ async function bootstrap() {
     }
   });
 
-  // 🌐 SERVIR FRONTEND NA RAIZ - SOLUÇÃO PRAGMÁTICA
-  app.useStaticAssets(clientPath, {
-    prefix: '/',
-    setHeaders: (res, path) => {
-      console.log(`[STATIC-ROOT] Servindo arquivo: ${path}`);
-    }
-  });
-  
-  // 🔧 CORREÇÃO: Configurar prefixo global, mas excluir rotas públicas de indicação
+    // 🔧 CORREÇÃO: Configurar prefixo global, mas excluir rotas públicas de indicação
   app.setGlobalPrefix('api', {
     exclude: [
       { path: 'indicacao', method: RequestMethod.GET },
@@ -101,22 +93,6 @@ async function bootstrap() {
 
   // Filtro global para logar qualquer erro
   app.useGlobalFilters(new GlobalExceptionLogger());
-
-  // 🌐 MIDDLEWARE SPA FALLBACK - SOLUÇÃO PRAGMÁTICA
-  app.use('*', (req, res, next) => {
-    // Se não for uma rota da API e não for um arquivo estático, servir index.html
-    if (!req.url.startsWith('/api/') && 
-        !req.url.startsWith('/client/') && 
-        !req.url.startsWith('/indicacao/') &&
-        !req.url.includes('.') && // Não é um arquivo
-        req.method === 'GET') {
-      
-      console.log(`[SPA-FALLBACK] Servindo index.html para: ${req.url}`);
-      const indexPath = join(__dirname, '..', '..', 'client', 'index.html');
-      return res.sendFile(indexPath);
-    }
-    next();
-  });
 
   // 🔧 CORS CONFIGURAÇÃO TEMPORÁRIA - PERMISSIVA PARA RESOLVER PROBLEMA
   app.enableCors({
