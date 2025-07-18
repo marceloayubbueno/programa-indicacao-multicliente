@@ -9,7 +9,7 @@
     {
       "src": "/indicacao/(.*)",
       "dest": "https://programa-indicacao-multicliente-production.up.railway.app/indicacao/$1",
-      "status": 307,
+      "status": 200,
       "headers": {
         "X-Forwarded-Host": "app.virallead.com.br",
         "X-Forwarded-Proto": "https",
@@ -19,7 +19,7 @@
     {
       "src": "/indicacao",
       "dest": "https://programa-indicacao-multicliente-production.up.railway.app/indicacao",
-      "status": 307,
+      "status": 200,
       "headers": {
         "X-Forwarded-Host": "app.virallead.com.br",
         "X-Forwarded-Proto": "https",
@@ -29,7 +29,7 @@
     {
       "src": "/api/(.*)",
       "dest": "https://programa-indicacao-multicliente-production.up.railway.app/api/$1",
-      "status": 307,
+      "status": 200,
       "headers": {
         "X-Forwarded-Host": "app.virallead.com.br",
         "X-Forwarded-Proto": "https"
