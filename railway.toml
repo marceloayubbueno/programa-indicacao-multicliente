@@ -13,6 +13,7 @@ NODE_ENV = "production"
 PORT = "3000"
 CLIENT_URL = "https://app.virallead.com.br"
 RAILWAY_PUBLIC_DOMAIN = "programa-indicacao-multicliente-production.up.railway.app"
+DOMAIN = "app.virallead.com.br"
 
 # Configurações de proxy para rotas públicas
 [environments.production.healthcheck]
