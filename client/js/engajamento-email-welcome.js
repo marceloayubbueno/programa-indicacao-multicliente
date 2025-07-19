@@ -34,10 +34,10 @@ function renderWelcomeEmailsList() {
     return;
   }
   
-  const API_URL = getApiUrl();
-  console.log(`🔗 [WELCOME] Fazendo requisição para: ${API_URL}/email-templates?clientId=${clientId}&type=welcome`);
-  
   // Carregar dados reais da API
+  loadWelcomeEmails();
+}
+
 async function loadWelcomeEmails() {
   try {
     const token = localStorage.getItem('clientToken');
@@ -66,37 +66,6 @@ async function loadWelcomeEmails() {
     console.error('❌ [WELCOME] Erro ao carregar e-mails:', error);
     showNotification('Erro ao carregar e-mails de boas-vindas', 'error');
   }
-}
-
-// Carregar dados
-loadWelcomeEmails();
-  
-  // Código real da API (comentado para MVP)
-  /*
-  fetch(`${API_URL}/email-templates?clientId=${clientId}&type=welcome`, {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  })
-    .then(response => {
-      console.log(`📡 [WELCOME] Status da resposta: ${response.status}`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('📊 [WELCOME] Dados recebidos:', data);
-      welcomeEmailsList = data.data || data || [];
-      console.log(`✅ [WELCOME] ${welcomeEmailsList.length} e-mails carregados`);
-      renderWelcomeEmailsTable();
-    })
-    .catch(error => {
-      console.error('❌ [WELCOME] Erro ao carregar e-mails:', error);
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Erro ao carregar</h3><p>Erro: ' + error.message + '</p></td></tr>';
-      showNotification('Erro ao carregar E-mails de Boas-vindas: ' + error.message, 'error');
-    });
-  */
 }
 
 function renderWelcomeEmailsTable() {

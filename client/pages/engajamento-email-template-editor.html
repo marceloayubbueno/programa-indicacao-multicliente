@@ -270,6 +270,39 @@
     </div>
   </div>
 
+  <!-- Modal para configurar template -->
+  <div id="templateConfigModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 w-96 max-w-md">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+        <i class="fas fa-cog mr-2 text-blue-500"></i>
+        Configurar Template
+      </h3>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Template</label>
+          <input type="text" id="templateName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                 placeholder="Ex: E-mail de Boas-vindas Padrão">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+          <textarea id="templateDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    placeholder="Descreva o propósito deste template"></textarea>
+        </div>
+      </div>
+      
+      <div class="flex justify-end gap-3 mt-6">
+        <button onclick="closeTemplateConfigModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+          Cancelar
+        </button>
+        <button onclick="confirmSaveTemplate()" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+          Salvar Template
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/grapesjs"></script>
   <script>
     console.log('[Email Editor] Iniciando configuração do editor...');
@@ -587,19 +620,123 @@
     };
 
     window.saveTemplate = function() {
+      // Abrir modal para configurar template
+      openTemplateConfigModal();
+    };
+
+    window.openTemplateConfigModal = function() {
+      const modal = document.getElementById('templateConfigModal');
+      const nameInput = document.getElementById('templateName');
+      const descriptionInput = document.getElementById('templateDescription');
+      
+      // Preencher com valores padrão se estiver editando
+      const urlParams = new URLSearchParams(window.location.search);
+      const templateId = urlParams.get('id');
+      
+      if (templateId) {
+        // Se for edição, carregar dados existentes (implementar quando tiver backend)
+        nameInput.value = 'Template de E-mail';
+        descriptionInput.value = 'Template personalizado';
+      } else {
+        // Se for criação, usar valores padrão
+        nameInput.value = `Template de ${templateType === 'welcome' ? 'Boas-vindas' : 'Campanha'}`;
+        descriptionInput.value = `Template de e-mail ${templateType === 'welcome' ? 'de boas-vindas' : 'de campanha'}`;
+      }
+      
+      modal.classList.remove('hidden');
+      nameInput.focus();
+    };
+
+    window.closeTemplateConfigModal = function() {
+      const modal = document.getElementById('templateConfigModal');
+      modal.classList.add('hidden');
+    };
+
+    window.confirmSaveTemplate = async function() {
+      const nameInput = document.getElementById('templateName');
+      const descriptionInput = document.getElementById('templateDescription');
+      
+      const name = nameInput.value.trim();
+      const description = descriptionInput.value.trim();
+      
+      if (!name) {
+        alert('Por favor, informe o nome do template.');
+        nameInput.focus();
+        return;
+      }
+      
       const html = window.editor.getHtml();
       const css = window.editor.getCss();
       
-      // Salvar no localStorage por enquanto
-      localStorage.setItem(`emailTemplate_${templateType}`, JSON.stringify({
-        html,
-        css,
-        type: templateType,
-        listId,
-        updatedAt: new Date().toISOString()
-      }));
-      
-      alert('Template salvo com sucesso!');
+      try {
+        // Obter dados do cliente
+        const token = localStorage.getItem('clientToken');
+        const clientId = localStorage.getItem('clientId');
+        
+        if (!token || !clientId) {
+          alert('Erro: Token ou ID do cliente não encontrado. Faça login novamente.');
+          return;
+        }
+
+        // Preparar dados do template
+        const templateData = {
+          name: name,
+          description: description,
+          htmlContent: html,
+          cssContent: css,
+          type: templateType,
+          clientId: clientId,
+          status: 'draft',
+          variables: ['nome', 'email', 'linkIndicacao', 'campanha', 'empresa'],
+          metadata: {
+            editor: 'grapesjs',
+            version: '1.0'
+          }
+        };
+
+        // Determinar se é criação ou edição
+        const urlParams = new URLSearchParams(window.location.search);
+        const templateId = urlParams.get('id');
+        
+        const API_URL = window.API_URL || (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api');
+        const endpoint = templateId 
+          ? `${API_URL}/email-templates/${templateId}`
+          : `${API_URL}/email-templates`;
+        
+        const method = templateId ? 'PUT' : 'POST';
+
+        console.log(`[Email Editor] Salvando template: ${method} ${endpoint}`);
+        
+        const response = await fetch(endpoint, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(templateData)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('[Email Editor] Template salvo com sucesso:', result);
+        
+        // Fechar modal
+        closeTemplateConfigModal();
+        
+        // Mostrar notificação de sucesso
+        alert('Template salvo com sucesso!');
+        
+        // Redirecionar de volta para a listagem
+        window.location.href = `engajamento-email-welcome.html`;
+        
+      } catch (error) {
+        console.error('[Email Editor] Erro ao salvar template:', error);
+        alert(`Erro ao salvar template: ${error.message}`);
+      }
     };
 
     window.testEmail = function() {
