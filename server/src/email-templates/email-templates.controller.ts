@@ -38,6 +38,10 @@ export class EmailTemplatesController {
   async findAll(@Request() req, @Query('type') type?: string) {
     const clientId = req.user?.clientId || req.user?.sub;
     
+    console.log('🔍 [EMAIL-TEMPLATES] Debug - req.user:', req.user);
+    console.log('🔍 [EMAIL-TEMPLATES] Debug - clientId extraído:', clientId);
+    console.log('🔍 [EMAIL-TEMPLATES] Debug - type:', type);
+    
     return this.emailTemplatesService.findAll(clientId, type);
   }
 

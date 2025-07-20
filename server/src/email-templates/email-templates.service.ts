@@ -27,6 +27,9 @@ export class EmailTemplatesService {
   async findAll(clientId?: string, type?: string): Promise<{ templates: EmailTemplate[]; total: number }> {
     const filter: any = {};
     
+    console.log('🔍 [EMAIL-TEMPLATES-SERVICE] Debug - clientId recebido:', clientId);
+    console.log('🔍 [EMAIL-TEMPLATES-SERVICE] Debug - type recebido:', type);
+    
     if (clientId) {
       filter.clientId = new Types.ObjectId(clientId);
     }
@@ -35,6 +38,8 @@ export class EmailTemplatesService {
       filter.type = type;
     }
 
+    console.log('🔍 [EMAIL-TEMPLATES-SERVICE] Debug - filtro aplicado:', JSON.stringify(filter));
+
     const templates = await this.emailTemplateModel
       .find(filter)
       .populate('clientId', 'companyName accessEmail')
@@ -42,6 +47,9 @@ export class EmailTemplatesService {
       .exec();
 
     const total = await this.emailTemplateModel.countDocuments(filter);
+
+    console.log('🔍 [EMAIL-TEMPLATES-SERVICE] Debug - templates encontrados:', templates.length);
+    console.log('🔍 [EMAIL-TEMPLATES-SERVICE] Debug - total:', total);
 
     return { templates, total };
   }
