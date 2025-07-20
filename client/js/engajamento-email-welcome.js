@@ -41,12 +41,21 @@ function renderWelcomeEmailsList() {
 async function loadWelcomeEmails() {
   try {
     const token = localStorage.getItem('clientToken');
+    const clientId = localStorage.getItem('clientId');
+    
+    console.log('🔍 [WELCOME] Debug - Token:', token ? 'Presente' : 'Ausente');
+    console.log('🔍 [WELCOME] Debug - ClientId:', clientId);
+    console.log('🔍 [WELCOME] Debug - API URL:', getApiUrl());
+    
     if (!token) {
       console.error('❌ [WELCOME] Token não encontrado');
       return;
     }
 
-    const response = await fetch(`${getApiUrl()}/email-templates?type=welcome`, {
+    const url = `${getApiUrl()}/email-templates?type=welcome`;
+    console.log('🔍 [WELCOME] Fazendo requisição para:', url);
+
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -54,17 +63,26 @@ async function loadWelcomeEmails() {
       }
     });
 
+    console.log('🔍 [WELCOME] Status da resposta:', response.status);
+    console.log('🔍 [WELCOME] Headers da resposta:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ [WELCOME] Erro na resposta:', errorText);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    welcomeEmailsList = data.templates || [];
+    console.log('🔍 [WELCOME] Dados recebidos:', data);
+    
+    welcomeEmailsList = data.templates || data || [];
     console.log(`✅ [WELCOME] ${welcomeEmailsList.length} e-mails carregados da API`);
+    console.log('🔍 [WELCOME] Lista de e-mails:', welcomeEmailsList);
+    
     renderWelcomeEmailsTable();
   } catch (error) {
     console.error('❌ [WELCOME] Erro ao carregar e-mails:', error);
-    showNotification('Erro ao carregar e-mails de boas-vindas', 'error');
+    showNotification('Erro ao carregar e-mails de boas-vindas: ' + error.message, 'error');
   }
 }
 
@@ -157,6 +175,16 @@ function renderWelcomeEmailsTable() {
 }
 
 // Funções de ação
+function refreshWelcomeEmails() {
+  console.log('🔄 [WELCOME] Atualizando lista de e-mails...');
+  loadWelcomeEmails();
+}
+
+function createWelcomeEmail() {
+  console.log('➕ [WELCOME] Criando novo e-mail de boas-vindas...');
+  window.location.href = 'engajamento-email-template-editor.html?type=welcome';
+}
+
 async function toggleWelcomeEmailStatus(emailId, currentStatus) {
   console.log(`🔄 [WELCOME] Alternando status do e-mail ${emailId} de ${currentStatus}`);
   const newStatus = currentStatus === 'active' ? 'draft' : 'active';
