@@ -11,8 +11,9 @@ export class CreateEmailTemplateDto {
   @IsString()
   htmlContent: string;
 
+  @IsOptional()
   @IsString()
-  clientId: string;
+  clientId?: string;
 
   @IsEnum(['welcome', 'campaign', 'flow', 'notification'])
   type: string;
