@@ -100,6 +100,15 @@ export class Participant extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'Participant', required: false })
   originalParticipantId?: Types.ObjectId;
+
+  @Prop({ required: false, select: false })
+  password?: string;
+
+  @Prop({ required: false })
+  plainPassword?: string;
+
+  @Prop({ required: false })
+  pixKey?: string;
 }
 
 export const ParticipantSchema = SchemaFactory.createForClass(Participant);

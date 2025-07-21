@@ -1,0 +1,236 @@
+<!--
+// [DEBUG TEMPORÁRIO] Exibindo dashboard sem autenticação e sem loading para validação visual
+// Remover este bloco após testes!
+-->
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Área do Indicador</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="../js/config.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+            <div class="flex items-center mb-8">
+                <span class="text-2xl font-bold text-green-400">
+                    <i class="fas fa-user-friends mr-2"></i>Indicador
+                </span>
+            </div>
+            <ul class="space-y-2 flex-1">
+                <li><a href="#" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-700 text-green-400 font-semibold"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+                <li><a href="#" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-gift mr-2"></i> Minhas Recompensas</a></li>
+                <li><a href="#" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-user mr-2"></i> Meu Perfil</a></li>
+                <li><a href="#" onclick="handleLogout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+            </ul>
+        </nav>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+            <div class="flex-1 flex flex-col">
+                <!-- Header -->
+                <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm border-b border-gray-700">
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-3xl font-bold text-green-400">Dashboard do Indicador</h1>
+                        <p class="text-gray-400">Acompanhe suas indicações, recompensas e dados pessoais</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-sm text-gray-400">Bem-vindo(a),</p>
+                            <p class="font-semibold text-gray-100" id="indicatorName">Indicador</p>
+                        </div>
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                    </div>
+                </header>
+                <!-- Main Content -->
+                <main class="flex-1 p-8">
+                    <!-- Cards de Estatísticas -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-400 text-sm font-medium">Indicações Feitas</p>
+                                    <p class="text-3xl font-bold text-gray-100" id="totalIndicacoes">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-user-plus text-green-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-400 text-sm font-medium">Aprovadas</p>
+                                    <p class="text-3xl font-bold text-gray-100" id="indicacoesAprovadas">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-blue-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-400 text-sm font-medium">Taxa de Conversão</p>
+                                    <p class="text-3xl font-bold text-gray-100"><span id="conversionRate">0</span>%</p>
+                                </div>
+                                <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-percentage text-yellow-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Novo Card: Comissões Recebidas -->
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-400 text-sm font-medium">Comissões Recebidas</p>
+                                    <p class="text-3xl font-bold text-green-400" id="totalComissoes">R$ 0,00</p>
+                                    <p class="text-gray-500 text-xs mt-1">Total já pago</p>
+                                </div>
+                                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-money-bill-wave text-green-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Cards Pix e Links de Indicação -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <!-- Pix Key Section -->
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-100 flex items-center">
+                                    <i class="fas fa-key text-yellow-400 mr-2"></i>
+                                    Chave Pix para Recebimento
+                                </h3>
+                            </div>
+                            <div class="flex items-center bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+                                <input 
+                                    type="text" 
+                                    id="pixKey" 
+                                    placeholder="Cadastre sua chave Pix"
+                                    class="flex-1 px-4 py-3 bg-transparent text-gray-100 focus:outline-none"
+                                >
+                                <button 
+                                    id="savePixBtn" 
+                                    class="px-6 py-3 bg-yellow-500 text-gray-900 hover:bg-yellow-600 transition-colors font-medium"
+                                >
+                                    <i class="fas fa-save mr-2"></i>Salvar
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Sua chave Pix será usada para pagamentos de recompensas.
+                            </p>
+                        </div>
+                        <!-- Lista de Links de Indicação por Campanha -->
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-100 flex items-center">
+                                    <i class="fas fa-link text-green-400 mr-2"></i>
+                                    Seus Links de Indicação
+                                </h3>
+                            </div>
+                            <div class="space-y-4">
+                                <!-- Exemplo de linha de campanha (replicar via JS futuramente) -->
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 bg-gray-900 border border-gray-700 rounded-lg p-3">
+                                    <span class="font-medium text-gray-200 flex-1">Campanha Black Friday</span>
+                                    <span class="text-green-400 font-semibold flex-shrink-0">R$ 50,00</span>
+                                    <input type="text" readonly value="https://exemplo.com/indique/blackfriday" class="flex-1 px-2 py-1 bg-transparent text-gray-100 focus:outline-none" />
+                                    <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                                        <i class="fas fa-copy mr-1"></i>Copiar
+                                    </button>
+                                </div>
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 bg-gray-900 border border-gray-700 rounded-lg p-3">
+                                    <span class="font-medium text-gray-200 flex-1">Campanha Verão Premiado</span>
+                                    <span class="text-green-400 font-semibold flex-shrink-0">R$ 30,00</span>
+                                    <input type="text" readonly value="https://exemplo.com/indique/verao" class="flex-1 px-2 py-1 bg-transparent text-gray-100 focus:outline-none" />
+                                    <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                                        <i class="fas fa-copy mr-1"></i>Copiar
+                                    </button>
+                                </div>
+                                <!-- Fim dos exemplos -->
+                            </div>
+                            <p class="text-sm text-gray-400 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Compartilhe o link correto para cada campanha e veja quanto pode ganhar!
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Compartilhamento e Atividades Recentes -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Share Options -->
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                            <h4 class="text-lg font-semibold text-gray-100 mb-4 text-center">
+                                Compartilhe nas Redes Sociais
+                            </h4>
+                            <div class="flex justify-center space-x-4">
+                                <button 
+                                    id="shareWhatsApp"
+                                    class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                >
+                                    <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                                </button>
+                                <button 
+                                    id="shareFacebook"
+                                    class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    <i class="fab fa-facebook mr-2"></i>Facebook
+                                </button>
+                                <button 
+                                    id="shareLinkedIn"
+                                    class="flex items-center px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors"
+                                >
+                                    <i class="fab fa-linkedin mr-2"></i>LinkedIn
+                                </button>
+                                <button 
+                                    id="shareTwitter"
+                                    class="flex items-center px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors"
+                                >
+                                    <i class="fab fa-twitter mr-2"></i>Twitter
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Atividades Recentes (placeholder) -->
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                            <h3 class="text-lg font-semibold text-gray-100 mb-4">Minhas Últimas Indicações</h3>
+                            <div class="space-y-4" id="recentActivities">
+                                <div class="flex items-center gap-4 p-4 bg-gray-700/50 rounded-lg">
+                                    <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user-plus text-green-400 text-sm"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-gray-100 font-medium">Indicação enviada</p>
+                                        <p class="text-gray-400 text-sm">Você indicou João Silva</p>
+                                    </div>
+                                    <div class="text-gray-400 text-sm">
+                                        Há 2 horas
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4 p-4 bg-gray-700/50 rounded-lg">
+                                    <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check-circle text-blue-400 text-sm"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-gray-100 font-medium">Indicação aprovada</p>
+                                        <p class="text-gray-400 text-sm">Indicação de Maria foi aprovada</p>
+                                    </div>
+                                    <div class="text-gray-400 text-sm">
+                                        Há 4 horas
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+    <script src="js/dashboard.js"></script>
+</body>
+</html> 

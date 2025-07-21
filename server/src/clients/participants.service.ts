@@ -7,6 +7,7 @@ import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { ImportParticipantsDto } from './dto/import-participants.dto';
 import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class ParticipantsService {
@@ -17,17 +18,26 @@ export class ParticipantsService {
 
   async create(dto: CreateParticipantDto) {
     console.log('🔧 BACKEND create participant chamado:', dto);
+    let passwordHash: string | undefined = undefined;
+    let plainPassword: string | undefined = undefined;
+    if (dto.tipo === 'indicador') {
+      if (dto.password) {
+        plainPassword = dto.password;
+        passwordHash = await bcrypt.hash(dto.password, 10);
+      } else {
+        // Gera senha aleatória se não informada
+        plainPassword = Math.random().toString(36).slice(-8) + Math.floor(Math.random()*1000);
+        passwordHash = await bcrypt.hash(plainPassword, 10);
+      }
+    }
     const participant = new this.participantModel({
       ...dto,
+      password: passwordHash,
+      plainPassword,
       participantId: (dto as any).participantId || uuidv4()
     });
-    
     const savedParticipant = await participant.save();
-    console.log('✅ BACKEND Participante criado:', savedParticipant._id);
-    
-    // 🚀 CORREÇÃO DEFINITIVA: Auto-associar participante a lista padrão
     await this.autoAssociateToDefaultList(savedParticipant);
-    
     return savedParticipant;
   }
 
@@ -92,6 +102,9 @@ export class ParticipantsService {
   }
 
   async update(id: string, dto: UpdateParticipantDto) {
+    if (dto.password) {
+      dto.password = await bcrypt.hash(dto.password, 10);
+    }
     return this.participantModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
@@ -235,8 +248,17 @@ export class ParticipantsService {
       })
       .skip((page - 1) * limit)
       .limit(limit)
+      .lean()
       .exec();
-    
+
+    // Adicionar plainPassword apenas para indicadores e se existir
+    const participantsWithPassword = participants.map(p => {
+      if (p.tipo === 'indicador' && p.plainPassword) {
+        return { ...p, plainPassword: p.plainPassword };
+      }
+      return { ...p, plainPassword: undefined };
+    });
+
     // 🔍 H2 - DIAGNÓSTICO MONGODB QUERY RESULT
     console.log('🔍 H2 - RESULTADO QUERY MONGODB:', {
       queryUsada: query,
@@ -369,7 +391,7 @@ export class ParticipantsService {
       clientId: p.clientId
     })));
     
-    return { participants, page, totalPages: Math.ceil(total / limit) };
+    return { participants: participantsWithPassword, page, totalPages: Math.ceil(total / limit) };
   }
 
   async findById(id: string) {

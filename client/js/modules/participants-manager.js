@@ -232,7 +232,17 @@ class ParticipantsManager {
         
         // 🔗 Link de indicação
         const linkDisplay = this.formatLinkForDisplay(participant);
-        
+
+        // 🔑 Coluna Senha
+        let senhaCol = '<td class="px-4 py-3 text-center">-</td>';
+        if (participant.tipo === 'indicador' && participant.plainPassword) {
+            senhaCol = `<td class="px-4 py-3 text-center">
+                <button class="px-3 py-1 bg-gray-700 text-gray-100 rounded hover:bg-green-600 transition-colors flex items-center gap-1" onclick="navigator.clipboard.writeText('${participant.plainPassword}').then(()=>window.showNotification('Senha copiada!','success'))">
+                    <i class='fas fa-copy'></i> Copiar
+                </button>
+            </td>`;
+        }
+
         tr.innerHTML = `
             <td class="px-4 py-3">
                 <input type="checkbox" value="${participant.id}" 
@@ -273,6 +283,7 @@ class ParticipantsManager {
                     ${participant.typeInfo.label}
                 </span>
             </td>
+            ${senhaCol}
             <td class="px-4 py-3">
                 ${linkDisplay}
             </td>

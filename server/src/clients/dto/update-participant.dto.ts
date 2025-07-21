@@ -41,4 +41,12 @@ export class UpdateParticipantDto {
   @IsString()
   @IsOptional()
   tipo?: 'participante' | 'indicador' | 'influenciador';
+
+  @IsString()
+  @IsOptional()
+  password?: string;
+
+  @IsString()
+  @IsOptional()
+  pixKey?: string;
 } 

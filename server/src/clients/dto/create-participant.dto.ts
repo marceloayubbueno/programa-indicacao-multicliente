@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEmail, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsOptional, IsArray, ValidateIf } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateParticipantDto {
@@ -41,6 +41,15 @@ export class CreateParticipantDto {
   @IsArray()
   @IsOptional()
   assignedRewards?: Types.ObjectId[];
+
+  @ValidateIf(o => o.tipo === 'indicador')
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsString()
+  @IsOptional()
+  pixKey?: string;
 
   @IsString()
   @IsNotEmpty()

@@ -1,0 +1,1191 @@
+
+> programa-indicacao-server@1.0.0 start
+> node dist/src/main.js
+
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +82ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mUsersModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mFormsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mIndicatorsModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseCoreModule dependencies initialized[39m[38;5;3m +38ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +35ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mRewardsModule dependencies initialized[39m[38;5;3m +6ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReferralsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPlanosModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mLandingPagesModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mFinanceModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuthModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPublicReferralsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mLPDivulgacaoModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAdminsModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mLPIndicadoresModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mEmailTemplatesModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mClientsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mIndicatorAuthModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mCampaignsModule dependencies initialized[39m[38;5;3m +1ms[39m
+✅ Super Admin já existe no sistema.
+[BOOT] 🔧 Servindo arquivos estáticos de: D:\DEV PROJETOS\Programa de indicação 03\server\client
+[BOOT] 🔧 Servindo arquivos estáticos PUBLIC de: D:\DEV PROJETOS\Programa de indicação 03\server\dist\public
+[33m[Nest] 38700  - [39m21/07/2025, 18:29:37 [33m   WARN[39m [38;5;3m[LegacyRouteConverter] [39m[33mUnsupported route path: "indicacao/*". In previous versions, the symbols ?, *, and + were used to denote optional or repeating path parameters. The latest version of "path-to-regexp" now requires the use of named parameters. For example, instead of using a route like /users/* to capture all routes starting with "/users", you should use /users/*path. For more details, refer to the migration guide. Attempting to auto-convert...[39m
+[33m[Nest] 38700  - [39m21/07/2025, 18:29:37 [33m   WARN[39m [38;5;3m[LegacyRouteConverter] [39m[33mUnsupported route path: "indicacao/*/preview". In previous versions, the symbols ?, *, and + were used to denote optional or repeating path parameters. The latest version of "path-to-regexp" now requires the use of named parameters. For example, instead of using a route like /users/* to capture all routes starting with "/users", you should use /users/*path. For more details, refer to the migration guide. Attempting to auto-convert...[39m
+[BOOT] 🌐 CORS configurado para: PERMITIR TODAS AS ORIGENS (TEMPORÁRIO)
+[BOOT] 🛣️ CONFIGURAÇÃO DE ROTAS:
+[BOOT] 🛣️ - Prefixo global: /api
+[BOOT] 🛣️ - Rotas excluídas: /indicacao/*, /indicacao/*/preview
+[BOOT] 🛣️ - Rotas públicas acessíveis diretamente
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/api}:[39m[38;5;3m +8ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api, GET} route[39m[38;5;3m +6ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/health, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAuthController {/api/auth}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/admin-login, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/bootstrap-admin, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/client-login, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/admins, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/recreate-super-admin, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mClientsController {/api/clients}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/debug/all, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/me, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/:id, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/login, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/trial, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/me/complete-profile, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/me/webhook-make, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/clients/:id/activate, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mParticipantsController {/api/participants}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/external, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/:id, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/import, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/:id/add-to-list/:listId, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/:id/remove-from-list/:listId, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/indicators-with-links, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/validate-referral/:code, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/by-referral-code/:code, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/../indicators, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/debug, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/fix-orphans, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/:id/generate-referral-code, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participants/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mParticipantListsController {/api/participant-lists}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participant-lists, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participant-lists/:id, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participant-lists, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participant-lists/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participant-lists/:id/add-participant/:participantId, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participant-lists/:id/remove-participant/:participantId, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participant-lists/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participant-lists/:id/participants/count, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/participant-lists/:id/participants, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminsController {/api/admins}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admins, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admins, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admins/:id, PUT} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admins/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mCampaignsController {/api/campaigns}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/:id/lp-indicadores, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/repair-lp-links, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mDebugController {/api/campaigns/debug}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/debug/overview, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/debug/campaign/:id/detailed, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/debug/campaign/:id/repair, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/debug/test, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/debug/list/:listId/participants, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/debug/test-list-population, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/campaigns/debug/auto-repair-after-submission, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mRewardsController {/api/rewards}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/rewards, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/rewards, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/rewards/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/rewards/:id, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/rewards/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mLPIndicadoresController {/api/lp-indicadores}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/templates, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/slug/:slug, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id/publish, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id/unpublish, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id/duplicate, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id/statistics, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/submit-form, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/success/:participantId, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/from-template/:templateId, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id/grapes-data, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id/save-grapes, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-indicadores/:id/preview, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mLPDivulgacaoController {/api/lp-divulgacao}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/templates, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/slug/:slug, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/publish, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/unpublish, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/duplicate, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/statistics, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/submit-referral, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/from-template/:templateId, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/grapes-data, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/save-grapes, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/preview, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/product-config, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/integration-config, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/track-redirect, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/toggle-status, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/redirect-config, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp-divulgacao/:id/redirect-config, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mReferralsController {/api/referrals}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals/payments, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals/:id/mark-conversion, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals/indicator/:indicatorId/rewards, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals/pending-rewards, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals/:id/status, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals/:id/approve-reward, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals/:id/reject-reward, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/referrals/:id/process-payment, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPlanosController {/api/planos}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/planos, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/planos/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/planos, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/planos/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/planos/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mLandingPagesController {/api/api/landing-pages}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/api/landing-pages, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/api/landing-pages, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/api/landing-pages/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/api/landing-pages/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/api/landing-pages/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPublicLandingPageController {/api/lp}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/lp/:slug, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPublicReferralsController {/api/indicacao}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/indicacao/debug-proxy-test, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/indicacao/test-route, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/indicacao/:codigo/preview, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/indicacao/:codigo, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mIndicatorAuthController {/api/indicator-auth}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/indicator-auth/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/indicator-auth/me, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/indicator-auth/dashboard, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/indicator-auth/referrals, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/indicator-auth/rewards, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mFinanceController {/api/admin/api/carteira}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/api/carteira/saldo, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/api/carteira/extrato, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/api/carteira/gerar-cobranca, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/api/carteira/webhook, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/admin/api/carteira/clientes, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mEmailTemplatesController {/api/email-templates}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/:id, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/:id/status, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/:id/send-test, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/config, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/config/me, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/config/me, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/config/test, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/types/available, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/email-templates/stats/overview, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 38700  - [39m21/07/2025, 18:29:37 [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +28ms[39m
+
+[BOOT] 🚀 Backend rodando na porta 3000
+[BOOT] 🌐 API disponível em: /api/
+[BOOT] 🔗 Environment: development
+[BOOT] 🌐 CLIENT_URL: http://localhost:5501
+[BOOT] 🛣️ ROTAS PÚBLICAS: /indicacao/* (excluídas do prefixo /api)
+
+[95m[Nest] 38700  - [39m21/07/2025, 18:32:03 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:32:03.846Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:32:03.849Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:32:04 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:32:04.219Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:32:04.220Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:32:14 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 DEBUG BACKEND CONTROLLER - ClientId: 68598fb3cd427ebfc5362464
+🔍 DEBUG BACKEND CONTROLLER - Page: 1 Limit: 25
+🔍 DEBUG BACKEND CONTROLLER - Query params: [Object: null prototype] {
+  clientId: '68598fb3cd427ebfc5362464',
+  page: '1',
+  limit: '25'
+}
+🔍 H2 - FILTROS RECEBIDOS BACKEND: {
+  allQueryParams: [Object: null prototype] {
+    clientId: '68598fb3cd427ebfc5362464',
+    page: '1',
+    limit: '25'
+  },
+  hasListId: false,
+  listIdValue: 'VAZIO',
+  listIdType: 'undefined',
+  otherFilters: []
+}
+🔍 DEBUG BACKEND CONTROLLER - Filter after cleanup: {}
+🔍 H2 - FILTRO APÓS LIMPEZA: {
+  filterAfterCleanup: {},
+  hasListIdAfterCleanup: false,
+  listIdAfterCleanup: 'VAZIO'
+}
+🔍 H2 - SEM FILTRO DE LISTA: {
+  originalFilter: {},
+  hasListId: false,
+  listIdValue: 'UNDEFINED',
+  finalQuery: { clientId: '68598fb3cd427ebfc5362464' }
+}
+🔍 DEBUG BACKEND SERVICE - ClientId: 68598fb3cd427ebfc5362464
+🔍 DEBUG BACKEND SERVICE - Original filter: {}
+🔍 DEBUG BACKEND SERVICE - Query MongoDB CORRIGIDA: { clientId: '68598fb3cd427ebfc5362464' }
+🔍 DEBUG BACKEND SERVICE - Page: 1 Limit: 25
+🔍 H1 - ClientId usado na consulta: 68598fb3cd427ebfc5362464
+🔍 H1 - Participantes sem clientId: 0
+🔍 H3 - Participantes origin=campaign para este cliente: 0
+🔍 H3 - Participantes com campaignId para este cliente: 11
+🔍 H6 - Investigando possível remoção de participantes duplicados...
+🔍 H6 - Participantes órfãos (sem listas): 0
+🔍 H6 - Participantes de campanha SEM listas: 0
+🔍 DEBUG BACKEND SERVICE - Total documents found: 21
+🔍 DEBUG BACKEND SERVICE - ALL participants in DB: 21
+🔍 DEBUG BACKEND SERVICE - ALL participants sample: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee073"),
+    name: 'Carla Mendes Rocha',
+    email: 'carla.rocha@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee074"),
+    name: 'Diego Fernandes Lima',
+    email: 'diego.lima@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee075"),
+    name: 'Eduardo Ramos Souza',
+    email: 'eduardo.souza@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  }
+]
+🔍 DEBUG BACKEND SERVICE - Participants WITHOUT clientId: 0
+🔍 H2 - RESULTADO QUERY MONGODB: {
+  queryUsada: { clientId: '68598fb3cd427ebfc5362464' },
+  participantsEncontrados: 21,
+  totalDocuments: 21,
+  temFiltroLista: false,
+  filtroListaValue: undefined,
+  participantsComListas: 21,
+  participantsSemListas: 0
+}
+🔍 H3 - SAMPLE PARTICIPANTES COM LISTAS: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee073"),
+    name: 'Carla Mendes Rocha',
+    email: 'carla.rocha@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  }
+]
+🔍 H2 - Listas existentes para este cliente: 5
+🔍 H6 - Listas vazias (total): 0
+🔍 H6 - Listas de campanha (total): 2
+🔍 H6 - Listas de campanha VAZIAS: 0
+🔍 H2 - Lista 1: {
+  id: new ObjectId("685c3156c70fbda6c29ee104"),
+  name: 'Lista teste 01',
+  tipo: 'participante',
+  participants: 10,
+  campaignId: undefined
+}
+🔍 H2 - Lista 2: {
+  id: new ObjectId("685c31edc70fbda6c29ee144"),
+  name: 'Indicadores - teste lista de participantes',
+  tipo: 'indicador',
+  participants: 14,
+  campaignId: '685c31edc70fbda6c29ee13b'
+}
+🔍 H2 - Lista 3: {
+  id: new ObjectId("685c3343c70fbda6c29ee1ca"),
+  name: 'Indicadores - teste de indicadores',
+  tipo: 'indicador',
+  participants: 5,
+  campaignId: '685c3343c70fbda6c29ee1c3'
+}
+🔍 DEBUG BACKEND SERVICE - Participants returned: 21
+🔍 DEBUG BACKEND SERVICE - Sample participants: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    originSource: 'manual',
+    tipo: 'indicador',
+    clientId: '68598fb3cd427ebfc5362464'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    originSource: 'manual',
+    tipo: 'indicador',
+    clientId: '68598fb3cd427ebfc5362464'
+  }
+]
+🔍 DEBUG BACKEND CONTROLLER - Result summary: {
+  participantsCount: 21,
+  page: 1,
+  totalPages: 1,
+  hasParticipants: true
+}
+[95m[Nest] 38700  - [39m21/07/2025, 18:32:18 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:32:18.157Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:32:18.157Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:32:23 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 DEBUG BACKEND CONTROLLER - ClientId: 68598fb3cd427ebfc5362464
+🔍 DEBUG BACKEND CONTROLLER - Page: 1 Limit: 25
+🔍 DEBUG BACKEND CONTROLLER - Query params: [Object: null prototype] {
+  clientId: '68598fb3cd427ebfc5362464',
+  page: '1',
+  limit: '25'
+}
+🔍 H2 - FILTROS RECEBIDOS BACKEND: {
+  allQueryParams: [Object: null prototype] {
+    clientId: '68598fb3cd427ebfc5362464',
+    page: '1',
+    limit: '25'
+  },
+  hasListId: false,
+  listIdValue: 'VAZIO',
+  listIdType: 'undefined',
+  otherFilters: []
+}
+🔍 DEBUG BACKEND CONTROLLER - Filter after cleanup: {}
+🔍 H2 - FILTRO APÓS LIMPEZA: {
+  filterAfterCleanup: {},
+  hasListIdAfterCleanup: false,
+  listIdAfterCleanup: 'VAZIO'
+}
+🔍 H2 - SEM FILTRO DE LISTA: {
+  originalFilter: {},
+  hasListId: false,
+  listIdValue: 'UNDEFINED',
+  finalQuery: { clientId: '68598fb3cd427ebfc5362464' }
+}
+🔍 DEBUG BACKEND SERVICE - ClientId: 68598fb3cd427ebfc5362464
+🔍 DEBUG BACKEND SERVICE - Original filter: {}
+🔍 DEBUG BACKEND SERVICE - Query MongoDB CORRIGIDA: { clientId: '68598fb3cd427ebfc5362464' }
+🔍 DEBUG BACKEND SERVICE - Page: 1 Limit: 25
+🔍 H1 - ClientId usado na consulta: 68598fb3cd427ebfc5362464
+🔍 H1 - Participantes sem clientId: 0
+🔍 H3 - Participantes origin=campaign para este cliente: 0
+🔍 H3 - Participantes com campaignId para este cliente: 11
+🔍 H6 - Investigando possível remoção de participantes duplicados...
+🔍 H6 - Participantes órfãos (sem listas): 0
+🔍 H6 - Participantes de campanha SEM listas: 0
+🔍 DEBUG BACKEND SERVICE - Total documents found: 21
+🔍 DEBUG BACKEND SERVICE - ALL participants in DB: 21
+🔍 DEBUG BACKEND SERVICE - ALL participants sample: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee073"),
+    name: 'Carla Mendes Rocha',
+    email: 'carla.rocha@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee074"),
+    name: 'Diego Fernandes Lima',
+    email: 'diego.lima@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee075"),
+    name: 'Eduardo Ramos Souza',
+    email: 'eduardo.souza@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  }
+]
+🔍 DEBUG BACKEND SERVICE - Participants WITHOUT clientId: 0
+🔍 H2 - RESULTADO QUERY MONGODB: {
+  queryUsada: { clientId: '68598fb3cd427ebfc5362464' },
+  participantsEncontrados: 21,
+  totalDocuments: 21,
+  temFiltroLista: false,
+  filtroListaValue: undefined,
+  participantsComListas: 21,
+  participantsSemListas: 0
+}
+🔍 H3 - SAMPLE PARTICIPANTES COM LISTAS: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee073"),
+    name: 'Carla Mendes Rocha',
+    email: 'carla.rocha@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  }
+]
+🔍 H2 - Listas existentes para este cliente: 5
+🔍 H6 - Listas vazias (total): 0
+🔍 H6 - Listas de campanha (total): 2
+🔍 H6 - Listas de campanha VAZIAS: 0
+🔍 H2 - Lista 1: {
+  id: new ObjectId("685c3156c70fbda6c29ee104"),
+  name: 'Lista teste 01',
+  tipo: 'participante',
+  participants: 10,
+  campaignId: undefined
+}
+🔍 H2 - Lista 2: {
+  id: new ObjectId("685c31edc70fbda6c29ee144"),
+  name: 'Indicadores - teste lista de participantes',
+  tipo: 'indicador',
+  participants: 14,
+  campaignId: '685c31edc70fbda6c29ee13b'
+}
+🔍 H2 - Lista 3: {
+  id: new ObjectId("685c3343c70fbda6c29ee1ca"),
+  name: 'Indicadores - teste de indicadores',
+  tipo: 'indicador',
+  participants: 5,
+  campaignId: '685c3343c70fbda6c29ee1c3'
+}
+🔍 DEBUG BACKEND SERVICE - Participants returned: 21
+🔍 DEBUG BACKEND SERVICE - Sample participants: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    originSource: 'manual',
+    tipo: 'indicador',
+    clientId: '68598fb3cd427ebfc5362464'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    originSource: 'manual',
+    tipo: 'indicador',
+    clientId: '68598fb3cd427ebfc5362464'
+  }
+]
+🔍 DEBUG BACKEND CONTROLLER - Result summary: {
+  participantsCount: 21,
+  page: 1,
+  totalPages: 1,
+  hasParticipants: true
+}
+[95m[Nest] 38700  - [39m21/07/2025, 18:32:48 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:32:48.525Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:32:48.525Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:32:50 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:32:50.564Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:32:50.564Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:32:51 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 DEBUG BACKEND CONTROLLER - ClientId: 68598fb3cd427ebfc5362464
+🔍 DEBUG BACKEND CONTROLLER - Page: 1 Limit: 25
+🔍 DEBUG BACKEND CONTROLLER - Query params: [Object: null prototype] {
+  clientId: '68598fb3cd427ebfc5362464',
+  page: '1',
+  limit: '25'
+}
+🔍 H2 - FILTROS RECEBIDOS BACKEND: {
+  allQueryParams: [Object: null prototype] {
+    clientId: '68598fb3cd427ebfc5362464',
+    page: '1',
+    limit: '25'
+  },
+  hasListId: false,
+  listIdValue: 'VAZIO',
+  listIdType: 'undefined',
+  otherFilters: []
+}
+🔍 DEBUG BACKEND CONTROLLER - Filter after cleanup: {}
+🔍 H2 - FILTRO APÓS LIMPEZA: {
+  filterAfterCleanup: {},
+  hasListIdAfterCleanup: false,
+  listIdAfterCleanup: 'VAZIO'
+}
+🔍 H2 - SEM FILTRO DE LISTA: {
+  originalFilter: {},
+  hasListId: false,
+  listIdValue: 'UNDEFINED',
+  finalQuery: { clientId: '68598fb3cd427ebfc5362464' }
+}
+🔍 DEBUG BACKEND SERVICE - ClientId: 68598fb3cd427ebfc5362464
+🔍 DEBUG BACKEND SERVICE - Original filter: {}
+🔍 DEBUG BACKEND SERVICE - Query MongoDB CORRIGIDA: { clientId: '68598fb3cd427ebfc5362464' }
+🔍 DEBUG BACKEND SERVICE - Page: 1 Limit: 25
+🔍 H1 - ClientId usado na consulta: 68598fb3cd427ebfc5362464
+🔍 H1 - Participantes sem clientId: 0
+🔍 H3 - Participantes origin=campaign para este cliente: 0
+🔍 H3 - Participantes com campaignId para este cliente: 11
+🔍 H6 - Investigando possível remoção de participantes duplicados...
+🔍 H6 - Participantes órfãos (sem listas): 0
+🔍 H6 - Participantes de campanha SEM listas: 0
+🔍 DEBUG BACKEND SERVICE - Total documents found: 21
+🔍 DEBUG BACKEND SERVICE - ALL participants in DB: 21
+🔍 DEBUG BACKEND SERVICE - ALL participants sample: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee073"),
+    name: 'Carla Mendes Rocha',
+    email: 'carla.rocha@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee074"),
+    name: 'Diego Fernandes Lima',
+    email: 'diego.lima@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee075"),
+    name: 'Eduardo Ramos Souza',
+    email: 'eduardo.souza@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  }
+]
+🔍 DEBUG BACKEND SERVICE - Participants WITHOUT clientId: 0
+🔍 H2 - RESULTADO QUERY MONGODB: {
+  queryUsada: { clientId: '68598fb3cd427ebfc5362464' },
+  participantsEncontrados: 21,
+  totalDocuments: 21,
+  temFiltroLista: false,
+  filtroListaValue: undefined,
+  participantsComListas: 21,
+  participantsSemListas: 0
+}
+🔍 H3 - SAMPLE PARTICIPANTES COM LISTAS: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee073"),
+    name: 'Carla Mendes Rocha',
+    email: 'carla.rocha@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  }
+]
+🔍 H2 - Listas existentes para este cliente: 5
+🔍 H6 - Listas vazias (total): 0
+🔍 H6 - Listas de campanha (total): 2
+🔍 H6 - Listas de campanha VAZIAS: 0
+🔍 H2 - Lista 1: {
+  id: new ObjectId("685c3156c70fbda6c29ee104"),
+  name: 'Lista teste 01',
+  tipo: 'participante',
+  participants: 10,
+  campaignId: undefined
+}
+🔍 H2 - Lista 2: {
+  id: new ObjectId("685c31edc70fbda6c29ee144"),
+  name: 'Indicadores - teste lista de participantes',
+  tipo: 'indicador',
+  participants: 14,
+  campaignId: '685c31edc70fbda6c29ee13b'
+}
+🔍 H2 - Lista 3: {
+  id: new ObjectId("685c3343c70fbda6c29ee1ca"),
+  name: 'Indicadores - teste de indicadores',
+  tipo: 'indicador',
+  participants: 5,
+  campaignId: '685c3343c70fbda6c29ee1c3'
+}
+🔍 DEBUG BACKEND SERVICE - Participants returned: 21
+🔍 DEBUG BACKEND SERVICE - Sample participants: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    originSource: 'manual',
+    tipo: 'indicador',
+    clientId: '68598fb3cd427ebfc5362464'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    originSource: 'manual',
+    tipo: 'indicador',
+    clientId: '68598fb3cd427ebfc5362464'
+  }
+]
+🔍 DEBUG BACKEND CONTROLLER - Result summary: {
+  participantsCount: 21,
+  page: 1,
+  totalPages: 1,
+  hasParticipants: true
+}
+[95m[Nest] 38700  - [39m21/07/2025, 18:36:39 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:36:39.825Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:36:39.825Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:36:40 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:36:40.209Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:36:40.209Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:36:44 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 DEBUG BACKEND CONTROLLER - ClientId: 68598fb3cd427ebfc5362464
+🔍 DEBUG BACKEND CONTROLLER - Page: 1 Limit: 25
+🔍 DEBUG BACKEND CONTROLLER - Query params: [Object: null prototype] {
+  clientId: '68598fb3cd427ebfc5362464',
+  page: '1',
+  limit: '25'
+}
+🔍 H2 - FILTROS RECEBIDOS BACKEND: {
+  allQueryParams: [Object: null prototype] {
+    clientId: '68598fb3cd427ebfc5362464',
+    page: '1',
+    limit: '25'
+  },
+  hasListId: false,
+  listIdValue: 'VAZIO',
+  listIdType: 'undefined',
+  otherFilters: []
+}
+🔍 DEBUG BACKEND CONTROLLER - Filter after cleanup: {}
+🔍 H2 - FILTRO APÓS LIMPEZA: {
+  filterAfterCleanup: {},
+  hasListIdAfterCleanup: false,
+  listIdAfterCleanup: 'VAZIO'
+}
+🔍 H2 - SEM FILTRO DE LISTA: {
+  originalFilter: {},
+  hasListId: false,
+  listIdValue: 'UNDEFINED',
+  finalQuery: { clientId: '68598fb3cd427ebfc5362464' }
+}
+🔍 DEBUG BACKEND SERVICE - ClientId: 68598fb3cd427ebfc5362464
+🔍 DEBUG BACKEND SERVICE - Original filter: {}
+🔍 DEBUG BACKEND SERVICE - Query MongoDB CORRIGIDA: { clientId: '68598fb3cd427ebfc5362464' }
+🔍 DEBUG BACKEND SERVICE - Page: 1 Limit: 25
+🔍 H1 - ClientId usado na consulta: 68598fb3cd427ebfc5362464
+🔍 H1 - Participantes sem clientId: 0
+🔍 H3 - Participantes origin=campaign para este cliente: 0
+🔍 H3 - Participantes com campaignId para este cliente: 11
+🔍 H6 - Investigando possível remoção de participantes duplicados...
+🔍 H6 - Participantes órfãos (sem listas): 0
+🔍 H6 - Participantes de campanha SEM listas: 0
+🔍 DEBUG BACKEND SERVICE - Total documents found: 21
+🔍 DEBUG BACKEND SERVICE - ALL participants in DB: 21
+🔍 DEBUG BACKEND SERVICE - ALL participants sample: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee073"),
+    name: 'Carla Mendes Rocha',
+    email: 'carla.rocha@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee074"),
+    name: 'Diego Fernandes Lima',
+    email: 'diego.lima@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee075"),
+    name: 'Eduardo Ramos Souza',
+    email: 'eduardo.souza@emailteste.com',
+    clientId: '68598fb3cd427ebfc5362464',
+    originSource: 'manual',
+    tipo: 'indicador'
+  }
+]
+🔍 DEBUG BACKEND SERVICE - Participants WITHOUT clientId: 0
+🔍 H2 - RESULTADO QUERY MONGODB: {
+  queryUsada: { clientId: '68598fb3cd427ebfc5362464' },
+  participantsEncontrados: 21,
+  totalDocuments: 21,
+  temFiltroLista: false,
+  filtroListaValue: undefined,
+  participantsComListas: 21,
+  participantsSemListas: 0
+}
+🔍 H3 - SAMPLE PARTICIPANTES COM LISTAS: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee073"),
+    name: 'Carla Mendes Rocha',
+    email: 'carla.rocha@emailteste.com',
+    lists: [ [Object], [Object] ],
+    listsCount: 2,
+    listsField: [ [Object], [Object] ]
+  }
+]
+🔍 H2 - Listas existentes para este cliente: 5
+🔍 H6 - Listas vazias (total): 0
+🔍 H6 - Listas de campanha (total): 2
+🔍 H6 - Listas de campanha VAZIAS: 0
+🔍 H2 - Lista 1: {
+  id: new ObjectId("685c3156c70fbda6c29ee104"),
+  name: 'Lista teste 01',
+  tipo: 'participante',
+  participants: 10,
+  campaignId: undefined
+}
+🔍 H2 - Lista 2: {
+  id: new ObjectId("685c31edc70fbda6c29ee144"),
+  name: 'Indicadores - teste lista de participantes',
+  tipo: 'indicador',
+  participants: 14,
+  campaignId: '685c31edc70fbda6c29ee13b'
+}
+🔍 H2 - Lista 3: {
+  id: new ObjectId("685c3343c70fbda6c29ee1ca"),
+  name: 'Indicadores - teste de indicadores',
+  tipo: 'indicador',
+  participants: 5,
+  campaignId: '685c3343c70fbda6c29ee1c3'
+}
+🔍 DEBUG BACKEND SERVICE - Participants returned: 21
+🔍 DEBUG BACKEND SERVICE - Sample participants: [
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee071"),
+    name: 'Ana Paula Silva',
+    email: 'ana.silva@emailteste.com',
+    originSource: 'manual',
+    tipo: 'indicador',
+    clientId: '68598fb3cd427ebfc5362464'
+  },
+  {
+    id: new ObjectId("685c2b82c70fbda6c29ee072"),
+    name: 'Bruno Henrique Oliveira',
+    email: 'bruno.oliveira@emailteste.com',
+    originSource: 'manual',
+    tipo: 'indicador',
+    clientId: '68598fb3cd427ebfc5362464'
+  }
+]
+🔍 DEBUG BACKEND CONTROLLER - Result summary: {
+  participantsCount: 21,
+  page: 1,
+  totalPages: 1,
+  hasParticipants: true
+}
+[95m[Nest] 38700  - [39m21/07/2025, 18:41:15 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:41:15.841Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:41:15.841Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:45:51 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:45:51.852Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:45:51.853Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:50:27 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:50:27.897Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:50:27.897Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:50:44 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:50:44.599Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:50:44.599Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:50:45 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:50:45.431Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:50:45.431Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:52:02 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:52:02.627Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:52:02.627Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:52:03 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:52:03.269Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:52:03.269Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:52:03 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:52:03.599Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:52:03.599Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
