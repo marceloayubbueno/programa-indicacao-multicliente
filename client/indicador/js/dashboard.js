@@ -41,6 +41,24 @@ async function fetchProfile() {
   }
 }
 
+async function fetchDashboard() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch(API_BASE + '/dashboard', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (data.success && data.data) {
+      fillDashboardData(data.data);
+    } else {
+      showMessage('Erro ao carregar dashboard', 'error');
+    }
+  } catch (e) {
+    showMessage('Erro de conexão ao carregar dashboard', 'error');
+  }
+}
+
 function fillDashboard(profile) {
   document.getElementById('indicatorName').textContent = profile.name || 'Indicador';
   document.getElementById('pixKey').value = profile.pixKey || '';
@@ -50,7 +68,186 @@ function fillDashboard(profile) {
     const rate = profile.totalIndicacoes > 0 ? Math.round((profile.indicacoesAprovadas / profile.totalIndicacoes) * 100) : 0;
     document.getElementById('conversionRate').textContent = rate;
   }
-  // TODO: preencher outros campos se necessário
+}
+
+function fillDashboardData(dashboardData) {
+  // Preencher dados básicos do indicador
+  if (dashboardData.indicator) {
+    fillDashboard(dashboardData.indicator);
+  }
+  
+  // Preencher estatísticas
+  if (dashboardData.stats) {
+    const stats = dashboardData.stats;
+    if (stats.totalReferrals !== undefined) document.getElementById('totalIndicacoes').textContent = stats.totalReferrals;
+    if (stats.approvedReferrals !== undefined) document.getElementById('indicacoesAprovadas').textContent = stats.approvedReferrals;
+    if (stats.conversionRate !== undefined) document.getElementById('conversionRate').textContent = stats.conversionRate;
+    if (stats.paidRewards !== undefined) {
+      const totalComissoes = document.getElementById('totalComissoes');
+      if (totalComissoes) {
+        totalComissoes.textContent = `R$ ${stats.paidRewards.toFixed(2).replace('.', ',')}`;
+      }
+    }
+  }
+  
+  // 🚀 NOVO: Renderizar campanhas com recompensas
+  if (dashboardData.campaigns && dashboardData.campaigns.length > 0) {
+    renderCampaigns(dashboardData.campaigns);
+  } else {
+    renderNoCampaigns();
+  }
+  
+  // Preencher atividades recentes
+  if (dashboardData.recentReferrals && dashboardData.recentReferrals.length > 0) {
+    renderRecentActivities(dashboardData.recentReferrals);
+  }
+}
+
+function renderCampaigns(campaigns) {
+  const container = document.querySelector('.space-y-4');
+  if (!container) return;
+  
+  // Limpar conteúdo existente
+  container.innerHTML = '';
+  
+  campaigns.forEach(campaign => {
+    const campaignElement = createCampaignElement(campaign);
+    container.appendChild(campaignElement);
+  });
+}
+
+function createCampaignElement(campaign) {
+  const div = document.createElement('div');
+  div.className = 'flex flex-col md:flex-row md:items-center gap-2 bg-gray-900 border border-gray-700 rounded-lg p-3';
+  
+  // Nome da campanha
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'font-medium text-gray-200 flex-1';
+  nameSpan.textContent = campaign.name;
+  
+  // Recompensas
+  const rewardsSpan = document.createElement('span');
+  rewardsSpan.className = 'text-green-400 font-semibold flex-shrink-0 text-sm';
+  
+  let rewardsText = '';
+  if (campaign.referralReward && campaign.conversionReward) {
+    rewardsText = `R$ ${campaign.referralReward.value},00 + R$ ${campaign.conversionReward.value},00`;
+  } else if (campaign.referralReward) {
+    rewardsText = `R$ ${campaign.referralReward.value},00`;
+  } else if (campaign.conversionReward) {
+    rewardsText = `R$ ${campaign.conversionReward.value},00`;
+  } else {
+    rewardsText = 'Sem recompensa';
+  }
+  rewardsSpan.textContent = rewardsText;
+  
+  // Link de indicação
+  const linkInput = document.createElement('input');
+  linkInput.type = 'text';
+  linkInput.readOnly = true;
+  linkInput.value = window.location.origin + campaign.referralLink;
+  linkInput.className = 'flex-1 px-2 py-1 bg-transparent text-gray-100 focus:outline-none text-sm';
+  
+  // Botão copiar
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm';
+  copyBtn.innerHTML = '<i class="fas fa-copy mr-1"></i>Copiar';
+  copyBtn.onclick = () => copyToClipboard(linkInput.value);
+  
+  div.appendChild(nameSpan);
+  div.appendChild(rewardsSpan);
+  div.appendChild(linkInput);
+  div.appendChild(copyBtn);
+  
+  return div;
+}
+
+function renderNoCampaigns() {
+  const container = document.querySelector('.space-y-4');
+  if (!container) return;
+  
+  container.innerHTML = `
+    <div class="text-center py-8 text-gray-400">
+      <i class="fas fa-info-circle text-2xl mb-2"></i>
+      <p>Nenhuma campanha ativa encontrada.</p>
+      <p class="text-sm">Entre em contato com o administrador.</p>
+    </div>
+  `;
+}
+
+function renderRecentActivities(referrals) {
+  const container = document.getElementById('recentActivities');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  referrals.forEach(referral => {
+    const activityElement = createActivityElement(referral);
+    container.appendChild(activityElement);
+  });
+}
+
+function createActivityElement(referral) {
+  const div = document.createElement('div');
+  div.className = 'flex items-center gap-4 p-4 bg-gray-700/50 rounded-lg';
+  
+  const icon = document.createElement('div');
+  icon.className = referral.status === 'aprovada' 
+    ? 'w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center'
+    : 'w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center';
+  
+  const iconElement = document.createElement('i');
+  iconElement.className = referral.status === 'aprovada'
+    ? 'fas fa-check-circle text-blue-400 text-sm'
+    : 'fas fa-user-plus text-green-400 text-sm';
+  
+  icon.appendChild(iconElement);
+  
+  const content = document.createElement('div');
+  content.className = 'flex-1';
+  
+  const title = document.createElement('p');
+  title.className = 'text-gray-100 font-medium';
+  title.textContent = referral.status === 'aprovada' ? 'Indicação aprovada' : 'Indicação enviada';
+  
+  const description = document.createElement('p');
+  description.className = 'text-gray-400 text-sm';
+  description.textContent = `Você indicou ${referral.leadName}`;
+  
+  content.appendChild(title);
+  content.appendChild(description);
+  
+  const time = document.createElement('div');
+  time.className = 'text-gray-400 text-sm';
+  time.textContent = formatTimeAgo(referral.createdAt);
+  
+  div.appendChild(icon);
+  div.appendChild(content);
+  div.appendChild(time);
+  
+  return div;
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showMessage('Link copiado para a área de transferência!', 'success');
+  }).catch(() => {
+    showMessage('Erro ao copiar link', 'error');
+  });
+}
+
+function formatTimeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+  
+  if (diffInHours < 1) return 'Agora mesmo';
+  if (diffInHours === 1) return 'Há 1 hora';
+  if (diffInHours < 24) return `Há ${diffInHours} horas`;
+  
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays === 1) return 'Há 1 dia';
+  return `Há ${diffInDays} dias`;
 }
 
 async function savePixKey() {
@@ -81,7 +278,9 @@ async function savePixKey() {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-  fetchProfile();
+  // Buscar dados completos do dashboard
+  fetchDashboard();
+  
   const btn = document.getElementById('savePixBtn');
   if (btn) {
     btn.addEventListener('click', savePixKey);

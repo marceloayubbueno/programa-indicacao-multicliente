@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Participant } from '../clients/entities/participant.schema';
 import { Referral } from '../referrals/entities/referral.schema';
+import { Campaign } from '../campaigns/entities/campaign.schema';
 
 @Injectable()
 export class IndicatorAuthService {
@@ -13,6 +14,7 @@ export class IndicatorAuthService {
     private readonly jwtService: JwtService,
     @InjectModel(Participant.name) private readonly participantModel: Model<Participant>,
     @InjectModel(Referral.name) private readonly referralModel: Model<Referral>,
+    @InjectModel(Campaign.name) private readonly campaignModel: Model<Campaign>,
   ) {}
 
   /**
@@ -199,6 +201,74 @@ export class IndicatorAuthService {
         if (stat._id === 'paid') paidRewards = stat.totalValue || 0;
       });
 
+      // 🚀 NOVO: Buscar campanhas do indicador com recompensas
+      let campaigns: any[] = [];
+      if (indicator.campaignId) {
+        // Buscar campanha específica do indicador
+        const campaign = await this.campaignModel.findById(indicator.campaignId)
+          .populate('rewardOnReferral', 'type value description')
+          .populate('rewardOnConversion', 'type value description');
+        
+        if (campaign) {
+          campaigns.push({
+            id: campaign._id,
+            name: campaign.name,
+            status: campaign.status,
+            referralReward: campaign.rewardOnReferral ? {
+              type: (campaign.rewardOnReferral as any).type,
+              value: (campaign.rewardOnReferral as any).value,
+              description: (campaign.rewardOnReferral as any).description
+            } : null,
+            conversionReward: campaign.rewardOnConversion ? {
+              type: (campaign.rewardOnConversion as any).type,
+              value: (campaign.rewardOnConversion as any).value,
+              description: (campaign.rewardOnConversion as any).description
+            } : null,
+            referralLink: `/indicacao/${indicator.referralCode}`
+          });
+        }
+      }
+
+      // 🔍 Buscar campanhas adicionais através das listas do indicador
+      if (indicator.lists && indicator.lists.length > 0) {
+        const { InjectModel } = await import('@nestjs/mongoose');
+        const mongoose = await import('mongoose');
+        const ParticipantListModel = mongoose.model('ParticipantList');
+        
+        // Buscar listas de campanha do indicador
+        const campaignLists = await ParticipantListModel.find({
+          _id: { $in: indicator.lists },
+          campaignId: { $exists: true, $ne: null }
+        }).populate('campaignId');
+        
+        for (const list of campaignLists) {
+          if (list.campaignId && !campaigns.find((c: any) => c.id.toString() === (list.campaignId as any)._id.toString())) {
+            const campaign = await this.campaignModel.findById((list.campaignId as any)._id)
+              .populate('rewardOnReferral', 'type value description')
+              .populate('rewardOnConversion', 'type value description');
+            
+            if (campaign) {
+              campaigns.push({
+                id: campaign._id,
+                name: campaign.name,
+                status: campaign.status,
+                referralReward: campaign.rewardOnReferral ? {
+                  type: (campaign.rewardOnReferral as any).type,
+                  value: (campaign.rewardOnReferral as any).value,
+                  description: (campaign.rewardOnReferral as any).description
+                } : null,
+                conversionReward: campaign.rewardOnConversion ? {
+                  type: (campaign.rewardOnConversion as any).type,
+                  value: (campaign.rewardOnConversion as any).value,
+                  description: (campaign.rewardOnConversion as any).description
+                } : null,
+                referralLink: `/indicacao/${indicator.referralCode}`
+              });
+            }
+          }
+        }
+      }
+
       return {
         indicator,
         stats: {
@@ -217,6 +287,7 @@ export class IndicatorAuthService {
           rewardValue: ref.rewardValue || 0,
           createdAt: ref.createdAt
         })),
+        campaigns, // 🚀 NOVO: Campanhas com recompensas
         quickActions: [
           {
             title: 'Compartilhar Link',
