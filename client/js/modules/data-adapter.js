@@ -81,7 +81,8 @@ class DataAdapter {
             
             // Timestamps
             createdAt: participant.createdAt || participant.created_at,
-            updatedAt: participant.updatedAt || participant.updated_at
+            updatedAt: participant.updatedAt || participant.updated_at,
+            plainPassword: participant.plainPassword || '',
         };
 
         // 🔗 Gerar link de compartilhamento se necessário

@@ -44,7 +44,7 @@ export class UpdateParticipantDto {
 
   @IsString()
   @IsOptional()
-  password?: string;
+  plainPassword?: string;
 
   @IsString()
   @IsOptional()
