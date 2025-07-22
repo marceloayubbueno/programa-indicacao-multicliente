@@ -242,7 +242,7 @@ class ParticipantsManager {
                 </button>
             </td>`;
         }
-
+        
         tr.innerHTML = `
             <td class="px-4 py-3">
                 <input type="checkbox" value="${participant.id}" 

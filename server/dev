@@ -1189,3 +1189,111 @@
   timestamp: '2025-07-21T21:52:03.599Z'
 }
 ✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:55:03 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:55:03.942Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:55:03.943Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:56:31 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:56:31.685Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:56:31.685Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:56:32 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:56:32.823Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:56:32.823Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:57:49 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:57:49.115Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:57:49.116Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:57:56 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:57:56.294Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:57:56.294Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
+[95m[Nest] 38700  - [39m21/07/2025, 18:59:39 [95m  DEBUG[39m [38;5;3m[JwtClientAuthGuard] [39m[95mCliente autenticado: 68598fb3cd427ebfc5362464 - Email: marceloayub@virallead.com.br[39m
+🔍 [LISTS-FIND] ============ BUSCANDO LISTAS ============
+🔍 [LISTS-FIND] Cliente ID: 68598fb3cd427ebfc5362464
+🔍 [AUTO-FIX] Verificando participantes órfãos antes de buscar listas...
+🔍 H1 - DIAGNÓSTICO LISTA GERAL AUTOMÁTICA: {
+  clientId: '68598fb3cd427ebfc5362464',
+  foundOrphans: 0,
+  orphansDetails: [],
+  timestamp: '2025-07-21T21:59:39.899Z'
+}
+🔍 [NO-ORPHANS] Nenhum participante órfão encontrado
+🔍 H1 - SEM ÓRFÃOS DETECTADOS: {
+  clientId: '68598fb3cd427ebfc5362464',
+  orphansFound: 0,
+  autoFixSkipped: true,
+  timestamp: '2025-07-21T21:59:39.899Z'
+}
+✅ FIND-ALL-LISTS: Retornando 5 listas para cliente
