@@ -71,6 +71,8 @@ function fillDashboard(profile) {
 }
 
 function fillDashboardData(dashboardData) {
+  console.log('🔍 [FRONTEND] Preenchendo dados do dashboard:', dashboardData);
+  
   // Preencher dados básicos do indicador
   if (dashboardData.indicator) {
     fillDashboard(dashboardData.indicator);
@@ -79,6 +81,7 @@ function fillDashboardData(dashboardData) {
   // Preencher estatísticas
   if (dashboardData.stats) {
     const stats = dashboardData.stats;
+    console.log('🔍 [FRONTEND] Estatísticas:', stats);
     if (stats.totalReferrals !== undefined) document.getElementById('totalIndicacoes').textContent = stats.totalReferrals;
     if (stats.approvedReferrals !== undefined) document.getElementById('indicacoesAprovadas').textContent = stats.approvedReferrals;
     if (stats.conversionRate !== undefined) document.getElementById('conversionRate').textContent = stats.conversionRate;
@@ -91,9 +94,12 @@ function fillDashboardData(dashboardData) {
   }
   
   // 🚀 NOVO: Renderizar campanhas com recompensas
+  console.log('🔍 [FRONTEND] Campanhas recebidas:', dashboardData.campaigns);
   if (dashboardData.campaigns && dashboardData.campaigns.length > 0) {
+    console.log(`🔍 [FRONTEND] Renderizando ${dashboardData.campaigns.length} campanhas`);
     renderCampaigns(dashboardData.campaigns);
   } else {
+    console.log('🔍 [FRONTEND] Nenhuma campanha encontrada');
     renderNoCampaigns();
   }
   
@@ -104,13 +110,19 @@ function fillDashboardData(dashboardData) {
 }
 
 function renderCampaigns(campaigns) {
-  const container = document.querySelector('.space-y-4');
-  if (!container) return;
+  const container = document.getElementById('campaignsContainer');
+  if (!container) {
+    console.error('❌ Container de campanhas não encontrado');
+    return;
+  }
+  
+  console.log(`🔍 [FRONTEND] Renderizando ${campaigns.length} campanhas`);
   
   // Limpar conteúdo existente
   container.innerHTML = '';
   
   campaigns.forEach(campaign => {
+    console.log(`🔍 [FRONTEND] Criando elemento para campanha: ${campaign.name}`);
     const campaignElement = createCampaignElement(campaign);
     container.appendChild(campaignElement);
   });
@@ -163,8 +175,13 @@ function createCampaignElement(campaign) {
 }
 
 function renderNoCampaigns() {
-  const container = document.querySelector('.space-y-4');
-  if (!container) return;
+  const container = document.getElementById('campaignsContainer');
+  if (!container) {
+    console.error('❌ Container de campanhas não encontrado');
+    return;
+  }
+  
+  console.log('🔍 [FRONTEND] Nenhuma campanha encontrada, renderizando mensagem');
   
   container.innerHTML = `
     <div class="text-center py-8 text-gray-400">
