@@ -13,11 +13,11 @@ export class IndicatorAuthController {
    * POST /indicator-auth/login
    */
   @Post('login')
-  async login(@Body() body: { email: string; referralCode?: string }) {
+  async login(@Body() body: { email: string; password: string; referralCode?: string }) {
     this.logger.log(`Tentativa de login do indicador: ${body.email}`);
     
     try {
-      const result = await this.indicatorAuthService.login(body.email, body.referralCode);
+      const result = await this.indicatorAuthService.login(body.email, body.password, body.referralCode);
       
       if (result.success) {
         this.logger.log(`✅ Login bem-sucedido: ${body.email}`);
@@ -127,6 +127,30 @@ export class IndicatorAuthController {
       return {
         success: false,
         message: 'Erro ao buscar recompensas'
+      };
+    }
+  }
+
+  /**
+   * Atualizar chave Pix do indicador
+   * PATCH /indicator-auth/pix
+   */
+  @UseGuards(JwtIndicatorAuthGuard)
+  @Post('pix')
+  async updatePixKey(@Request() req, @Body() body: { pixKey: string }) {
+    this.logger.log(`Atualizando chave Pix do indicador: ${req.user.id}`);
+    try {
+      const result = await this.indicatorAuthService.updatePixKey(req.user.id, body.pixKey);
+      return {
+        success: true,
+        message: 'Chave Pix atualizada com sucesso',
+        pixKey: result.pixKey
+      };
+    } catch (error) {
+      this.logger.error(`Erro ao atualizar chave Pix: ${error.message}`);
+      return {
+        success: false,
+        message: error.message || 'Erro ao atualizar chave Pix'
       };
     }
   }

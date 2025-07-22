@@ -104,7 +104,34 @@ export class Participant extends Document {
   @Prop({ required: false })
   plainPassword?: string;
 
-  @Prop({ required: false })
+  @Prop({
+    required: false,
+    validate: {
+      validator: function (value: string) {
+        if (!value) return true; // Campo opcional
+        // Regex para e-mail
+        const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        // Regex para CPF (apenas números, 11 dígitos)
+        const cpfRegex = /^\d{11}$/;
+        // Regex para celular (apenas números, 11 dígitos, ex: 11999999999)
+        const phoneRegex = /^\d{11}$/;
+        // Regex para chave aleatória Pix (32 caracteres, letras e números)
+        const randomKeyRegex = /^[a-zA-Z0-9]{32}$/;
+        return (
+          emailRegex.test(value) ||
+          cpfRegex.test(value) ||
+          phoneRegex.test(value) ||
+          randomKeyRegex.test(value)
+        );
+      },
+      message: 'Chave Pix inválida. Use um e-mail, CPF, celular (apenas números) ou chave aleatória Pix.'
+    },
+    trim: true
+  })
+  /**
+   * Chave Pix do participante (e-mail, CPF, celular ou chave aleatória Pix)
+   * Validação básica aplicada. Campo opcional.
+   */
   pixKey?: string;
 }
 

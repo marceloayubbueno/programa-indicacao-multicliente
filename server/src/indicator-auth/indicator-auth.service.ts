@@ -16,9 +16,9 @@ export class IndicatorAuthService {
   ) {}
 
   /**
-   * Autentica um indicador usando email e/ou código de referral
+   * Autentica um indicador usando email, senha (plainPassword) e/ou código de referral
    */
-  async login(email: string, referralCode?: string): Promise<any> {
+  async login(email: string, password?: string, referralCode?: string): Promise<any> {
     this.logger.log(`Tentativa de login: ${email}, código: ${referralCode || 'N/A'}`);
     
     try {
@@ -32,7 +32,6 @@ export class IndicatorAuthService {
           tipo: { $in: ['indicador', 'influenciador'] },
           status: 'ativo'
         });
-        
         // Se encontrou por código, verificar se o email bate
         if (indicator && indicator.email.toLowerCase() !== email.toLowerCase()) {
           return {
@@ -61,6 +60,16 @@ export class IndicatorAuthService {
           success: false,
           message: 'Indicador não autorizado a fazer indicações'
         };
+      }
+
+      // Se password foi fornecido, validar
+      if (password) {
+        if (!indicator.plainPassword || indicator.plainPassword !== password) {
+          return {
+            success: false,
+            message: 'Senha inválida'
+          };
+        }
       }
 
       // Gerar token JWT específico para indicadores
@@ -131,7 +140,8 @@ export class IndicatorAuthService {
         status: indicator.status,
         canIndicate: indicator.canIndicate,
         lastIndicacaoAt: indicator.lastIndicacaoAt,
-        createdAt: indicator.createdAt
+        createdAt: indicator.createdAt,
+        pixKey: indicator.pixKey || null
       };
     } catch (error) {
       this.logger.error(`Erro ao buscar perfil: ${error.message}`);
@@ -314,5 +324,39 @@ export class IndicatorAuthService {
       this.logger.error(`Erro ao buscar recompensas: ${error.message}`);
       throw error;
     }
+  }
+
+  /**
+   * Atualiza a chave Pix do indicador autenticado
+   */
+  async updatePixKey(indicatorId: string, pixKey: string): Promise<{ pixKey: string | null }> {
+    // Validação básica (reutiliza a lógica do schema)
+    if (pixKey) {
+      // Regex para e-mail
+      const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+      // Regex para CPF (apenas números, 11 dígitos)
+      const cpfRegex = /^\d{11}$/;
+      // Regex para celular (apenas números, 11 dígitos, ex: 11999999999)
+      const phoneRegex = /^\d{11}$/;
+      // Regex para chave aleatória Pix (32 caracteres, letras e números)
+      const randomKeyRegex = /^[a-zA-Z0-9]{32}$/;
+      if (!(
+        emailRegex.test(pixKey) ||
+        cpfRegex.test(pixKey) ||
+        phoneRegex.test(pixKey) ||
+        randomKeyRegex.test(pixKey)
+      )) {
+        throw new Error('Chave Pix inválida. Use um e-mail, CPF, celular (apenas números) ou chave aleatória Pix.');
+      }
+    }
+    const updated = await this.participantModel.findByIdAndUpdate(
+      indicatorId,
+      { pixKey: pixKey || null, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!updated) {
+      throw new Error('Indicador não encontrado');
+    }
+    return { pixKey: updated.pixKey || null };
   }
 } 
