@@ -1,6 +1,6 @@
 // Integração completa do dashboard do indicador
 
-const API_BASE = '/indicator-auth';
+const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL + '/indicator-auth' : '/indicator-auth';
 
 function getToken() {
   return localStorage.getItem('indicator_token');
