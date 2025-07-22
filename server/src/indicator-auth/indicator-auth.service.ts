@@ -203,13 +203,20 @@ export class IndicatorAuthService {
 
       // 🚀 NOVO: Buscar campanhas do indicador com recompensas
       let campaigns: any[] = [];
+      
+      this.logger.log(`🔍 [DASHBOARD] Buscando campanhas para indicador: ${indicatorId}`);
+      this.logger.log(`🔍 [DASHBOARD] Indicador campaignId: ${indicator.campaignId}`);
+      this.logger.log(`🔍 [DASHBOARD] Indicador lists: ${indicator.lists?.length || 0}`);
+      
       if (indicator.campaignId) {
+        this.logger.log(`🔍 [DASHBOARD] Buscando campanha específica: ${indicator.campaignId}`);
         // Buscar campanha específica do indicador
         const campaign = await this.campaignModel.findById(indicator.campaignId)
           .populate('rewardOnReferral', 'type value description')
           .populate('rewardOnConversion', 'type value description');
         
         if (campaign) {
+          this.logger.log(`✅ [DASHBOARD] Campanha encontrada: ${campaign.name}`);
           campaigns.push({
             id: campaign._id,
             name: campaign.name,
@@ -226,11 +233,15 @@ export class IndicatorAuthService {
             } : null,
             referralLink: `/indicacao/${indicator.referralCode}`
           });
+        } else {
+          this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada: ${indicator.campaignId}`);
         }
       }
 
       // 🔍 Buscar campanhas adicionais através das listas do indicador
       if (indicator.lists && indicator.lists.length > 0) {
+        this.logger.log(`🔍 [DASHBOARD] Buscando campanhas através das listas: ${indicator.lists.length} listas`);
+        
         const { InjectModel } = await import('@nestjs/mongoose');
         const mongoose = await import('mongoose');
         const ParticipantListModel = mongoose.model('ParticipantList');
@@ -241,13 +252,18 @@ export class IndicatorAuthService {
           campaignId: { $exists: true, $ne: null }
         }).populate('campaignId');
         
+        this.logger.log(`🔍 [DASHBOARD] Listas com campanha encontradas: ${campaignLists.length}`);
+        
         for (const list of campaignLists) {
+          this.logger.log(`🔍 [DASHBOARD] Processando lista: ${list._id} - campanha: ${(list.campaignId as any)?._id}`);
+          
           if (list.campaignId && !campaigns.find((c: any) => c.id.toString() === (list.campaignId as any)._id.toString())) {
             const campaign = await this.campaignModel.findById((list.campaignId as any)._id)
               .populate('rewardOnReferral', 'type value description')
               .populate('rewardOnConversion', 'type value description');
             
             if (campaign) {
+              this.logger.log(`✅ [DASHBOARD] Campanha encontrada via lista: ${campaign.name}`);
               campaigns.push({
                 id: campaign._id,
                 name: campaign.name,
@@ -264,10 +280,14 @@ export class IndicatorAuthService {
                 } : null,
                 referralLink: `/indicacao/${indicator.referralCode}`
               });
+            } else {
+              this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada via lista: ${(list.campaignId as any)?._id}`);
             }
           }
         }
       }
+      
+      this.logger.log(`🔍 [DASHBOARD] Total de campanhas encontradas: ${campaigns.length}`);
 
       return {
         indicator,
