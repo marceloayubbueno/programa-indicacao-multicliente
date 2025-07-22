@@ -210,10 +210,18 @@ export class IndicatorAuthService {
       
       if (indicator.campaignId) {
         this.logger.log(`🔍 [DASHBOARD] Buscando campanha específica: ${indicator.campaignId}`);
+        this.logger.log(`🔍 [DASHBOARD] Tipo do campaignId: ${typeof indicator.campaignId}`);
+        this.logger.log(`🔍 [DASHBOARD] CampaignId válido: ${indicator.campaignId ? 'SIM' : 'NÃO'}`);
+        
         // Buscar campanha específica do indicador
         const campaign = await this.campaignModel.findById(indicator.campaignId)
           .populate('rewardOnReferral', 'type value description')
           .populate('rewardOnConversion', 'type value description');
+        
+        this.logger.log(`🔍 [DASHBOARD] Resultado da busca da campanha: ${campaign ? 'ENCONTRADA' : 'NÃO ENCONTRADA'}`);
+        if (campaign) {
+          this.logger.log(`🔍 [DASHBOARD] Campanha encontrada - Nome: ${campaign.name}, Status: ${campaign.status}`);
+        }
         
         if (campaign) {
           this.logger.log(`✅ [DASHBOARD] Campanha encontrada: ${campaign.name}`);
@@ -225,8 +233,10 @@ export class IndicatorAuthService {
           let conversionReward: any = null;
           
           if (campaign.rewardOnReferral) {
+            this.logger.log(`🔍 [DASHBOARD] Buscando recompensa por indicação: ${campaign.rewardOnReferral}`);
             try {
               const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnReferral);
+              this.logger.log(`🔍 [DASHBOARD] Resultado busca recompensa indicação: ${reward ? 'ENCONTRADA' : 'NÃO ENCONTRADA'}`);
               if (reward) {
                 referralReward = {
                   type: reward.type,
@@ -234,15 +244,22 @@ export class IndicatorAuthService {
                   description: reward.description
                 };
                 this.logger.log(`✅ [DASHBOARD] Recompensa por indicação encontrada: R$ ${reward.value}`);
+              } else {
+                this.logger.warn(`⚠️ [DASHBOARD] Recompensa por indicação não encontrada: ${campaign.rewardOnReferral}`);
               }
             } catch (error) {
               this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por indicação: ${error.message}`);
+              this.logger.error(`❌ [DASHBOARD] Stack: ${error.stack}`);
             }
+          } else {
+            this.logger.log(`ℹ️ [DASHBOARD] Campanha não tem recompensa por indicação configurada`);
           }
           
           if (campaign.rewardOnConversion) {
+            this.logger.log(`🔍 [DASHBOARD] Buscando recompensa por conversão: ${campaign.rewardOnConversion}`);
             try {
               const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnConversion);
+              this.logger.log(`🔍 [DASHBOARD] Resultado busca recompensa conversão: ${reward ? 'ENCONTRADA' : 'NÃO ENCONTRADA'}`);
               if (reward) {
                 conversionReward = {
                   type: reward.type,
@@ -250,11 +267,20 @@ export class IndicatorAuthService {
                   description: reward.description
                 };
                 this.logger.log(`✅ [DASHBOARD] Recompensa por conversão encontrada: R$ ${reward.value}`);
+              } else {
+                this.logger.warn(`⚠️ [DASHBOARD] Recompensa por conversão não encontrada: ${campaign.rewardOnConversion}`);
               }
             } catch (error) {
               this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por conversão: ${error.message}`);
+              this.logger.error(`❌ [DASHBOARD] Stack: ${error.stack}`);
             }
+          } else {
+            this.logger.log(`ℹ️ [DASHBOARD] Campanha não tem recompensa por conversão configurada`);
           }
+          
+          this.logger.log(`🔍 [DASHBOARD] Adicionando campanha ao array: ${campaign.name}`);
+          this.logger.log(`🔍 [DASHBOARD] ReferralReward: ${referralReward ? 'SIM' : 'NÃO'}`);
+          this.logger.log(`🔍 [DASHBOARD] ConversionReward: ${conversionReward ? 'SIM' : 'NÃO'}`);
           
           campaigns.push({
             id: campaign._id,
@@ -264,6 +290,8 @@ export class IndicatorAuthService {
             conversionReward,
             referralLink: `/indicacao/${indicator.uniqueReferralCode}`
           });
+          
+          this.logger.log(`✅ [DASHBOARD] Campanha adicionada ao array. Total agora: ${campaigns.length}`);
         } else {
           this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada: ${indicator.campaignId}`);
         }
