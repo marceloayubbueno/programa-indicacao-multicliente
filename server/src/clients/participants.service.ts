@@ -18,21 +18,16 @@ export class ParticipantsService {
 
   async create(dto: CreateParticipantDto) {
     console.log('🔧 BACKEND create participant chamado:', dto);
-    let passwordHash: string | undefined = undefined;
     let plainPassword: string | undefined = undefined;
     if (dto.tipo === 'indicador') {
-      if (dto.password) {
-        plainPassword = dto.password;
-        passwordHash = await bcrypt.hash(dto.password, 10);
+      if (dto.plainPassword) {
+        plainPassword = dto.plainPassword;
       } else {
-        // Gera senha aleatória se não informada
-        plainPassword = Math.random().toString(36).slice(-8) + Math.floor(Math.random()*1000);
-        passwordHash = await bcrypt.hash(plainPassword, 10);
+        plainPassword = Math.random().toString(36).slice(-8);
       }
     }
     const participant = new this.participantModel({
       ...dto,
-      password: passwordHash,
       plainPassword,
       participantId: (dto as any).participantId || uuidv4()
     });
@@ -102,9 +97,7 @@ export class ParticipantsService {
   }
 
   async update(id: string, dto: UpdateParticipantDto) {
-    if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
-    }
+    // Permitir atualização de plainPassword se necessário
     return this.participantModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
