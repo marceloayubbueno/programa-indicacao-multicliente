@@ -8,6 +8,7 @@ import { JwtIndicatorStrategy } from './strategies/jwt-indicator.strategy';
 import { JwtIndicatorAuthGuard } from './guards/jwt-indicator-auth.guard';
 import { Participant, ParticipantSchema } from '../clients/entities/participant.schema';
 import { Referral, ReferralSchema } from '../referrals/entities/referral.schema';
+import { Campaign, CampaignSchema } from '../campaigns/entities/campaign.schema';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { Referral, ReferralSchema } from '../referrals/entities/referral.schema'
     MongooseModule.forFeature([
       { name: Participant.name, schema: ParticipantSchema },
       { name: Referral.name, schema: ReferralSchema },
+      { name: Campaign.name, schema: CampaignSchema },
     ]),
   ],
   controllers: [IndicatorAuthController],
