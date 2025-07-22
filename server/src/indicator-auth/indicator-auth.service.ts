@@ -217,21 +217,52 @@ export class IndicatorAuthService {
         
         if (campaign) {
           this.logger.log(`✅ [DASHBOARD] Campanha encontrada: ${campaign.name}`);
+          this.logger.log(`🔍 [DASHBOARD] RewardOnReferral: ${campaign.rewardOnReferral}`);
+          this.logger.log(`🔍 [DASHBOARD] RewardOnConversion: ${campaign.rewardOnConversion}`);
+          
+          // Buscar recompensas manualmente se não foram populadas
+          let referralReward: any = null;
+          let conversionReward: any = null;
+          
+          if (campaign.rewardOnReferral) {
+            try {
+              const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnReferral);
+              if (reward) {
+                referralReward = {
+                  type: reward.type,
+                  value: reward.value,
+                  description: reward.description
+                };
+                this.logger.log(`✅ [DASHBOARD] Recompensa por indicação encontrada: R$ ${reward.value}`);
+              }
+            } catch (error) {
+              this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por indicação: ${error.message}`);
+            }
+          }
+          
+          if (campaign.rewardOnConversion) {
+            try {
+              const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnConversion);
+              if (reward) {
+                conversionReward = {
+                  type: reward.type,
+                  value: reward.value,
+                  description: reward.description
+                };
+                this.logger.log(`✅ [DASHBOARD] Recompensa por conversão encontrada: R$ ${reward.value}`);
+              }
+            } catch (error) {
+              this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por conversão: ${error.message}`);
+            }
+          }
+          
           campaigns.push({
             id: campaign._id,
             name: campaign.name,
             status: campaign.status,
-            referralReward: campaign.rewardOnReferral ? {
-              type: (campaign.rewardOnReferral as any).type,
-              value: (campaign.rewardOnReferral as any).value,
-              description: (campaign.rewardOnReferral as any).description
-            } : null,
-            conversionReward: campaign.rewardOnConversion ? {
-              type: (campaign.rewardOnConversion as any).type,
-              value: (campaign.rewardOnConversion as any).value,
-              description: (campaign.rewardOnConversion as any).description
-            } : null,
-            referralLink: `/indicacao/${indicator.referralCode}`
+            referralReward,
+            conversionReward,
+            referralLink: `/indicacao/${indicator.uniqueReferralCode}`
           });
         } else {
           this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada: ${indicator.campaignId}`);
@@ -264,21 +295,52 @@ export class IndicatorAuthService {
             
             if (campaign) {
               this.logger.log(`✅ [DASHBOARD] Campanha encontrada via lista: ${campaign.name}`);
+              this.logger.log(`🔍 [DASHBOARD] RewardOnReferral: ${campaign.rewardOnReferral}`);
+              this.logger.log(`🔍 [DASHBOARD] RewardOnConversion: ${campaign.rewardOnConversion}`);
+              
+              // Buscar recompensas manualmente se não foram populadas
+              let referralReward: any = null;
+              let conversionReward: any = null;
+              
+              if (campaign.rewardOnReferral) {
+                try {
+                  const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnReferral);
+                  if (reward) {
+                    referralReward = {
+                      type: reward.type,
+                      value: reward.value,
+                      description: reward.description
+                    };
+                    this.logger.log(`✅ [DASHBOARD] Recompensa por indicação encontrada: R$ ${reward.value}`);
+                  }
+                } catch (error) {
+                  this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por indicação: ${error.message}`);
+                }
+              }
+              
+              if (campaign.rewardOnConversion) {
+                try {
+                  const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnConversion);
+                  if (reward) {
+                    conversionReward = {
+                      type: reward.type,
+                      value: reward.value,
+                      description: reward.description
+                    };
+                    this.logger.log(`✅ [DASHBOARD] Recompensa por conversão encontrada: R$ ${reward.value}`);
+                  }
+                } catch (error) {
+                  this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por conversão: ${error.message}`);
+                }
+              }
+              
               campaigns.push({
                 id: campaign._id,
                 name: campaign.name,
                 status: campaign.status,
-                referralReward: campaign.rewardOnReferral ? {
-                  type: (campaign.rewardOnReferral as any).type,
-                  value: (campaign.rewardOnReferral as any).value,
-                  description: (campaign.rewardOnReferral as any).description
-                } : null,
-                conversionReward: campaign.rewardOnConversion ? {
-                  type: (campaign.rewardOnConversion as any).type,
-                  value: (campaign.rewardOnConversion as any).value,
-                  description: (campaign.rewardOnConversion as any).description
-                } : null,
-                referralLink: `/indicacao/${indicator.referralCode}`
+                referralReward,
+                conversionReward,
+                referralLink: `/indicacao/${indicator.uniqueReferralCode}`
               });
             } else {
               this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada via lista: ${(list.campaignId as any)?._id}`);

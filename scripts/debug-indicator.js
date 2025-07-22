@@ -68,19 +68,19 @@ async function debugIndicator() {
         console.log(`✅ Listas com campanha: ${campaignLists.length}`);
 
         for (const list of campaignLists) {
-          console.log(`   📋 Lista: ${list.name} - Campanha: ${(list.campaignId as any)?.name || 'N/A'}`);
+          console.log(`   📋 Lista: ${list.name} - Campanha: ${list.campaignId?.name || 'N/A'}`);
           
-          if (list.campaignId) {
-            const campaign = await Campaign.findById((list.campaignId as any)._id)
-              .populate('rewardOnReferral', 'type value description')
-              .populate('rewardOnConversion', 'type value description');
+                      if (list.campaignId) {
+              const campaign = await Campaign.findById(list.campaignId._id)
+                .populate('rewardOnReferral', 'type value description')
+                .populate('rewardOnConversion', 'type value description');
 
-            if (campaign) {
-              console.log(`      ✅ Campanha: ${campaign.name} (${campaign.status})`);
-              console.log(`         Referral Reward: ${campaign.rewardOnReferral ? `R$ ${(campaign.rewardOnReferral as any).value}` : 'NÃO'}`);
-              console.log(`         Conversion Reward: ${campaign.rewardOnConversion ? `R$ ${(campaign.rewardOnConversion as any).value}` : 'NÃO'}`);
+              if (campaign) {
+                console.log(`      ✅ Campanha: ${campaign.name} (${campaign.status})`);
+                console.log(`         Referral Reward: ${campaign.rewardOnReferral ? `R$ ${campaign.rewardOnReferral.value}` : 'NÃO'}`);
+                console.log(`         Conversion Reward: ${campaign.rewardOnConversion ? `R$ ${campaign.rewardOnConversion.value}` : 'NÃO'}`);
+              }
             }
-          }
         }
       }
 
@@ -98,8 +98,8 @@ async function debugIndicator() {
     
     for (const campaign of allCampaigns) {
       console.log(`   📋 ${campaign.name} (${campaign.status})`);
-      console.log(`      Referral: ${campaign.rewardOnReferral ? `R$ ${(campaign.rewardOnReferral as any).value}` : 'NÃO'}`);
-      console.log(`      Conversion: ${campaign.rewardOnConversion ? `R$ ${(campaign.rewardOnConversion as any).value}` : 'NÃO'}`);
+      console.log(`      Referral: ${campaign.rewardOnReferral ? `R$ ${campaign.rewardOnReferral.value}` : 'NÃO'}`);
+      console.log(`      Conversion: ${campaign.rewardOnConversion ? `R$ ${campaign.rewardOnConversion.value}` : 'NÃO'}`);
     }
 
   } catch (error) {
