@@ -1,6 +1,6 @@
 // Lógica inicial de login do participante
 
-const API_BASE = '/indicator-auth';
+const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.API_URL + '/indicator-auth' : '/indicator-auth';
 
 document.getElementById('login-form').addEventListener('submit', async function(event) {
   event.preventDefault();
