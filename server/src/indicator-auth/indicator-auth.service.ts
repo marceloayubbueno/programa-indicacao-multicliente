@@ -231,16 +231,16 @@ export class IndicatorAuthService {
         if (campaign) {
           this.logger.log(`✅ [DASHBOARD] Campanha direta encontrada: ${campaign.name}`);
           
-          campaigns.push({
-            id: campaign._id,
-            name: campaign.name,
-            status: campaign.status,
-            type: campaign.type,
-            referralLink: `/indicacao/${indicator.uniqueReferralCode}`,
-            rewardOnReferral: campaign.rewardOnReferral,
-            rewardOnConversion: campaign.rewardOnConversion,
-            isCurrentIndicator: true
-          });
+                      campaigns.push({
+              id: campaign._id,
+              name: campaign.name,
+              status: campaign.status,
+              type: campaign.type,
+              referralLink: `https://lp.virallead.com.br/indicacao/${indicator.uniqueReferralCode}`,
+              rewardOnReferral: campaign.rewardOnReferral,
+              rewardOnConversion: campaign.rewardOnConversion,
+              isCurrentIndicator: true
+            });
         }
       }
 
@@ -265,7 +265,7 @@ export class IndicatorAuthService {
             name: campaign.name,
             status: campaign.status,
             type: campaign.type,
-            referralLink: `/indicacao/${indicator.uniqueReferralCode}`,
+            referralLink: `https://lp.virallead.com.br/indicacao/${indicator.uniqueReferralCode}`,
             rewardOnReferral: campaign.rewardOnReferral,
             rewardOnConversion: campaign.rewardOnConversion,
             isCurrentIndicator: false
@@ -302,7 +302,7 @@ export class IndicatorAuthService {
                 name: campaign.name,
                 status: campaign.status,
                 type: campaign.type,
-                referralLink: `/indicacao/${otherIndicator.uniqueReferralCode}`,
+                referralLink: `https://lp.virallead.com.br/indicacao/${otherIndicator.uniqueReferralCode}`,
                 rewardOnReferral: campaign.rewardOnReferral,
                 rewardOnConversion: campaign.rewardOnConversion,
                 isCurrentIndicator: false
@@ -345,7 +345,7 @@ export class IndicatorAuthService {
             title: 'Compartilhar Link',
             description: 'Copie seu link exclusivo de indicação',
             action: 'copy_link',
-            link: `/indicacao/${indicator.uniqueReferralCode}`
+            link: `https://lp.virallead.com.br/indicacao/${indicator.uniqueReferralCode}`
           },
           {
             title: 'Ver Indicações',

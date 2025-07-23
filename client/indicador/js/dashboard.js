@@ -142,34 +142,41 @@ function createCampaignElement(campaign) {
   rewardsSpan.className = 'text-green-400 font-semibold flex-shrink-0 text-sm';
   
   let rewardsText = '';
-  if (campaign.referralReward && campaign.conversionReward) {
-    rewardsText = `R$ ${campaign.referralReward.value},00 + R$ ${campaign.conversionReward.value},00`;
-  } else if (campaign.referralReward) {
-    rewardsText = `R$ ${campaign.referralReward.value},00`;
-  } else if (campaign.conversionReward) {
-    rewardsText = `R$ ${campaign.conversionReward.value},00`;
+  if (campaign.rewardOnReferral && campaign.rewardOnConversion) {
+    rewardsText = `R$ ${campaign.rewardOnReferral.value},00 + R$ ${campaign.rewardOnConversion.value},00`;
+  } else if (campaign.rewardOnReferral) {
+    rewardsText = `R$ ${campaign.rewardOnReferral.value},00`;
+  } else if (campaign.rewardOnConversion) {
+    rewardsText = `R$ ${campaign.rewardOnConversion.value},00`;
   } else {
     rewardsText = 'Sem recompensa';
   }
   rewardsSpan.textContent = rewardsText;
   
-  // Link de indicação
-  const linkInput = document.createElement('input');
-  linkInput.type = 'text';
-  linkInput.readOnly = true;
-  linkInput.value = window.location.origin + campaign.referralLink;
-  linkInput.className = 'flex-1 px-2 py-1 bg-transparent text-gray-100 focus:outline-none text-sm';
+  // 🔗 LINK DE INDICAÇÃO - MESMA UX DA CENTRAL DE PARTICIPANTES
+  const linkContainer = document.createElement('div');
+  linkContainer.className = 'flex items-center gap-2';
   
-  // Botão copiar
+  // Botão copiar (apenas ícone)
   const copyBtn = document.createElement('button');
-  copyBtn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm';
-  copyBtn.innerHTML = '<i class="fas fa-copy mr-1"></i>Copiar';
-  copyBtn.onclick = () => copyToClipboard(linkInput.value);
+  copyBtn.className = 'text-blue-400 hover:text-blue-300 text-sm transition-colors p-2 rounded hover:bg-blue-500/10';
+  copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+  copyBtn.title = 'Copiar link de indicação';
+  copyBtn.onclick = () => copyToClipboard(campaign.referralLink);
+  
+  // Botão regenerar código (apenas ícone)
+  const regenerateBtn = document.createElement('button');
+  regenerateBtn.className = 'text-green-400 hover:text-green-300 text-sm transition-colors p-2 rounded hover:bg-green-500/10';
+  regenerateBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+  regenerateBtn.title = 'Gerar novo código';
+  regenerateBtn.onclick = () => regenerateReferralCode();
+  
+  linkContainer.appendChild(copyBtn);
+  linkContainer.appendChild(regenerateBtn);
   
   div.appendChild(nameSpan);
   div.appendChild(rewardsSpan);
-  div.appendChild(linkInput);
-  div.appendChild(copyBtn);
+  div.appendChild(linkContainer);
   
   return div;
 }
@@ -251,6 +258,10 @@ function copyToClipboard(text) {
   }).catch(() => {
     showMessage('Erro ao copiar link', 'error');
   });
+}
+
+function regenerateReferralCode() {
+  showMessage('Funcionalidade de regenerar código será implementada em breve!', 'info');
 }
 
 function formatTimeAgo(dateString) {
