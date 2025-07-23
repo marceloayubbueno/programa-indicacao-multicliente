@@ -201,86 +201,103 @@ export class IndicatorAuthService {
         if (stat._id === 'paid') paidRewards = stat.totalValue || 0;
       });
 
-      // 🚀 CORREÇÃO: Buscar campanha diretamente associada ao indicador
+      // 🚀 CORREÇÃO DEFINITIVA: Usar a mesma lógica da Central de Participantes
       let campaigns: any[] = [];
       
-      this.logger.log(`🔍 [DASHBOARD] Buscando campanha para indicador: ${indicatorId}`);
+      this.logger.log(`🔍 [DASHBOARD] Buscando campanhas para indicador: ${indicatorId}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador nome: ${indicator.name}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador email: ${indicator.email}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador clientId: ${indicator.clientId}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador tipo: ${indicator.tipo}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador uniqueReferralCode: ${indicator.uniqueReferralCode}`);
       
-      // ✅ CORREÇÃO: Buscar campanha diretamente associada ao indicador atual
-      if (indicator.campaignId) {
-        this.logger.log(`🔍 [DASHBOARD] Indicador tem campaignId: ${indicator.campaignId}`);
+      // ✅ CORREÇÃO: Usar EXATAMENTE a mesma lógica da Central de Participantes
+      try {
+        // Buscar TODOS os indicadores do mesmo cliente (como faz a Central)
+        const allIndicators = await this.participantModel
+          .find({ 
+            clientId: indicator.clientId,
+            tipo: { $in: ['indicador', 'influenciador'] },
+            uniqueReferralCode: { $exists: true, $ne: null }
+          })
+          .select('name email uniqueReferralCode campaignId campaignName')
+          .sort({ createdAt: -1 })
+          .exec();
         
-        try {
-          const campaign = await this.campaignModel.findById(indicator.campaignId)
-            .populate('rewardOnReferral', 'type value description')
-            .populate('rewardOnConversion', 'type value description');
-          
-          if (campaign) {
-            this.logger.log(`✅ [DASHBOARD] Campanha encontrada: ${campaign.name}`);
+        this.logger.log(`🔍 [DASHBOARD] Total de indicadores do cliente: ${allIndicators.length}`);
+        
+        // Para cada indicador, buscar sua campanha
+        for (const ind of allIndicators) {
+          if (ind.campaignId) {
+            this.logger.log(`🔍 [DASHBOARD] Buscando campanha para indicador ${ind.name}: ${ind.campaignId}`);
             
-            // Buscar recompensas
-            let referralReward: any = null;
-            let conversionReward: any = null;
+            const campaign = await this.campaignModel.findById(ind.campaignId)
+              .populate('rewardOnReferral', 'type value description')
+              .populate('rewardOnConversion', 'type value description');
             
-            if (campaign.rewardOnReferral) {
-              try {
-                const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnReferral);
-                if (reward) {
-                  referralReward = {
-                    type: reward.type,
-                    value: reward.value,
-                    description: reward.description
-                  };
-                  this.logger.log(`✅ [DASHBOARD] Recompensa por indicação: R$ ${reward.value}`);
+            if (campaign) {
+              this.logger.log(`✅ [DASHBOARD] Campanha encontrada: ${campaign.name}`);
+              
+              // Buscar recompensas
+              let referralReward: any = null;
+              let conversionReward: any = null;
+              
+              if (campaign.rewardOnReferral) {
+                try {
+                  const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnReferral);
+                  if (reward) {
+                    referralReward = {
+                      type: reward.type,
+                      value: reward.value,
+                      description: reward.description
+                    };
+                    this.logger.log(`✅ [DASHBOARD] Recompensa por indicação: R$ ${reward.value}`);
+                  }
+                } catch (error) {
+                  this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por indicação: ${error.message}`);
                 }
-              } catch (error) {
-                this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por indicação: ${error.message}`);
               }
-            }
-            
-            if (campaign.rewardOnConversion) {
-              try {
-                const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnConversion);
-                if (reward) {
-                  conversionReward = {
-                    type: reward.type,
-                    value: reward.value,
-                    description: reward.description
-                  };
-                  this.logger.log(`✅ [DASHBOARD] Recompensa por conversão: R$ ${reward.value}`);
+              
+              if (campaign.rewardOnConversion) {
+                try {
+                  const reward = await this.campaignModel.db.model('Reward').findById(campaign.rewardOnConversion);
+                  if (reward) {
+                    conversionReward = {
+                      type: reward.type,
+                      value: reward.value,
+                      description: reward.description
+                    };
+                    this.logger.log(`✅ [DASHBOARD] Recompensa por conversão: R$ ${reward.value}`);
+                  }
+                } catch (error) {
+                  this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por conversão: ${error.message}`);
                 }
-              } catch (error) {
-                this.logger.error(`❌ [DASHBOARD] Erro ao buscar recompensa por conversão: ${error.message}`);
               }
+              
+              campaigns.push({
+                id: campaign._id,
+                name: campaign.name,
+                status: campaign.status,
+                referralReward,
+                conversionReward,
+                referralLink: `/indicacao/${ind.uniqueReferralCode}`,
+                isCurrentIndicator: ind._id.toString() === indicatorId
+              });
+              
+              this.logger.log(`✅ [DASHBOARD] Campanha adicionada: ${campaign.name} (Link: ${ind.uniqueReferralCode})`);
+            } else {
+              this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada: ${ind.campaignId}`);
             }
-            
-            campaigns.push({
-              id: campaign._id,
-              name: campaign.name,
-              status: campaign.status,
-              referralReward,
-              conversionReward,
-              referralLink: `/indicacao/${indicator.uniqueReferralCode}`,
-              isCurrentIndicator: true
-            });
-            
-            this.logger.log(`✅ [DASHBOARD] Campanha adicionada: ${campaign.name} (Link: ${indicator.uniqueReferralCode})`);
           } else {
-            this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada: ${indicator.campaignId}`);
+            this.logger.log(`ℹ️ [DASHBOARD] Indicador ${ind.name} não tem campaignId`);
           }
-        } catch (error) {
-          this.logger.error(`❌ [DASHBOARD] Erro ao processar campanha ${indicator.campaignId}: ${error.message}`);
         }
-      } else {
-        this.logger.log(`❌ [DASHBOARD] Indicador não tem campaignId associado`);
+        
+        this.logger.log(`🔍 [DASHBOARD] Total de campanhas processadas: ${campaigns.length}`);
+        
+      } catch (error) {
+        this.logger.error(`❌ [DASHBOARD] Erro ao buscar campanhas: ${error.message}`);
       }
-      
-      this.logger.log(`🔍 [DASHBOARD] Total de campanhas processadas: ${campaigns.length}`);
 
       return {
         indicator,
