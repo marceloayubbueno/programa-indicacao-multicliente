@@ -155,10 +155,24 @@ export class IndicatorAuthService {
    * Carrega dados do dashboard do indicador
    */
   async getDashboard(indicatorId: string): Promise<any> {
+    this.logger.log(`🔍 [DASHBOARD] Iniciando busca do dashboard para indicador: ${indicatorId}`);
+    
     try {
-      const indicator = await this.getProfile(indicatorId);
-      
-      // Buscar indicações recentes
+      // 1. Buscar dados do indicador
+      const indicator = await this.participantModel.findById(indicatorId)
+        .select('name email clientId tipo uniqueReferralCode campaignId campaignName pixKey status')
+        .exec();
+
+      if (!indicator) {
+        this.logger.error(`❌ [DASHBOARD] Indicador não encontrado: ${indicatorId}`);
+        throw new Error('Indicador não encontrado');
+      }
+
+      this.logger.log(`✅ [DASHBOARD] Indicador encontrado: ${indicator.name} (${indicator.email})`);
+      this.logger.log(`🔍 [DASHBOARD] Indicador clientId: ${indicator.clientId}`);
+      this.logger.log(`🔍 [DASHBOARD] Indicador campaignId: ${indicator.campaignId}`);
+
+      // 2. Buscar indicações recentes
       const recentReferrals = await this.referralModel.find({
         indicatorId: indicatorId
       })
@@ -166,7 +180,7 @@ export class IndicatorAuthService {
       .limit(5)
       .select('leadName leadEmail status rewardValue createdAt');
 
-      // Calcular estatísticas
+      // 3. Calcular estatísticas
       const totalReferrals = await this.referralModel.countDocuments({
         indicatorId: indicatorId
       });
@@ -201,48 +215,114 @@ export class IndicatorAuthService {
         if (stat._id === 'paid') paidRewards = stat.totalValue || 0;
       });
 
-      // 🚀 CORREÇÃO SUPER SIMPLES: Buscar campanha diretamente do indicador atual
+      // 🚀 REFATORAÇÃO COMPLETA: Usar lógica SIMPLES e DIRETA
       let campaigns: any[] = [];
       
-      this.logger.log(`🔍 [DASHBOARD] Buscando campanha para indicador: ${indicatorId}`);
-      this.logger.log(`🔍 [DASHBOARD] Indicador nome: ${indicator.name}`);
-      this.logger.log(`🔍 [DASHBOARD] Indicador campaignId: ${indicator.campaignId}`);
-      
-      // ✅ CORREÇÃO SUPER SIMPLES: Se o indicador tem campaignId, buscar a campanha
+      // ✅ MÉTODO 1: Buscar campanha diretamente associada ao indicador
       if (indicator.campaignId) {
-        try {
-          this.logger.log(`🔍 [DASHBOARD] Buscando campanha: ${indicator.campaignId}`);
+        this.logger.log(`🔍 [DASHBOARD] MÉTODO 1: Buscando campanha direta...`);
+        
+        const campaign = await this.campaignModel.findById(indicator.campaignId)
+          .select('_id name status type rewardOnReferral rewardOnConversion')
+          .populate('rewardOnReferral', 'type value description')
+          .populate('rewardOnConversion', 'type value description')
+          .exec();
+        
+        if (campaign) {
+          this.logger.log(`✅ [DASHBOARD] Campanha direta encontrada: ${campaign.name}`);
           
-          const campaign = await this.campaignModel.findById(indicator.campaignId);
-          
-          if (campaign) {
-            this.logger.log(`✅ [DASHBOARD] Campanha encontrada: ${campaign.name}`);
-            
-            campaigns.push({
-              id: campaign._id,
-              name: campaign.name,
-              status: campaign.status,
-              referralReward: null,
-              conversionReward: null,
-              referralLink: `/indicacao/${indicator.uniqueReferralCode}`,
-              isCurrentIndicator: true
-            });
-            
-            this.logger.log(`✅ [DASHBOARD] Campanha adicionada: ${campaign.name}`);
-          } else {
-            this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada: ${indicator.campaignId}`);
-          }
-        } catch (error) {
-          this.logger.error(`❌ [DASHBOARD] Erro ao buscar campanha: ${error.message}`);
+          campaigns.push({
+            id: campaign._id,
+            name: campaign.name,
+            status: campaign.status,
+            type: campaign.type,
+            referralLink: `/indicacao/${indicator.uniqueReferralCode}`,
+            rewardOnReferral: campaign.rewardOnReferral,
+            rewardOnConversion: campaign.rewardOnConversion,
+            isCurrentIndicator: true
+          });
         }
-      } else {
-        this.logger.log(`❌ [DASHBOARD] Indicador não tem campaignId`);
       }
-      
-      this.logger.log(`🔍 [DASHBOARD] Total de campanhas: ${campaigns.length}`);
 
-      return {
-        indicator,
+      // ✅ MÉTODO 2: Se não encontrou, buscar TODAS as campanhas do cliente
+      if (campaigns.length === 0) {
+        this.logger.log(`🔍 [DASHBOARD] MÉTODO 2: Buscando todas as campanhas do cliente...`);
+        
+        const allClientCampaigns = await this.campaignModel.find({
+          clientId: indicator.clientId,
+          status: 'active'
+        })
+        .select('_id name status type rewardOnReferral rewardOnConversion')
+        .populate('rewardOnReferral', 'type value description')
+        .populate('rewardOnConversion', 'type value description')
+        .exec();
+
+        this.logger.log(`🔍 [DASHBOARD] Total de campanhas do cliente: ${allClientCampaigns.length}`);
+
+        for (const campaign of allClientCampaigns) {
+          campaigns.push({
+            id: campaign._id,
+            name: campaign.name,
+            status: campaign.status,
+            type: campaign.type,
+            referralLink: `/indicacao/${indicator.uniqueReferralCode}`,
+            rewardOnReferral: campaign.rewardOnReferral,
+            rewardOnConversion: campaign.rewardOnConversion,
+            isCurrentIndicator: false
+          });
+        }
+      }
+
+      // ✅ MÉTODO 3: Se ainda não encontrou, buscar indicadores do mesmo cliente
+      if (campaigns.length === 0) {
+        this.logger.log(`🔍 [DASHBOARD] MÉTODO 3: Buscando indicadores do mesmo cliente...`);
+        
+        const otherIndicators = await this.participantModel.find({
+          clientId: indicator.clientId,
+          tipo: { $in: ['indicador', 'influenciador'] },
+          campaignId: { $exists: true, $ne: null },
+          _id: { $ne: indicatorId }
+        })
+        .select('campaignId campaignName uniqueReferralCode')
+        .exec();
+
+        this.logger.log(`🔍 [DASHBOARD] Outros indicadores encontrados: ${otherIndicators.length}`);
+
+        for (const otherIndicator of otherIndicators) {
+          if (otherIndicator.campaignId) {
+            const campaign = await this.campaignModel.findById(otherIndicator.campaignId)
+              .select('_id name status type rewardOnReferral rewardOnConversion')
+              .populate('rewardOnReferral', 'type value description')
+              .populate('rewardOnConversion', 'type value description')
+              .exec();
+
+            if (campaign) {
+              campaigns.push({
+                id: campaign._id,
+                name: campaign.name,
+                status: campaign.status,
+                type: campaign.type,
+                referralLink: `/indicacao/${otherIndicator.uniqueReferralCode}`,
+                rewardOnReferral: campaign.rewardOnReferral,
+                rewardOnConversion: campaign.rewardOnConversion,
+                isCurrentIndicator: false
+              });
+            }
+          }
+        }
+      }
+
+      this.logger.log(`📊 [DASHBOARD] Total final de campanhas: ${campaigns.length}`);
+
+      const dashboard = {
+        indicator: {
+          id: indicator._id,
+          name: indicator.name,
+          email: indicator.email,
+          uniqueReferralCode: indicator.uniqueReferralCode,
+          pixKey: indicator.pixKey,
+          status: indicator.status
+        },
         stats: {
           totalReferrals,
           approvedReferrals,
@@ -259,7 +339,7 @@ export class IndicatorAuthService {
           rewardValue: ref.rewardValue || 0,
           createdAt: ref.createdAt
         })),
-        campaigns, // 🚀 CORRIGIDO: Campanhas com recompensas usando padrão correto
+        campaigns,
         quickActions: [
           {
             title: 'Compartilhar Link',
@@ -281,8 +361,14 @@ export class IndicatorAuthService {
           }
         ]
       };
+
+      this.logger.log(`✅ [DASHBOARD] Dashboard montado com sucesso para: ${indicator.name}`);
+      this.logger.log(`📊 [DASHBOARD] Campanhas no dashboard: ${campaigns.length}`);
+      
+      return dashboard;
+
     } catch (error) {
-      this.logger.error(`Erro ao carregar dashboard: ${error.message}`);
+      this.logger.error(`💥 [DASHBOARD] Erro ao montar dashboard: ${error.message}`);
       throw error;
     }
   }
