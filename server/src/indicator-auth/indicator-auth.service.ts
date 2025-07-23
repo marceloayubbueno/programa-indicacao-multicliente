@@ -201,44 +201,29 @@ export class IndicatorAuthService {
         if (stat._id === 'paid') paidRewards = stat.totalValue || 0;
       });
 
-      // 🚀 CORREÇÃO: Buscar campanhas seguindo o padrão da Central de Participantes
+      // 🚀 CORREÇÃO: Buscar campanha diretamente associada ao indicador
       let campaigns: any[] = [];
       
-      this.logger.log(`🔍 [DASHBOARD] Buscando campanhas para indicador: ${indicatorId}`);
+      this.logger.log(`🔍 [DASHBOARD] Buscando campanha para indicador: ${indicatorId}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador nome: ${indicator.name}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador email: ${indicator.email}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador clientId: ${indicator.clientId}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador tipo: ${indicator.tipo}`);
       this.logger.log(`🔍 [DASHBOARD] Indicador uniqueReferralCode: ${indicator.uniqueReferralCode}`);
       
-      // 🎯 PADRÃO CORRETO: Buscar todos os participantes do tipo 'indicador' do mesmo cliente
-      const clientIndicators = await this.participantModel.find({
-        clientId: indicator.clientId,
-        tipo: { $in: ['indicador', 'influenciador'] },
-        status: 'ativo',
-        campaignId: { $exists: true, $ne: null }
-      }).select('campaignId campaignName uniqueReferralCode');
-      
-      this.logger.log(`🔍 [DASHBOARD] Indicadores do cliente encontrados: ${clientIndicators.length}`);
-      
-      // Extrair campanhas únicas dos indicadores
-      const uniqueCampaignIds = [...new Set(clientIndicators.map(ind => ind.campaignId?.toString()).filter(Boolean))];
-      this.logger.log(`🔍 [DASHBOARD] Campanhas únicas encontradas: ${uniqueCampaignIds.length}`);
-      this.logger.log(`🔍 [DASHBOARD] IDs das campanhas:`, uniqueCampaignIds);
-      
-      // Buscar detalhes das campanhas
-      for (const campaignId of uniqueCampaignIds) {
+      // ✅ CORREÇÃO: Buscar campanha diretamente associada ao indicador atual
+      if (indicator.campaignId) {
+        this.logger.log(`🔍 [DASHBOARD] Indicador tem campaignId: ${indicator.campaignId}`);
+        
         try {
-          this.logger.log(`🔍 [DASHBOARD] Buscando campanha: ${campaignId}`);
-          
-          const campaign = await this.campaignModel.findById(campaignId)
+          const campaign = await this.campaignModel.findById(indicator.campaignId)
             .populate('rewardOnReferral', 'type value description')
             .populate('rewardOnConversion', 'type value description');
           
           if (campaign) {
             this.logger.log(`✅ [DASHBOARD] Campanha encontrada: ${campaign.name}`);
             
-            // Buscar recompensas manualmente se não foram populadas
+            // Buscar recompensas
             let referralReward: any = null;
             let conversionReward: any = null;
             
@@ -274,30 +259,25 @@ export class IndicatorAuthService {
               }
             }
             
-            // Encontrar o indicador específico para esta campanha (pode ser o atual ou outro)
-            const campaignIndicator = clientIndicators.find(ind => 
-              ind.campaignId?.toString() === campaignId
-            );
+            campaigns.push({
+              id: campaign._id,
+              name: campaign.name,
+              status: campaign.status,
+              referralReward,
+              conversionReward,
+              referralLink: `/indicacao/${indicator.uniqueReferralCode}`,
+              isCurrentIndicator: true
+            });
             
-            if (campaignIndicator) {
-              campaigns.push({
-                id: campaign._id,
-                name: campaign.name,
-                status: campaign.status,
-                referralReward,
-                conversionReward,
-                referralLink: `/indicacao/${campaignIndicator.uniqueReferralCode}`,
-                isCurrentIndicator: campaignIndicator._id.toString() === indicatorId
-              });
-              
-              this.logger.log(`✅ [DASHBOARD] Campanha adicionada: ${campaign.name} (Link: ${campaignIndicator.uniqueReferralCode})`);
-            }
+            this.logger.log(`✅ [DASHBOARD] Campanha adicionada: ${campaign.name} (Link: ${indicator.uniqueReferralCode})`);
           } else {
-            this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada: ${campaignId}`);
+            this.logger.warn(`⚠️ [DASHBOARD] Campanha não encontrada: ${indicator.campaignId}`);
           }
         } catch (error) {
-          this.logger.error(`❌ [DASHBOARD] Erro ao processar campanha ${campaignId}: ${error.message}`);
+          this.logger.error(`❌ [DASHBOARD] Erro ao processar campanha ${indicator.campaignId}: ${error.message}`);
         }
+      } else {
+        this.logger.log(`❌ [DASHBOARD] Indicador não tem campaignId associado`);
       }
       
       this.logger.log(`🔍 [DASHBOARD] Total de campanhas processadas: ${campaigns.length}`);
