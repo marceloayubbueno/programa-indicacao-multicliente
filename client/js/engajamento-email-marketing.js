@@ -13,7 +13,7 @@ class EmailMarketingManager {
     async init() {
         try {
             await this.loadWelcomeEmailData();
-            await this.loadCampaignData();
+            // await this.loadCampaignData(); // Removido: não há mais campanhas
             await this.loadEmailLists();
             await this.loadRecentActivity();
         } catch (error) {
@@ -41,30 +41,6 @@ class EmailMarketingManager {
 
         } catch (error) {
             console.error('Erro ao carregar dados do e-mail de boas-vindas:', error);
-        }
-    }
-
-    /**
-     * Carrega dados das campanhas
-     */
-    async loadCampaignData() {
-        try {
-            // Mock data - será substituído por API real
-            const mockData = {
-                activeCampaigns: 2,
-                totalCampaigns: 8,
-                lastCampaign: '2024-01-14T10:00:00Z',
-                avgOpenRate: 65.2
-            };
-
-            // Atualizar UI
-            document.getElementById('activeCampaignsCount').textContent = mockData.activeCampaigns;
-            document.getElementById('totalCampaigns').textContent = mockData.totalCampaigns;
-            document.getElementById('lastCampaignDate').textContent = this.formatDate(mockData.lastCampaign);
-            document.getElementById('avgOpenRate').textContent = mockData.avgOpenRate + '%';
-
-        } catch (error) {
-            console.error('Erro ao carregar dados das campanhas:', error);
         }
     }
 
@@ -212,14 +188,6 @@ class EmailMarketingManager {
                     color: 'text-blue-400'
                 },
                 {
-                    type: 'campaign_created',
-                    description: 'Nova campanha criada',
-                    name: 'Promoção Especial',
-                    time: '1 hora atrás',
-                    icon: 'fa-bullhorn',
-                    color: 'text-purple-400'
-                },
-                {
                     type: 'email_opened',
                     description: 'E-mail aberto',
                     recipient: 'maria@exemplo.com',
@@ -332,32 +300,8 @@ function previewWelcomeEmail() {
     window.location.href = 'engajamento-email-template-editor.html?type=welcome&preview=true';
 }
 
-function createNewCampaign() {
-    window.location.href = 'engajamento-email-template-editor.html?type=campaign';
-}
-
-function viewAllCampaigns() {
-    window.location.href = 'engajamento-email-campaigns.html';
-}
-
-function selectList(listId) {
-    console.log('Lista selecionada para e-mail:', listId);
-    // Redirecionar para editor de template com a lista selecionada
-    window.location.href = `engajamento-email-template-editor.html?type=campaign&listId=${listId}`;
-}
-
-function viewListDetails(listId) {
-    console.log('Visualizando detalhes da lista:', listId);
-    // Redirecionar para página de detalhes da lista
-    window.location.href = `participants.html?listId=${listId}`;
-}
-
 function createWelcomeEmail() {
     window.location.href = 'engajamento-email-template-editor.html?type=welcome';
-}
-
-function createEmailCampaign() {
-    window.location.href = 'engajamento-email-template-editor.html?type=campaign';
 }
 
 function createEmailFlow() {

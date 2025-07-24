@@ -41,6 +41,7 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+# Nunca versionar arquivos .env! Cada dev deve ter o seu localmente.
 
 # temp directory
 .temp

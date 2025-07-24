@@ -59,9 +59,6 @@
               <button onclick="createWelcomeEmail()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
                 <i class="fas fa-envelope mr-2"></i>E-mail Boas-vindas
               </button>
-              <button onclick="createEmailCampaign()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
-                <i class="fas fa-bullhorn mr-2"></i>Nova Campanha
-              </button>
               <button onclick="createEmailFlow()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
                 <i class="fas fa-project-diagram mr-2"></i>Fluxo Automático
               </button>
@@ -76,7 +73,7 @@
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-xl font-bold text-white">
                 <i class="fas fa-handshake mr-2 text-green-400"></i>
-                E-mail de Boas-vindas
+                E-mail Marketing
               </h3>
               <div class="flex items-center space-x-2">
                 <span id="welcomeEmailStatus" class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-400">Ativo</span>
@@ -86,7 +83,7 @@
               </div>
             </div>
             
-            <p class="text-gray-400 mb-4">E-mail automático enviado aos novos indicadores com instruções e link exclusivo</p>
+            <p class="text-gray-400 mb-4">E-mail automático enviado aos novos indicadores com instruções, link exclusivo e informações de campanha</p>
             
             <div class="space-y-3 mb-4">
               <div class="flex items-center justify-between">
@@ -109,45 +106,6 @@
               </button>
               <button onclick="previewWelcomeEmail()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition-colors">
                 <i class="fas fa-eye mr-2"></i>Visualizar
-              </button>
-            </div>
-          </div>
-
-          <!-- Campaign Templates -->
-          <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-xl font-bold text-white">
-                <i class="fas fa-bullhorn mr-2 text-purple-400"></i>
-                Campanhas de E-mail
-              </h3>
-              <span class="px-2 py-1 text-xs rounded-full bg-purple-500/20 text-purple-400">
-                <span id="activeCampaignsCount">0</span> ativas
-              </span>
-            </div>
-            
-            <p class="text-gray-400 mb-4">Crie campanhas personalizadas para engajar seus indicadores</p>
-            
-            <div class="space-y-3 mb-4">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-300">Total de campanhas:</span>
-                <span id="totalCampaigns" class="text-sm text-white">0</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-300">Última campanha:</span>
-                <span id="lastCampaignDate" class="text-sm text-gray-400">Nunca</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-300">Taxa média de abertura:</span>
-                <span id="avgOpenRate" class="text-sm text-white">0%</span>
-              </div>
-            </div>
-            
-            <div class="flex space-x-3">
-              <button onclick="createNewCampaign()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors">
-                <i class="fas fa-plus mr-2"></i>Nova Campanha
-              </button>
-              <button onclick="viewAllCampaigns()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition-colors">
-                <i class="fas fa-list mr-2"></i>Ver Todas
               </button>
             </div>
           </div>
