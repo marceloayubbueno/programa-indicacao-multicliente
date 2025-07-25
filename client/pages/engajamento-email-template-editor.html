@@ -21,7 +21,32 @@
     .btn-success:hover { background: #229954; }
     .editor-row { display: flex; gap: 15px; height: calc(100vh - 140px); }
     .editor-canvas { flex: 1; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    #gjs { height: 100%; border: none; }
+    #gjs { 
+      height: 100%; 
+      border: none; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Forçar centralização do canvas */
+    .gjs-cv-canvas {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-height: 100vh !important;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      padding: 20px !important;
+    }
+    
+    /* Forçar centralização do frame */
+    .gjs-frame {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-height: 100vh !important;
+    }
     .panel__right {
       width: 320px;
       background: #222c36;
@@ -484,6 +509,34 @@ document.addEventListener('DOMContentLoaded', forceBlocksGrid);
       document.getElementById('tab-btn-' + tabName).classList.add('active');
       document.getElementById('tab-' + tabName).classList.add('active');
     }
+    
+    // Função para garantir centralização
+    function ensureCentralization() {
+      const canvas = document.querySelector('.gjs-cv-canvas');
+      const frame = document.querySelector('.gjs-frame');
+      
+      if (canvas) {
+        canvas.style.display = 'flex';
+        canvas.style.alignItems = 'center';
+        canvas.style.justifyContent = 'center';
+        canvas.style.minHeight = '100vh';
+        canvas.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        canvas.style.padding = '20px';
+      }
+      
+      if (frame) {
+        frame.style.display = 'flex';
+        frame.style.alignItems = 'center';
+        frame.style.justifyContent = 'center';
+        frame.style.minHeight = '100vh';
+      }
+    }
+    
+    // Aplicar centralização periodicamente
+    setInterval(ensureCentralization, 1000);
+    
+    // Aplicar centralização quando a página carregar
+    document.addEventListener('DOMContentLoaded', ensureCentralization);
     // Lista de variáveis disponíveis
     const variaveis = [
       { tag: '{{nome}}', desc: 'Nome do indicador' },

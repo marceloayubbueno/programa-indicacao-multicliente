@@ -1,4 +1,4 @@
-// Editor de E-mail Marketing (GrapesJS)
+// Editor de E-mail Marketing (GrapesJS) - Versão Moderna e Centralizada
 // Este arquivo deve ser importado em engajamento-email-template-editor.html
 
 // Tabs
@@ -8,7 +8,8 @@ function switchTab(tabName) {
   document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
   document.getElementById(`tab-${tabName}`).classList.add('active');
 }
-// GrapesJS init
+
+// Configuração moderna do GrapesJS com padrão centralizado
 const editor = grapesjs.init({
   container: '#gjs',
   fromElement: false,
@@ -17,109 +18,284 @@ const editor = grapesjs.init({
   storageManager: false,
   blockManager: { appendTo: '#blocks' },
   styleManager: { appendTo: '#tab-styles .styles-container' },
+  
+  // Configurações avançadas para melhor experiência
+  deviceManager: {
+    devices: [
+      {
+        name: 'Desktop',
+        width: '600px',
+        height: 'auto'
+      },
+      {
+        name: 'Mobile',
+        width: '320px',
+        height: 'auto'
+      }
+    ]
+  },
+  
+  // Configuração do canvas com estilos modernos e centralizados
   canvas: { 
     styles: [
       'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
       `
-        /* Estilos globais para manter formatação moderna */
+        /* Reset e estilos globais modernos */
+        * {
+          box-sizing: border-box;
+        }
+        
         body { 
           margin: 0; 
-          padding: 0; 
-          font-family: 'Segoe UI', Arial, sans-serif; 
-          background: #f5f6fa; 
+          padding: 20px; 
+          font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; 
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         
-        /* Container principal para todos os e-mails */
+        /* Container principal centralizado - PADRÃO MODERNO */
         .email-container {
-          background: #fff;
-          border-radius: 18px;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+          background: #ffffff;
+          border-radius: 16px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
           max-width: 600px;
+          width: 100%;
           margin: 0 auto;
           overflow: hidden;
-          font-family: 'Segoe UI', Arial, sans-serif;
+          font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+          position: relative;
         }
         
-        /* Estilos para elementos internos */
-        .email-container h1, .email-container h2, .email-container h3 {
-          color: #2c3e50;
+        /* Wrapper interno para garantir centralização */
+        .email-wrapper {
+          width: 100%;
+          max-width: 600px;
+          margin: 0 auto;
+          background: #ffffff;
+          border-radius: 16px;
+          overflow: hidden;
+        }
+        
+        /* Estilos modernos para elementos internos */
+        .email-container h1, 
+        .email-container h2, 
+        .email-container h3 {
+          color: #1a202c;
           font-weight: 700;
           margin: 0 0 16px 0;
+          line-height: 1.3;
         }
         
+        .email-container h1 { font-size: 28px; }
+        .email-container h2 { font-size: 24px; }
+        .email-container h3 { font-size: 20px; }
+        
         .email-container p {
-          color: #555;
+          color: #4a5568;
           line-height: 1.6;
           margin: 0 0 16px 0;
+          font-size: 16px;
         }
         
         .email-container a {
-          color: #3498db;
+          color: #3182ce;
           text-decoration: none;
+          transition: color 0.2s ease;
         }
         
+        .email-container a:hover {
+          color: #2c5282;
+        }
+        
+        /* Botões modernos */
         .email-container .btn {
-          background: #3498db;
-          color: #fff;
-          padding: 16px 36px;
-          border-radius: 8px;
-          font-weight: bold;
-          font-size: 18px;
+          background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+          color: #ffffff;
+          padding: 16px 32px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 16px;
           text-decoration: none;
           display: inline-block;
-          box-shadow: 0 4px 12px rgba(52,152,219,0.3);
+          box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+          transition: all 0.3s ease;
+          border: none;
+          cursor: pointer;
         }
         
+        .email-container .btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(49, 130, 206, 0.4);
+        }
+        
+        /* Seções com padding consistente */
         .email-container .section {
-          padding: 32px;
+          padding: 32px 24px;
         }
         
-        .email-container .footer {
-          background: #34495e;
+        /* Header moderno */
+        .email-container .header {
+          background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
           color: white;
+          padding: 32px 24px;
+          text-align: center;
+          border-radius: 16px 16px 0 0;
+        }
+        
+        /* Footer moderno */
+        .email-container .footer {
+          background: #2d3748;
+          color: #e2e8f0;
           padding: 24px;
           text-align: center;
           font-size: 14px;
-          border-radius: 0 0 18px 18px;
+          border-radius: 0 0 16px 16px;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 640px) {
+          .email-container {
+            margin: 0 16px;
+            border-radius: 12px;
+          }
+          
+          .email-container .section {
+            padding: 24px 16px;
+          }
+          
+          .email-container .header,
+          .email-container .footer {
+            padding: 24px 16px;
+          }
+        }
+        
+        /* Estilos para o editor */
+        .gjs-cv-canvas {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 20px;
+        }
+        
+        /* Centralização forçada no editor */
+        .gjs-frame {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          min-height: 100vh !important;
         }
       `
-    ] 
+    ],
+    
+    // Configurações do canvas para centralização
+    scripts: [],
+    styles: [],
+    
+    // Configuração de dispositivos
+    device: 'Desktop'
+  },
+  
+  // Configurações de componentes
+  components: {
+    wrapper: {
+      tagName: 'div',
+      attributes: { class: 'email-wrapper' }
+    }
+  },
+  
+  // Configurações de estilos
+  cssIcons: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+  
+  // Configurações de painéis
+  panels: {
+    defaults: [
+      {
+        id: 'basic-actions',
+        el: '.panel__basic-actions',
+        buttons: [
+          {
+            id: 'visibility',
+            active: true,
+            className: 'btn-toggle-command',
+            label: '<u>B</u>',
+            command: 'sw-visibility',
+          },
+          {
+            id: 'export',
+            className: 'btn-open-command',
+            label: 'Exp',
+            command: 'export-template',
+            context: 'export-template',
+          },
+          {
+            id: 'show-json',
+            className: 'btn-open-command',
+            label: 'JSON',
+            command: 'show-json',
+          },
+        ],
+      },
+    ],
+  },
+  
+  // Configurações de comandos
+  commands: {
+    defaults: [
+      {
+        id: 'export-template',
+        run: function(editor) {
+          const html = editor.getHtml();
+          const css = editor.getCss();
+          const template = `<html><head><style>${css}</style></head><body>${html}</body></html>`;
+          const blob = new Blob([template], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'email-template.html';
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      }
+    ]
   }
 });
-// Blocos essenciais (ajustados para visual moderno e espaçado)
+
+// Blocos modernos com padrão centralizado
 editor.BlockManager.add('header', {
   label: 'Cabeçalho',
-  content: `<div style="background: #f8f9fa; padding: 32px 24px; text-align: center; border-bottom: 4px solid #3498db; border-radius: 12px 12px 0 0; box-shadow: 0 2px 8px rgba(52,152,219,0.08);">
-    <img src="https://via.placeholder.com/200x60/3498db/ffffff?text=LOGO" alt="Logo" style="height: 60px; width: auto; margin-bottom: 12px;">
-    <h1 style="color: #2c3e50; margin: 10px 0; font-size: 28px; font-weight: bold; letter-spacing: 1px;">{{empresa}}</h1>
+  content: `<div class="header" style="background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%); padding: 32px 24px; text-align: center; border-radius: 16px 16px 0 0; color: white;">
+    <img src="https://via.placeholder.com/200x60/ffffff/3182ce?text=LOGO" alt="Logo" style="height: 60px; width: auto; margin-bottom: 16px; border-radius: 8px;">
+    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">{{empresa}}</h1>
+    <p style="color: #e2e8f0; margin: 8px 0 0 0; font-size: 16px;">Sua empresa de confiança</p>
   </div>`,
   category: 'Estrutura',
   attributes: { class: 'fas fa-header' }
 });
 editor.BlockManager.add('content', {
   label: 'Conteúdo',
-  content: `<div style="padding: 36px 28px; background: #ffffff; border-radius: 0 0 12px 12px; box-shadow: 0 2px 8px rgba(44,62,80,0.06);">
-    <h2 style="color: #2c3e50; margin-bottom: 24px; font-size: 22px; font-weight: 600;">Olá {{nome}}!</h2>
-    <p style="color: #555; line-height: 1.7; margin-bottom: 24px; font-size: 16px;">Bem-vindo ao nosso programa de indicação!</p>
+  content: `<div class="section" style="padding: 32px 24px; background: #ffffff; text-align: center;">
+    <h2 style="color: #1a202c; margin-bottom: 16px; font-size: 24px; font-weight: 700;">Olá {{nome}}!</h2>
+    <p style="color: #4a5568; line-height: 1.6; margin-bottom: 24px; font-size: 16px;">Bem-vindo ao nosso programa de indicação! Estamos felizes em ter você conosco.</p>
   </div>`,
   category: 'Conteúdo',
   attributes: { class: 'fas fa-envelope-open' }
 });
 editor.BlockManager.add('cta', {
   label: 'Botão CTA',
-  content: `<div style="text-align: center; padding: 32px 24px; background: #ffffff;">
-    <a href="{{linkIndicacao}}" style="background: #3498db; color: white; padding: 18px 36px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 2px 8px rgba(52,152,219,0.12); display: inline-block;">Começar a Indicar</a>
+  content: `<div class="section" style="text-align: center; padding: 32px 24px; background: #ffffff;">
+    <a href="{{linkIndicacao}}" class="btn" style="background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3); display: inline-block; transition: all 0.3s ease;">Começar a Indicar</a>
   </div>`,
   category: 'Conteúdo',
   attributes: { class: 'fas fa-mouse-pointer' }
 });
 editor.BlockManager.add('footer', {
   label: 'Rodapé',
-  content: `<div style="background: #34495e; color: white; padding: 24px; text-align: center; font-size: 14px; border-radius: 0 0 12px 12px;">
+  content: `<div class="footer" style="background: #2d3748; color: #e2e8f0; padding: 24px; text-align: center; font-size: 14px; border-radius: 0 0 16px 16px;">
     <p style="margin: 0 0 12px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
     <p style="margin: 0 0 10px 0;">
-      <a href="#" style="color: #3498db; text-decoration: none;">Cancelar inscrição</a> |
-      <a href="#" style="color: #3498db; text-decoration: none;">Política de Privacidade</a>
+      <a href="#" style="color: #3182ce; text-decoration: none;">Cancelar inscrição</a> |
+      <a href="#" style="color: #3182ce; text-decoration: none;">Política de Privacidade</a>
     </p>
   </div>`,
   category: 'Estrutura',
@@ -223,71 +399,96 @@ editor.BlockManager.add('banner', {
   category: 'Conteúdo',
   attributes: { class: 'fas fa-image' }
 });
-// Modelo pronto: Boas-vindas
+// Modelo moderno padrão: Boas-vindas (PADRÃO CENTRALIZADO)
 editor.BlockManager.add('welcome-template', {
   label: 'Modelo: Boas-vindas',
   content: `
-    <div style="background:#fff; border-radius:18px; box-shadow:0 4px 24px #0002; max-width:600px; margin:0 auto; overflow:hidden; font-family:'Segoe UI', Arial, sans-serif;">
-      <div style="text-align:center; padding:0;">
-        <img src="https://via.placeholder.com/600x200/3498db/ffffff?text=Bem-vindo%28a%29+ao+{{empresa}}" alt="Bem-vindo(a)" style="width:100%; height:auto; border-radius:18px 18px 0 0;">
-      </div>
-      <div style="padding:32px 32px 0 32px; text-align:center;">
-        <h2 style="color:#2c3e50; font-size:26px; margin-bottom:12px; font-weight:700;">Olá, {{nome}}!</h2>
-        <p style="color:#555; font-size:16px; margin-bottom:24px; line-height:1.6;">
-          Seja bem-vindo(a) ao programa da <b>{{empresa}}</b>!<br>
-          Seu acesso exclusivo já está disponível.<br>
-          Use o botão abaixo para acessar sua área exclusiva e começar a aproveitar todos os benefícios.
-        </p>
-        <div style="text-align:center; margin-bottom:32px;">
-          <a href="{{linkAcesso}}" style="background:#3498db; color:#fff; padding:16px 36px; border-radius:8px; font-weight:bold; font-size:18px; text-decoration:none; display:inline-block; box-shadow:0 4px 12px rgba(52,152,219,0.3);">
+    <div class="email-wrapper">
+      <div class="email-container">
+        <div class="header" style="background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%); padding: 32px 24px; text-align: center; border-radius: 16px 16px 0 0; color: white;">
+          <img src="https://via.placeholder.com/200x60/ffffff/3182ce?text=LOGO" alt="Logo" style="height: 60px; width: auto; margin-bottom: 16px; border-radius: 8px;">
+          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">{{empresa}}</h1>
+          <p style="color: #e2e8f0; margin: 8px 0 0 0; font-size: 16px;">Sua empresa de confiança</p>
+        </div>
+        
+        <div class="section" style="padding: 32px 24px; background: #ffffff; text-align: center;">
+          <h2 style="color: #1a202c; margin-bottom: 16px; font-size: 24px; font-weight: 700;">Olá, {{nome}}!</h2>
+          <p style="color: #4a5568; line-height: 1.6; margin-bottom: 24px; font-size: 16px;">
+            Seja bem-vindo(a) ao programa da <b>{{empresa}}</b>!<br>
+            Seu acesso exclusivo já está disponível.
+          </p>
+          <a href="{{linkAcesso}}" class="btn" style="background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3); display: inline-block; transition: all 0.3s ease;">
             Acessar minha área exclusiva
           </a>
         </div>
-      </div>
-      <div style="padding:0 32px; margin-bottom:24px;">
-        <ul style="color:#2c3e50; font-size:15px; background:#f8f9fa; border-radius:12px; padding:20px 24px; margin:0; list-style:none;">
-          <li style="margin-bottom:8px; display:flex; align-items:center; gap:8px;"><span style="color:#27ae60; font-weight:bold;">✓</span> Suporte dedicado</li>
-          <li style="margin-bottom:8px; display:flex; align-items:center; gap:8px;"><span style="color:#27ae60; font-weight:bold;">✓</span> Conteúdos exclusivos</li>
-          <li style="display:flex; align-items:center; gap:8px;"><span style="color:#27ae60; font-weight:bold;">✓</span> Participação em campanhas e sorteios</li>
-        </ul>
-      </div>
-      <div style="padding:0 32px; margin-bottom:24px;">
-        <div style="display:flex; align-items:center; gap:18px; background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(44,62,80,0.08); padding:20px 24px; border:1px solid #ecf0f1;">
-          <img src="https://via.placeholder.com/64x64/3498db/ffffff?text=Foto" alt="Foto" style="width:64px; height:64px; border-radius:50%; object-fit:cover; box-shadow:0 2px 8px rgba(52,152,219,0.2);">
-          <div>
-            <div style="font-weight:600; color:#2c3e50; font-size:16px;">{{nomeResponsavel}}</div>
-            <div style="color:#555; font-size:14px;">Equipe {{empresa}}</div>
-            <div style="color:#3498db; font-size:13px; margin-top:4px;">contato@email.com</div>
+        
+        <div class="section" style="padding: 0 24px; background: #ffffff;">
+          <ul style="color: #1a202c; font-size: 15px; background: #f7fafc; border-radius: 12px; padding: 20px 24px; margin: 0; list-style: none;">
+            <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><span style="color: #38a169; font-weight: bold;">✓</span> Suporte dedicado</li>
+            <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><span style="color: #38a169; font-weight: bold;">✓</span> Conteúdos exclusivos</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><span style="color: #38a169; font-weight: bold;">✓</span> Participação em campanhas e sorteios</li>
+          </ul>
+        </div>
+        
+        <div class="section" style="padding: 24px; background: #ffffff;">
+          <div style="display: flex; align-items: center; gap: 18px; background: #f7fafc; border-radius: 12px; padding: 20px 24px; border: 1px solid #e2e8f0;">
+            <img src="https://via.placeholder.com/64x64/3182ce/ffffff?text=Foto" alt="Foto" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 8px rgba(49, 130, 206, 0.2);">
+            <div>
+              <div style="font-weight: 600; color: #1a202c; font-size: 16px;">{{nomeResponsavel}}</div>
+              <div style="color: #4a5568; font-size: 14px;">Equipe {{empresa}}</div>
+              <div style="color: #3182ce; font-size: 13px; margin-top: 4px;">contato@email.com</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div style="background:#34495e; color:white; padding:24px; text-align:center; font-size:14px; border-radius:0 0 18px 18px; margin-top:32px;">
-        <p style="margin:0 0 12px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
-        <p style="margin:0;">
-          <a href="#" style="color:#3498db; text-decoration:none;">Cancelar inscrição</a> |
-          <a href="#" style="color:#3498db; text-decoration:none;">Política de Privacidade</a>
-        </p>
+        
+        <div class="footer" style="background: #2d3748; color: #e2e8f0; padding: 24px; text-align: center; font-size: 14px; border-radius: 0 0 16px 16px;">
+          <p style="margin: 0 0 12px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+          <p style="margin: 0;">
+            <a href="#" style="color: #3182ce; text-decoration: none;">Cancelar inscrição</a> |
+            <a href="#" style="color: #3182ce; text-decoration: none;">Política de Privacidade</a>
+          </p>
+        </div>
       </div>
     </div>
   `,
   category: 'Modelos',
   attributes: { class: 'fas fa-star' }
 });
-// Preview
+// Preview com estrutura centralizada
 window.previewEmail = function() {
-  const html = editor.getHtml();
+  let html = editor.getHtml();
   const css = editor.getCss();
+  
+  // Garantir estrutura centralizada no preview
+  if (!html.includes('email-wrapper')) {
+    if (!html.includes('email-container')) {
+      html = `<div class="email-container">${html}</div>`;
+    }
+    html = `<div class="email-wrapper">${html}</div>`;
+  }
+  
   const previewWindow = window.open('', '_blank');
   previewWindow.document.write(`
     <html>
       <head>
         <title>Preview do E-mail</title>
-        <style>${css}</style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          ${css}
+          body { 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+          }
+        </style>
       </head>
-      <body style="margin: 0; padding: 20px; background: #f5f5f5;">
-        <div style="max-width: 600px; margin: 0 auto; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
-          ${html}
-        </div>
+      <body>
+        ${html}
       </body>
     </html>
   `);
@@ -298,37 +499,102 @@ function getUrlParam(name) {
   return url.searchParams.get(name);
 }
 
-// Carregar template existente se houver ID na URL
+// Sistema de inicialização com estrutura centralizada garantida
 const templateId = getUrlParam('id');
-if (templateId) {
-  fetchTemplate(templateId);
-} else {
-  // Se não há template para carregar, garantir container principal
+
+// Função de inicialização que garante estrutura centralizada
+function initializeEditor() {
+  console.log('🚀 [INIT] Inicializando editor com estrutura centralizada...');
+  
+  if (templateId) {
+    fetchTemplate(templateId);
+  } else {
+    // Criar estrutura centralizada vazia
+    ensureEmailContainer();
+  }
+  
+  // Forçar centralização após carregamento
   setTimeout(() => {
     ensureEmailContainer();
-  }, 1000);
+    console.log('✅ [INIT] Editor inicializado com sucesso');
+  }, 500);
 }
 
-// Função para garantir container principal (chamada manualmente quando necessário)
+// Inicializar editor
+setTimeout(initializeEditor, 100);
+
+// Função para forçar estrutura centralizada em qualquer situação
+window.forceCentralizedStructure = function() {
+  console.log('🔧 [FORCE] Forçando estrutura centralizada...');
+  ensureEmailContainer();
+  
+  // Verificar se o canvas está centralizado
+  const canvas = document.querySelector('.gjs-cv-canvas');
+  if (canvas) {
+    canvas.style.display = 'flex';
+    canvas.style.alignItems = 'center';
+    canvas.style.justifyContent = 'center';
+    canvas.style.minHeight = '100vh';
+  }
+  
+  // Verificar se o frame está centralizado
+  const frame = document.querySelector('.gjs-frame');
+  if (frame) {
+    frame.style.display = 'flex';
+    frame.style.alignItems = 'center';
+    frame.style.justifyContent = 'center';
+    frame.style.minHeight = '100vh';
+  }
+  
+  console.log('✅ [FORCE] Estrutura centralizada forçada');
+};
+
+// Chamar função de força periodicamente
+setInterval(() => {
+  forceCentralizedStructure();
+}, 2000);
+
+// Função para garantir container principal centralizado (PADRÃO MODERNO)
 function ensureEmailContainer() {
   const wrapper = editor.getWrapper();
   const components = wrapper.getComponents();
   
-  // Se não há componentes ou o primeiro não é o container principal
-  if (components.length === 0 || !components[0].getClasses().includes('email-container')) {
-    console.log('🔍 [DEBUG] Container principal não encontrado, criando...');
-    
-    // Se há componentes, mover para dentro do container
-    if (components.length > 0) {
-      const content = wrapper.getInnerHTML();
-      wrapper.set('content', `<div class="email-container">${content}</div>`);
-    } else {
-      // Se não há componentes, criar container vazio
-      wrapper.set('content', '<div class="email-container"></div>');
-    }
-    
-    console.log('🔍 [DEBUG] Container principal criado');
+  // Verificar se já existe o wrapper centralizado
+  const hasWrapper = components.length > 0 && components[0].getClasses().includes('email-wrapper');
+  const hasContainer = components.length > 0 && components[0].getClasses().includes('email-container');
+  
+  console.log('🔍 [DEBUG] Verificando estrutura:', { hasWrapper, hasContainer, componentsCount: components.length });
+  
+  if (components.length === 0) {
+    // Criar estrutura completa vazia
+    console.log('🔍 [DEBUG] Criando estrutura completa vazia...');
+    wrapper.set('content', `
+      <div class="email-wrapper">
+        <div class="email-container">
+          <!-- Conteúdo do e-mail será inserido aqui -->
+        </div>
+      </div>
+    `);
+  } else if (!hasWrapper) {
+    // Se não tem wrapper, adicionar wrapper e container
+    console.log('🔍 [DEBUG] Adicionando wrapper e container...');
+    const content = wrapper.getInnerHTML();
+    wrapper.set('content', `
+      <div class="email-wrapper">
+        <div class="email-container">
+          ${content}
+        </div>
+      </div>
+    `);
+  } else if (!hasContainer) {
+    // Se tem wrapper mas não tem container, adicionar container
+    console.log('🔍 [DEBUG] Adicionando container...');
+    const wrapperEl = components[0];
+    const wrapperContent = wrapperEl.getInnerHTML();
+    wrapperEl.set('content', `<div class="email-container">${wrapperContent}</div>`);
   }
+  
+  console.log('🔍 [DEBUG] Estrutura centralizada garantida');
 }
 
 function fetchTemplate(id) {
@@ -346,15 +612,19 @@ function fetchTemplate(id) {
         document.getElementById('templateType').value = data.type;
       }
       if (data && data.htmlContent) {
-        // Garantir que o conteúdo tenha o container principal
+        // Garantir que o conteúdo tenha a estrutura centralizada
         let htmlContent = data.htmlContent;
         
-        // Se não tem container principal, adicionar
-        if (!htmlContent.includes('email-container')) {
-          htmlContent = `<div class="email-container">${htmlContent}</div>`;
+        // Se não tem wrapper, adicionar estrutura completa
+        if (!htmlContent.includes('email-wrapper')) {
+          if (!htmlContent.includes('email-container')) {
+            htmlContent = `<div class="email-container">${htmlContent}</div>`;
+          }
+          htmlContent = `<div class="email-wrapper">${htmlContent}</div>`;
         }
         
         editor.setComponents(htmlContent);
+        console.log('🔍 [DEBUG] Template carregado com estrutura centralizada');
       }
       // Se quiser preencher outros campos, adicione aqui
     });
@@ -376,10 +646,14 @@ window.saveTemplate = function() {
   let htmlContent = editor.getHtml();
   console.log('🔍 [DEBUG] HTML content obtido, tamanho:', htmlContent.length);
   
-  // Garantir que o conteúdo tenha o container principal
-  if (!htmlContent.includes('email-container')) {
-    htmlContent = `<div class="email-container">${htmlContent}</div>`;
-    console.log('🔍 [DEBUG] Container principal adicionado');
+  // Garantir que o conteúdo tenha a estrutura centralizada completa
+  if (!htmlContent.includes('email-wrapper')) {
+    if (!htmlContent.includes('email-container')) {
+      htmlContent = `<div class="email-container">${htmlContent}</div>`;
+      console.log('🔍 [DEBUG] Container principal adicionado');
+    }
+    htmlContent = `<div class="email-wrapper">${htmlContent}</div>`;
+    console.log('🔍 [DEBUG] Wrapper centralizado adicionado');
   }
   
   const type = document.getElementById('templateType').value || 'welcome';
@@ -490,9 +764,27 @@ setTimeout(fixBlocksGrid, 1000);
 setTimeout(fixBlocksGrid, 2000);
 setTimeout(fixBlocksGrid, 3000);
 
+// Sistema de eventos para manter estrutura centralizada
+editor.on('component:add', function(component) {
+  console.log('🔧 [EVENT] Componente adicionado, verificando estrutura...');
+  setTimeout(() => ensureEmailContainer(), 100);
+});
+
+editor.on('component:update', function(component) {
+  console.log('🔧 [EVENT] Componente atualizado, verificando estrutura...');
+  setTimeout(() => ensureEmailContainer(), 100);
+});
+
+editor.on('component:remove', function(component) {
+  console.log('🔧 [EVENT] Componente removido, verificando estrutura...');
+  setTimeout(() => ensureEmailContainer(), 100);
+});
+
 // Observer para mudanças no DOM
 const observer = new MutationObserver(() => {
   fixBlocksGrid();
+  // Verificar estrutura centralizada periodicamente
+  setTimeout(() => ensureEmailContainer(), 200);
 });
 observer.observe(document.body, { childList: true, subtree: true }); 
 
