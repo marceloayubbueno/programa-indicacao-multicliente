@@ -41,6 +41,9 @@ async function loadEmailTemplates() {
   try {
     const token = localStorage.getItem('clientToken');
     const clientId = localStorage.getItem('clientId');
+    console.log('🔍 [TEMPLATES] Token encontrado:', token ? 'SIM' : 'NÃO');
+    console.log('🔍 [TEMPLATES] ClientId encontrado:', clientId || 'NÃO');
+    
     if (!token) {
       console.error('❌ [TEMPLATES] Token não encontrado');
       return;
@@ -48,6 +51,11 @@ async function loadEmailTemplates() {
     let url = `${getApiUrl()}/email-templates`;
     if (currentType !== 'all') url += `?type=${currentType}`;
     console.log('🔍 [TEMPLATES] Fazendo requisição para:', url);
+    console.log('🔍 [TEMPLATES] Headers:', {
+      'Authorization': `Bearer ${token ? 'TOKEN_PRESENTE' : 'TOKEN_AUSENTE'}`,
+      'Content-Type': 'application/json'
+    });
+    
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -55,12 +63,18 @@ async function loadEmailTemplates() {
         'Content-Type': 'application/json'
       }
     });
+    console.log('🔍 [TEMPLATES] Status da resposta:', response.status);
+    console.log('🔍 [TEMPLATES] Headers da resposta:', Object.fromEntries(response.headers.entries()));
+    
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ [TEMPLATES] Erro na resposta:', errorText);
       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
     const data = await response.json();
+    console.log('🔍 [TEMPLATES] Dados recebidos:', data);
+    console.log('🔍 [TEMPLATES] Templates encontrados:', data.templates ? data.templates.length : 0);
+    
     emailTemplatesList = data.templates || data || [];
     renderEmailTemplatesTable();
   } catch (error) {

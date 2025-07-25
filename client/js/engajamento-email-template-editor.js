@@ -240,6 +240,9 @@ function fetchTemplate(id) {
       if (data && data.name) {
         document.getElementById('templateName').value = data.name;
       }
+      if (data && data.type) {
+        document.getElementById('templateType').value = data.type;
+      }
       if (data && data.htmlContent) {
         editor.setComponents(data.htmlContent);
       }
@@ -263,7 +266,7 @@ window.saveTemplate = function() {
   const htmlContent = editor.getHtml();
   console.log('🔍 [DEBUG] HTML content obtido, tamanho:', htmlContent.length);
   
-  const type = getUrlParam('type') || 'welcome';
+  const type = document.getElementById('templateType').value || 'welcome';
   console.log('🔍 [DEBUG] Tipo do template:', type);
   
   const token = localStorage.getItem('clientToken');
