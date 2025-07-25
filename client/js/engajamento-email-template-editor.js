@@ -232,7 +232,7 @@ if (templateId) {
 function fetchTemplate(id) {
   const token = localStorage.getItem('clientToken');
   if (!token) return alert('Token não encontrado');
-  fetch(`${window.API_URL || 'http://localhost:3000/api'}/email-templates/${id}`, {
+  fetch(`${window.APP_CONFIG ? window.APP_CONFIG.API_URL : (window.API_URL || 'http://localhost:3000/api')}/email-templates/${id}`, {
     headers: { 'Authorization': `Bearer ${token}` }
   })
     .then(res => res.json())
@@ -281,7 +281,7 @@ window.saveTemplate = function() {
   };
   console.log('🔍 [DEBUG] Payload preparado:', payload);
   
-  let url = `${window.API_URL || 'http://localhost:3000/api'}/email-templates`;
+  let url = `${window.APP_CONFIG ? window.APP_CONFIG.API_URL : (window.API_URL || 'http://localhost:3000/api')}/email-templates`;
   let method = 'POST';
   if (templateId) {
     url += `/${templateId}`;
