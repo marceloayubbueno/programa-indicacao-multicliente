@@ -269,20 +269,38 @@ window.saveTemplate = function() {
     url += `/${templateId}`;
     method = 'PATCH';
   }
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+  // LOG: Exibir detalhes da requisição
+  console.log('[EMAIL TEMPLATE][REQUEST]', { url, method, headers, payload });
   fetch(url, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify(payload)
   })
-    .then(res => res.json())
-    .then(data => {
+    .then(async res => {
+      const contentType = res.headers.get('content-type');
+      let data;
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        data = await res.text();
+      }
+      // LOG: Exibir resposta da API
+      console.log('[EMAIL TEMPLATE][RESPONSE]', { status: res.status, data });
+      if (!res.ok) {
+        alert('Erro ao salvar template: ' + (data?.message || res.status));
+        return;
+      }
       alert('Template salvo com sucesso!');
       // Redirecionar ou atualizar a página, se necessário
     })
-    .catch(() => alert('Erro ao salvar template.'));
+    .catch((err) => {
+      console.error('[EMAIL TEMPLATE][NETWORK ERROR]', err);
+      alert('Erro de rede ao salvar template. Veja o console para detalhes.');
+    });
 }
 // Testar (mock)
 window.testEmail = function() {
