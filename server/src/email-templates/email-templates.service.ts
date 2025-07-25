@@ -25,15 +25,30 @@ export class EmailTemplatesService {
   }
 
   async findAll(clientId?: string, type?: string): Promise<{ templates: EmailTemplate[]; total: number }> {
+    console.log('🔍 [BACKEND] findAll chamado com clientId:', clientId);
+    console.log('🔍 [BACKEND] findAll chamado com type:', type);
+    
     const filter: any = {};
     
     if (clientId) {
-      filter.clientId = new Types.ObjectId(clientId);
+      console.log('🔍 [BACKEND] ClientId original:', clientId);
+      console.log('🔍 [BACKEND] ClientId é ObjectId válido?', Types.ObjectId.isValid(clientId));
+      
+      try {
+        filter.clientId = new Types.ObjectId(clientId);
+        console.log('🔍 [BACKEND] Filter aplicado:', filter);
+      } catch (error) {
+        console.error('❌ [BACKEND] Erro ao converter clientId para ObjectId:', error);
+        // Se não for um ObjectId válido, tenta buscar como string
+        filter.clientId = clientId;
+      }
     }
     
     if (type) {
       filter.type = type;
     }
+
+    console.log('🔍 [BACKEND] Filter final:', filter);
 
     const templates = await this.emailTemplateModel
       .find(filter)
@@ -41,7 +56,16 @@ export class EmailTemplatesService {
       .sort({ createdAt: -1 })
       .exec();
 
+    console.log('🔍 [BACKEND] Templates encontrados:', templates.length);
+    console.log('🔍 [BACKEND] Primeiro template (se houver):', templates[0] ? {
+      _id: templates[0]._id,
+      name: templates[0].name,
+      clientId: templates[0].clientId,
+      type: templates[0].type
+    } : 'Nenhum template encontrado');
+
     const total = await this.emailTemplateModel.countDocuments(filter);
+    console.log('🔍 [BACKEND] Total de documentos:', total);
 
     return { templates, total };
   }
