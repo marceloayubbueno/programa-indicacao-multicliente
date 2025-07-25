@@ -34,40 +34,73 @@ export class EmailTemplatesService {
       console.log('🔍 [BACKEND] ClientId original:', clientId);
       console.log('🔍 [BACKEND] ClientId é ObjectId válido?', Types.ObjectId.isValid(clientId));
       
-      try {
-        filter.clientId = new Types.ObjectId(clientId);
-        console.log('🔍 [BACKEND] Filter aplicado:', filter);
-      } catch (error) {
-        console.error('❌ [BACKEND] Erro ao converter clientId para ObjectId:', error);
-        // Se não for um ObjectId válido, tenta buscar como string
-        filter.clientId = clientId;
+      // Tentar buscar tanto como ObjectId quanto como string
+      const objectIdFilter = { clientId: new Types.ObjectId(clientId) };
+      const stringFilter = { clientId: clientId };
+      
+      console.log('🔍 [BACKEND] Tentando buscar com ObjectId filter:', objectIdFilter);
+      console.log('🔍 [BACKEND] Tentando buscar com string filter:', stringFilter);
+      
+      // Primeiro, tentar com ObjectId
+      let templates = await this.emailTemplateModel
+        .find(objectIdFilter)
+        .populate('clientId', 'companyName accessEmail')
+        .sort({ createdAt: -1 })
+        .exec();
+      
+      console.log('🔍 [BACKEND] Templates encontrados com ObjectId:', templates.length);
+      
+      // Se não encontrou nada, tentar com string
+      if (templates.length === 0) {
+        console.log('🔍 [BACKEND] Nenhum template encontrado com ObjectId, tentando com string...');
+        templates = await this.emailTemplateModel
+          .find(stringFilter)
+          .populate('clientId', 'companyName accessEmail')
+          .sort({ createdAt: -1 })
+          .exec();
+        
+        console.log('🔍 [BACKEND] Templates encontrados com string:', templates.length);
       }
+      
+      // Se ainda não encontrou, tentar sem filtro de clientId para ver se há templates
+      if (templates.length === 0) {
+        console.log('🔍 [BACKEND] Nenhum template encontrado, verificando se há templates no banco...');
+        const allTemplates = await this.emailTemplateModel.find({}).limit(5).exec();
+        console.log('🔍 [BACKEND] Total de templates no banco (primeiros 5):', allTemplates.length);
+        if (allTemplates.length > 0) {
+          console.log('🔍 [BACKEND] Exemplo de template no banco:', {
+            _id: allTemplates[0]._id,
+            name: allTemplates[0].name,
+            clientId: allTemplates[0].clientId,
+            type: allTemplates[0].type
+          });
+        }
+      }
+      
+      // Aplicar filtro de tipo se especificado
+      if (type && templates.length > 0) {
+        templates = templates.filter(t => t.type === type);
+        console.log('🔍 [BACKEND] Templates após filtro de tipo:', templates.length);
+      }
+      
+      const total = templates.length;
+      console.log('🔍 [BACKEND] Total final:', total);
+      
+      return { templates, total };
     }
     
-    if (type) {
-      filter.type = type;
-    }
-
-    console.log('🔍 [BACKEND] Filter final:', filter);
-
+    // Se não tem clientId, buscar todos
+    console.log('🔍 [BACKEND] Buscando todos os templates (sem clientId)');
+    
     const templates = await this.emailTemplateModel
-      .find(filter)
+      .find({})
       .populate('clientId', 'companyName accessEmail')
       .sort({ createdAt: -1 })
       .exec();
-
-    console.log('🔍 [BACKEND] Templates encontrados:', templates.length);
-    console.log('🔍 [BACKEND] Primeiro template (se houver):', templates[0] ? {
-      _id: templates[0]._id,
-      name: templates[0].name,
-      clientId: templates[0].clientId,
-      type: templates[0].type
-    } : 'Nenhum template encontrado');
-
-    const total = await this.emailTemplateModel.countDocuments(filter);
-    console.log('🔍 [BACKEND] Total de documentos:', total);
-
-    return { templates, total };
+    
+    console.log('🔍 [BACKEND] Total de templates encontrados:', templates.length);
+    
+    return { templates, total: templates.length };
   }
 
   async findOne(id: string): Promise<EmailTemplate> {
