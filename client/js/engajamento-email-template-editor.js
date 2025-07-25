@@ -302,29 +302,34 @@ function getUrlParam(name) {
 const templateId = getUrlParam('id');
 if (templateId) {
   fetchTemplate(templateId);
+} else {
+  // Se não há template para carregar, garantir container principal
+  setTimeout(() => {
+    ensureEmailContainer();
+  }, 1000);
 }
 
-// Evento para garantir que sempre haja um container principal
-editor.on('component:add', function(component) {
+// Função para garantir container principal (chamada manualmente quando necessário)
+function ensureEmailContainer() {
   const wrapper = editor.getWrapper();
   const components = wrapper.getComponents();
   
   // Se não há componentes ou o primeiro não é o container principal
   if (components.length === 0 || !components[0].getClasses().includes('email-container')) {
-    // Criar container principal
-    const container = editor.addComponent({
-      type: 'default',
-      tagName: 'div',
-      classes: ['email-container'],
-      content: component.toHTML()
-    });
+    console.log('🔍 [DEBUG] Container principal não encontrado, criando...');
     
-    // Remover o componente original
-    component.remove();
+    // Se há componentes, mover para dentro do container
+    if (components.length > 0) {
+      const content = wrapper.getInnerHTML();
+      wrapper.set('content', `<div class="email-container">${content}</div>`);
+    } else {
+      // Se não há componentes, criar container vazio
+      wrapper.set('content', '<div class="email-container"></div>');
+    }
     
-    console.log('🔍 [DEBUG] Container principal criado automaticamente');
+    console.log('🔍 [DEBUG] Container principal criado');
   }
-});
+}
 
 function fetchTemplate(id) {
   const token = localStorage.getItem('clientToken');
