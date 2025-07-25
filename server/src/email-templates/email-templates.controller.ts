@@ -37,6 +37,9 @@ export class EmailTemplatesController {
   @Get()
   async findAll(@Request() req, @Query('type') type?: string) {
     const clientId = req.user?.clientId || req.user?.sub;
+    console.log('🔍 [CONTROLLER] findAll - req.user:', req.user);
+    console.log('🔍 [CONTROLLER] findAll - clientId extraído:', clientId);
+    console.log('🔍 [CONTROLLER] findAll - type:', type);
     
     return this.emailTemplatesService.findAll(clientId, type);
   }
