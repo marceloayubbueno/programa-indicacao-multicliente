@@ -249,38 +249,62 @@ function fetchTemplate(id) {
 
 // Salvar template
 window.saveTemplate = function() {
+  console.log('🔍 [DEBUG] Função saveTemplate iniciada');
+  
   const name = document.getElementById('templateName').value.trim();
+  console.log('🔍 [DEBUG] Nome do template:', name);
+  
   if (!name) {
+    console.log('🔍 [DEBUG] Nome vazio - retornando');
     alert('Por favor, informe o nome do template.');
     return;
   }
+  
   const htmlContent = editor.getHtml();
+  console.log('🔍 [DEBUG] HTML content obtido, tamanho:', htmlContent.length);
+  
   const type = getUrlParam('type') || 'welcome';
+  console.log('🔍 [DEBUG] Tipo do template:', type);
+  
   const token = localStorage.getItem('clientToken');
-  if (!token) return alert('Token não encontrado');
+  console.log('🔍 [DEBUG] Token encontrado:', token ? 'SIM' : 'NÃO');
+  
+  if (!token) {
+    console.log('🔍 [DEBUG] Token não encontrado - retornando');
+    return alert('Token não encontrado');
+  }
+  
   const payload = {
     name,
     htmlContent,
     type
   };
+  console.log('🔍 [DEBUG] Payload preparado:', payload);
+  
   let url = `${window.API_URL || 'http://localhost:3000/api'}/email-templates`;
   let method = 'POST';
   if (templateId) {
     url += `/${templateId}`;
     method = 'PATCH';
   }
+  console.log('🔍 [DEBUG] URL e método:', { url, method });
+  
   const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`
   };
+  
   // LOG: Exibir detalhes da requisição
   console.log('[EMAIL TEMPLATE][REQUEST]', { url, method, headers, payload });
+  
+  console.log('🔍 [DEBUG] Iniciando fetch...');
   fetch(url, {
     method,
     headers,
     body: JSON.stringify(payload)
   })
     .then(async res => {
+      console.log('🔍 [DEBUG] Resposta recebida, status:', res.status);
       const contentType = res.headers.get('content-type');
       let data;
       if (contentType && contentType.includes('application/json')) {
@@ -291,13 +315,16 @@ window.saveTemplate = function() {
       // LOG: Exibir resposta da API
       console.log('[EMAIL TEMPLATE][RESPONSE]', { status: res.status, data });
       if (!res.ok) {
+        console.log('🔍 [DEBUG] Erro na resposta - exibindo alerta');
         alert('Erro ao salvar template: ' + (data?.message || res.status));
         return;
       }
+      console.log('🔍 [DEBUG] Sucesso - exibindo alerta de sucesso');
       alert('Template salvo com sucesso!');
       // Redirecionar ou atualizar a página, se necessário
     })
     .catch((err) => {
+      console.log('🔍 [DEBUG] Erro de rede capturado:', err);
       console.error('[EMAIL TEMPLATE][NETWORK ERROR]', err);
       alert('Erro de rede ao salvar template. Veja o console para detalhes.');
     });
@@ -394,17 +421,14 @@ editor.BlockManager.add('welcome-coinbase', {
         <a href="{{linkAcesso}}" style="background:#232c3d; color:#fff; padding:14px 32px; border-radius:8px; font-weight:bold; font-size:17px; text-decoration:none; display:inline-block; margin-bottom:18px;">Acessar minha área exclusiva</a>
       </div>
       <div style="padding:0 32px; margin-top:18px;">
-        <div style="background:#f8f9fa; border-radius:8px; padding:14px 18px; color:#232c3d; font-size:14px;">
-          <b>Por que você vai gostar:</b>
-          <ul style="margin:8px 0 0 0; padding:0 0 0 18px;">
-            <li>Atendimento personalizado</li>
-            <li>Conteúdo exclusivo</li>
-            <li>Ofertas e novidades em primeira mão</li>
-          </ul>
+        <div style="background:#f8f9fa; border-radius:8px; padding:14px 18px; color:#232c3d; font-size:14px; display:flex; gap:18px; justify-content:center;">
+          <div style="display:flex;align-items:center;gap:8px;"><img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" width="22" alt="">Atendimento personalizado</div>
+          <div style="display:flex;align-items:center;gap:8px;"><img src="https://cdn-icons-png.flaticon.com/512/190/190406.png" width="22" alt="">Conteúdo exclusivo</div>
+          <div style="display:flex;align-items:center;gap:8px;"><img src="https://cdn-icons-png.flaticon.com/512/190/190422.png" width="22" alt="">Ofertas e novidades</div>
         </div>
       </div>
       <div style="padding:0 32px; margin-top:24px; text-align:center; color:#aaa; font-size:13px;">Dúvidas? Responda este e-mail ou acesse nossa central de ajuda.</div>
-      <div style="background:#232c3d; color:white; padding:18px; text-align:center; font-size:14px; border-radius:0 0 16px 16px; margin-top:28px;">
+      <div style="background:#232c3d; color:white; padding:18px; text-align:center; font-size:14px; border-radius:0 0 18px 18px; margin-top:28px;">
         <p style="margin:0 0 8px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
         <p style="margin:0;">
           <a href="#" style="color:#3498db; text-decoration:none;">Cancelar inscrição</a> |
