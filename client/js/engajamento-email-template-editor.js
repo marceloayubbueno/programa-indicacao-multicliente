@@ -160,39 +160,47 @@ editor.BlockManager.add('banner', {
 editor.BlockManager.add('welcome-template', {
   label: 'Modelo: Boas-vindas',
   content: `
-    <div style="text-align:center; margin-bottom:24px;">
-      <img src="https://via.placeholder.com/600x200/3498db/ffffff?text=Bem-vindo%28a%29+ao+{{empresa}}" alt="Bem-vindo(a)" style="width:100%; max-width:600px; border-radius:12px;">
-    </div>
-    <h2 style="color:#2c3e50; font-size:24px; margin-bottom:12px;">Olá, {{nome}}!</h2>
-    <p style="color:#555; font-size:16px; margin-bottom:24px;">
-      Seja bem-vindo(a) ao programa da <b>{{empresa}}</b>!<br>
-      Seu acesso exclusivo já está disponível.<br>
-      Use o botão abaixo para acessar sua área exclusiva e começar a aproveitar todos os benefícios.
-    </p>
-    <div style="text-align:center; margin-bottom:32px;">
-      <a href="{{linkAcesso}}" style="background:#3498db; color:#fff; padding:16px 36px; border-radius:8px; font-weight:bold; font-size:18px; text-decoration:none; display:inline-block;">
-        Acessar minha área exclusiva
-      </a>
-    </div>
-    <ul style="color:#2c3e50; font-size:15px; background:#f8f9fa; border-radius:8px; padding:18px 24px; margin-bottom:24px;">
-      <li>Suporte dedicado</li>
-      <li>Conteúdos exclusivos</li>
-      <li>Participação em campanhas e sorteios</li>
-    </ul>
-    <div style="display:flex; align-items:center; gap:18px; background:#fff; border-radius:10px; box-shadow:0 2px 8px rgba(44,62,80,0.06); padding:18px 24px;">
-      <img src="https://via.placeholder.com/64x64/3498db/ffffff?text=Foto" alt="Foto" style="width:64px; height:64px; border-radius:50%; object-fit:cover;">
-      <div>
-        <div style="font-weight:600; color:#2c3e50; font-size:16px;">{{nomeResponsavel}}</div>
-        <div style="color:#555; font-size:14px;">Equipe {{empresa}}</div>
-        <div style="color:#3498db; font-size:13px; margin-top:4px;">contato@email.com</div>
+    <div style="background:#fff; border-radius:18px; box-shadow:0 4px 24px #0002; max-width:600px; margin:0 auto; overflow:hidden; font-family:'Segoe UI', Arial, sans-serif;">
+      <div style="text-align:center; padding:0;">
+        <img src="https://via.placeholder.com/600x200/3498db/ffffff?text=Bem-vindo%28a%29+ao+{{empresa}}" alt="Bem-vindo(a)" style="width:100%; height:auto; border-radius:18px 18px 0 0;">
       </div>
-    </div>
-    <div style="background:#34495e; color:white; padding:24px; text-align:center; font-size:14px; border-radius:0 0 12px 12px; margin-top:32px;">
-      <p style="margin:0 0 12px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
-      <p style="margin:0 0 10px 0;">
-        <a href="#" style="color:#3498db; text-decoration:none;">Cancelar inscrição</a> |
-        <a href="#" style="color:#3498db; text-decoration:none;">Política de Privacidade</a>
-      </p>
+      <div style="padding:32px 32px 0 32px; text-align:center;">
+        <h2 style="color:#2c3e50; font-size:26px; margin-bottom:12px; font-weight:700;">Olá, {{nome}}!</h2>
+        <p style="color:#555; font-size:16px; margin-bottom:24px; line-height:1.6;">
+          Seja bem-vindo(a) ao programa da <b>{{empresa}}</b>!<br>
+          Seu acesso exclusivo já está disponível.<br>
+          Use o botão abaixo para acessar sua área exclusiva e começar a aproveitar todos os benefícios.
+        </p>
+        <div style="text-align:center; margin-bottom:32px;">
+          <a href="{{linkAcesso}}" style="background:#3498db; color:#fff; padding:16px 36px; border-radius:8px; font-weight:bold; font-size:18px; text-decoration:none; display:inline-block; box-shadow:0 4px 12px rgba(52,152,219,0.3);">
+            Acessar minha área exclusiva
+          </a>
+        </div>
+      </div>
+      <div style="padding:0 32px; margin-bottom:24px;">
+        <ul style="color:#2c3e50; font-size:15px; background:#f8f9fa; border-radius:12px; padding:20px 24px; margin:0; list-style:none;">
+          <li style="margin-bottom:8px; display:flex; align-items:center; gap:8px;"><span style="color:#27ae60; font-weight:bold;">✓</span> Suporte dedicado</li>
+          <li style="margin-bottom:8px; display:flex; align-items:center; gap:8px;"><span style="color:#27ae60; font-weight:bold;">✓</span> Conteúdos exclusivos</li>
+          <li style="display:flex; align-items:center; gap:8px;"><span style="color:#27ae60; font-weight:bold;">✓</span> Participação em campanhas e sorteios</li>
+        </ul>
+      </div>
+      <div style="padding:0 32px; margin-bottom:24px;">
+        <div style="display:flex; align-items:center; gap:18px; background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(44,62,80,0.08); padding:20px 24px; border:1px solid #ecf0f1;">
+          <img src="https://via.placeholder.com/64x64/3498db/ffffff?text=Foto" alt="Foto" style="width:64px; height:64px; border-radius:50%; object-fit:cover; box-shadow:0 2px 8px rgba(52,152,219,0.2);">
+          <div>
+            <div style="font-weight:600; color:#2c3e50; font-size:16px;">{{nomeResponsavel}}</div>
+            <div style="color:#555; font-size:14px;">Equipe {{empresa}}</div>
+            <div style="color:#3498db; font-size:13px; margin-top:4px;">contato@email.com</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#34495e; color:white; padding:24px; text-align:center; font-size:14px; border-radius:0 0 18px 18px; margin-top:32px;">
+        <p style="margin:0 0 12px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+        <p style="margin:0;">
+          <a href="#" style="color:#3498db; text-decoration:none;">Cancelar inscrição</a> |
+          <a href="#" style="color:#3498db; text-decoration:none;">Política de Privacidade</a>
+        </p>
+      </div>
     </div>
   `,
   category: 'Modelos',
