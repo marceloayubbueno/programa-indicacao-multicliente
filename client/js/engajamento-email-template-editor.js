@@ -17,7 +17,74 @@ const editor = grapesjs.init({
   storageManager: false,
   blockManager: { appendTo: '#blocks' },
   styleManager: { appendTo: '#tab-styles .styles-container' },
-  canvas: { styles: ['https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'] }
+  canvas: { 
+    styles: [
+      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+      `
+        /* Estilos globais para manter formatação moderna */
+        body { 
+          margin: 0; 
+          padding: 0; 
+          font-family: 'Segoe UI', Arial, sans-serif; 
+          background: #f5f6fa; 
+        }
+        
+        /* Container principal para todos os e-mails */
+        .email-container {
+          background: #fff;
+          border-radius: 18px;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+          max-width: 600px;
+          margin: 0 auto;
+          overflow: hidden;
+          font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        /* Estilos para elementos internos */
+        .email-container h1, .email-container h2, .email-container h3 {
+          color: #2c3e50;
+          font-weight: 700;
+          margin: 0 0 16px 0;
+        }
+        
+        .email-container p {
+          color: #555;
+          line-height: 1.6;
+          margin: 0 0 16px 0;
+        }
+        
+        .email-container a {
+          color: #3498db;
+          text-decoration: none;
+        }
+        
+        .email-container .btn {
+          background: #3498db;
+          color: #fff;
+          padding: 16px 36px;
+          border-radius: 8px;
+          font-weight: bold;
+          font-size: 18px;
+          text-decoration: none;
+          display: inline-block;
+          box-shadow: 0 4px 12px rgba(52,152,219,0.3);
+        }
+        
+        .email-container .section {
+          padding: 32px;
+        }
+        
+        .email-container .footer {
+          background: #34495e;
+          color: white;
+          padding: 24px;
+          text-align: center;
+          font-size: 14px;
+          border-radius: 0 0 18px 18px;
+        }
+      `
+    ] 
+  }
 });
 // Blocos essenciais (ajustados para visual moderno e espaçado)
 editor.BlockManager.add('header', {
@@ -237,6 +304,28 @@ if (templateId) {
   fetchTemplate(templateId);
 }
 
+// Evento para garantir que sempre haja um container principal
+editor.on('component:add', function(component) {
+  const wrapper = editor.getWrapper();
+  const components = wrapper.getComponents();
+  
+  // Se não há componentes ou o primeiro não é o container principal
+  if (components.length === 0 || !components[0].getClasses().includes('email-container')) {
+    // Criar container principal
+    const container = editor.addComponent({
+      type: 'default',
+      tagName: 'div',
+      classes: ['email-container'],
+      content: component.toHTML()
+    });
+    
+    // Remover o componente original
+    component.remove();
+    
+    console.log('🔍 [DEBUG] Container principal criado automaticamente');
+  }
+});
+
 function fetchTemplate(id) {
   const token = localStorage.getItem('clientToken');
   if (!token) return alert('Token não encontrado');
@@ -252,7 +341,15 @@ function fetchTemplate(id) {
         document.getElementById('templateType').value = data.type;
       }
       if (data && data.htmlContent) {
-        editor.setComponents(data.htmlContent);
+        // Garantir que o conteúdo tenha o container principal
+        let htmlContent = data.htmlContent;
+        
+        // Se não tem container principal, adicionar
+        if (!htmlContent.includes('email-container')) {
+          htmlContent = `<div class="email-container">${htmlContent}</div>`;
+        }
+        
+        editor.setComponents(htmlContent);
       }
       // Se quiser preencher outros campos, adicione aqui
     });
@@ -271,8 +368,14 @@ window.saveTemplate = function() {
     return;
   }
   
-  const htmlContent = editor.getHtml();
+  let htmlContent = editor.getHtml();
   console.log('🔍 [DEBUG] HTML content obtido, tamanho:', htmlContent.length);
+  
+  // Garantir que o conteúdo tenha o container principal
+  if (!htmlContent.includes('email-container')) {
+    htmlContent = `<div class="email-container">${htmlContent}</div>`;
+    console.log('🔍 [DEBUG] Container principal adicionado');
+  }
   
   const type = document.getElementById('templateType').value || 'welcome';
   console.log('🔍 [DEBUG] Tipo do template:', type);
