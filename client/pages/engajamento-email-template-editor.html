@@ -20,32 +20,49 @@
     .btn-success { background: #27ae60; color: #fff; }
     .btn-success:hover { background: #229954; }
     .editor-row { display: flex; gap: 15px; height: calc(100vh - 140px); }
-    .editor-canvas { flex: 1; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .editor-canvas { flex: 1; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: relative; }
     #gjs { 
       height: 100%; 
       border: none; 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #f5f6fa;
+      overflow-y: auto; /* Rolagem vertical quando necessário */
     }
     
-    /* Forçar centralização do canvas */
+    /* Canvas do editor */
     .gjs-cv-canvas {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
+      background: #f5f6fa !important;
+      padding: 20px !important;
+      min-height: 100vh !important; /* Garante altura mínima para rolagem */
+      height: auto !important; /* Altura automática baseada no conteúdo */
+      overflow: visible !important; /* Permite que conteúdo cresça */
+    }
+    
+    /* Frame do editor */
+    .gjs-frame {
+      background: #ffffff !important;
+      border-radius: 8px !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+      max-width: 600px !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+      min-height: 100vh !important; /* Garante altura mínima */
+    }
+    
+    /* Container do e-mail para rolagem */
+    .email-container {
       min-height: 100vh !important;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
       padding: 20px !important;
     }
     
-    /* Forçar centralização do frame */
-    .gjs-frame {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
+    /* Wrapper do e-mail */
+    .email-wrapper {
       min-height: 100vh !important;
+      background: #ffffff !important;
+      border-radius: 8px !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+      max-width: 600px !important;
+      width: 100% !important;
+      margin: 0 auto !important;
     }
     .panel__right {
       width: 320px;
@@ -406,6 +423,37 @@
     @media (max-width: 900px) {
       .gjs-category .gjs-blocks-c { grid-template-columns: 1fr !important; }
     }
+    
+    /* Estilos para o body do frame */
+    .gjs-frame body {
+      margin: 0 !important;
+      padding: 0 !important;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
+      background: #ffffff !important;
+    }
+    
+    /* Container principal centralizado */
+    .email-container {
+      background: #ffffff !important;
+      border-radius: 8px !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+      max-width: 600px !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+      overflow: hidden !important;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
+      position: relative !important;
+    }
+    
+    /* Wrapper interno para garantir centralização */
+    .email-wrapper {
+      width: 100% !important;
+      max-width: 600px !important;
+      margin: 0 auto !important;
+      background: #ffffff !important;
+      border-radius: 8px !important;
+      overflow: hidden !important;
+    }
   </style>
 </head>
 <body>
@@ -439,9 +487,9 @@
       <button class="btn btn-primary" onclick="saveTemplate()">
         <i class="fas fa-save mr-2"></i>Salvar Template
       </button>
-      <button class="btn btn-success" onclick="testEmail()">
-        <i class="fas fa-paper-plane mr-2"></i>Testar E-mail
-      </button>
+              <button class="btn btn-success" onclick="testEmail()">
+          <i class="fas fa-paper-plane mr-2"></i>Testar E-mail
+        </button>
     </div>
   </div>
   <div class="editor-row">
@@ -472,15 +520,38 @@
         </div>
         <div class="panel__tab-content" id="tab-variaveis">
           <div style="padding: 18px 18px 8px 18px;">
-            <h3 style="margin: 0 0 10px 0; color: #27ae60; font-size: 15px; font-weight: 600; display: flex; align-items: center;"><i class='fas fa-info-circle mr-1'></i> Variáveis Disponíveis</h3>
-            <div id="variaveis-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div>
+            <h3 style="margin: 0 0 15px 0; color: #27ae60; font-size: 15px; font-weight: 600; display: flex; align-items: center;"><i class='fas fa-code mr-1'></i> Variáveis Dinâmicas</h3>
+            <div id="variaveis-list" style="display: flex; flex-direction: column; gap: 16px;"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <script src="https://unpkg.com/grapesjs"></script>
+  <!-- Modal para teste de e-mail -->
+  <div id="testEmailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+      <h3 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 20px; font-weight: 600; display: flex; align-items: center;">
+        <i class="fas fa-paper-plane mr-2 text-blue-500"></i>
+        Testar E-mail
+      </h3>
+      <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+        Digite o e-mail onde você deseja receber o teste deste template:
+      </p>
+      <input type="email" id="testEmailInput" placeholder="seu@email.com" style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; margin-bottom: 20px; box-sizing: border-box;">
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button onclick="closeTestEmailModal()" style="padding: 10px 20px; border: 1px solid #ddd; background: #f8f9fa; color: #666; border-radius: 6px; cursor: pointer; font-size: 14px;">
+          Cancelar
+        </button>
+        <button onclick="sendTestEmail()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+          <i class="fas fa-paper-plane mr-1"></i>
+          Enviar Teste
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/config.js"></script>
+  <script src="https://unpkg.com/grapesjs"></script>
   <script src="../js/engajamento-email-template-editor.js"></script>
   <script>
 function forceBlocksGrid() {
@@ -539,32 +610,105 @@ document.addEventListener('DOMContentLoaded', forceBlocksGrid);
     document.addEventListener('DOMContentLoaded', ensureCentralization);
     // Lista de variáveis disponíveis
     const variaveis = [
+      // Variáveis básicas do indicador
       { tag: '{{nome}}', desc: 'Nome do indicador' },
       { tag: '{{email}}', desc: 'E-mail do indicador' },
-      { tag: '{{linkIndicacao}}', desc: 'Link exclusivo de indicação' },
-      { tag: '{{campanha}}', desc: 'Nome da campanha' },
-      { tag: '{{empresa}}', desc: 'Nome da empresa' },
       { tag: '{{senha}}', desc: 'Senha de acesso do indicador' },
-      { tag: '{{linkAcesso}}', desc: 'Link para área exclusiva' },
       { tag: '{{dataCriacao}}', desc: 'Data de criação' },
+      
+      // Variáveis de empresa e campanha
+      { tag: '{{empresa}}', desc: 'Nome da empresa' },
+      { tag: '{{nomeCampanha}}', desc: 'Nome da campanha' },
+      { tag: '{{descricaoCampanha}}', desc: 'Descrição da campanha' },
+      { tag: '{{recompensaCampanha}}', desc: 'Recompensa da campanha' },
+      { tag: '{{metaIndicacoes}}', desc: 'Meta de indicações' },
+      { tag: '{{dataLimite}}', desc: 'Data limite da campanha' },
+      
+      // Variáveis de links
+      { tag: '{{linkIndicacao}}', desc: 'Link exclusivo de indicação' },
+      { tag: '{{linkAcesso}}', desc: 'Link para área exclusiva' },
+      { tag: '{{linkCampanha}}', desc: 'Link da campanha' },
+      
+      // Variáveis de progresso
+      { tag: '{{indicacoesRealizadas}}', desc: 'Indicações realizadas' },
+      { tag: '{{indicacoesRestantes}}', desc: 'Indicações restantes' },
+      { tag: '{{indicacoesNecessarias}}', desc: 'Indicações necessárias' },
+      { tag: '{{recompensasGanhas}}', desc: 'Recompensas ganhas' },
+      { tag: '{{proximaRecompensa}}', desc: 'Próxima recompensa' },
+      { tag: '{{recompensaProxima}}', desc: 'Recompensa próxima' },
+      
+      // Variáveis de recompensa/conquista
+      { tag: '{{tipoRecompensa}}', desc: 'Tipo da recompensa' },
+      { tag: '{{descricaoRecompensa}}', desc: 'Descrição da recompensa' },
+      { tag: '{{valorRecompensa}}', desc: 'Valor da recompensa' },
+      { tag: '{{dataConquista}}', desc: 'Data da conquista' },
+      { tag: '{{proximoNivel}}', desc: 'Próximo nível' },
+      
+      // Variáveis de ranking
+      { tag: '{{rankingPosicao}}', desc: 'Posição no ranking' },
+      
+      // Variáveis de contato
       { tag: '{{nomeResponsavel}}', desc: 'Nome do responsável' },
       { tag: '{{telefone}}', desc: 'Telefone de contato' },
+      { tag: '{{emailResponsavel}}', desc: 'E-mail do responsável' },
     ];
-    // Renderizar variáveis como blocos arrastáveis
+    // Renderizar variáveis como blocos arrastáveis organizados por categoria
     function renderVariaveis() {
       const list = document.getElementById('variaveis-list');
       list.innerHTML = '';
-      variaveis.forEach(v => {
-        const bloco = document.createElement('div');
-        bloco.className = 'gjs-block';
-        bloco.setAttribute('draggable', 'true');
-        bloco.setAttribute('data-var', v.tag);
-        bloco.innerHTML = `<span class='variable-tag' style='font-size:13px;'>${v.tag}</span><span class='gjs-block-label' style='font-size:12px; color:#2c3e50; margin-top:4px;'>${v.desc}</span>`;
-        bloco.ondragstart = function(e) {
-          e.dataTransfer.setData('text/plain', v.tag);
-          e.dataTransfer.effectAllowed = 'copy';
-        };
-        list.appendChild(bloco);
+      
+      // Organizar variáveis por categoria
+      const categorias = {
+        'Indicador': variaveis.filter(v => ['nome', 'email', 'senha', 'dataCriacao'].some(key => v.tag.includes(key))),
+        'Campanha': variaveis.filter(v => ['empresa', 'nomeCampanha', 'descricaoCampanha', 'recompensaCampanha', 'metaIndicacoes', 'dataLimite'].some(key => v.tag.includes(key))),
+        'Links': variaveis.filter(v => ['linkIndicacao', 'linkAcesso', 'linkCampanha'].some(key => v.tag.includes(key))),
+        'Progresso': variaveis.filter(v => ['indicacoesRealizadas', 'indicacoesRestantes', 'indicacoesNecessarias', 'recompensasGanhas', 'proximaRecompensa', 'recompensaProxima'].some(key => v.tag.includes(key))),
+        'Recompensas': variaveis.filter(v => ['tipoRecompensa', 'descricaoRecompensa', 'valorRecompensa', 'dataConquista', 'proximoNivel'].some(key => v.tag.includes(key))),
+        'Ranking': variaveis.filter(v => ['rankingPosicao'].some(key => v.tag.includes(key))),
+        'Contato': variaveis.filter(v => ['nomeResponsavel', 'telefone', 'emailResponsavel'].some(key => v.tag.includes(key)))
+      };
+      
+      Object.entries(categorias).forEach(([categoria, vars]) => {
+        if (vars.length > 0) {
+          // Cabeçalho da categoria
+          const categoriaHeader = document.createElement('div');
+          categoriaHeader.style.cssText = 'background: #2c3e50; color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;';
+          categoriaHeader.textContent = categoria;
+          list.appendChild(categoriaHeader);
+          
+          // Variáveis da categoria
+          const categoriaContainer = document.createElement('div');
+          categoriaContainer.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;';
+          
+          vars.forEach(v => {
+            const bloco = document.createElement('div');
+            bloco.className = 'gjs-block';
+            bloco.setAttribute('draggable', 'true');
+            bloco.setAttribute('data-var', v.tag);
+            bloco.style.cssText = 'background: #fff; border: 1px solid #ecf0f1; border-radius: 6px; padding: 8px; cursor: grab; transition: all 0.2s ease; font-size: 11px; text-align: center;';
+            bloco.innerHTML = `
+              <div style='background: #3498db; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-family: monospace; margin-bottom: 4px;'>${v.tag}</div>
+              <div style='font-size: 10px; color: #2c3e50; line-height: 1.2;'>${v.desc}</div>
+            `;
+            bloco.ondragstart = function(e) {
+              e.dataTransfer.setData('text/plain', v.tag);
+              e.dataTransfer.effectAllowed = 'copy';
+            };
+            bloco.onmouseover = function() {
+              this.style.background = '#f8f9fa';
+              this.style.borderColor = '#3498db';
+              this.style.transform = 'translateY(-1px)';
+            };
+            bloco.onmouseout = function() {
+              this.style.background = '#fff';
+              this.style.borderColor = '#ecf0f1';
+              this.style.transform = 'translateY(0)';
+            };
+            categoriaContainer.appendChild(bloco);
+          });
+          
+          list.appendChild(categoriaContainer);
+        }
       });
     }
     renderVariaveis();
@@ -586,6 +730,30 @@ document.addEventListener('DOMContentLoaded', forceBlocksGrid);
         });
       }
       setTimeout(setupDrop, 1500);
+    });
+    
+    // Fechar modal ao clicar fora
+    document.addEventListener('click', function(e) {
+      const modal = document.getElementById('testEmailModal');
+      if (e.target === modal) {
+        closeTestEmailModal();
+      }
+    });
+    
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeTestEmailModal();
+      }
+    });
+    
+    // Garantir que o modal não abra automaticamente
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('testEmailModal');
+      if (modal) {
+        modal.style.display = 'none';
+        console.log('✅ [MODAL] Modal inicializado como fechado');
+      }
     });
   </script>
 </body>

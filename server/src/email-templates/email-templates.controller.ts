@@ -82,6 +82,22 @@ export class EmailTemplatesController {
     return this.emailTemplatesService.sendTestEmail(id, testEmail);
   }
 
+  @UseGuards(JwtClientAuthGuard)
+  @Post('test')
+  async testTemplateDirect(@Body() body: { testEmail: string; htmlContent: string; css?: string; subject?: string }, @Request() req) {
+    if (!body.testEmail) {
+      throw new BadRequestException('E-mail de teste é obrigatório');
+    }
+    
+    if (!body.htmlContent) {
+      throw new BadRequestException('Conteúdo HTML é obrigatório');
+    }
+    
+    const clientId = req.user?.clientId || req.user?.sub;
+    
+    return this.emailTemplatesService.testTemplateDirect(clientId, body.testEmail, body.htmlContent, body.css, body.subject);
+  }
+
   // ===== EMAIL CONFIG =====
 
   @UseGuards(JwtClientAuthGuard)

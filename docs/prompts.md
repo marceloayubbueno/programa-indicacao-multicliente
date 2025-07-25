@@ -176,6 +176,51 @@ Focado em melhorar a qualidade, manutenibilidade e performance de código existe
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+### PARA ANALISAR E MELHORAR UMA FUNCIONALIDADE (Modo Analista de Produto e Engenheiro)
+
+Focado em analisar funcionalidades existentes e propor melhorias incrementais que preservem a estabilidade do sistema.
+
+> **COPIE E COLE ABAIXO**
+> ```markdown
+> # MISSÃO: ANALISAR E MELHORAR FUNCIONALIDADE
+> 
+> **Sua Missão:** Você atuará como Analista de Produto e Engenheiro de Software. Sua tarefa é analisar uma funcionalidade existente, identificar oportunidades de melhoria e implementar melhorias incrementais que preservem a estabilidade e não quebrem funcionalidades existentes.
+> 
+> **Workflow Obrigatório:**
+> 1. **Análise da Funcionalidade Atual:** Explique como a funcionalidade funciona atualmente, identificando seus pontos fortes e limitações.
+> 2. **Identificação de Oportunidades:** Liste 3-5 melhorias específicas que podem ser implementadas, priorizando impacto vs. risco.
+> 3. **Plano de Melhorias Incrementais:** Proponha um plano detalhado de implementação em fases, garantindo que cada fase seja testável e não quebre funcionalidades existentes.
+> 4. **Aguarde Aprovação:** Pare e aguarde minha aprovação do plano. **NÃO IMPLEMENTE NENHUMA MELHORIA AINDA.**
+> 5. **Implementação Faseada:** Após aprovação, implemente as melhorias uma fase por vez, validando cada etapa antes de prosseguir.
+> 6. **Testes de Regressão:** Após cada fase, execute testes para garantir que funcionalidades existentes continuam funcionando.
+> 
+> **Princípios de Melhoria:**
+> - **Preservação de Funcionalidades:** Nenhuma mudança deve quebrar funcionalidades existentes
+> - **Melhorias Incrementais:** Implementar mudanças em pequenas fases testáveis
+> - **Backward Compatibility:** Manter compatibilidade com dados e APIs existentes
+> - **Testes de Regressão:** Validar que o que funcionava antes continua funcionando
+> - **Documentação:** Atualizar documentação conforme necessário
+> 
+> **[ESCREVA SEU CONTEXTO AQUI]**
+> 
+> **1. Funcionalidade a ser Analisada:**
+> *   [Descreva a funcionalidade específica. Ex: "Sistema de login de clientes", "Dashboard de campanhas", "Geração de landing pages"]
+> 
+> **2. Objetivos de Melhoria:**
+> *   [Liste os objetivos específicos. Ex: "Melhorar performance", "Adicionar validações", "Melhorar UX", "Corrigir bugs conhecidos", "Adicionar novas features"]
+> 
+> **3. Critérios de Sucesso:**
+> *   [Defina como medir o sucesso das melhorias. Ex: "Tempo de carregamento < 2s", "Taxa de erro < 1%", "Feedback positivo dos usuários"]
+> 
+> **4. Arquivos de Contexto:**
+> *   [Use `@` para referenciar os arquivos principais da funcionalidade. Ex: `@client/js/auth.js`, `@server/src/auth/auth.service.ts`]
+> 
+> **5. Funcionalidades Críticas a Preservar:**
+> *   [Liste funcionalidades que NÃO podem ser quebradas. Ex: "Login deve continuar funcionando", "Dados existentes devem ser preservados", "APIs públicas não podem mudar"]
+> ```
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ## Parte 4: Biblioteca de Prompts Comuns
 
 ### PARA CRIAR TESTES

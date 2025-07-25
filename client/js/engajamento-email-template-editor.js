@@ -9,7 +9,16 @@ function switchTab(tabName) {
   document.getElementById(`tab-${tabName}`).classList.add('active');
 }
 
+// Verificar se GrapesJS está disponível
+if (typeof grapesjs === 'undefined') {
+  console.error('❌ [GRAPESJS] GrapesJS não está carregado!');
+  alert('Erro: GrapesJS não foi carregado. Recarregue a página.');
+  throw new Error('GrapesJS não está disponível');
+}
+
 // Configuração moderna do GrapesJS com padrão centralizado
+console.log('🚀 [GRAPESJS] Iniciando configuração do editor...');
+
 const editor = grapesjs.init({
   container: '#gjs',
   fromElement: false,
@@ -18,6 +27,23 @@ const editor = grapesjs.init({
   storageManager: false,
   blockManager: { appendTo: '#blocks' },
   styleManager: { appendTo: '#tab-styles .styles-container' },
+  // Configuração simplificada para funcionar corretamente
+  avoidDefaults: false,
+  showOffsets: false,
+  showDevices: false,
+  noticeOnUnload: false,
+  // Configuração do canvas simplificada
+  canvas: {
+    styles: [
+      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
+    ],
+    scripts: [],
+    // Configurações para melhorar rolagem
+    customBadgeLabel: false,
+    enableSelection: true,
+    enableDrag: true,
+    enableResize: true
+  },
   
   // Configurações avançadas para melhor experiência
   deviceManager: {
@@ -35,166 +61,7 @@ const editor = grapesjs.init({
     ]
   },
   
-  // Configuração do canvas com estilos modernos e centralizados
-  canvas: { 
-    styles: [
-      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
-      `
-        /* Reset e estilos globais modernos */
-        * {
-          box-sizing: border-box;
-        }
-        
-        body { 
-          margin: 0; 
-          padding: 20px; 
-          font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; 
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        
-        /* Container principal centralizado - PADRÃO MODERNO */
-        .email-container {
-          background: #ffffff;
-          border-radius: 16px;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-          max-width: 600px;
-          width: 100%;
-          margin: 0 auto;
-          overflow: hidden;
-          font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-          position: relative;
-        }
-        
-        /* Wrapper interno para garantir centralização */
-        .email-wrapper {
-          width: 100%;
-          max-width: 600px;
-          margin: 0 auto;
-          background: #ffffff;
-          border-radius: 16px;
-          overflow: hidden;
-        }
-        
-        /* Estilos modernos para elementos internos */
-        .email-container h1, 
-        .email-container h2, 
-        .email-container h3 {
-          color: #1a202c;
-          font-weight: 700;
-          margin: 0 0 16px 0;
-          line-height: 1.3;
-        }
-        
-        .email-container h1 { font-size: 28px; }
-        .email-container h2 { font-size: 24px; }
-        .email-container h3 { font-size: 20px; }
-        
-        .email-container p {
-          color: #4a5568;
-          line-height: 1.6;
-          margin: 0 0 16px 0;
-          font-size: 16px;
-        }
-        
-        .email-container a {
-          color: #3182ce;
-          text-decoration: none;
-          transition: color 0.2s ease;
-        }
-        
-        .email-container a:hover {
-          color: #2c5282;
-        }
-        
-        /* Botões modernos */
-        .email-container .btn {
-          background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
-          color: #ffffff;
-          padding: 16px 32px;
-          border-radius: 12px;
-          font-weight: 600;
-          font-size: 16px;
-          text-decoration: none;
-          display: inline-block;
-          box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
-          transition: all 0.3s ease;
-          border: none;
-          cursor: pointer;
-        }
-        
-        .email-container .btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(49, 130, 206, 0.4);
-        }
-        
-        /* Seções com padding consistente */
-        .email-container .section {
-          padding: 32px 24px;
-        }
-        
-        /* Header moderno */
-        .email-container .header {
-          background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
-          color: white;
-          padding: 32px 24px;
-          text-align: center;
-          border-radius: 16px 16px 0 0;
-        }
-        
-        /* Footer moderno */
-        .email-container .footer {
-          background: #2d3748;
-          color: #e2e8f0;
-          padding: 24px;
-          text-align: center;
-          font-size: 14px;
-          border-radius: 0 0 16px 16px;
-        }
-        
-        /* Responsividade */
-        @media (max-width: 640px) {
-          .email-container {
-            margin: 0 16px;
-            border-radius: 12px;
-          }
-          
-          .email-container .section {
-            padding: 24px 16px;
-          }
-          
-          .email-container .header,
-          .email-container .footer {
-            padding: 24px 16px;
-          }
-        }
-        
-        /* Estilos para o editor */
-        .gjs-cv-canvas {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          padding: 20px;
-        }
-        
-        /* Centralização forçada no editor */
-        .gjs-frame {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          min-height: 100vh !important;
-        }
-      `
-    ],
-    
-    // Configurações do canvas para centralização
-    scripts: [],
-    styles: [],
-    
-    // Configuração de dispositivos
-    device: 'Desktop'
-  },
+
   
   // Configurações de componentes
   components: {
@@ -260,6 +127,8 @@ const editor = grapesjs.init({
     ]
   }
 });
+
+console.log('✅ [GRAPESJS] Editor configurado com sucesso');
 
 // Blocos modernos com padrão centralizado
 editor.BlockManager.add('header', {
@@ -502,100 +371,140 @@ function getUrlParam(name) {
 // Sistema de inicialização com estrutura centralizada garantida
 const templateId = getUrlParam('id');
 
+// Função que FORÇA o recálculo da altura baseada no conteúdo real
+function adjustCanvasHeight() {
+  try {
+    const canvas = document.querySelector('.gjs-cv-canvas');
+    const wrapper = editor.getWrapper();
+    
+    if (canvas && wrapper) {
+      // Forçar renderização do editor
+      editor.refresh();
+      
+      // Aguardar um pouco e calcular altura real
+      setTimeout(() => {
+        let totalHeight = 0;
+        const components = wrapper.getComponents();
+        
+        // Calcular altura de cada componente
+        components.forEach(component => {
+          const el = component.getEl();
+          if (el) {
+            // Forçar recálculo do layout
+            el.style.display = 'none';
+            el.offsetHeight; // Força reflow
+            el.style.display = '';
+            
+            const height = el.scrollHeight || el.offsetHeight || 0;
+            totalHeight += height;
+          }
+        });
+        
+        // Adicionar espaço extra
+        totalHeight += 300;
+        
+        // Aplicar altura mínima
+        const minHeight = Math.max(totalHeight, window.innerHeight);
+        canvas.style.minHeight = minHeight + 'px';
+        
+        console.log('📏 [HEIGHT] Altura real:', totalHeight + 'px, Aplicada:', minHeight + 'px');
+      }, 100);
+    }
+  } catch (error) {
+    console.log('⚠️ [HEIGHT] Erro:', error.message);
+  }
+}
+
+
+
 // Função de inicialização que garante estrutura centralizada
 function initializeEditor() {
-  console.log('🚀 [INIT] Inicializando editor com estrutura centralizada...');
+  console.log('🚀 [INIT] Inicializando editor...');
   
-  if (templateId) {
-    fetchTemplate(templateId);
-  } else {
-    // Criar estrutura centralizada vazia
-    ensureEmailContainer();
-  }
-  
-  // Forçar centralização após carregamento
-  setTimeout(() => {
-    ensureEmailContainer();
+  // Aguardar o editor estar pronto
+  editor.on('load', () => {
+    console.log('✅ [INIT] Editor GrapesJS carregado');
+    
+    if (templateId) {
+      fetchTemplate(templateId);
+    } else {
+      // Criar estrutura inicial simples
+      const wrapper = editor.getWrapper();
+      wrapper.set('content', `
+        <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
+          <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Bem-vindo ao Editor de E-mail</h2>
+          <p style="color: #666; font-size: 16px; margin-bottom: 24px;">Arraste blocos da barra lateral para começar a criar seu e-mail</p>
+          <div style="background: #3498db; color: white; padding: 12px 24px; border-radius: 8px; display: inline-block; font-weight: 600;">
+            Comece arrastando um bloco aqui
+          </div>
+        </div>
+      `);
+    }
+    
+
+    
     console.log('✅ [INIT] Editor inicializado com sucesso');
-  }, 500);
+    
+    // Ajustar altura após inicialização
+    setTimeout(adjustCanvasHeight, 1000);
+  });
+  
+  // Fallback se o evento load não disparar
+  setTimeout(() => {
+    if (!editor.getWrapper().getComponents().length) {
+      console.log('🔧 [INIT] Aplicando fallback...');
+      const wrapper = editor.getWrapper();
+      wrapper.set('content', `
+        <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
+          <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Editor Carregado</h2>
+          <p style="color: #666; font-size: 16px;">Arraste blocos para começar</p>
+        </div>
+      `);
+    }
+  }, 2000);
 }
 
-// Inicializar editor
-setTimeout(initializeEditor, 100);
+// Inicializar editor após o DOM estar pronto
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 [DOM] DOM carregado, inicializando editor...');
+  setTimeout(initializeEditor, 100);
+});
 
-// Função para forçar estrutura centralizada em qualquer situação
-window.forceCentralizedStructure = function() {
-  console.log('🔧 [FORCE] Forçando estrutura centralizada...');
-  ensureEmailContainer();
-  
-  // Verificar se o canvas está centralizado
-  const canvas = document.querySelector('.gjs-cv-canvas');
-  if (canvas) {
-    canvas.style.display = 'flex';
-    canvas.style.alignItems = 'center';
-    canvas.style.justifyContent = 'center';
-    canvas.style.minHeight = '100vh';
+// Fallback para garantir inicialização
+setTimeout(() => {
+  if (!editor.getWrapper()) {
+    console.log('🚀 [FALLBACK] Inicializando editor via fallback...');
+    initializeEditor();
   }
-  
-  // Verificar se o frame está centralizado
-  const frame = document.querySelector('.gjs-frame');
-  if (frame) {
-    frame.style.display = 'flex';
-    frame.style.alignItems = 'center';
-    frame.style.justifyContent = 'center';
-    frame.style.minHeight = '100vh';
-  }
-  
-  console.log('✅ [FORCE] Estrutura centralizada forçada');
-};
-
-// Chamar função de força periodicamente
-setInterval(() => {
-  forceCentralizedStructure();
 }, 2000);
 
-// Função para garantir container principal centralizado (PADRÃO MODERNO)
-function ensureEmailContainer() {
-  const wrapper = editor.getWrapper();
-  const components = wrapper.getComponents();
-  
-  // Verificar se já existe o wrapper centralizado
-  const hasWrapper = components.length > 0 && components[0].getClasses().includes('email-wrapper');
-  const hasContainer = components.length > 0 && components[0].getClasses().includes('email-container');
-  
-  console.log('🔍 [DEBUG] Verificando estrutura:', { hasWrapper, hasContainer, componentsCount: components.length });
-  
-  if (components.length === 0) {
-    // Criar estrutura completa vazia
-    console.log('🔍 [DEBUG] Criando estrutura completa vazia...');
-    wrapper.set('content', `
-      <div class="email-wrapper">
-        <div class="email-container">
-          <!-- Conteúdo do e-mail será inserido aqui -->
-        </div>
-      </div>
-    `);
-  } else if (!hasWrapper) {
-    // Se não tem wrapper, adicionar wrapper e container
-    console.log('🔍 [DEBUG] Adicionando wrapper e container...');
-    const content = wrapper.getInnerHTML();
-    wrapper.set('content', `
-      <div class="email-wrapper">
-        <div class="email-container">
-          ${content}
-        </div>
-      </div>
-    `);
-  } else if (!hasContainer) {
-    // Se tem wrapper mas não tem container, adicionar container
-    console.log('🔍 [DEBUG] Adicionando container...');
-    const wrapperEl = components[0];
-    const wrapperContent = wrapperEl.getInnerHTML();
-    wrapperEl.set('content', `<div class="email-container">${wrapperContent}</div>`);
-  }
-  
-  console.log('🔍 [DEBUG] Estrutura centralizada garantida');
-}
+// Eventos para forçar recálculo de altura
+editor.on('component:add', () => {
+  setTimeout(adjustCanvasHeight, 500);
+  setTimeout(adjustCanvasHeight, 1000);
+});
+editor.on('component:remove', () => {
+  setTimeout(adjustCanvasHeight, 500);
+  setTimeout(adjustCanvasHeight, 1000);
+});
+editor.on('component:update', () => {
+  setTimeout(adjustCanvasHeight, 500);
+});
+
+// Recalcular periodicamente para garantir
+setInterval(adjustCanvasHeight, 3000);
+
+// Função global para forçar recálculo manual
+window.forceRecalculateHeight = function() {
+  adjustCanvasHeight();
+  console.log('🔄 [FORCE] Altura recalculada manualmente');
+};
+
+
+
+
+
+
 
 function fetchTemplate(id) {
   const token = localStorage.getItem('clientToken');
@@ -722,10 +631,124 @@ window.saveTemplate = function() {
       alert('Erro de rede ao salvar template. Veja o console para detalhes.');
     });
 }
-// Testar (mock)
+// Funções para teste de e-mail
 window.testEmail = function() {
-  alert('Funcionalidade de teste será implementada!');
+  console.log('🔍 [TEST] Abrindo modal de teste...');
+  
+  // Verificar se o modal existe no DOM
+  const modal = document.getElementById('testEmailModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    const input = document.getElementById('testEmailInput');
+    if (input) {
+      input.focus();
+    }
+    console.log('✅ [TEST] Modal aberto com sucesso');
+  } else {
+    console.error('❌ [TEST] Modal não encontrado no DOM');
+    // Fallback se o modal não existir
+    const testEmail = prompt('Digite o e-mail para teste:');
+    if (testEmail) {
+      sendTestEmailDirect(testEmail);
+    }
+  }
 };
+
+window.closeTestEmailModal = function() {
+  const modal = document.getElementById('testEmailModal');
+  if (modal) {
+    modal.style.display = 'none';
+    const input = document.getElementById('testEmailInput');
+    if (input) {
+      input.value = '';
+    }
+  }
+};
+
+window.sendTestEmail = function() {
+  const testEmail = document.getElementById('testEmailInput')?.value?.trim();
+  
+  if (!testEmail) {
+    alert('Por favor, digite um e-mail válido para o teste.');
+    return;
+  }
+  
+  if (!testEmail.includes('@')) {
+    alert('Por favor, digite um e-mail válido.');
+    return;
+  }
+  
+  sendTestEmailDirect(testEmail);
+};
+
+function sendTestEmailDirect(testEmail) {
+  const token = localStorage.getItem('clientToken');
+  if (!token) {
+    alert('Token não encontrado. Faça login novamente.');
+    return;
+  }
+  
+  // Obter o HTML do template atual
+  let htmlContent = editor.getHtml();
+  const css = editor.getCss();
+  
+  // Garantir estrutura centralizada
+  if (!htmlContent.includes('email-wrapper')) {
+    if (!htmlContent.includes('email-container')) {
+      htmlContent = `<div class="email-container">${htmlContent}</div>`;
+    }
+    htmlContent = `<div class="email-wrapper">${htmlContent}</div>`;
+  }
+  
+  // Preparar dados para envio
+  const payload = {
+    testEmail: testEmail,
+    htmlContent: htmlContent,
+    css: css,
+    subject: `Teste - ${document.getElementById('templateName')?.value || 'Template de E-mail'}`
+  };
+  
+  // Mostrar loading
+  const sendButton = document.querySelector('#testEmailModal button[onclick="sendTestEmail()"]');
+  if (sendButton) {
+    const originalText = sendButton.innerHTML;
+    sendButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Enviando...';
+    sendButton.disabled = true;
+  }
+  
+  console.log('🔍 [TEST] Enviando e-mail de teste para:', testEmail);
+  
+  // Enviar teste
+  fetch(`${window.APP_CONFIG ? window.APP_CONFIG.API_URL : (window.API_URL || 'http://localhost:3000/api')}/email-templates/test`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(async res => {
+    const data = await res.json();
+    
+    if (res.ok) {
+      alert('E-mail de teste enviado com sucesso! Verifique sua caixa de entrada.');
+      closeTestEmailModal();
+    } else {
+      throw new Error(data.message || 'Erro ao enviar e-mail de teste');
+    }
+  })
+  .catch(error => {
+    console.error('❌ [TEST] Erro ao enviar teste:', error);
+    alert('Erro ao enviar e-mail de teste: ' + error.message);
+  })
+  .finally(() => {
+    // Restaurar botão
+    if (sendButton) {
+      sendButton.innerHTML = originalText;
+      sendButton.disabled = false;
+    }
+  });
+}
 // Forçar grid de 2 colunas nos blocos do GrapesJS (garantia máxima)
 function fixBlocksGrid() {
   const blocks = document.querySelectorAll('.blocks-container .gjs-block');
@@ -764,27 +787,9 @@ setTimeout(fixBlocksGrid, 1000);
 setTimeout(fixBlocksGrid, 2000);
 setTimeout(fixBlocksGrid, 3000);
 
-// Sistema de eventos para manter estrutura centralizada
-editor.on('component:add', function(component) {
-  console.log('🔧 [EVENT] Componente adicionado, verificando estrutura...');
-  setTimeout(() => ensureEmailContainer(), 100);
-});
-
-editor.on('component:update', function(component) {
-  console.log('🔧 [EVENT] Componente atualizado, verificando estrutura...');
-  setTimeout(() => ensureEmailContainer(), 100);
-});
-
-editor.on('component:remove', function(component) {
-  console.log('🔧 [EVENT] Componente removido, verificando estrutura...');
-  setTimeout(() => ensureEmailContainer(), 100);
-});
-
-// Observer para mudanças no DOM
+// Observer para mudanças no DOM (apenas para grid de blocos)
 const observer = new MutationObserver(() => {
   fixBlocksGrid();
-  // Verificar estrutura centralizada periodicamente
-  setTimeout(() => ensureEmailContainer(), 200);
 });
 observer.observe(document.body, { childList: true, subtree: true }); 
 
@@ -917,7 +922,7 @@ editor.BlockManager.add('welcome-onboarding', {
   `,
   category: 'Modelos',
   attributes: { class: 'fas fa-star' }
-});
+}); 
 
 // Modelo 3: Minimalista Sofisticado
 editor.BlockManager.add('welcome-minimal', {
@@ -950,4 +955,317 @@ editor.BlockManager.add('welcome-minimal', {
   `,
   category: 'Modelos',
   attributes: { class: 'fas fa-star' }
+}); 
+
+// ===== TEMPLATES ESPECÍFICOS PARA PROGRAMA DE INDICAÇÃO =====
+
+// Template 1: Boas-vindas ao Programa de Indicação
+editor.BlockManager.add('indicacao-welcome', {
+  label: 'Indicação: Boas-vindas',
+  content: `
+    <div style="background:#fff; border-radius:16px; box-shadow:0 4px 24px #0002; max-width:600px; margin:0 auto; overflow:hidden; font-family:'Segoe UI', Arial, sans-serif;">
+      <div style="background:linear-gradient(135deg,#3498db 0%,#2c3e50 100%); padding:40px 32px; text-align:center; color:white;">
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" width="80" alt="Welcome" style="background:#fff; border-radius:50%; padding:12px; margin-bottom:20px; box-shadow:0 4px 12px rgba(255,255,255,0.2);">
+        <h1 style="font-size:32px; margin:0 0 12px 0; font-weight:700;">Bem-vindo(a) ao Programa de Indicação!</h1>
+        <p style="font-size:18px; margin:0; opacity:0.9;">{{empresa}} - {{nomeCampanha}}</p>
+      </div>
+      
+      <div style="padding:32px; text-align:center;">
+        <h2 style="color:#2c3e50; font-size:24px; margin-bottom:16px; font-weight:600;">Olá, {{nome}}!</h2>
+        <p style="color:#555; font-size:16px; line-height:1.6; margin-bottom:24px;">
+          Parabéns! Você agora faz parte do nosso programa de indicação da <b>{{empresa}}</b>.<br>
+          Seu acesso exclusivo já está disponível e você pode começar a indicar amigos imediatamente.
+        </p>
+        
+        <a href="{{linkAcesso}}" style="background:#3498db; color:#fff; padding:16px 36px; border-radius:8px; font-weight:600; font-size:18px; text-decoration:none; display:inline-block; margin-bottom:24px; box-shadow:0 4px 12px rgba(52,152,219,0.3);">
+          Acessar Minha Área Exclusiva
+        </a>
+        
+        <div style="background:#f8f9fa; border-radius:12px; padding:24px; margin:24px 0; text-align:left;">
+          <h3 style="color:#2c3e50; font-size:18px; margin-bottom:16px; font-weight:600;">📋 Seus Dados de Acesso:</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:14px;">
+            <div><strong>E-mail:</strong> {{email}}</div>
+            <div><strong>Senha:</strong> {{senha}}</div>
+            <div><strong>Link Exclusivo:</strong> <a href="{{linkIndicacao}}" style="color:#3498db;">{{linkIndicacao}}</a></div>
+            <div><strong>Campanha:</strong> {{nomeCampanha}}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="padding:0 32px;">
+        <div style="background:#e8f5e8; border:1px solid #27ae60; border-radius:8px; padding:20px; margin-bottom:24px;">
+          <h3 style="color:#27ae60; font-size:16px; margin-bottom:12px; font-weight:600;">🎁 Benefícios do Programa:</h3>
+          <ul style="color:#2c3e50; font-size:14px; margin:0; padding-left:20px;">
+            <li style="margin-bottom:8px;">Recompensas por cada indicação válida</li>
+            <li style="margin-bottom:8px;">Acesso a conteúdo exclusivo</li>
+            <li style="margin-bottom:8px;">Participação em sorteios especiais</li>
+            <li>Suporte dedicado para indicadores</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div style="padding:0 32px 32px 32px; text-align:center;">
+        <p style="color:#666; font-size:14px; margin-bottom:16px;">Dúvidas? Entre em contato conosco:</p>
+        <div style="display:flex; justify-content:center; gap:24px; font-size:14px;">
+          <div><strong>{{nomeResponsavel}}</strong><br>{{telefone}}</div>
+          <div><strong>E-mail:</strong><br>{{emailResponsavel}}</div>
+        </div>
+      </div>
+      
+      <div style="background:#34495e; color:white; padding:20px; text-align:center; font-size:14px;">
+        <p style="margin:0 0 8px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+        <p style="margin:0;">
+          <a href="#" style="color:#3498db; text-decoration:none;">Cancelar inscrição</a> |
+          <a href="#" style="color:#3498db; text-decoration:none;">Política de Privacidade</a>
+        </p>
+      </div>
+    </div>
+  `,
+  category: 'Indicação',
+  attributes: { class: 'fas fa-user-plus' }
+});
+
+// Template 2: Confirmação de Indicação
+editor.BlockManager.add('indicacao-confirmation', {
+  label: 'Indicação: Confirmação',
+  content: `
+    <div style="background:#fff; border-radius:16px; box-shadow:0 4px 24px #0002; max-width:600px; margin:0 auto; overflow:hidden; font-family:'Segoe UI', Arial, sans-serif;">
+      <div style="background:linear-gradient(135deg,#27ae60 0%,#2ecc71 100%); padding:40px 32px; text-align:center; color:white;">
+        <div style="background:#fff; border-radius:50%; width:80px; height:80px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(255,255,255,0.2);">
+          <i class="fas fa-check" style="font-size:32px; color:#27ae60;"></i>
+        </div>
+        <h1 style="font-size:28px; margin:0 0 12px 0; font-weight:700;">Indicação Confirmada!</h1>
+        <p style="font-size:16px; margin:0; opacity:0.9;">{{empresa}} - {{nomeCampanha}}</p>
+      </div>
+      
+      <div style="padding:32px; text-align:center;">
+        <h2 style="color:#2c3e50; font-size:24px; margin-bottom:16px; font-weight:600;">Parabéns, {{nome}}!</h2>
+        <p style="color:#555; font-size:16px; line-height:1.6; margin-bottom:24px;">
+          Sua indicação foi <strong>confirmada com sucesso</strong>!<br>
+          Continue indicando amigos para ganhar mais recompensas.
+        </p>
+        
+        <div style="background:#f8f9fa; border-radius:12px; padding:24px; margin:24px 0; text-align:left;">
+          <h3 style="color:#2c3e50; font-size:18px; margin-bottom:16px; font-weight:600;">📊 Seu Progresso:</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:14px;">
+            <div><strong>Indicações Realizadas:</strong> {{indicacoesRealizadas}}</div>
+            <div><strong>Meta de Indicações:</strong> {{metaIndicacoes}}</div>
+            <div><strong>Recompensas Ganhas:</strong> {{recompensasGanhas}}</div>
+            <div><strong>Próxima Recompensa:</strong> {{proximaRecompensa}}</div>
+          </div>
+        </div>
+        
+        <a href="{{linkIndicacao}}" style="background:#27ae60; color:#fff; padding:16px 36px; border-radius:8px; font-weight:600; font-size:18px; text-decoration:none; display:inline-block; margin-bottom:24px; box-shadow:0 4px 12px rgba(39,174,96,0.3);">
+          Fazer Nova Indicação
+        </a>
+      </div>
+      
+      <div style="padding:0 32px;">
+        <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:20px; margin-bottom:24px;">
+          <h3 style="color:#856404; font-size:16px; margin-bottom:12px; font-weight:600;">💡 Dica:</h3>
+          <p style="color:#856404; font-size:14px; margin:0;">
+            Compartilhe seu link exclusivo nas redes sociais para aumentar suas chances de indicações válidas!
+          </p>
+        </div>
+      </div>
+      
+      <div style="background:#34495e; color:white; padding:20px; text-align:center; font-size:14px;">
+        <p style="margin:0 0 8px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+        <p style="margin:0;">
+          <a href="#" style="color:#3498db; text-decoration:none;">Cancelar inscrição</a> |
+          <a href="#" style="color:#3498db; text-decoration:none;">Política de Privacidade</a>
+        </p>
+      </div>
+    </div>
+  `,
+  category: 'Indicação',
+  attributes: { class: 'fas fa-check-circle' }
+});
+
+// Template 3: Follow-up para Indicadores Inativos
+editor.BlockManager.add('indicacao-followup', {
+  label: 'Indicação: Follow-up',
+  content: `
+    <div style="background:#fff; border-radius:16px; box-shadow:0 4px 24px #0002; max-width:600px; margin:0 auto; overflow:hidden; font-family:'Segoe UI', Arial, sans-serif;">
+      <div style="background:linear-gradient(135deg,#f39c12 0%,#e67e22 100%); padding:40px 32px; text-align:center; color:white;">
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190422.png" width="80" alt="Reminder" style="background:#fff; border-radius:50%; padding:12px; margin-bottom:20px; box-shadow:0 4px 12px rgba(255,255,255,0.2);">
+        <h1 style="font-size:28px; margin:0 0 12px 0; font-weight:700;">Você está perdendo oportunidades!</h1>
+        <p style="font-size:16px; margin:0; opacity:0.9;">{{empresa}} - {{nomeCampanha}}</p>
+      </div>
+      
+      <div style="padding:32px; text-align:center;">
+        <h2 style="color:#2c3e50; font-size:24px; margin-bottom:16px; font-weight:600;">Olá, {{nome}}!</h2>
+        <p style="color:#555; font-size:16px; line-height:1.6; margin-bottom:24px;">
+          Notamos que você ainda não aproveitou todas as oportunidades do nosso programa de indicação.<br>
+          <strong>Não perca mais tempo!</strong> Comece a indicar amigos hoje mesmo.
+        </p>
+        
+        <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:20px; margin:24px 0;">
+          <h3 style="color:#856404; font-size:18px; margin-bottom:12px; font-weight:600;">🎯 Oportunidades Disponíveis:</h3>
+          <ul style="color:#856404; font-size:14px; margin:0; padding-left:20px; text-align:left;">
+            <li style="margin-bottom:8px;">Recompensas por indicações válidas</li>
+            <li style="margin-bottom:8px;">Bônus por metas atingidas</li>
+            <li style="margin-bottom:8px;">Participação em sorteios exclusivos</li>
+            <li>Ranking especial para indicadores ativos</li>
+          </ul>
+        </div>
+        
+        <a href="{{linkIndicacao}}" style="background:#f39c12; color:#fff; padding:16px 36px; border-radius:8px; font-weight:600; font-size:18px; text-decoration:none; display:inline-block; margin-bottom:24px; box-shadow:0 4px 12px rgba(243,156,18,0.3);">
+          Começar a Indicar Agora
+        </a>
+      </div>
+      
+      <div style="padding:0 32px;">
+        <div style="background:#e8f5e8; border:1px solid #27ae60; border-radius:8px; padding:20px; margin-bottom:24px;">
+          <h3 style="color:#27ae60; font-size:16px; margin-bottom:12px; font-weight:600;">📈 Seu Potencial:</h3>
+          <p style="color:#2c3e50; font-size:14px; margin:0;">
+            Com apenas <strong>{{indicacoesRestantes}}</strong> indicações, você pode ganhar <strong>{{recompensaProxima}}</strong>!
+          </p>
+        </div>
+      </div>
+      
+      <div style="padding:0 32px 32px 32px; text-align:center;">
+        <p style="color:#666; font-size:14px; margin-bottom:16px;">Precisa de ajuda? Entre em contato:</p>
+        <div style="display:flex; justify-content:center; gap:24px; font-size:14px;">
+          <div><strong>{{nomeResponsavel}}</strong><br>{{telefone}}</div>
+          <div><strong>E-mail:</strong><br>{{emailResponsavel}}</div>
+        </div>
+      </div>
+      
+      <div style="background:#34495e; color:white; padding:20px; text-align:center; font-size:14px;">
+        <p style="margin:0 0 8px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+        <p style="margin:0;">
+          <a href="#" style="color:#3498db; text-decoration:none;">Cancelar inscrição</a> |
+          <a href="#" style="color:#3498db; text-decoration:none;">Política de Privacidade</a>
+        </p>
+      </div>
+    </div>
+  `,
+  category: 'Indicação',
+  attributes: { class: 'fas fa-bell' }
+});
+
+// Template 4: Recompensa/Conquista Alcançada
+editor.BlockManager.add('indicacao-reward', {
+  label: 'Indicação: Recompensa',
+  content: `
+    <div style="background:#fff; border-radius:16px; box-shadow:0 4px 24px #0002; max-width:600px; margin:0 auto; overflow:hidden; font-family:'Segoe UI', Arial, sans-serif;">
+      <div style="background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%); padding:40px 32px; text-align:center; color:white;">
+        <div style="background:#fff; border-radius:50%; width:80px; height:80px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(255,255,255,0.2);">
+          <i class="fas fa-trophy" style="font-size:32px; color:#e74c3c;"></i>
+        </div>
+        <h1 style="font-size:28px; margin:0 0 12px 0; font-weight:700;">🎉 Parabéns! Você Conquistou!</h1>
+        <p style="font-size:16px; margin:0; opacity:0.9;">{{empresa}} - {{nomeCampanha}}</p>
+      </div>
+      
+      <div style="padding:32px; text-align:center;">
+        <h2 style="color:#2c3e50; font-size:24px; margin-bottom:16px; font-weight:600;">{{nome}}, você é incrível!</h2>
+        <p style="color:#555; font-size:16px; line-height:1.6; margin-bottom:24px;">
+          Você acabou de conquistar uma nova recompensa no nosso programa de indicação!<br>
+          Continue assim para ganhar ainda mais benefícios.
+        </p>
+        
+        <div style="background:#e8f5e8; border:1px solid #27ae60; border-radius:12px; padding:24px; margin:24px 0;">
+          <h3 style="color:#27ae60; font-size:20px; margin-bottom:16px; font-weight:600;">🏆 Sua Conquista:</h3>
+          <div style="background:#fff; border-radius:8px; padding:20px; margin-bottom:16px;">
+            <div style="font-size:24px; font-weight:700; color:#e74c3c; margin-bottom:8px;">{{tipoRecompensa}}</div>
+            <div style="font-size:16px; color:#2c3e50;">{{descricaoRecompensa}}</div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:14px; text-align:left;">
+            <div><strong>Data da Conquista:</strong> {{dataConquista}}</div>
+            <div><strong>Indicações Necessárias:</strong> {{indicacoesNecessarias}}</div>
+            <div><strong>Valor da Recompensa:</strong> {{valorRecompensa}}</div>
+            <div><strong>Próximo Nível:</strong> {{proximoNivel}}</div>
+          </div>
+        </div>
+        
+        <a href="{{linkAcesso}}" style="background:#e74c3c; color:#fff; padding:16px 36px; border-radius:8px; font-weight:600; font-size:18px; text-decoration:none; display:inline-block; margin-bottom:24px; box-shadow:0 4px 12px rgba(231,76,60,0.3);">
+          Ver Minhas Recompensas
+        </a>
+      </div>
+      
+      <div style="padding:0 32px;">
+        <div style="background:#f8f9fa; border-radius:8px; padding:20px; margin-bottom:24px;">
+          <h3 style="color:#2c3e50; font-size:16px; margin-bottom:12px; font-weight:600;">📊 Seu Ranking:</h3>
+          <p style="color:#555; font-size:14px; margin:0;">
+            Você está na <strong>{{rankingPosicao}}ª posição</strong> entre todos os indicadores! Continue indicando para subir no ranking.
+          </p>
+        </div>
+      </div>
+      
+      <div style="background:#34495e; color:white; padding:20px; text-align:center; font-size:14px;">
+        <p style="margin:0 0 8px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+        <p style="margin:0;">
+          <a href="#" style="color:#3498db; text-decoration:none;">Cancelar inscrição</a> |
+          <a href="#" style="color:#3498db; text-decoration:none;">Política de Privacidade</a>
+        </p>
+      </div>
+    </div>
+  `,
+  category: 'Indicação',
+  attributes: { class: 'fas fa-trophy' }
+});
+
+// Template 5: Nova Campanha Disponível
+editor.BlockManager.add('indicacao-new-campaign', {
+  label: 'Indicação: Nova Campanha',
+  content: `
+    <div style="background:#fff; border-radius:16px; box-shadow:0 4px 24px #0002; max-width:600px; margin:0 auto; overflow:hidden; font-family:'Segoe UI', Arial, sans-serif;">
+      <div style="background:linear-gradient(135deg,#9b59b6 0%,#8e44ad 100%); padding:40px 32px; text-align:center; color:white;">
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190406.png" width="80" alt="New Campaign" style="background:#fff; border-radius:50%; padding:12px; margin-bottom:20px; box-shadow:0 4px 12px rgba(255,255,255,0.2);">
+        <h1 style="font-size:28px; margin:0 0 12px 0; font-weight:700;">Nova Campanha Disponível!</h1>
+        <p style="font-size:16px; margin:0; opacity:0.9;">{{empresa}} - {{nomeCampanha}}</p>
+      </div>
+      
+      <div style="padding:32px; text-align:center;">
+        <h2 style="color:#2c3e50; font-size:24px; margin-bottom:16px; font-weight:600;">{{nome}}, temos uma novidade!</h2>
+        <p style="color:#555; font-size:16px; line-height:1.6; margin-bottom:24px;">
+          Acabamos de lançar uma <strong>nova campanha de indicação</strong> com recompensas ainda melhores!<br>
+          Seja um dos primeiros a participar e aproveite as vantagens exclusivas.
+        </p>
+        
+        <div style="background:#f0f8ff; border:1px solid #9b59b6; border-radius:12px; padding:24px; margin:24px 0;">
+          <h3 style="color:#8e44ad; font-size:20px; margin-bottom:16px; font-weight:600;">🚀 Nova Campanha: {{nomeCampanha}}</h3>
+          <div style="text-align:left; margin-bottom:16px;">
+            <p style="color:#2c3e50; font-size:14px; margin-bottom:12px;"><strong>Descrição:</strong> {{descricaoCampanha}}</p>
+            <p style="color:#2c3e50; font-size:14px; margin-bottom:12px;"><strong>Recompensa Principal:</strong> {{recompensaCampanha}}</p>
+            <p style="color:#2c3e50; font-size:14px; margin-bottom:12px;"><strong>Meta de Indicações:</strong> {{metaIndicacoes}}</p>
+            <p style="color:#2c3e50; font-size:14px; margin-bottom:12px;"><strong>Data Limite:</strong> {{dataLimite}}</p>
+          </div>
+          <div style="background:#fff; border-radius:8px; padding:16px; margin-top:16px;">
+            <h4 style="color:#8e44ad; font-size:16px; margin-bottom:8px; font-weight:600;">🎁 Bônus Especiais:</h4>
+            <ul style="color:#2c3e50; font-size:14px; margin:0; padding-left:20px;">
+              <li style="margin-bottom:6px;">Bônus por indicação rápida</li>
+              <li style="margin-bottom:6px;">Recompensas extras por metas</li>
+              <li style="margin-bottom:6px;">Participação em sorteio exclusivo</li>
+              <li>Ranking especial da campanha</li>
+            </ul>
+          </div>
+        </div>
+        
+        <a href="{{linkCampanha}}" style="background:#9b59b6; color:#fff; padding:16px 36px; border-radius:8px; font-weight:600; font-size:18px; text-decoration:none; display:inline-block; margin-bottom:24px; box-shadow:0 4px 12px rgba(155,89,182,0.3);">
+          Participar da Nova Campanha
+        </a>
+      </div>
+      
+      <div style="padding:0 32px;">
+        <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:20px; margin-bottom:24px;">
+          <h3 style="color:#856404; font-size:16px; margin-bottom:12px; font-weight:600;">⏰ Ação Rápida:</h3>
+          <p style="color:#856404; font-size:14px; margin:0;">
+            Os primeiros participantes têm vantagens especiais! Não perca tempo e comece a indicar agora mesmo.
+          </p>
+        </div>
+      </div>
+      
+      <div style="background:#34495e; color:white; padding:20px; text-align:center; font-size:14px;">
+        <p style="margin:0 0 8px 0;">© 2024 {{empresa}}. Todos os direitos reservados.</p>
+        <p style="margin:0;">
+          <a href="#" style="color:#3498db; text-decoration:none;">Cancelar inscrição</a> |
+          <a href="#" style="color:#3498db; text-decoration:none;">Política de Privacidade</a>
+        </p>
+      </div>
+    </div>
+  `,
+  category: 'Indicação',
+  attributes: { class: 'fas fa-rocket' }
 }); 

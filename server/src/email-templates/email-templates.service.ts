@@ -171,6 +171,37 @@ export class EmailTemplatesService {
     }
   }
 
+  async testTemplateDirect(clientId: string, testEmail: string, htmlContent: string, css?: string, subject?: string): Promise<{ success: boolean; message: string }> {
+    try {
+      // Buscar configuração do cliente
+      const config = await this.findConfigByClientId(clientId);
+
+      if (!config || config.status !== 'active') {
+        throw new BadRequestException('Configuração de e-mail não encontrada ou inativa');
+      }
+
+      // Combinar HTML e CSS
+      const fullHtml = css ? `<style>${css}</style>${htmlContent}` : htmlContent;
+
+      // Enviar e-mail de teste
+      await this.mailService.sendMail({
+        to: testEmail,
+        subject: subject || 'Teste de Template de E-mail',
+        html: fullHtml,
+      });
+
+      console.log(`[EMAIL TEST] E-mail de teste enviado para ${testEmail} do cliente ${clientId}`);
+
+      return { 
+        success: true, 
+        message: 'E-mail de teste enviado com sucesso! Verifique sua caixa de entrada.' 
+      };
+    } catch (error) {
+      console.error(`[EMAIL TEST ERROR] Erro ao enviar teste para ${testEmail}:`, error);
+      throw new BadRequestException(`Erro ao enviar e-mail de teste: ${error.message}`);
+    }
+  }
+
   // ===== EMAIL CONFIG =====
 
   async createConfig(createEmailConfigDto: CreateEmailConfigDto): Promise<EmailConfig> {
