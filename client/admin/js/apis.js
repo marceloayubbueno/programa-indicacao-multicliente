@@ -59,9 +59,10 @@ async function saveBrevoConfig() {
         }
         
         const config = {
+            provider: 'brevo',
             apiKey: apiKey,
             enabled: true,
-            updatedAt: new Date().toISOString()
+            isDefault: true
         };
         
         // Salvar no backend
@@ -157,10 +158,15 @@ async function loadBrevoConfig() {
         });
         
         if (response.ok) {
-            brevoConfig = await response.json();
-            document.getElementById('brevoApiKey').value = brevoConfig.apiKey || '';
-            updateBrevoStatus(brevoConfig.enabled ? 'active' : 'inactive');
-            adminSuccessLog('✅ Configuração Brevo carregada');
+            const data = await response.json();
+            if (data.config) {
+                brevoConfig = data.config;
+                document.getElementById('brevoApiKey').value = brevoConfig.apiKey || '';
+                updateBrevoStatus(brevoConfig.enabled ? 'active' : 'inactive');
+                adminSuccessLog('✅ Configuração Brevo carregada');
+            } else {
+                updateBrevoStatus('not-configured');
+            }
         } else {
             updateBrevoStatus('not-configured');
         }

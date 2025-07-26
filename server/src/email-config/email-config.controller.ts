@@ -24,7 +24,11 @@ export class EmailConfigController {
   @UseGuards(JwtAuthGuard)
   @Get('admin/:provider')
   async getGlobalConfig(@Param('provider') provider: string) {
-    return this.emailConfigService.findGlobalByProvider(provider);
+    const config = await this.emailConfigService.findGlobalByProvider(provider);
+    if (!config) {
+      return { message: 'Configuração não encontrada', config: null };
+    }
+    return config;
   }
 
   // 🧪 ADMIN - Testar configuração global
