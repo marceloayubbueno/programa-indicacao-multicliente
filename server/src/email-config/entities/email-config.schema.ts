@@ -8,7 +8,7 @@ export class EmailConfig {
   @Prop({ required: false, default: null })
   clientId?: string; // null = configuração global
 
-  @Prop({ required: true, enum: ['brevo', 'sendgrid'] })
+  @Prop({ required: true, enum: ['brevo'] })
   provider: string;
 
   @Prop({ required: true })

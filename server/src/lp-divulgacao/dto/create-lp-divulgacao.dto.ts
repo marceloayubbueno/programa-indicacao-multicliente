@@ -58,7 +58,7 @@ export class CustomFieldDto {
 
 // DTO para configuração de email provider
 export class EmailProviderDto {
-  @IsEnum(['mailchimp', 'sendgrid', 'custom'])
+  @IsEnum(['mailchimp', 'custom'])
   provider: string;
 
   @IsOptional()

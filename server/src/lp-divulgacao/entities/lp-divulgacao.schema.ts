@@ -40,7 +40,7 @@ interface LPStatistics {
 interface IntegrationConfig {
   crmWebhook?: string;                   // Webhook para CRM
   emailProvider?: {                      // Configuração de email
-    provider: 'mailchimp' | 'sendgrid' | 'custom';
+    provider: 'mailchimp' | 'custom';
     apiKey?: string;
     listId?: string;
   };

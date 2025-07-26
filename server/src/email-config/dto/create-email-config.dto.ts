@@ -5,7 +5,7 @@ export class CreateEmailConfigDto {
   @IsString()
   clientId?: string;
 
-  @IsEnum(['brevo', 'sendgrid'])
+  @IsEnum(['brevo'])
   provider: string;
 
   @IsString()

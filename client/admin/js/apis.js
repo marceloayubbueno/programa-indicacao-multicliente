@@ -3,15 +3,12 @@
  * Arquivo responsável por gerenciar configurações de APIs externas
  * 
  * Funcionalidades:
- * - Configuração SendGrid API
  * - Configuração Brevo API  
  * - Testes de conectividade
  * - Gerenciamento de status
  */
 
 // 🌐 Configurações globais
-let currentTab = 'sendgrid';
-let sendgridConfig = null;
 let brevoConfig = null;
 
 // 📋 Inicialização
@@ -20,40 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Carregar configurações salvas
     loadAllConfigs();
-    
-    // Mostrar aba padrão
-    showTab('sendgrid');
 });
 
-// 🎯 Função para alternar entre abas
-function showTab(tabName) {
-    adminDebugLog(`🔄 Alternando para aba: ${tabName}`);
-    
-    // Atualizar botões das abas
-    document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.remove('active', 'border-red-400', 'text-red-400');
-        btn.classList.add('border-transparent', 'text-gray-400');
-    });
-    
-    // Ativar botão selecionado
-    const activeButton = document.querySelector(`#tab-${tabName}`);
-    if (activeButton) {
-        activeButton.classList.add('active', 'border-red-400', 'text-red-400');
-        activeButton.classList.remove('border-transparent', 'text-gray-400');
-    }
-    
-    // Mostrar conteúdo da aba
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('hidden');
-    });
-    
-    const activeContent = document.querySelector(`#content-${tabName}`);
-    if (activeContent) {
-        activeContent.classList.remove('hidden');
-    }
-    
-    currentTab = tabName;
-}
+
 
 // 👁️ Função para mostrar/ocultar senha
 function togglePasswordVisibility(inputId) {
@@ -72,54 +38,7 @@ function togglePasswordVisibility(inputId) {
     }
 }
 
-// 💾 Função para salvar configuração SendGrid
-async function saveSendGridConfig() {
-    try {
-        const apiKey = document.getElementById('sendgridApiKey').value.trim();
-        
-        if (!apiKey) {
-            adminErrorLog('❌ API Key do SendGrid é obrigatória');
-            showNotification('API Key do SendGrid é obrigatória', 'error');
-            return;
-        }
-        
-        // Validar formato da API Key
-        if (!apiKey.startsWith('SG.')) {
-            adminErrorLog('❌ API Key do SendGrid deve começar com "SG."');
-            showNotification('API Key do SendGrid deve começar com "SG."', 'error');
-            return;
-        }
-        
-        const config = {
-            apiKey: apiKey,
-            enabled: true,
-            updatedAt: new Date().toISOString()
-        };
-        
-        // Salvar no backend
-        const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/email-config/sendgrid`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getAdminToken()}`
-            },
-            body: JSON.stringify(config)
-        });
-        
-        if (response.ok) {
-            sendgridConfig = config;
-            updateSendGridStatus('active');
-            adminSuccessLog('✅ Configuração SendGrid salva com sucesso');
-            showNotification('Configuração SendGrid salva com sucesso!', 'success');
-        } else {
-            throw new Error('Erro ao salvar configuração');
-        }
-        
-    } catch (error) {
-        adminErrorLog('❌ Erro ao salvar configuração SendGrid:', error);
-        showNotification('Erro ao salvar configuração SendGrid', 'error');
-    }
-}
+
 
 // 💾 Função para salvar configuração Brevo
 async function saveBrevoConfig() {
@@ -170,59 +89,7 @@ async function saveBrevoConfig() {
     }
 }
 
-// 🧪 Função para testar SendGrid
-async function testSendGrid() {
-    try {
-        const testEmail = document.getElementById('sendgridTestEmail').value.trim();
-        
-        if (!testEmail) {
-            adminErrorLog('❌ E-mail de teste é obrigatório');
-            showNotification('E-mail de teste é obrigatório', 'error');
-            return;
-        }
-        
-        if (!sendgridConfig?.apiKey) {
-            adminErrorLog('❌ Configure a API Key do SendGrid primeiro');
-            showNotification('Configure a API Key do SendGrid primeiro', 'error');
-            return;
-        }
-        
-        // Mostrar loading
-        const button = event.target;
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Testando...';
-        button.disabled = true;
-        
-        // Testar envio
-        const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/email-config/test-sendgrid`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getAdminToken()}`
-            },
-            body: JSON.stringify({
-                testEmail: testEmail
-            })
-        });
-        
-        if (response.ok) {
-            adminSuccessLog('✅ Teste SendGrid realizado com sucesso');
-            showNotification('E-mail de teste enviado com sucesso!', 'success');
-        } else {
-            const error = await response.json();
-            throw new Error(error.message || 'Erro no teste');
-        }
-        
-    } catch (error) {
-        adminErrorLog('❌ Erro no teste SendGrid:', error);
-        showNotification(`Erro no teste: ${error.message}`, 'error');
-    } finally {
-        // Restaurar botão
-        const button = event.target;
-        button.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Testar';
-        button.disabled = false;
-    }
-}
+
 
 // 🧪 Função para testar Brevo
 async function testBrevo() {
@@ -278,29 +145,7 @@ async function testBrevo() {
     }
 }
 
-// 📥 Função para carregar configuração SendGrid
-async function loadSendGridConfig() {
-    try {
-        const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/email-config/sendgrid`, {
-            headers: {
-                'Authorization': `Bearer ${getAdminToken()}`
-            }
-        });
-        
-        if (response.ok) {
-            sendgridConfig = await response.json();
-            document.getElementById('sendgridApiKey').value = sendgridConfig.apiKey || '';
-            updateSendGridStatus(sendgridConfig.enabled ? 'active' : 'inactive');
-            adminSuccessLog('✅ Configuração SendGrid carregada');
-        } else {
-            updateSendGridStatus('not-configured');
-        }
-        
-    } catch (error) {
-        adminErrorLog('❌ Erro ao carregar configuração SendGrid:', error);
-        updateSendGridStatus('error');
-    }
-}
+
 
 // 📥 Função para carregar configuração Brevo
 async function loadBrevoConfig() {
@@ -328,39 +173,10 @@ async function loadBrevoConfig() {
 
 // 📥 Função para carregar todas as configurações
 async function loadAllConfigs() {
-    await loadSendGridConfig();
     await loadBrevoConfig();
 }
 
-// 🔄 Função para atualizar status SendGrid
-function updateSendGridStatus(status) {
-    const statusElement = document.getElementById('sendgrid-status');
-    const icon = statusElement.querySelector('i');
-    
-    statusElement.className = 'px-3 py-1 rounded-full text-xs font-medium';
-    
-    switch (status) {
-        case 'active':
-            statusElement.classList.add('bg-green-600', 'text-green-100');
-            icon.className = 'fas fa-circle mr-1';
-            statusElement.innerHTML = '<i class="fas fa-circle mr-1"></i>Ativo';
-            break;
-        case 'inactive':
-            statusElement.classList.add('bg-yellow-600', 'text-yellow-100');
-            icon.className = 'fas fa-circle mr-1';
-            statusElement.innerHTML = '<i class="fas fa-circle mr-1"></i>Inativo';
-            break;
-        case 'error':
-            statusElement.classList.add('bg-red-600', 'text-red-100');
-            icon.className = 'fas fa-exclamation-triangle mr-1';
-            statusElement.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i>Erro';
-            break;
-        default:
-            statusElement.classList.add('bg-gray-600', 'text-gray-300');
-            icon.className = 'fas fa-circle mr-1';
-            statusElement.innerHTML = '<i class="fas fa-circle mr-1"></i>Não configurado';
-    }
-}
+
 
 // 🔄 Função para atualizar status Brevo
 function updateBrevoStatus(status) {

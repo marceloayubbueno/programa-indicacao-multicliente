@@ -125,8 +125,6 @@ export class EmailConfigService {
       let result;
       if (provider === 'brevo') {
         result = await this.mailService.sendMailViaBrevo(emailData, config.apiKey);
-      } else if (provider === 'sendgrid') {
-        result = await this.mailService.sendMailViaSendGrid(emailData, config.apiKey);
       } else {
         throw new BadRequestException(`Provider ${provider} não suportado`);
       }

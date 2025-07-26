@@ -102,56 +102,5 @@ export class MailService {
     }
   }
 
-  // 📧 Enviar email via SendGrid API
-  async sendMailViaSendGrid(emailData: {
-    to: string;
-    subject: string;
-    html: string;
-    from?: string;
-    fromName?: string;
-  }, apiKey: string): Promise<void> {
-    try {
-      const response = await axios.post(
-        'https://api.sendgrid.com/v3/mail/send',
-        {
-          personalizations: [
-            {
-              to: [
-                {
-                  email: emailData.to,
-                  name: emailData.to.split('@')[0]
-                }
-              ]
-            }
-          ],
-          from: {
-            email: emailData.from || 'noreply@example.com',
-            name: emailData.fromName || 'Sistema'
-          },
-          subject: emailData.subject,
-          content: [
-            {
-              type: 'text/html',
-              value: emailData.html
-            }
-          ]
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
 
-      if (response.status !== 202) {
-        throw new Error(`SendGrid API error: ${response.status} - ${response.statusText}`);
-      }
-
-      console.log(`[SENDGRID] Email enviado com sucesso para ${emailData.to}`);
-    } catch (error) {
-      console.error('[SENDGRID ERROR]', error.response?.data || error.message);
-      throw new InternalServerErrorException(`Erro ao enviar email via SendGrid: ${error.message}`);
-    }
-  }
 } 

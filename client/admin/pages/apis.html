@@ -50,80 +50,8 @@
                 
                 <!-- Main Content -->
                 <main class="flex-1 p-8">
-                    <!-- Tabs -->
-                    <div class="mb-8">
-                        <div class="border-b border-gray-700">
-                            <nav class="-mb-px flex space-x-8">
-                                <button onclick="showTab('sendgrid')" id="tab-sendgrid" class="tab-button active py-2 px-1 border-b-2 border-red-400 font-medium text-sm text-red-400">
-                                    <i class="fas fa-envelope mr-2"></i>SendGrid API
-                                </button>
-                                <button onclick="showTab('brevo')" id="tab-brevo" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-400 hover:text-gray-300">
-                                    <i class="fas fa-paper-plane mr-2"></i>Brevo API
-                                </button>
-                            </nav>
-                        </div>
-                    </div>
-
-                    <!-- SendGrid Tab Content -->
-                    <div id="content-sendgrid" class="tab-content">
-                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                            <div class="flex items-center justify-between mb-6">
-                                <h2 class="text-xl font-semibold text-gray-100">
-                                    <i class="fas fa-envelope text-blue-400 mr-2"></i>
-                                    Configuração SendGrid
-                                </h2>
-                                <div class="flex items-center gap-2">
-                                    <span id="sendgrid-status" class="px-3 py-1 rounded-full text-xs font-medium bg-gray-600 text-gray-300">
-                                        <i class="fas fa-circle mr-1"></i>Não configurado
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="space-y-6">
-                                <!-- API Key Input -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">
-                                        API Key do SendGrid
-                                    </label>
-                                    <div class="flex gap-2">
-                                        <input type="password" id="sendgridApiKey" placeholder="SG.xxxxxxxxxxxxxxxxxxxxx" 
-                                               class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <button onclick="togglePasswordVisibility('sendgridApiKey')" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    <p class="text-xs text-gray-400 mt-1">
-                                        Obtenha sua API Key em: <a href="https://app.sendgrid.com/settings/api_keys" target="_blank" class="text-blue-400 hover:underline">SendGrid Dashboard</a>
-                                    </p>
-                                </div>
-
-                                <!-- Test Section -->
-                                <div class="bg-gray-700 rounded-lg p-4">
-                                    <h3 class="text-lg font-medium text-gray-100 mb-3">Teste de Conectividade</h3>
-                                    <div class="flex gap-3">
-                                        <input type="email" id="sendgridTestEmail" placeholder="email@exemplo.com" 
-                                               class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-4 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <button onclick="testSendGrid()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
-                                            <i class="fas fa-paper-plane mr-2"></i>Testar
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Actions -->
-                                <div class="flex gap-3">
-                                    <button onclick="saveSendGridConfig()" class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors">
-                                        <i class="fas fa-save mr-2"></i>Salvar Configuração
-                                    </button>
-                                    <button onclick="loadSendGridConfig()" class="px-6 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg font-medium transition-colors">
-                                        <i class="fas fa-sync mr-2"></i>Carregar Configuração
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Brevo Tab Content -->
-                    <div id="content-brevo" class="tab-content hidden">
+                    <div id="content-brevo" class="tab-content">
                         <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
                             <div class="flex items-center justify-between mb-6">
                                 <h2 class="text-xl font-semibold text-gray-100">
@@ -179,6 +107,8 @@
                             </div>
                         </div>
                     </div>
+
+
                 </main>
             </div>
         </div>
