@@ -134,12 +134,19 @@ async function testBrevo(event) {
         
         if (response.ok) {
             const result = await response.json();
-            adminSuccessLog('✅ Teste Brevo realizado com sucesso', result);
-            showNotification(`E-mail de teste enviado com sucesso para ${testEmail}!`, 'success');
             
-            // Mostrar detalhes no console
-            if (result.details) {
-                adminDebugLog('📧 Detalhes do envio:', result.details);
+            // Verificar se realmente foi enviado
+            if (result.success) {
+                adminSuccessLog('✅ E-mail enviado com sucesso!', result);
+                showNotification(`📧 E-mail enviado para ${testEmail}! Verifique sua caixa de entrada.`, 'success');
+                
+                // Mostrar detalhes
+                if (result.details) {
+                    adminDebugLog('📧 Detalhes do envio:', result.details);
+                    showNotification(`🆔 ID: ${result.details.configId} | ⏰ ${new Date(result.details.timestamp).toLocaleString('pt-BR')}`, 'info');
+                }
+            } else {
+                throw new Error('Falha no envio do e-mail');
             }
         } else {
             const error = await response.json();
