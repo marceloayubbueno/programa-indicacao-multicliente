@@ -25,6 +25,9 @@ export class CreateEmailConfigDto {
     fromEmail?: string;
     replyTo?: string;
   };
+
+  @IsOptional()
+  updatedAt?: string;
 }
 
 export class UpdateEmailConfigDto {

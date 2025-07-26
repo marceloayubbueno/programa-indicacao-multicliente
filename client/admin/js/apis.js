@@ -65,7 +65,7 @@ async function saveBrevoConfig() {
         };
         
         // Salvar no backend
-        const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/email-config/brevo`, {
+        const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/email-config/admin/brevo`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ async function testBrevo() {
         button.disabled = true;
         
         // Testar envio
-        const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/email-config/test-brevo`, {
+        const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/email-config/admin/brevo/test`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ async function testBrevo() {
 // 📥 Função para carregar configuração Brevo
 async function loadBrevoConfig() {
     try {
-        const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/email-config/brevo`, {
+        const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/email-config/admin/brevo`, {
             headers: {
                 'Authorization': `Bearer ${getAdminToken()}`
             }
