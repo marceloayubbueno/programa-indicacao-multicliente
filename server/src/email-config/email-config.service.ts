@@ -130,8 +130,8 @@ export class EmailConfigService {
           <p><strong>Provider:</strong> ${provider}</p>
           <p><strong>Config ID:</strong> ${config._id}</p>
         `,
-        from: config.settings?.fromEmail || 'noreply@example.com',
-        fromName: config.settings?.fromName || 'Sistema de Teste'
+        from: config.settings?.fromEmail || 'marcelo_ayub@hotmail.com',
+        fromName: config.settings?.fromName || 'Marcelo Ayub - Sistema'
       };
 
       console.log(`[EMAIL TEST] Dados do email preparados:`, {
