@@ -65,39 +65,72 @@ export class MailService {
     html: string;
     from?: string;
     fromName?: string;
-  }, apiKey: string): Promise<void> {
+  }, apiKey: string): Promise<any> {
     try {
+      console.log(`[BREVO START] Iniciando envio para ${emailData.to}`);
+      console.log(`[BREVO] API Key: ${apiKey.substring(0, 10)}...${apiKey.substring(apiKey.length - 4)}`);
+      
+      const payload = {
+        sender: {
+          name: emailData.fromName || 'Sistema',
+          email: emailData.from || 'noreply@example.com'
+        },
+        to: [
+          {
+            email: emailData.to,
+            name: emailData.to.split('@')[0]
+          }
+        ],
+        subject: emailData.subject,
+        htmlContent: emailData.html
+      };
+
+      console.log(`[BREVO] Payload preparado:`, {
+        sender: payload.sender,
+        to: payload.to,
+        subject: payload.subject,
+        htmlLength: payload.htmlContent.length
+      });
+
       const response = await axios.post(
         'https://api.brevo.com/v3/smtp/email',
-        {
-          sender: {
-            name: emailData.fromName || 'Sistema',
-            email: emailData.from || 'noreply@example.com'
-          },
-          to: [
-            {
-              email: emailData.to,
-              name: emailData.to.split('@')[0]
-            }
-          ],
-          subject: emailData.subject,
-          htmlContent: emailData.html
-        },
+        payload,
         {
           headers: {
             'api-key': apiKey,
             'content-type': 'application/json'
-          }
+          },
+          timeout: 30000 // 30 segundos
         }
       );
+
+      console.log(`[BREVO] Resposta da API:`, {
+        status: response.status,
+        statusText: response.statusText,
+        data: response.data
+      });
 
       if (response.status !== 201) {
         throw new Error(`Brevo API error: ${response.status} - ${response.statusText}`);
       }
 
-      console.log(`[BREVO] Email enviado com sucesso para ${emailData.to}`);
+      console.log(`[BREVO SUCCESS] Email enviado com sucesso para ${emailData.to}`);
+      return response.data;
     } catch (error) {
-      console.error('[BREVO ERROR]', error.response?.data || error.message);
+      console.error('[BREVO ERROR] Detalhes do erro:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          headers: error.config?.headers ? {
+            'api-key': error.config.headers['api-key'] ? '***PRESENT***' : '***MISSING***',
+            'content-type': error.config.headers['content-type']
+          } : '***NO HEADERS***'
+        }
+      });
       throw new InternalServerErrorException(`Erro ao enviar email via Brevo: ${error.message}`);
     }
   }

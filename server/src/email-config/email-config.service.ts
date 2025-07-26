@@ -96,16 +96,27 @@ export class EmailConfigService {
   }
 
   // 🧪 Testar configuração de email
-  async testEmailConfig(provider: string, testEmailDto: TestEmailDto, clientId?: string): Promise<{ success: boolean; message: string }> {
+  async testEmailConfig(provider: string, testEmailDto: TestEmailDto, clientId?: string): Promise<{ success: boolean; message: string; details?: any }> {
     try {
+      console.log(`[EMAIL TEST START] Iniciando teste ${provider} para ${testEmailDto.testEmail}`);
+      
       // Buscar configuração
       const config = clientId 
         ? await this.findByClientAndProvider(clientId, provider)
         : await this.findGlobalByProvider(provider);
 
       if (!config) {
+        console.error(`[EMAIL TEST ERROR] Configuração ${provider} não encontrada`);
         throw new BadRequestException(`Configuração ${provider} não encontrada ou inativa`);
       }
+
+      console.log(`[EMAIL TEST] Configuração encontrada:`, {
+        provider: config.provider,
+        enabled: config.enabled,
+        isDefault: config.isDefault,
+        hasApiKey: !!config.apiKey,
+        apiKeyLength: config.apiKey?.length || 0
+      });
 
       // Preparar dados do email
       const emailData = {
@@ -116,48 +127,70 @@ export class EmailConfigService {
           <p>Este é um email de teste para verificar a configuração do ${provider}.</p>
           <p><strong>Data/Hora:</strong> ${new Date().toLocaleString('pt-BR')}</p>
           <p><strong>Cliente ID:</strong> ${clientId || 'Global'}</p>
+          <p><strong>Provider:</strong> ${provider}</p>
+          <p><strong>Config ID:</strong> ${config._id}</p>
         `,
         from: config.settings?.fromEmail || 'noreply@example.com',
         fromName: config.settings?.fromName || 'Sistema de Teste'
       };
 
+      console.log(`[EMAIL TEST] Dados do email preparados:`, {
+        to: emailData.to,
+        subject: emailData.subject,
+        from: emailData.from,
+        fromName: emailData.fromName,
+        htmlLength: emailData.html.length
+      });
+
       // Enviar email usando o provider específico
       let result;
       if (provider === 'brevo') {
+        console.log(`[EMAIL TEST] Enviando via Brevo API...`);
         result = await this.mailService.sendMailViaBrevo(emailData, config.apiKey);
+        console.log(`[EMAIL TEST] Resultado do Brevo:`, result);
       } else {
         throw new BadRequestException(`Provider ${provider} não suportado`);
       }
 
-             // Atualizar último teste
-       await this.emailConfigModel.findByIdAndUpdate((config as any)._id, {
-         lastTestAt: new Date(),
-         lastTestResult: true,
-         lastTestError: null
-       });
+      // Atualizar último teste
+      await this.emailConfigModel.findByIdAndUpdate((config as any)._id, {
+        lastTestAt: new Date(),
+        lastTestResult: true,
+        lastTestError: null
+      });
 
-      console.log(`[EMAIL TEST] Teste ${provider} para ${testEmailDto.testEmail} - SUCESSO`);
+      console.log(`[EMAIL TEST SUCCESS] Teste ${provider} para ${testEmailDto.testEmail} - SUCESSO`);
       
       return {
         success: true,
-        message: `Email de teste enviado com sucesso para ${testEmailDto.testEmail}`
+        message: `Email de teste enviado com sucesso para ${testEmailDto.testEmail}`,
+        details: {
+          provider,
+          email: testEmailDto.testEmail,
+          timestamp: new Date().toISOString(),
+          configId: config._id
+        }
       };
 
     } catch (error) {
-      console.error(`[EMAIL TEST ERROR] Erro no teste ${provider}:`, error);
+      console.error(`[EMAIL TEST ERROR] Erro no teste ${provider}:`, {
+        error: error.message,
+        stack: error.stack,
+        response: error.response?.data
+      });
 
       // Atualizar último teste com erro
       const config = clientId 
         ? await this.findByClientAndProvider(clientId, provider)
         : await this.findGlobalByProvider(provider);
       
-             if (config) {
-         await this.emailConfigModel.findByIdAndUpdate((config as any)._id, {
-           lastTestAt: new Date(),
-           lastTestResult: false,
-           lastTestError: error.message
-         });
-       }
+      if (config) {
+        await this.emailConfigModel.findByIdAndUpdate((config as any)._id, {
+          lastTestAt: new Date(),
+          lastTestResult: false,
+          lastTestError: error.message
+        });
+      }
 
       throw new BadRequestException(`Erro no teste de email: ${error.message}`);
     }

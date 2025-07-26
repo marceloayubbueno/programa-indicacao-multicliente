@@ -133,8 +133,14 @@ async function testBrevo(event) {
         });
         
         if (response.ok) {
-            adminSuccessLog('✅ Teste Brevo realizado com sucesso');
-            showNotification('E-mail de teste enviado com sucesso!', 'success');
+            const result = await response.json();
+            adminSuccessLog('✅ Teste Brevo realizado com sucesso', result);
+            showNotification(`E-mail de teste enviado com sucesso para ${testEmail}!`, 'success');
+            
+            // Mostrar detalhes no console
+            if (result.details) {
+                adminDebugLog('📧 Detalhes do envio:', result.details);
+            }
         } else {
             const error = await response.json();
             throw new Error(error.message || 'Erro no teste');
