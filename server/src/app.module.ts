@@ -20,6 +20,7 @@ import { PublicReferralsModule } from './public-referrals/public-referrals.modul
 import { IndicatorAuthModule } from './indicator-auth/indicator-auth.module';
 import { FinanceModule } from './finance/finance.module';
 import { EmailTemplatesModule } from './email-templates/email-templates.module';
+import { EmailConfigModule } from './email-config/email-config.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { EmailTemplatesModule } from './email-templates/email-templates.module';
     IndicatorAuthModule,
     FinanceModule,
     EmailTemplatesModule,
+    EmailConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],
