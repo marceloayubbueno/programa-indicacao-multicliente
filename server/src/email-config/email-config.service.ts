@@ -1,19 +1,19 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { EmailConfig, EmailConfigDocument } from './entities/email-config.schema';
+import { ApiEmailConfig, ApiEmailConfigDocument } from './entities/email-config.schema';
 import { CreateEmailConfigDto, UpdateEmailConfigDto, TestEmailDto } from './dto/create-email-config.dto';
 import { MailService } from '../common/mail.service';
 
 @Injectable()
 export class EmailConfigService {
   constructor(
-    @InjectModel(EmailConfig.name) private emailConfigModel: Model<EmailConfigDocument>,
+    @InjectModel(ApiEmailConfig.name) private emailConfigModel: Model<ApiEmailConfigDocument>,
     private mailService: MailService,
   ) {}
 
   // 🔧 Criar ou atualizar configuração
-  async createOrUpdateConfig(createEmailConfigDto: CreateEmailConfigDto): Promise<EmailConfig> {
+  async createOrUpdateConfig(createEmailConfigDto: CreateEmailConfigDto): Promise<ApiEmailConfig> {
     const { clientId, provider } = createEmailConfigDto;
     
     // Se for configuração global (clientId = null), desabilitar outras configurações globais do mesmo provider
@@ -57,12 +57,12 @@ export class EmailConfigService {
   }
 
   // 📥 Buscar configuração por cliente e provider
-  async findByClientAndProvider(clientId: string, provider: string): Promise<EmailConfig | null> {
+  async findByClientAndProvider(clientId: string, provider: string): Promise<ApiEmailConfig | null> {
     return this.emailConfigModel.findOne({ clientId, provider, enabled: true });
   }
 
   // 📥 Buscar configuração global por provider
-  async findGlobalByProvider(provider: string): Promise<EmailConfig | null> {
+  async findGlobalByProvider(provider: string): Promise<ApiEmailConfig | null> {
     return this.emailConfigModel.findOne({ 
       clientId: null, 
       provider, 
@@ -72,7 +72,7 @@ export class EmailConfigService {
   }
 
   // 📥 Buscar configuração padrão para envio
-  async findDefaultConfig(clientId?: string, provider?: string): Promise<EmailConfig | null> {
+  async findDefaultConfig(clientId?: string, provider?: string): Promise<ApiEmailConfig | null> {
     // 1. Tentar configuração específica do cliente
     if (clientId && provider) {
       const clientConfig = await this.findByClientAndProvider(clientId, provider);
@@ -164,7 +164,7 @@ export class EmailConfigService {
   }
 
   // 📊 Listar todas as configurações
-  async findAll(clientId?: string): Promise<EmailConfig[]> {
+  async findAll(clientId?: string): Promise<ApiEmailConfig[]> {
     const filter = clientId ? { clientId } : { clientId: null };
     return this.emailConfigModel.find(filter).sort({ createdAt: -1 });
   }
@@ -179,7 +179,7 @@ export class EmailConfigService {
   }
 
   // 🔄 Habilitar/Desabilitar configuração
-  async toggleConfig(id: string, enabled: boolean): Promise<EmailConfig> {
+  async toggleConfig(id: string, enabled: boolean): Promise<ApiEmailConfig> {
     const config = await this.emailConfigModel.findByIdAndUpdate(
       id,
       { enabled },

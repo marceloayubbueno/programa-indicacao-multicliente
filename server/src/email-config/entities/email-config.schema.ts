@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type EmailConfigDocument = EmailConfig & Document;
+export type ApiEmailConfigDocument = ApiEmailConfig & Document;
 
 @Schema({ timestamps: true })
-export class EmailConfig {
+export class ApiEmailConfig {
   @Prop({ required: false, default: null })
   clientId?: string; // null = configuração global
 
@@ -44,9 +44,9 @@ export class EmailConfig {
   lastTestError?: string;
 }
 
-export const EmailConfigSchema = SchemaFactory.createForClass(EmailConfig);
+export const ApiEmailConfigSchema = SchemaFactory.createForClass(ApiEmailConfig);
 
 // Índices para performance
-EmailConfigSchema.index({ clientId: 1, provider: 1 });
-EmailConfigSchema.index({ isDefault: 1, provider: 1 });
-EmailConfigSchema.index({ enabled: 1 }); 
+ApiEmailConfigSchema.index({ clientId: 1, provider: 1 });
+ApiEmailConfigSchema.index({ isDefault: 1, provider: 1 });
+ApiEmailConfigSchema.index({ enabled: 1 }); 
