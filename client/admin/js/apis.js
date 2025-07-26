@@ -15,8 +15,11 @@ let brevoConfig = null;
 document.addEventListener('DOMContentLoaded', function() {
     adminDebugLog('🚀 Inicializando gerenciador de APIs...');
     
-    // Carregar configurações salvas
+    // Carregar configurações salvas automaticamente
     loadAllConfigs();
+    
+    // Preencher campo de teste com email padrão
+    document.getElementById('brevoTestEmail').value = 'marceloayub@virallead.com.br';
 });
 
 
@@ -76,12 +79,14 @@ async function saveBrevoConfig() {
         });
         
         if (response.ok) {
-            brevoConfig = config;
+            const savedConfig = await response.json();
+            brevoConfig = savedConfig;
             updateBrevoStatus('active');
             adminSuccessLog('✅ Configuração Brevo salva com sucesso');
             showNotification('Configuração Brevo salva com sucesso!', 'success');
         } else {
-            throw new Error('Erro ao salvar configuração');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao salvar configuração');
         }
         
     } catch (error) {
@@ -105,7 +110,7 @@ async function testBrevo() {
         
         if (!brevoConfig?.apiKey) {
             adminErrorLog('❌ Configure a API Key do Brevo primeiro');
-            showNotification('Configure a API Key do Brevo primeiro', 'error');
+            showNotification('⚠️ Primeiro salve a configuração do Brevo antes de testar!', 'warning');
             return;
         }
         
