@@ -487,9 +487,9 @@
       <button class="btn btn-primary" onclick="saveTemplate()">
         <i class="fas fa-save mr-2"></i>Salvar Template
       </button>
-              <button class="btn btn-success" onclick="testEmail()">
-          <i class="fas fa-paper-plane mr-2"></i>Testar E-mail
-        </button>
+      <button class="btn btn-success" onclick="testEmail()">
+        <i class="fas fa-paper-plane mr-2"></i>Testar E-mail
+      </button>
     </div>
   </div>
   <div class="editor-row">
@@ -681,19 +681,19 @@ document.addEventListener('DOMContentLoaded', forceBlocksGrid);
           categoriaContainer.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;';
           
           vars.forEach(v => {
-            const bloco = document.createElement('div');
-            bloco.className = 'gjs-block';
-            bloco.setAttribute('draggable', 'true');
-            bloco.setAttribute('data-var', v.tag);
+        const bloco = document.createElement('div');
+        bloco.className = 'gjs-block';
+        bloco.setAttribute('draggable', 'true');
+        bloco.setAttribute('data-var', v.tag);
             bloco.style.cssText = 'background: #fff; border: 1px solid #ecf0f1; border-radius: 6px; padding: 8px; cursor: grab; transition: all 0.2s ease; font-size: 11px; text-align: center;';
             bloco.innerHTML = `
               <div style='background: #3498db; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-family: monospace; margin-bottom: 4px;'>${v.tag}</div>
               <div style='font-size: 10px; color: #2c3e50; line-height: 1.2;'>${v.desc}</div>
             `;
-            bloco.ondragstart = function(e) {
-              e.dataTransfer.setData('text/plain', v.tag);
-              e.dataTransfer.effectAllowed = 'copy';
-            };
+        bloco.ondragstart = function(e) {
+          e.dataTransfer.setData('text/plain', v.tag);
+          e.dataTransfer.effectAllowed = 'copy';
+        };
             bloco.onmouseover = function() {
               this.style.background = '#f8f9fa';
               this.style.borderColor = '#3498db';

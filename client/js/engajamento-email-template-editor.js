@@ -376,16 +376,16 @@ function adjustCanvasHeight() {
   try {
     const canvas = document.querySelector('.gjs-cv-canvas');
     const wrapper = editor.getWrapper();
-    
+  
     if (canvas && wrapper) {
       // Forçar renderização do editor
       editor.refresh();
       
       // Aguardar um pouco e calcular altura real
-      setTimeout(() => {
+  setTimeout(() => {
         let totalHeight = 0;
         const components = wrapper.getComponents();
-        
+
         // Calcular altura de cada componente
         components.forEach(component => {
           const el = component.getEl();
@@ -397,7 +397,7 @@ function adjustCanvasHeight() {
             
             const height = el.scrollHeight || el.offsetHeight || 0;
             totalHeight += height;
-          }
+  }
         });
         
         // Adicionar espaço extra
@@ -430,15 +430,15 @@ function initializeEditor() {
     } else {
       // Criar estrutura inicial simples
       const wrapper = editor.getWrapper();
-      wrapper.set('content', `
+    wrapper.set('content', `
         <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
           <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Bem-vindo ao Editor de E-mail</h2>
           <p style="color: #666; font-size: 16px; margin-bottom: 24px;">Arraste blocos da barra lateral para começar a criar seu e-mail</p>
           <div style="background: #3498db; color: white; padding: 12px 24px; border-radius: 8px; display: inline-block; font-weight: 600;">
             Comece arrastando um bloco aqui
-          </div>
         </div>
-      `);
+      </div>
+    `);
     }
     
 
@@ -454,12 +454,12 @@ function initializeEditor() {
     if (!editor.getWrapper().getComponents().length) {
       console.log('🔧 [INIT] Aplicando fallback...');
       const wrapper = editor.getWrapper();
-      wrapper.set('content', `
+    wrapper.set('content', `
         <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
           <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Editor Carregado</h2>
           <p style="color: #666; font-size: 16px;">Arraste blocos para começar</p>
-        </div>
-      `);
+      </div>
+    `);
     }
   }, 2000);
 }
@@ -922,7 +922,7 @@ editor.BlockManager.add('welcome-onboarding', {
   `,
   category: 'Modelos',
   attributes: { class: 'fas fa-star' }
-}); 
+});
 
 // Modelo 3: Minimalista Sofisticado
 editor.BlockManager.add('welcome-minimal', {
