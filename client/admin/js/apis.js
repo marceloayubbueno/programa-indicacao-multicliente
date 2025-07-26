@@ -164,7 +164,15 @@ async function loadBrevoConfig() {
         
         if (response.ok) {
             const data = await response.json();
-            if (data.config) {
+            // Verificar se é configuração direta ou objeto com config
+            if (data.apiKey) {
+                // Configuração direta
+                brevoConfig = data;
+                document.getElementById('brevoApiKey').value = brevoConfig.apiKey || '';
+                updateBrevoStatus(brevoConfig.enabled ? 'active' : 'inactive');
+                adminSuccessLog('✅ Configuração Brevo carregada');
+            } else if (data.config) {
+                // Objeto com config
                 brevoConfig = data.config;
                 document.getElementById('brevoApiKey').value = brevoConfig.apiKey || '';
                 updateBrevoStatus(brevoConfig.enabled ? 'active' : 'inactive');
