@@ -98,7 +98,7 @@ async function saveBrevoConfig() {
 
 
 // 🧪 Função para testar Brevo
-async function testBrevo() {
+async function testBrevo(event) {
     try {
         const testEmail = document.getElementById('brevoTestEmail').value.trim();
         
