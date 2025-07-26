@@ -57,12 +57,12 @@ export class EmailConfigService {
   }
 
   // 📥 Buscar configuração por cliente e provider
-  async findByClientAndProvider(clientId: string, provider: string): Promise<ApiEmailConfig | null> {
+  async findByClientAndProvider(clientId: string, provider: string): Promise<ApiEmailConfigDocument | null> {
     return this.emailConfigModel.findOne({ clientId, provider, enabled: true });
   }
 
   // 📥 Buscar configuração global por provider
-  async findGlobalByProvider(provider: string): Promise<ApiEmailConfig | null> {
+  async findGlobalByProvider(provider: string): Promise<ApiEmailConfigDocument | null> {
     return this.emailConfigModel.findOne({ 
       clientId: null, 
       provider, 
@@ -72,7 +72,7 @@ export class EmailConfigService {
   }
 
   // 📥 Buscar configuração padrão para envio
-  async findDefaultConfig(clientId?: string, provider?: string): Promise<ApiEmailConfig | null> {
+  async findDefaultConfig(clientId?: string, provider?: string): Promise<ApiEmailConfigDocument | null> {
     // 1. Tentar configuração específica do cliente
     if (clientId && provider) {
       const clientConfig = await this.findByClientAndProvider(clientId, provider);
