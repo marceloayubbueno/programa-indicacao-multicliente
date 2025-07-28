@@ -4,7 +4,7 @@
   "description": "Servidor para o programa de indicação",
   "scripts": {
     "start:dev": "ts-node src/main.ts",
-    "build": "tsc",
+    "build": "npm install && tsc",
     "start": "node dist/src/main.js",
     "start:prod": "node dist/src/main.js"
   },
