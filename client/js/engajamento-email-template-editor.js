@@ -424,6 +424,14 @@ function adjustCanvasHeight() {
 // Função de inicialização que garante estrutura centralizada
 function initializeEditor() {
   console.log('🚀 [INIT] Inicializando editor...');
+  console.log('🔍 [INIT] templateId:', templateId);
+  console.log('🔍 [INIT] editor disponível:', typeof editor !== 'undefined');
+  
+  // Verificar se o editor está disponível
+  if (typeof editor === 'undefined') {
+    console.error('❌ [INIT] Editor não está disponível!');
+    return;
+  }
   
   // Aguardar o editor estar pronto
   editor.on('load', () => {
@@ -482,12 +490,23 @@ function initializeEditor() {
 // Inicializar editor após o DOM estar pronto
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🚀 [DOM] DOM carregado, inicializando editor...');
+  console.log('🔍 [DOM] templateId:', templateId);
+  console.log('🔍 [DOM] editor disponível:', typeof editor !== 'undefined');
   setTimeout(initializeEditor, 100);
 });
 
 // Fallback para garantir inicialização
 setTimeout(() => {
-  if (!editor.getWrapper()) {
+  console.log('🔍 [FALLBACK] Verificando se editor está pronto...');
+  try {
+    const wrapper = editor.getWrapper();
+    console.log('🔍 [FALLBACK] Wrapper encontrado:', !!wrapper);
+    if (!wrapper) {
+      console.log('🚀 [FALLBACK] Inicializando editor via fallback...');
+      initializeEditor();
+    }
+  } catch (error) {
+    console.log('⚠️ [FALLBACK] Erro ao verificar wrapper:', error.message);
     console.log('🚀 [FALLBACK] Inicializando editor via fallback...');
     initializeEditor();
   }
