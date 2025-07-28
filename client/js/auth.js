@@ -49,8 +49,8 @@ async function handleLogin(event) {
         // Salvar token e dados do cliente
         localStorage.setItem('clientToken', data.token);
         localStorage.setItem('clientData', JSON.stringify(data.client));
-        if (data.client && data.client._id) {
-            localStorage.setItem('clientId', data.client._id);
+        if (data.client && data.client.id) {
+            localStorage.setItem('clientId', data.client.id);
         }
 
         // Se for primeiro acesso, redirecionar para página de troca de senha
