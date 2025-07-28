@@ -377,41 +377,45 @@ function adjustCanvasHeight() {
     const canvas = document.querySelector('.gjs-cv-canvas');
     const wrapper = editor.getWrapper();
   
-    if (canvas && wrapper) {
+    if (canvas && wrapper && wrapper.getComponents) {
       // Forçar renderização do editor
       editor.refresh();
       
       // Aguardar um pouco e calcular altura real
-  setTimeout(() => {
-        let totalHeight = 0;
-        const components = wrapper.getComponents();
+      setTimeout(() => {
+        try {
+          let totalHeight = 0;
+          const components = wrapper.getComponents();
 
-        // Calcular altura de cada componente
-        components.forEach(component => {
-          const el = component.getEl();
-          if (el) {
-            // Forçar recálculo do layout
-            el.style.display = 'none';
-            el.offsetHeight; // Força reflow
-            el.style.display = '';
-            
-            const height = el.scrollHeight || el.offsetHeight || 0;
-            totalHeight += height;
-  }
-        });
-        
-        // Adicionar espaço extra
-        totalHeight += 300;
-        
-        // Aplicar altura mínima
-        const minHeight = Math.max(totalHeight, window.innerHeight);
-        canvas.style.minHeight = minHeight + 'px';
-        
-        console.log('📏 [HEIGHT] Altura real:', totalHeight + 'px, Aplicada:', minHeight + 'px');
+          // Calcular altura de cada componente
+          components.forEach(component => {
+            const el = component.getEl();
+            if (el) {
+              // Forçar recálculo do layout
+              el.style.display = 'none';
+              el.offsetHeight; // Força reflow
+              el.style.display = '';
+              
+              const height = el.scrollHeight || el.offsetHeight || 0;
+              totalHeight += height;
+            }
+          });
+          
+          // Adicionar espaço extra
+          totalHeight += 300;
+          
+          // Aplicar altura mínima
+          const minHeight = Math.max(totalHeight, window.innerHeight);
+          canvas.style.minHeight = minHeight + 'px';
+          
+          console.log('📏 [HEIGHT] Altura real:', totalHeight + 'px, Aplicada:', minHeight + 'px');
+        } catch (error) {
+          console.log('⚠️ [HEIGHT] Erro ao calcular altura:', error.message);
+        }
       }, 100);
     }
   } catch (error) {
-    console.log('⚠️ [HEIGHT] Erro:', error.message);
+    console.log('⚠️ [HEIGHT] Erro geral:', error.message);
   }
 }
 
@@ -425,43 +429,54 @@ function initializeEditor() {
   editor.on('load', () => {
     console.log('✅ [INIT] Editor GrapesJS carregado');
     
-    if (templateId) {
-      fetchTemplate(templateId);
-    } else {
-      // Criar estrutura inicial simples
-      const wrapper = editor.getWrapper();
-    wrapper.set('content', `
-        <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
-          <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Bem-vindo ao Editor de E-mail</h2>
-          <p style="color: #666; font-size: 16px; margin-bottom: 24px;">Arraste blocos da barra lateral para começar a criar seu e-mail</p>
-          <div style="background: #3498db; color: white; padding: 12px 24px; border-radius: 8px; display: inline-block; font-weight: 600;">
-            Comece arrastando um bloco aqui
-        </div>
-      </div>
-    `);
-    }
-    
-
-    
-    console.log('✅ [INIT] Editor inicializado com sucesso');
-    
-    // Ajustar altura após inicialização
-    setTimeout(adjustCanvasHeight, 1000);
+    // Aguardar um pouco mais para garantir que o editor esteja totalmente pronto
+    setTimeout(() => {
+      if (templateId) {
+        console.log('🔍 [INIT] Carregando template existente:', templateId);
+        fetchTemplate(templateId);
+      } else {
+        console.log('🔍 [INIT] Criando novo template');
+        // Criar estrutura inicial simples
+        const wrapper = editor.getWrapper();
+        if (wrapper && wrapper.set) {
+          wrapper.set('content', `
+            <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
+              <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Bem-vindo ao Editor de E-mail</h2>
+              <p style="color: #666; font-size: 16px; margin-bottom: 24px;">Arraste blocos da barra lateral para começar a criar seu e-mail</p>
+              <div style="background: #3498db; color: white; padding: 12px 24px; border-radius: 8px; display: inline-block; font-weight: 600;">
+                Comece arrastando um bloco aqui
+              </div>
+            </div>
+          `);
+        }
+      }
+      
+      console.log('✅ [INIT] Editor inicializado com sucesso');
+      
+      // Ajustar altura após inicialização
+      setTimeout(adjustCanvasHeight, 1000);
+    }, 500);
   });
   
   // Fallback se o evento load não disparar
   setTimeout(() => {
-    if (!editor.getWrapper().getComponents().length) {
-      console.log('🔧 [INIT] Aplicando fallback...');
+    try {
       const wrapper = editor.getWrapper();
-    wrapper.set('content', `
-        <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
-          <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Editor Carregado</h2>
-          <p style="color: #666; font-size: 16px;">Arraste blocos para começar</p>
-      </div>
-    `);
+      if (wrapper && wrapper.getComponents && wrapper.getComponents().length === 0) {
+        console.log('🔧 [INIT] Aplicando fallback...');
+        if (wrapper.set) {
+          wrapper.set('content', `
+            <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
+              <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Editor Carregado</h2>
+              <p style="color: #666; font-size: 16px;">Arraste blocos para começar</p>
+            </div>
+          `);
+        }
+      }
+    } catch (error) {
+      console.log('⚠️ [INIT] Erro no fallback:', error.message);
     }
-  }, 2000);
+  }, 3000);
 }
 
 // Inicializar editor após o DOM estar pronto
@@ -507,20 +522,50 @@ window.forceRecalculateHeight = function() {
 
 
 function fetchTemplate(id) {
+  console.log('🔍 [FETCH] Iniciando busca do template:', id);
+  
   const token = localStorage.getItem('clientToken');
-  if (!token) return alert('Token não encontrado');
-  fetch(`${window.APP_CONFIG ? window.APP_CONFIG.API_URL : (window.API_URL || 'http://localhost:3000/api')}/email-templates/${id}`, {
+  if (!token) {
+    console.error('❌ [FETCH] Token não encontrado');
+    return alert('Token não encontrado');
+  }
+  
+  const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : (window.API_URL || 'http://localhost:3000/api');
+  const url = `${apiUrl}/email-templates/${id}`;
+  
+  console.log('🔍 [FETCH] URL da requisição:', url);
+  console.log('🔍 [FETCH] Token presente:', token ? 'SIM' : 'NÃO');
+  
+  fetch(url, {
     headers: { 'Authorization': `Bearer ${token}` }
   })
-    .then(res => res.json())
+    .then(async res => {
+      console.log('🔍 [FETCH] Status da resposta:', res.status);
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('❌ [FETCH] Erro na resposta:', errorText);
+        throw new Error(`HTTP ${res.status}: ${errorText}`);
+      }
+      
+      return res.json();
+    })
     .then(data => {
+      console.log('🔍 [FETCH] Dados recebidos:', data);
+      
       if (data && data.name) {
         document.getElementById('templateName').value = data.name;
+        console.log('🔍 [FETCH] Nome do template definido:', data.name);
       }
+      
       if (data && data.type) {
         document.getElementById('templateType').value = data.type;
+        console.log('🔍 [FETCH] Tipo do template definido:', data.type);
       }
+      
       if (data && data.htmlContent) {
+        console.log('🔍 [FETCH] HTML Content encontrado, tamanho:', data.htmlContent.length);
+        
         // Garantir que o conteúdo tenha a estrutura centralizada
         let htmlContent = data.htmlContent;
         
@@ -528,14 +573,26 @@ function fetchTemplate(id) {
         if (!htmlContent.includes('email-wrapper')) {
           if (!htmlContent.includes('email-container')) {
             htmlContent = `<div class="email-container">${htmlContent}</div>`;
+            console.log('🔍 [FETCH] Container adicionado');
           }
           htmlContent = `<div class="email-wrapper">${htmlContent}</div>`;
+          console.log('🔍 [FETCH] Wrapper adicionado');
         }
         
-        editor.setComponents(htmlContent);
-        console.log('🔍 [DEBUG] Template carregado com estrutura centralizada');
+        // Verificar se o editor está pronto
+        if (editor && editor.setComponents) {
+          editor.setComponents(htmlContent);
+          console.log('✅ [FETCH] Template carregado no editor com sucesso');
+        } else {
+          console.error('❌ [FETCH] Editor não está pronto para receber componentes');
+        }
+      } else {
+        console.warn('⚠️ [FETCH] HTML Content não encontrado nos dados');
       }
-      // Se quiser preencher outros campos, adicione aqui
+    })
+    .catch(error => {
+      console.error('❌ [FETCH] Erro ao buscar template:', error);
+      alert(`Erro ao carregar template: ${error.message}`);
     });
 }
 
