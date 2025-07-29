@@ -749,6 +749,18 @@ window.saveTemplate = function() {
   let htmlContent = editor.getHtml();
   console.log('🔍 [DEBUG] HTML content obtido, tamanho:', htmlContent.length);
   
+  // 🔧 CORREÇÃO: Limpar estrutura HTML incorreta
+  console.log('🔧 [CLEAN] Limpando estrutura HTML...');
+  
+  // Remover tags <body> incorretas que podem estar dentro do conteúdo
+  htmlContent = htmlContent.replace(/<\/?body[^>]*>/gi, '');
+  console.log('🔧 [CLEAN] Tags <body> removidas');
+  
+  // Remover <html>, <head> tags se existirem
+  htmlContent = htmlContent.replace(/<\/?html[^>]*>/gi, '');
+  htmlContent = htmlContent.replace(/<\/?head[^>]*>/gi, '');
+  console.log('🔧 [CLEAN] Tags estruturais removidas');
+  
   // Garantir que o conteúdo tenha a estrutura centralizada completa
   if (!htmlContent.includes('email-wrapper')) {
     if (!htmlContent.includes('email-container')) {
@@ -758,6 +770,9 @@ window.saveTemplate = function() {
     htmlContent = `<div class="email-wrapper">${htmlContent}</div>`;
     console.log('🔍 [DEBUG] Wrapper centralizado adicionado');
   }
+  
+  console.log('🔧 [CLEAN] HTML final, tamanho:', htmlContent.length);
+  console.log('🔧 [CLEAN] HTML preview:', htmlContent.substring(0, 200) + '...');
   
   const type = document.getElementById('templateType').value || 'welcome';
   console.log('🔍 [DEBUG] Tipo do template:', type);
