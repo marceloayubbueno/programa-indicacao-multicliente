@@ -372,6 +372,8 @@ function getUrlParam(name) {
 
 // Sistema de inicialização com estrutura centralizada garantida
 const templateId = getUrlParam('id');
+console.log('🔍 [URL] templateId obtido da URL:', templateId);
+console.log('🔍 [URL] URL completa:', window.location.href);
 
 // Função que FORÇA o recálculo da altura baseada no conteúdo real
 function adjustCanvasHeight() {
