@@ -4,7 +4,7 @@ import { EmailTemplatesService } from './email-templates.service';
 import { EmailTemplatesController } from './email-templates.controller';
 import { EmailTemplate, EmailTemplateSchema } from './entities/email-template.schema';
 import { EmailConfig, EmailConfigSchema } from './entities/email-config.schema';
-import { MailService } from '../common/mail.service';
+import { MailModule } from '../common/mail.module';
 
 @Module({
   imports: [
@@ -12,9 +12,10 @@ import { MailService } from '../common/mail.service';
       { name: EmailTemplate.name, schema: EmailTemplateSchema },
       { name: EmailConfig.name, schema: EmailConfigSchema },
     ]),
+    MailModule
   ],
   controllers: [EmailTemplatesController],
-  providers: [EmailTemplatesService, MailService],
+  providers: [EmailTemplatesService],
   exports: [EmailTemplatesService],
 })
 export class EmailTemplatesModule {} 

@@ -21,6 +21,7 @@ import { IndicatorAuthModule } from './indicator-auth/indicator-auth.module';
 import { FinanceModule } from './finance/finance.module';
 import { EmailTemplatesModule } from './email-templates/email-templates.module';
 import { EmailConfigModule } from './email-config/email-config.module';
+import { MailModule } from './common/mail.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { EmailConfigModule } from './email-config/email-config.module';
     FinanceModule,
     EmailTemplatesModule,
     EmailConfigModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
