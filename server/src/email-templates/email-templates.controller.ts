@@ -144,6 +144,18 @@ export class EmailTemplatesController {
     return this.emailTemplatesService.testConfig(clientId, testEmail);
   }
 
+  @UseGuards(JwtClientAuthGuard)
+  @Post('config/test-send')
+  async testSendEmail(@Body() testData: { testEmail: string; subject?: string; message?: string }, @Request() req) {
+    if (!testData.testEmail) {
+      throw new BadRequestException('E-mail de teste é obrigatório');
+    }
+    
+    const clientId = req.user?.clientId || req.user?.sub;
+    
+    return this.emailTemplatesService.testSendEmail(clientId, testData);
+  }
+
   // ===== ENDPOINTS AUXILIARES =====
 
   @UseGuards(JwtClientAuthGuard)

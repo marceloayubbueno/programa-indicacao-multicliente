@@ -362,13 +362,38 @@ async function testConfig() {
     }
 
     // Testar configuração
-    const testResponse = await fetch(`${getApiUrl()}/email-templates/config/test`, {
+    const testResponse = await fetch(`${getApiUrl()}/email-templates/config/test-send`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ testEmail })
+      body: JSON.stringify({ 
+        testEmail,
+        subject: 'Teste de Configuração SMTP - Sistema de Indicação',
+        message: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+            <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+              <h2 style="color: #2563eb; margin-bottom: 20px;">🧪 Teste de Configuração SMTP</h2>
+              <p>Parabéns! Sua configuração SMTP está funcionando perfeitamente.</p>
+              <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2563eb; margin: 20px 0;">
+                <strong>✅ Configuração validada com sucesso!</strong>
+              </div>
+              <p>Agora você pode:</p>
+              <ul style="color: #666;">
+                <li>Enviar e-mails de campanhas</li>
+                <li>Criar fluxos automatizados</li>
+                <li>Personalizar templates</li>
+              </ul>
+              <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; font-size: 14px; margin: 0;">
+                <strong>Sistema de Indicação</strong><br>
+                Teste realizado em: ${new Date().toLocaleString('pt-BR')}
+              </p>
+            </div>
+          </div>
+        `
+      })
     });
 
     hideLoading();
@@ -384,13 +409,20 @@ async function testConfig() {
     addTestToHistory({
       email: testEmail,
       success: result.success,
+      method: result.method || 'unknown',
       message: result.message,
       timestamp: new Date()
     });
 
     if (result.success) {
-      showNotification('Teste realizado com sucesso! Verifique seu e-mail.', 'success');
-      showTestResult(true, 'Teste realizado com sucesso');
+      const methodText = {
+        'smtp': '📧 SMTP do Cliente',
+        'brevo': '🔄 Brevo API (Fallback)', 
+        'default': '⚙️ Configuração Padrão'
+      }[result.method] || '📤 Sistema';
+      
+      showNotification(`✅ Teste realizado via ${methodText}! Verifique seu e-mail.`, 'success');
+      showTestResult(true, `Teste realizado via ${methodText}`);
       updateStatusIndicator('configured', 'Configuração testada');
     } else {
       showNotification('Erro no teste: ' + result.message, 'error');

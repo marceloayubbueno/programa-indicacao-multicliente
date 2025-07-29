@@ -290,6 +290,34 @@ export class EmailTemplatesService {
     }
   }
 
+  async testSendEmail(clientId: string, testData: { testEmail: string; subject?: string; message?: string }): Promise<{ success: boolean; method: string; message: string }> {
+    try {
+      const result = await this.mailService.sendMailWithClientConfig({
+        clientId,
+        to: testData.testEmail,
+        subject: testData.subject || 'Teste de Envio - Configuração SMTP',
+        html: testData.message || `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #333;">🧪 Teste de Configuração SMTP</h2>
+            <p>Olá!</p>
+            <p>Este é um e-mail de teste para validar sua configuração SMTP.</p>
+            <p>Se você recebeu este e-mail, sua configuração está funcionando corretamente! ✅</p>
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+            <p style="color: #666; font-size: 12px;">
+              Enviado via Sistema de Indicação<br>
+              Data: ${new Date().toLocaleString('pt-BR')}
+            </p>
+          </div>
+        `,
+        fallbackToBrevo: true
+      });
+
+      return result;
+    } catch (error) {
+      throw new BadRequestException(`Erro ao enviar e-mail de teste: ${error.message}`);
+    }
+  }
+
   // ===== MÉTODOS AUXILIARES =====
 
   async getDefaultTemplate(clientId: string, type: string): Promise<EmailTemplate | null> {
