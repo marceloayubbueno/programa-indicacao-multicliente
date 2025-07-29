@@ -3,100 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhooks Make.com - Área do Cliente</title>
+    <title>Configurar Webhook Make.com - Integrações</title>
     <link rel="stylesheet" href="../css/tailwind.output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="../js/config.js"></script>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
     <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <div id="sidebar-container"></div>
-        
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
-            <header class="px-8 py-6 bg-gray-900 flex items-center shadow-sm">
-                <h1 class="text-3xl font-bold text-blue-400">Webhooks Make.com</h1>
-            </header>
-            <main class="flex-1 p-8">
-                <!-- Configuração de Webhooks -->
-                <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-6">
-                    <h2 class="text-xl font-bold text-gray-100 mb-4">Configuração de Webhooks</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-gray-300 text-sm font-medium mb-2">URL do Webhook Make.com</label>
-                            <input type="url" id="webhookUrl" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="https://hook.eu1.make.com/...">
-                        </div>
-                        <div>
-                            <label class="block text-gray-300 text-sm font-medium mb-2">Token de Autenticação (opcional)</label>
-                            <input type="text" id="webhookToken" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Seu token de segurança">
-                        </div>
-                    </div>
-                    <div class="mt-6 flex gap-3">
-                        <button onclick="testWebhook()" class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
-                            <i class="fas fa-vial mr-2"></i>Testar Webhook
-                        </button>
-                        <button onclick="saveWebhookConfig()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-save mr-2"></i>Salvar Configuração
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Eventos Disponíveis -->
-                <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-6">
-                    <h2 class="text-xl font-bold text-gray-100 mb-4">Eventos Disponíveis</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="event-new-referral" class="rounded border-gray-600 text-blue-600 focus:ring-blue-500">
-                            <label for="event-new-referral" class="ml-3 text-gray-300">Nova indicação recebida</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="event-referral-converted" class="rounded border-gray-600 text-blue-600 focus:ring-blue-500">
-                            <label for="event-referral-converted" class="ml-3 text-gray-300">Indicação convertida</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="event-reward-earned" class="rounded border-gray-600 text-blue-600 focus:ring-blue-500">
-                            <label for="event-reward-earned" class="ml-3 text-gray-300">Recompensa conquistada</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="event-campaign-started" class="rounded border-gray-600 text-blue-600 focus:ring-blue-500">
-                            <label for="event-campaign-started" class="ml-3 text-gray-300">Campanha iniciada</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Log de Webhooks -->
-                <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-700">
-                        <h3 class="text-lg font-semibold text-gray-100">Log de Webhooks</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-700">
-                            <thead class="bg-gray-800">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Data/Hora</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Evento</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Resposta</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="webhookLogBody" class="bg-gray-800 divide-y divide-gray-700">
-                                <!-- Dados serão carregados via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </main>
+      <!-- Sidebar -->
+      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+        <div class="flex items-center mb-8">
+          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
         </div>
+        <ul class="space-y-2 flex-1">
+          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementMenu()">
+              <i class="fas fa-chart-bar mr-2"></i> Engajamentos
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="engagementMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail Marketing</a></li>
+              <li><a href="engajamento-email-campaigns.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> E-mail de Campanha</a></li>
+              <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
+            </ul>
+          </li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de Leads</a></li>
+          <!-- Início do novo menu Financeiro -->
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleFinanceMenu()">
+              <i class="fas fa-wallet mr-2"></i> Financeiro
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="financeArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="financeMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="carteira.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-piggy-bank mr-2"></i> Carteira</a></li>
+              <li><a href="payments.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+            </ul>
+          </li>
+          <!-- Fim do novo menu Financeiro -->
+          <!-- Início do novo menu Configurações -->
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleConfiguracoesMenu()">
+              <i class="fas fa-cog mr-2"></i> Configurações
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="configuracoesArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="configuracoesMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <!-- Início do submenu Integrações -->
+              <li>
+                <div class="flex items-center pl-10 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleIntegracoesMenu()">
+                  <i class="fas fa-plug mr-2"></i> Integrações
+                  <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="integracoesArrow" style="transform: rotate(0deg);"></i>
+                </div>
+                <ul id="integracoesMenu" class="ml-8 mt-1 space-y-1 hidden">
+                  <li><a href="webhook-make.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700" id="webhookMakeMenuItem"><i class="fas fa-link mr-2"></i> Webhooks Make.com</a></li>
+                </ul>
+              </li>
+              <!-- Fim do submenu Integrações -->
+              <!-- Outros itens de configuração podem ser adicionados aqui -->
+            </ul>
+          </li>
+          <!-- Fim do novo menu Configurações -->
+          <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+        </ul>
+      </nav>
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+        <header class="px-8 py-6 bg-gray-900 flex items-center shadow-sm">
+          <h1 class="text-3xl font-bold text-blue-400">Integrações - Webhook Make.com</h1>
+        </header>
+        <main class="flex-1 p-8 flex items-center justify-center">
+          <form id="webhookForm" class="bg-gray-800 rounded-lg shadow-lg p-8 w-full max-w-lg">
+            <div class="mb-6">
+              <label for="webhookUrl" class="block text-gray-300 text-lg font-semibold mb-2">URL do Webhook Make.com</label>
+              <input type="url" id="webhookUrl" name="webhookUrl" class="w-full px-4 py-2 rounded bg-gray-900 border border-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="https://hook.us2.make.com/xxxxxxx" required>
+              <p id="webhookError" class="text-red-400 text-sm mt-2 hidden">Insira uma URL válida.</p>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors">Salvar Webhook</button>
+            <p id="webhookSuccess" class="text-green-400 text-center mt-4 hidden">Webhook salvo com sucesso!</p>
+            <p id="webhookFail" class="text-red-400 text-center mt-4 hidden">Erro ao salvar o webhook. Tente novamente.</p>
+          </form>
+        </main>
+      </div>
     </div>
-
-    <script src="../js/config.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/shared-menu.js"></script>
-    <script src="../js/webhook-make.js"></script>
+    <script src="../js/auth.js" onload="console.log('auth.js carregado')"></script>
     <script>
-        checkAuth();
-        initSharedMenu('integrations');
+    // Log inicial ao carregar a página
+    console.log('[DEBUG] Token no localStorage ao carregar página:', getToken());
+    checkAuth();
+    // Log após checkAuth
+    console.log('[DEBUG] Token após checkAuth:', getToken());
+    // Script para expandir/colapsar o menu Financeiro
+    function toggleFinanceMenu() {
+      const menu = document.getElementById('financeMenu');
+      const arrow = document.getElementById('financeArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
+    // Toggle Engagement Menu
+    function toggleEngagementMenu() {
+      const menu = document.getElementById('engagementMenu');
+      const arrow = document.getElementById('engagementArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
+    // Script para expandir/colapsar o menu Configurações
+    function toggleConfiguracoesMenu() {
+      const menu = document.getElementById('configuracoesMenu');
+      const arrow = document.getElementById('configuracoesArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
+    // Script para expandir/colapsar o menu Integrações
+    function toggleIntegracoesMenu() {
+      const menu = document.getElementById('integracoesMenu');
+      const arrow = document.getElementById('integracoesArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
+    // Deixar o menu Configurações e Integrações abertos por padrão nesta página e destacar o item ativo
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('configuracoesMenu').classList.remove('hidden');
+      document.getElementById('configuracoesArrow').style.transform = 'rotate(90deg)';
+      document.getElementById('integracoesMenu').classList.remove('hidden');
+      document.getElementById('integracoesArrow').style.transform = 'rotate(90deg)';
+      var item = document.getElementById('webhookMakeMenuItem');
+      item.classList.add('bg-gray-800', 'text-blue-400', 'font-semibold', 'hover:bg-gray-700');
+    });
+    // Validação e feedback do formulário + chamada à API
+    document.getElementById('webhookForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const url = document.getElementById('webhookUrl').value.trim();
+      const error = document.getElementById('webhookError');
+      const success = document.getElementById('webhookSuccess');
+      const fail = document.getElementById('webhookFail');
+      error.classList.add('hidden');
+      success.classList.add('hidden');
+      fail.classList.add('hidden');
+      // Validação simples de URL
+      try {
+        new URL(url);
+      } catch {
+        error.classList.remove('hidden');
+        return;
+      }
+      // Chamada à API para salvar o webhook
+      try {
+        const token = getToken();
+        console.log('[DEBUG] Token antes do fetch:', token);
+        // CORREÇÃO: usar API dinâmica
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+        const response = await fetch(`${apiUrl}/clients/me/webhook-make`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ webhookUrl: url })
+        });
+        if (response.ok) {
+          success.classList.remove('hidden');
+        } else {
+          fail.classList.remove('hidden');
+        }
+      } catch (err) {
+        fail.classList.remove('hidden');
+      }
+    });
     </script>
 </body>
 </html> 

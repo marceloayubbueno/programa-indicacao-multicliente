@@ -9,86 +9,227 @@
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
     <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <div id="sidebar-container"></div>
-        
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
-            <header class="px-8 py-6 bg-gray-900 flex items-center shadow-sm">
-                <h1 class="text-3xl font-bold text-blue-400">Gestão de Leads</h1>
-            </header>
-            <main class="flex-1 p-8">
-                <!-- Todo o conteúdo funcional da página permanece aqui -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-blue-600 text-white">
-                                <i class="fas fa-user-plus text-xl"></i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-gray-400 text-sm">Total de Leads</p>
-                                <p class="text-2xl font-bold text-gray-100" id="totalReferrals">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-green-600 text-white">
-                                <i class="fas fa-check-circle text-xl"></i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-gray-400 text-sm">Convertidos</p>
-                                <p class="text-2xl font-bold text-gray-100" id="convertedReferrals">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-yellow-600 text-white">
-                                <i class="fas fa-clock text-xl"></i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-gray-400 text-sm">Pendentes</p>
-                                <p class="text-2xl font-bold text-gray-100" id="pendingReferrals">0</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabela de Leads -->
-                <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-700">
-                        <h3 class="text-lg font-semibold text-gray-100">Lista de Leads</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-700">
-                            <thead class="bg-gray-800">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Nome</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">E-mail</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Telefone</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Data</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="referralsTableBody" class="bg-gray-800 divide-y divide-gray-700">
-                                <!-- Dados serão carregados via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </main>
+      <!-- Sidebar -->
+      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+        <div class="flex items-center mb-8">
+          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
         </div>
+        <ul class="space-y-2 flex-1">
+          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementMenu()">
+              <i class="fas fa-chart-bar mr-2"></i> Engajamentos
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="engagementMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail Marketing</a></li>
+              <li><a href="engajamento-email-campaigns.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> E-mail de Campanha</a></li>
+              <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
+            </ul>
+          </li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-user-plus mr-2"></i> Gestão de Leads</a></li>
+          <!-- Início do novo menu Financeiro -->
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleFinanceMenu()">
+              <i class="fas fa-wallet mr-2"></i> Financeiro
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="financeArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="financeMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="carteira.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-piggy-bank mr-2"></i> Carteira</a></li>
+              <li><a href="payments.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+            </ul>
+          </li>
+          <!-- Fim do novo menu Financeiro -->
+          <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+          <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+        </ul>
+      </nav>
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+        <header class="px-8 py-6 bg-gray-900 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm">
+          <div>
+            <h1 class="text-3xl font-bold text-blue-400">Gestão de Leads</h1>
+            <p class="text-gray-400 mt-1">Gerencie leads vindos das suas campanhas de indicação</p>
+          </div>
+          <div class="flex flex-col md:flex-row gap-2 md:gap-4 items-start md:items-center">
+            <div class="flex items-center border border-gray-700 rounded-lg bg-gray-900 px-2">
+              <input type="text" id="searchLead" placeholder="Buscar lead..." class="bg-transparent px-2 py-1 focus:outline-none text-gray-100">
+              <button class="px-3 py-1 rounded bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors" onclick="searchLeads()">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+            <button class="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors" onclick="exportLeads()">
+              <i class="fas fa-download mr-2"></i>Exportar
+            </button>
+          </div>
+        </header>
+        <main class="flex-1 p-8">
+          <!-- Filtros -->
+          <div class="flex flex-col md:flex-row gap-4 mb-6">
+            <div class="flex flex-col">
+              <label for="campaignFilter" class="text-gray-400 mb-1">Campanha:</label>
+              <select id="campaignFilter" onchange="filterLeads()" class="rounded-lg border border-gray-700 bg-gray-800 text-gray-100 px-3 py-2">
+                <option value="">Todas</option>
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="statusFilter" class="text-gray-400 mb-1">Status:</label>
+              <select id="statusFilter" onchange="filterLeads()" class="rounded-lg border border-gray-700 bg-gray-800 text-gray-100 px-3 py-2">
+                <option value="">Todos</option>
+                <option value="novo">Novo</option>
+                <option value="contatado">Contatado</option>
+                <option value="qualificado">Qualificado</option>
+                <option value="convertido">Convertido</option>
+                <option value="perdido">Perdido</option>
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="indicatorFilter" class="text-gray-400 mb-1">Indicador:</label>
+              <select id="indicatorFilter" onchange="filterLeads()" class="rounded-lg border border-gray-700 bg-gray-800 text-gray-100 px-3 py-2">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="dateFilter" class="text-gray-400 mb-1">Data:</label>
+              <input type="date" id="dateFilter" onchange="filterLeads()" class="rounded-lg border border-gray-700 bg-gray-800 text-gray-100 px-3 py-2">
+            </div>
+          </div>
+
+          <!-- Cards de estatísticas de leads -->
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
+              <h3 class="text-lg font-semibold text-gray-300 mb-2">Total de Leads</h3>
+              <p id="totalLeads" class="text-3xl font-bold text-blue-400">0</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
+              <h3 class="text-lg font-semibold text-gray-300 mb-2">Novos</h3>
+              <p id="newLeads" class="text-3xl font-bold text-yellow-400">0</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
+              <h3 class="text-lg font-semibold text-gray-300 mb-2">Contatados</h3>
+              <p id="contactedLeads" class="text-3xl font-bold text-orange-400">0</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
+              <h3 class="text-lg font-semibold text-gray-300 mb-2">Convertidos</h3>
+              <p id="convertedLeads" class="text-3xl font-bold text-green-400">0</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
+              <h3 class="text-lg font-semibold text-gray-300 mb-2">Taxa Conversão</h3>
+              <p id="conversionRate" class="text-3xl font-bold text-purple-400">0%</p>
+            </div>
+          </div>
+
+          <!-- Tabela de leads -->
+          <div class="overflow-x-auto mb-8">
+            <table class="min-w-full divide-y divide-gray-700">
+              <thead class="bg-gray-800">
+                <tr>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Lead</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Contato</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Indicador</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Campanha</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Origem</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Data</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Status</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-200 uppercase tracking-wider">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="leadsTableBody" class="bg-gray-900 divide-y divide-gray-700">
+                <!-- Linhas serão inseridas via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginação -->
+          <div class="flex items-center justify-center gap-4 mb-8">
+            <button id="prevPage" class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors disabled:opacity-50" onclick="changePage('prev')">
+              <i class="fas fa-chevron-left mr-2"></i>Anterior
+            </button>
+            <span id="pageInfo" class="text-gray-400">Página 1 de 1</span>
+            <button id="nextPage" class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors disabled:opacity-50" onclick="changePage('next')">
+              Próxima<i class="fas fa-chevron-right ml-2"></i>
+            </button>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Modal de Conversão -->
+    <div id="conversionModal" class="fixed inset-0 z-50 flex items-center justify-center min-h-screen bg-black bg-opacity-40 hidden">
+      <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-lg relative flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-100">Marcar Lead como Convertido</h2>
+          <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closeConversionModal()">&times;</button>
+        </div>
+        <div class="mb-4">
+          <p class="text-gray-300">Lead: <span id="conversionLeadName" class="font-semibold text-blue-400"></span></p>
+          <p class="text-gray-300">Indicador: <span id="conversionIndicator" class="font-semibold text-green-400"></span></p>
+        </div>
+        <div class="mb-4">
+          <label for="conversionValue" class="block text-gray-400 mb-2">Valor da Conversão (R$):</label>
+          <input type="number" id="conversionValue" step="0.01" min="0" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2" placeholder="0.00">
+        </div>
+        <div class="mb-4">
+          <label for="conversionNotes" class="block text-gray-400 mb-2">Observações:</label>
+          <textarea id="conversionNotes" rows="3" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2" placeholder="Detalhes da conversão..."></textarea>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors" onclick="closeConversionModal()">Cancelar</button>
+          <button class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors" onclick="confirmConversion()">
+            <i class="fas fa-check mr-2"></i>Confirmar Conversão
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Detalhes do Lead -->
+    <div id="leadModal" class="fixed inset-0 z-50 flex items-center justify-center min-h-screen bg-black bg-opacity-40 hidden">
+      <div class="bg-gray-800 rounded-xl p-8 shadow-lg w-full max-w-lg relative flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-100">Detalhes do Lead</h2>
+          <button class="text-2xl text-gray-400 hover:text-gray-200" onclick="closeLeadModal()">&times;</button>
+        </div>
+        <div id="leadDetails" class="flex flex-col gap-2 mb-4">
+          <!-- Detalhes serão preenchidos via JS -->
+        </div>
+        <div class="flex justify-end">
+          <button class="px-4 py-2 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors" onclick="closeLeadModal()">Fechar</button>
+        </div>
+      </div>
     </div>
 
     <script src="../js/config.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/shared-menu.js"></script>
     <script src="../js/referrals.js"></script>
-    <script>
-        checkAuth();
-        initSharedMenu('leads');
+    <script src="../js/auth.js"></script>
+    <script>checkAuth();
+    // Script para expandir/colapsar o menu Financeiro
+    function toggleFinanceMenu() {
+      const menu = document.getElementById('financeMenu');
+      const arrow = document.getElementById('financeArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
+    // Toggle Engagement Menu
+    function toggleEngagementMenu() {
+      const menu = document.getElementById('engagementMenu');
+      const arrow = document.getElementById('engagementArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
     </script>
 </body>
 </html> 

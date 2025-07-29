@@ -98,13 +98,31 @@
         </div>
       </div>
     </div>
-    <script src="../js/config.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/shared-menu.js"></script>
     <script src="../js/lp-indicadores.js"></script>
-    <script>
-        checkAuth();
-        initSharedMenu('lp-indicadores');
+    <script src="../js/auth.js"></script>
+    <script>checkAuth();
+    // Script para expandir/colapsar o menu Financeiro
+    function toggleFinanceMenu() {
+      const menu = document.getElementById('financeMenu');
+      const arrow = document.getElementById('financeArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
+    // Toggle Engagement Menu
+    function toggleEngagementMenu() {
+      const menu = document.getElementById('engagementMenu');
+      const arrow = document.getElementById('engagementArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
     </script>
 </body>
 </html> 

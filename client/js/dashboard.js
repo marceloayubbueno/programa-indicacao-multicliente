@@ -1,9 +1,17 @@
-// 🔧 CORREÇÃO: Usar sistema de autenticação padrão do auth.js
-// Remover função checkAuth duplicada - usar a do auth.js
-// function checkAuth() já existe em auth.js
+// Verificar se o cliente está logado
+function checkAuth() {
+    const isLoggedIn = localStorage.getItem('isClientLoggedIn');
+    if (!isLoggedIn) {
+        window.location.href = 'login.html';
+    }
+}
 
-// Função de logout - usar a do auth.js  
-// function logout() já existe em auth.js
+// Função de logout
+function logout() {
+    localStorage.removeItem('isClientLoggedIn');
+    localStorage.removeItem('clientEmail');
+    window.location.href = 'login.html';
+}
 
 // Carregar dados do dashboard
 function loadDashboardData() {
