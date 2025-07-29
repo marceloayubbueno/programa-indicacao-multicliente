@@ -733,15 +733,8 @@ function isValidEmail(email) {
   return emailRegex.test(email);
 }
 
-// 🔐 AUTENTICAÇÃO
-function checkAuth() {
-  const token = localStorage.getItem('clientToken');
-  if (!token) {
-    window.location.href = 'login.html';
-    return false;
-  }
-  return true;
-}
+// 🔐 AUTENTICAÇÃO - Usar função do auth.js
+// function checkAuth() já existe em auth.js
 
-// ⚡ INICIALIZAR AUTENTICAÇÃO
-checkAuth(); 
+// ⚡ INICIALIZAR AUTENTICAÇÃO - será feita pelo auth.js automaticamente
+// checkAuth() será chamado automaticamente pelo auth.js 

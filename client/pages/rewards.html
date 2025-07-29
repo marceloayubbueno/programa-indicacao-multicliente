@@ -171,8 +171,14 @@
     <script src="../js/shared-menu.js"></script>
     <script src="../js/rewards.js"></script>
     <script>
+        // 🔧 CORREÇÃO: Garantir ordem correta de inicialização
         checkAuth();
-        initSharedMenu('rewards');
+        
+        setTimeout(() => {
+            if (localStorage.getItem('clientToken')) {
+                initSharedMenu('rewards');
+            }
+        }, 100);
     </script>
 </body>
 </html> 

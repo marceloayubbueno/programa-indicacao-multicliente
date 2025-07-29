@@ -175,11 +175,14 @@
     <script src="../js/modules/participants-manager.js"></script>
     <script src="../js/participants.js"></script>
     <script>
-        // Verificar autenticação
+        // 🔧 CORREÇÃO: Garantir ordem correta de inicialização
         checkAuth();
         
-        // Inicializar menu com página ativa
-        initSharedMenu('participants');
+        setTimeout(() => {
+            if (localStorage.getItem('clientToken')) {
+                initSharedMenu('participants');
+            }
+        }, 100);
     </script>
 </body>
 </html> 

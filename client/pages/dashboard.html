@@ -124,11 +124,17 @@
     <script src="../js/shared-menu.js"></script>
     <script src="../js/dashboard.js"></script>
     <script>
-        // Verificar autenticação
+        // 🔧 CORREÇÃO: Garantir ordem correta de inicialização
+        // 1º - Verificar autenticação (pode redirecionar)
         checkAuth();
         
-        // Inicializar menu com página ativa
-        initSharedMenu('dashboard');
+        // 2º - Só inicializar menu se passou na verificação
+        // Usar setTimeout para garantir que auth.js terminou
+        setTimeout(() => {
+            if (localStorage.getItem('clientToken')) {
+                initSharedMenu('dashboard');
+            }
+        }, 100);
     </script>
 </body>
 </html> 
