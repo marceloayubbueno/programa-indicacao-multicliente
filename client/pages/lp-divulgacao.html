@@ -17,25 +17,23 @@
         </div>
         <ul class="space-y-2 flex-1">
           <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
-          <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
           <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
-          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> Lp de indicadores</a></li>
           <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
-          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-bullhorn mr-2"></i> Lp de divulgação</a></li>
           <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
           <li>
-            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementMenu()">
-              <i class="fas fa-chart-bar mr-2"></i> Engajamentos
-              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementArrow" style="transform: rotate(0deg);"></i>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementEmailMenu()">
+              <i class="fas fa-envelope mr-2"></i> Engajamento e-mail
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementEmailArrow" style="transform: rotate(0deg);"></i>
             </div>
-            <ul id="engagementMenu" class="ml-8 mt-1 space-y-1 hidden">
-              <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail Marketing</a></li>
-              <li><a href="engajamento-email-campaigns.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> E-mail de Campanha</a></li>
+            <ul id="engagementEmailMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail marketing</a></li>
               <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
             </ul>
           </li>
-          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de Leads</a></li>
-          <!-- Início do novo menu Financeiro -->
+          <li><a href="engajamento-whatsapp.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-whatsapp mr-2"></i> Engajamentos Whatsapp</a></li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de leads</a></li>
           <li>
             <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleFinanceMenu()">
               <i class="fas fa-wallet mr-2"></i> Financeiro
@@ -46,8 +44,18 @@
               <li><a href="payments.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
             </ul>
           </li>
-          <!-- Fim do novo menu Financeiro -->
-          <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleSettingsMenu()">
+              <i class="fas fa-cog mr-2"></i> Configurações
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="settingsArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="settingsMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="my-data.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+              <li><a href="email-config.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope-open mr-2"></i> Configuração de e-mail</a></li>
+              <li><a href="configuracao-whatsapp.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-whatsapp mr-2"></i> Configuração de whatsapp</a></li>
+              <li><a href="configuracao-integracoes.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-plug mr-2"></i> Configuração Integrações</a></li>
+            </ul>
+          </li>
           <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
         </ul>
       </nav>
@@ -113,10 +121,22 @@
         arrow.style.transform = 'rotate(90deg)';
       }
     }
-    // Toggle Engagement Menu
-    function toggleEngagementMenu() {
-      const menu = document.getElementById('engagementMenu');
-      const arrow = document.getElementById('engagementArrow');
+    // Toggle Engagement Email Menu
+    function toggleEngagementEmailMenu() {
+      const menu = document.getElementById('engagementEmailMenu');
+      const arrow = document.getElementById('engagementEmailArrow');
+      menu.classList.toggle('hidden');
+      if (menu.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
+
+    // Toggle Settings Menu
+    function toggleSettingsMenu() {
+      const menu = document.getElementById('settingsMenu');
+      const arrow = document.getElementById('settingsArrow');
       menu.classList.toggle('hidden');
       if (menu.classList.contains('hidden')) {
         arrow.style.transform = 'rotate(0deg)';
