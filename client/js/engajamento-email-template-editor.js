@@ -687,26 +687,63 @@ function fetchTemplate(id) {
         console.log('🔍 [EDITOR_DEBUG] getWrapper disponível?', !!(editor && editor.getWrapper));
         console.log('🔍 [TIMING_DEBUG] Momento da execução:', new Date().toISOString());
         
-        // Garantir que o conteúdo tenha a estrutura centralizada
+        // 🔧 CORREÇÃO APRIMORADA: Limpar e corrigir HTML antes de carregar
         let htmlContent = data.htmlContent;
+        console.log('🔧 [RENDER_FIX] HTML original:', htmlContent.substring(0, 300) + '...');
         
-        // Se não tem wrapper, adicionar estrutura completa
-        if (!htmlContent.includes('email-wrapper')) {
-          if (!htmlContent.includes('email-container')) {
-            htmlContent = `<div class="email-container">${htmlContent}</div>`;
-            console.log('🔍 [FETCH] Container adicionado');
-          }
-          htmlContent = `<div class="email-wrapper">${htmlContent}</div>`;
-          console.log('🔍 [FETCH] Wrapper adicionado');
+        // 1. Remover estruturas problemáticas
+        htmlContent = htmlContent.replace(/<\/?body[^>]*>/gi, '');
+        htmlContent = htmlContent.replace(/<\/?html[^>]*>/gi, '');
+        htmlContent = htmlContent.replace(/<\/?head[^>]*>/gi, '');
+        console.log('🔧 [RENDER_FIX] Tags estruturais removidas');
+        
+        // 2. Remover wrappers externos se existirem (para re-adicionar limpos)
+        htmlContent = htmlContent.replace(/<div\s+class=["']email-wrapper["'][^>]*>/gi, '');
+        htmlContent = htmlContent.replace(/<div\s+class=["']email-container["'][^>]*>/gi, '');
+        // Contar e remover </div> correspondentes do final
+        const wrapperCount = (htmlContent.match(/<\/div>\s*<\/div>\s*$/gi) || []).length;
+        if (wrapperCount > 0) {
+          htmlContent = htmlContent.replace(/<\/div>\s*<\/div>\s*$/gi, '');
+        } else {
+          // Se não achou no final, remover os últimos </div>
+          htmlContent = htmlContent.replace(/<\/div>\s*$/g, '').replace(/<\/div>\s*$/g, '');
         }
+        console.log('🔧 [RENDER_FIX] Wrappers externos removidos');
+        
+        // 3. Garantir que não tenha múltiplas camadas de wrapper
+        while (htmlContent.includes('email-wrapper') && htmlContent.includes('email-container')) {
+          htmlContent = htmlContent.replace(/<div[^>]*class=["'][^"']*email-wrapper[^"']*["'][^>]*>/gi, '');
+          htmlContent = htmlContent.replace(/<div[^>]*class=["'][^"']*email-container[^"']*["'][^>]*>/gi, '');
+          htmlContent = htmlContent.replace(/<\/div>\s*<\/div>\s*$/gi, '');
+        }
+        console.log('🔧 [RENDER_FIX] Múltiplas camadas removidas');
+        
+        // 4. Adicionar estrutura limpa e correta
+        htmlContent = `<div class="email-container" style="background: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 600px; width: 100%; margin: 0 auto; overflow: hidden; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; position: relative;">${htmlContent}</div>`;
+        htmlContent = `<div class="email-wrapper" style="width: 100%; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden;">${htmlContent}</div>`;
+        
+        console.log('🔧 [RENDER_FIX] HTML final:', htmlContent.substring(0, 300) + '...');
+        console.log('🔧 [RENDER_FIX] Tamanho final:', htmlContent.length);
         
         // Verificar se o editor está pronto
         if (editor && editor.setComponents) {
           console.log('🔍 [EDITOR_DEBUG] Tentando carregar conteúdo no editor...');
           try {
+            // Limpar editor primeiro
+            editor.DomComponents.clear();
+            console.log('🔧 [RENDER_FIX] Editor limpo');
+            
+            // Carregar novo conteúdo
             editor.setComponents(htmlContent);
             console.log('✅ [FETCH] Template carregado no editor com sucesso');
             console.log('✅ [EDITOR_DEBUG] setComponents executado com sucesso');
+            
+            // Forçar atualização da canvas
+            setTimeout(() => {
+              editor.refresh();
+              console.log('🔧 [RENDER_FIX] Editor refreshed');
+            }, 500);
+            
           } catch (error) {
             console.error('❌ [EDITOR_DEBUG] Erro ao executar setComponents:', error);
           }
