@@ -554,6 +554,21 @@
   <script src="https://unpkg.com/grapesjs"></script>
   <script src="../js/engajamento-email-template-editor.js?v=1.0.1"></script>
   <script>
+    // DEBUG: Logs para verificar se a página está carregando corretamente
+    console.log('📄 [HTML] Página engajamento-email-template-editor.html carregada');
+    console.log('🔍 [HTML] URL atual:', window.location.href);
+    console.log('🔍 [HTML] Parâmetros da URL:', window.location.search);
+    
+    // Verificar se há parâmetro 'id' na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const templateId = urlParams.get('id');
+    console.log('🔍 [HTML] templateId da URL:', templateId);
+    
+    // Verificar se há parâmetro 'type' na URL
+    const templateType = urlParams.get('type');
+    console.log('🔍 [HTML] templateType da URL:', templateType);
+  </script>
+  <script>
 function forceBlocksGrid() {
   document.querySelectorAll('.gjs-blocks-c').forEach(el => {
     el.style.display = 'grid';
