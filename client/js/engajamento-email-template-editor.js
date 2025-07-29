@@ -1,7 +1,7 @@
 // Editor de E-mail Marketing (GrapesJS) - Versão Moderna e Centralizada
 // Este arquivo deve ser importado em engajamento-email-template-editor.html
 
-console.log('📁 [FILE] Arquivo engajamento-email-template-editor.js carregado');
+console.log('📁 [FILE] Arquivo engajamento-email-template-editor.js carregado - VERSÃO DEBUG');
 
 // Tabs
 function switchTab(tabName) {
@@ -366,14 +366,19 @@ window.previewEmail = function() {
 };
 // Utilidades para obter parâmetros da URL
 function getUrlParam(name) {
+  console.log('🔍 [URL_PARAM] Buscando parâmetro:', name);
+  console.log('🔍 [URL_PARAM] URL atual:', window.location.href);
   const url = new URL(window.location.href);
-  return url.searchParams.get(name);
+  const value = url.searchParams.get(name);
+  console.log('🔍 [URL_PARAM] Valor encontrado:', value);
+  return value;
 }
 
 // Sistema de inicialização com estrutura centralizada garantida
 const templateId = getUrlParam('id');
 console.log('🔍 [URL] templateId obtido da URL:', templateId);
 console.log('🔍 [URL] URL completa:', window.location.href);
+console.log('🔍 [URL] Parâmetros da URL:', window.location.search);
 
 // Função que FORÇA o recálculo da altura baseada no conteúdo real
 function adjustCanvasHeight() {
@@ -546,6 +551,8 @@ window.forceRecalculateHeight = function() {
 
 function fetchTemplate(id) {
   console.log('🔍 [FETCH] Iniciando busca do template:', id);
+  console.log('🔍 [FETCH] Tipo do ID:', typeof id);
+  console.log('🔍 [FETCH] ID é válido?', id && id.length > 0);
   
   const token = localStorage.getItem('clientToken');
   if (!token) {
@@ -556,6 +563,7 @@ function fetchTemplate(id) {
   const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : (window.API_URL || 'http://localhost:3000/api');
   const url = `${apiUrl}/email-templates/${id}`;
   
+  console.log('🔍 [FETCH] API_URL configurado:', apiUrl);
   console.log('🔍 [FETCH] URL da requisição:', url);
   console.log('🔍 [FETCH] Token presente:', token ? 'SIM' : 'NÃO');
   
