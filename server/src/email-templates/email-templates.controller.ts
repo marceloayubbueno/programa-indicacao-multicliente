@@ -103,10 +103,22 @@ export class EmailTemplatesController {
   @UseGuards(JwtClientAuthGuard)
   @Post('config')
   async createConfig(@Body() createEmailConfigDto: CreateEmailConfigDto, @Request() req) {
+    console.log('📧 [EMAIL-CONFIG] POST /config chamado');
+    console.log('📧 [EMAIL-CONFIG] Body recebido:', createEmailConfigDto);
+    
     const clientId = req.user?.clientId || req.user?.sub;
+    console.log('📧 [EMAIL-CONFIG] ClientId extraído:', clientId);
+    
     createEmailConfigDto.clientId = clientId;
     
-    return this.emailTemplatesService.createConfig(createEmailConfigDto);
+    try {
+      const result = await this.emailTemplatesService.createConfig(createEmailConfigDto);
+      console.log('📧 [EMAIL-CONFIG] Configuração criada com sucesso');
+      return result;
+    } catch (error) {
+      console.error('📧 [EMAIL-CONFIG] Erro ao criar configuração:', error.message);
+      throw error;
+    }
   }
 
   @UseGuards(JwtClientAuthGuard)
@@ -127,9 +139,20 @@ export class EmailTemplatesController {
   @UseGuards(JwtClientAuthGuard)
   @Patch('config/me')
   async updateMyConfig(@Body() updateEmailConfigDto: UpdateEmailConfigDto, @Request() req) {
-    const clientId = req.user?.clientId || req.user?.sub;
+    console.log('📧 [EMAIL-CONFIG] PATCH /config/me chamado');
+    console.log('📧 [EMAIL-CONFIG] Body recebido:', updateEmailConfigDto);
     
-    return this.emailTemplatesService.updateConfig(clientId, updateEmailConfigDto);
+    const clientId = req.user?.clientId || req.user?.sub;
+    console.log('📧 [EMAIL-CONFIG] ClientId extraído:', clientId);
+    
+    try {
+      const result = await this.emailTemplatesService.updateConfig(clientId, updateEmailConfigDto);
+      console.log('📧 [EMAIL-CONFIG] Configuração atualizada com sucesso');
+      return result;
+    } catch (error) {
+      console.error('📧 [EMAIL-CONFIG] Erro ao atualizar configuração:', error.message);
+      throw error;
+    }
   }
 
   @UseGuards(JwtClientAuthGuard)

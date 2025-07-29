@@ -237,10 +237,9 @@ async function handleSubmit(event) {
 
     showLoading('Salvando configuração...');
 
-    const url = currentConfig ? 
-      `${getApiUrl()}/email-templates/config/me` : 
-      `${getApiUrl()}/email-templates/config`;
-    const method = currentConfig ? 'PATCH' : 'POST';
+    // Sempre usar PATCH que tem upsert (cria se não existir, atualiza se existir)
+    const url = `${getApiUrl()}/email-templates/config/me`;
+    const method = 'PATCH';
 
     const response = await fetch(url, {
       method: method,
@@ -345,11 +344,9 @@ async function testConfig() {
     showLoading('Testando configuração...');
 
     // Salvar configuração
-    const saveUrl = currentConfig ? 
-      `${getApiUrl()}/email-templates/config/me` : 
-      `${getApiUrl()}/email-templates/config`;
+    const saveUrl = `${getApiUrl()}/email-templates/config/me`;
     const saveResponse = await fetch(saveUrl, {
-      method: currentConfig ? 'PATCH' : 'POST',
+      method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
