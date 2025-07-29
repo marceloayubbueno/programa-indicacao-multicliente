@@ -1,274 +1,323 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configuração de E-mail - Programa de Indicação</title>
-  <link rel="stylesheet" href="../css/tailwind.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuração de E-mail - Programa de Indicação</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
-  <!-- Sidebar -->
-  <div class="fixed inset-y-0 left-0 w-64 bg-gray-800 shadow-lg">
-    <div class="flex items-center justify-center h-16 bg-gray-900">
-      <h1 class="text-xl font-bold text-blue-400">Programa de Indicação</h1>
-    </div>
-    
-    <nav class="mt-8">
-      <ul class="space-y-2 px-4">
-        <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a></li>
-        <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> Campanhas</a></li>
-        <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Participantes</a></li>
-        <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-share-alt mr-2"></i> Indicações</a></li>
-        <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
-        <li>
-          <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementMenu()">
-            <i class="fas fa-chart-bar mr-2"></i> Engajamentos
-            <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementArrow" style="transform: rotate(0deg);"></i>
-          </div>
-          <ul id="engagementMenu" class="ml-8 mt-1 space-y-1 hidden">
-            <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail Marketing</a></li>
-            <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
-          </ul>
-        </li>
-        <li><a href="payments.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-credit-card mr-2"></i> Pagamentos</a></li>
-        <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus Dados</a></li>
-        <li><a href="email-config.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-cog mr-2"></i> Configuração de E-mail</a></li>
-      </ul>
-    </nav>
-  </div>
-
-  <!-- Main Content -->
-  <div class="ml-64 p-8">
-    <!-- Header -->
-    <div class="mb-8">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-white mb-2">
-            <i class="fas fa-cog mr-3 text-blue-400"></i>
-            Configuração de E-mail
-          </h1>
-          <p class="text-gray-400">Configure as configurações SMTP para envio de e-mails automáticos</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Configuração SMTP -->
-    <div class="bg-gray-800 rounded-lg p-6 mb-8">
-      <div class="flex items-center mb-6">
-        <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mr-4">
-          <i class="fas fa-server text-blue-400 text-xl"></i>
-        </div>
-        <div>
-          <h2 class="text-xl font-semibold text-white">Configurações SMTP</h2>
-          <p class="text-gray-400">Configure seu servidor de e-mail para envio automático</p>
-        </div>
-      </div>
-
-      <form id="emailConfigForm" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Servidor SMTP -->
-          <div>
-            <label for="smtpHost" class="block text-sm font-medium text-gray-300 mb-2">
-              Servidor SMTP <span class="text-red-400">*</span>
-            </label>
-            <input type="text" id="smtpHost" name="smtpHost" required
-                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   placeholder="Ex: smtp.gmail.com">
-            <p class="text-xs text-gray-500 mt-1">Servidor SMTP do seu provedor de e-mail</p>
-          </div>
-
-          <!-- Porta SMTP -->
-          <div>
-            <label for="smtpPort" class="block text-sm font-medium text-gray-300 mb-2">
-              Porta SMTP <span class="text-red-400">*</span>
-            </label>
-            <input type="number" id="smtpPort" name="smtpPort" required
-                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   placeholder="587" value="587">
-            <p class="text-xs text-gray-500 mt-1">Porta padrão: 587 (TLS) ou 465 (SSL)</p>
-          </div>
-
-          <!-- Usuário SMTP -->
-          <div>
-            <label for="smtpUser" class="block text-sm font-medium text-gray-300 mb-2">
-              E-mail <span class="text-red-400">*</span>
-            </label>
-            <input type="email" id="smtpUser" name="smtpUser" required
-                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   placeholder="seu-email@gmail.com">
-            <p class="text-xs text-gray-500 mt-1">E-mail usado para autenticação SMTP</p>
-          </div>
-
-          <!-- Senha SMTP -->
-          <div>
-            <label for="smtpPassword" class="block text-sm font-medium text-gray-300 mb-2">
-              Senha <span class="text-red-400">*</span>
-            </label>
-            <div class="relative">
-              <input type="password" id="smtpPassword" name="smtpPassword" required
-                     class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-                     placeholder="Sua senha ou senha de app">
-              <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
-                <i class="fas fa-eye" id="passwordIcon"></i>
-              </button>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+            <div class="flex items-center mb-8">
+                <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
             </div>
-            <p class="text-xs text-gray-500 mt-1">Para Gmail, use senha de aplicativo</p>
-          </div>
+            <ul class="space-y-2 flex-1">
+                <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+                <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+                <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+                <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
+                <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+                <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
+                <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+                <li>
+                    <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementMenu()">
+                        <i class="fas fa-chart-bar mr-2"></i> Engajamentos
+                        <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementArrow" style="transform: rotate(0deg);"></i>
+                    </div>
+                    <ul id="engagementMenu" class="ml-8 mt-1 space-y-1 hidden">
+                        <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail Marketing</a></li>
+                        <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
+                    </ul>
+                </li>
+                <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de Leads</a></li>
+                <!-- Início do novo menu Financeiro -->
+                <li>
+                    <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleFinanceMenu()">
+                        <i class="fas fa-wallet mr-2"></i> Financeiro
+                        <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="financeArrow" style="transform: rotate(0deg);"></i>
+                    </div>
+                    <ul id="financeMenu" class="ml-8 mt-1 space-y-1 hidden">
+                        <li><a href="carteira.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-piggy-bank mr-2"></i> Carteira</a></li>
+                        <li><a href="payments.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+                    </ul>
+                </li>
+                <!-- Fim do novo menu Financeiro -->
+                <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+                <li><a href="email-config.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-envelope mr-2"></i> Configuração de E-mail</a></li>
+                <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+            </ul>
+        </nav>
 
-          <!-- E-mail Remetente -->
-          <div>
-            <label for="fromEmail" class="block text-sm font-medium text-gray-300 mb-2">
-              E-mail Remetente <span class="text-red-400">*</span>
-            </label>
-            <input type="email" id="fromEmail" name="fromEmail" required
-                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   placeholder="noreply@suaempresa.com">
-            <p class="text-xs text-gray-500 mt-1">E-mail que aparecerá como remetente</p>
-          </div>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+            <div class="flex-1 flex flex-col">
+                <!-- Header -->
+                <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-3xl font-bold text-blue-400">
+                            <i class="fas fa-envelope mr-3"></i>
+                            Configuração de E-mail
+                        </h1>
+                        <p class="text-gray-400">Configure as configurações SMTP para envio de e-mails automáticos</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <!-- Status da Configuração -->
+                        <div id="configStatus" class="flex items-center gap-2">
+                            <span id="statusIndicator" class="px-3 py-1 rounded-full text-xs font-medium bg-gray-600 text-gray-300">
+                                <i class="fas fa-circle mr-1"></i>Não configurado
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="block text-gray-200 font-medium" id="clientName">Cliente</span>
+                            <i class="fas fa-user-circle text-2xl text-gray-400"></i>
+                        </div>
+                    </div>
+                </header>
 
-          <!-- Nome Remetente -->
-          <div>
-            <label for="fromName" class="block text-sm font-medium text-gray-300 mb-2">
-              Nome Remetente <span class="text-red-400">*</span>
-            </label>
-            <input type="text" id="fromName" name="fromName" required
-                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   placeholder="Sua Empresa">
-            <p class="text-xs text-gray-500 mt-1">Nome que aparecerá como remetente</p>
-          </div>
-        </div>
+                <!-- Main Content -->
+                <main class="flex-1 p-8">
+                    <!-- Configuração SMTP -->
+                    <div class="bg-gray-800 rounded-xl p-6 mb-8 border border-gray-700">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-server text-blue-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-semibold text-gray-100">Configurações SMTP</h2>
+                                <p class="text-gray-400">Configure seu servidor de e-mail para envio automático</p>
+                            </div>
+                        </div>
 
-        <!-- Configurações Adicionais -->
-        <div class="border-t border-gray-700 pt-6">
-          <h3 class="text-lg font-medium text-white mb-4">Configurações Adicionais</h3>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Conexão Segura -->
-            <div class="flex items-center">
-              <input type="checkbox" id="isSecure" name="isSecure"
-                     class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2">
-              <label for="isSecure" class="ml-3 text-sm text-gray-300">
-                Usar conexão segura (SSL/TLS)
-              </label>
+                        <form id="emailConfigForm" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Servidor SMTP -->
+                                <div>
+                                    <label for="smtpHost" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Servidor SMTP <span class="text-red-400">*</span>
+                                    </label>
+                                    <input type="text" id="smtpHost" name="smtpHost" required
+                                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                           placeholder="Ex: smtp.gmail.com">
+                                    <p class="text-xs text-gray-500 mt-1">Servidor SMTP do seu provedor de e-mail</p>
+                                </div>
+
+                                <!-- Porta SMTP -->
+                                <div>
+                                    <label for="smtpPort" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Porta SMTP <span class="text-red-400">*</span>
+                                    </label>
+                                    <input type="number" id="smtpPort" name="smtpPort" required
+                                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                           placeholder="587" value="587">
+                                    <p class="text-xs text-gray-500 mt-1">Porta padrão: 587 (TLS) ou 465 (SSL)</p>
+                                </div>
+
+                                <!-- Usuário SMTP -->
+                                <div>
+                                    <label for="smtpUser" class="block text-sm font-medium text-gray-300 mb-2">
+                                        E-mail <span class="text-red-400">*</span>
+                                    </label>
+                                    <input type="email" id="smtpUser" name="smtpUser" required
+                                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                           placeholder="seu-email@gmail.com">
+                                    <p class="text-xs text-gray-500 mt-1">E-mail usado para autenticação SMTP</p>
+                                </div>
+
+                                <!-- Senha SMTP -->
+                                <div>
+                                    <label for="smtpPassword" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Senha <span class="text-red-400">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input type="password" id="smtpPassword" name="smtpPassword" required
+                                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                                               placeholder="Sua senha ou senha de app">
+                                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-100 transition-colors">
+                                            <i class="fas fa-eye" id="passwordIcon"></i>
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Para Gmail, use senha de aplicativo</p>
+                                </div>
+
+                                <!-- E-mail Remetente -->
+                                <div>
+                                    <label for="fromEmail" class="block text-sm font-medium text-gray-300 mb-2">
+                                        E-mail Remetente <span class="text-red-400">*</span>
+                                    </label>
+                                    <input type="email" id="fromEmail" name="fromEmail" required
+                                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                           placeholder="noreply@suaempresa.com">
+                                    <p class="text-xs text-gray-500 mt-1">E-mail que aparecerá como remetente</p>
+                                </div>
+
+                                <!-- Nome Remetente -->
+                                <div>
+                                    <label for="fromName" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Nome Remetente <span class="text-red-400">*</span>
+                                    </label>
+                                    <input type="text" id="fromName" name="fromName" required
+                                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                           placeholder="Sua Empresa">
+                                    <p class="text-xs text-gray-500 mt-1">Nome que aparecerá como remetente</p>
+                                </div>
+                            </div>
+
+                            <!-- Configurações Adicionais -->
+                            <div class="border-t border-gray-700 pt-6">
+                                <h3 class="text-lg font-medium text-gray-100 mb-4">Configurações Adicionais</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Conexão Segura -->
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="isSecure" name="isSecure" checked
+                                               class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2">
+                                        <label for="isSecure" class="ml-3 text-sm text-gray-300">
+                                            Usar conexão segura (SSL/TLS)
+                                        </label>
+                                    </div>
+
+                                    <!-- Status -->
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="status" name="status" checked
+                                               class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2">
+                                        <label for="status" class="ml-3 text-sm text-gray-300">
+                                            Configuração ativa
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- E-mail de Resposta -->
+                                <div class="mt-6">
+                                    <label for="replyTo" class="block text-sm font-medium text-gray-300 mb-2">
+                                        E-mail de Resposta (Opcional)
+                                    </label>
+                                    <input type="email" id="replyTo" name="replyTo"
+                                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                           placeholder="suporte@suaempresa.com">
+                                    <p class="text-xs text-gray-500 mt-1">E-mail para onde as respostas serão direcionadas</p>
+                                </div>
+                            </div>
+
+                            <!-- Botões -->
+                            <div class="flex items-center justify-between pt-6 border-t border-gray-700">
+                                <div class="flex items-center space-x-4">
+                                    <button type="button" onclick="testConfig()" 
+                                            class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors flex items-center">
+                                        <i class="fas fa-vial mr-2"></i>
+                                        Testar Configuração
+                                    </button>
+                                    <div id="testResult" class="hidden flex items-center"></div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-4">
+                                    <button type="button" onclick="resetForm()" 
+                                            class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors">
+                                        <i class="fas fa-undo mr-2"></i>
+                                        Limpar
+                                    </button>
+                                    <button type="submit" 
+                                            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center">
+                                        <i class="fas fa-save mr-2"></i>
+                                        Salvar Configuração
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Informações e Dicas -->
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-100">Dicas de Configuração</h3>
+                                <p class="text-gray-400">Informações importantes para configurar seu SMTP</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-medium text-gray-100 mb-2">
+                                        <i class="fas fa-envelope mr-2 text-blue-400"></i>Gmail
+                                    </h4>
+                                    <div class="text-sm text-gray-300 space-y-1">
+                                        <p><strong>Servidor:</strong> smtp.gmail.com</p>
+                                        <p><strong>Porta:</strong> 587</p>
+                                        <p><strong>Segurança:</strong> TLS</p>
+                                        <p><strong>Dica:</strong> Use senha de aplicativo</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-medium text-gray-100 mb-2">
+                                        <i class="fas fa-envelope mr-2 text-green-400"></i>Outlook/Hotmail
+                                    </h4>
+                                    <div class="text-sm text-gray-300 space-y-1">
+                                        <p><strong>Servidor:</strong> smtp-mail.outlook.com</p>
+                                        <p><strong>Porta:</strong> 587</p>
+                                        <p><strong>Segurança:</strong> TLS</p>
+                                        <p><strong>Dica:</strong> Use senha normal</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-info-circle text-blue-400 text-lg mt-0.5"></i>
+                                <div>
+                                    <h4 class="font-medium text-blue-400 mb-1">Informação Importante</h4>
+                                    <p class="text-sm text-gray-300">
+                                        Para o Gmail, você precisa ativar a verificação em duas etapas e gerar uma senha de aplicativo específica. 
+                                        Esta é uma medida de segurança obrigatória.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Histórico de Testes -->
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mt-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mr-4">
+                                    <i class="fas fa-history text-green-400 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-100">Histórico de Testes</h3>
+                                    <p class="text-gray-400">Últimos testes de configuração realizados</p>
+                                </div>
+                            </div>
+                            <button onclick="clearTestHistory()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm transition-colors">
+                                <i class="fas fa-trash mr-2"></i>Limpar Histórico
+                            </button>
+                        </div>
+
+                        <div id="testHistory" class="space-y-3">
+                            <div class="flex items-center justify-center py-8 text-gray-500">
+                                <i class="fas fa-clock mr-2"></i>
+                                Nenhum teste realizado ainda
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
-
-            <!-- Status -->
-            <div class="flex items-center">
-              <input type="checkbox" id="status" name="status" checked
-                     class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2">
-              <label for="status" class="ml-3 text-sm text-gray-300">
-                Configuração ativa
-              </label>
-            </div>
-          </div>
-
-          <!-- E-mail de Resposta -->
-          <div class="mt-6">
-            <label for="replyTo" class="block text-sm font-medium text-gray-300 mb-2">
-              E-mail de Resposta (Opcional)
-            </label>
-            <input type="email" id="replyTo" name="replyTo"
-                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   placeholder="suporte@suaempresa.com">
-            <p class="text-xs text-gray-500 mt-1">E-mail para onde as respostas serão direcionadas</p>
-          </div>
         </div>
-
-        <!-- Botões -->
-        <div class="flex items-center justify-between pt-6 border-t border-gray-700">
-          <div class="flex items-center space-x-4">
-            <button type="button" onclick="testConfig()" 
-                    class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors flex items-center">
-              <i class="fas fa-vial mr-2"></i>
-              Testar Configuração
-            </button>
-            <div id="testResult" class="hidden"></div>
-          </div>
-          
-          <div class="flex items-center space-x-4">
-            <button type="button" onclick="resetForm()" 
-                    class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors">
-              Limpar
-            </button>
-            <button type="submit" 
-                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center">
-              <i class="fas fa-save mr-2"></i>
-              Salvar Configuração
-            </button>
-          </div>
-        </div>
-      </form>
     </div>
 
-    <!-- Status da Configuração -->
-    <div id="configStatus" class="bg-gray-800 rounded-lg p-6 hidden">
-      <div class="flex items-center mb-4">
-        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mr-4">
-          <i class="fas fa-check-circle text-green-400 text-xl"></i>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold text-white">Configuração Ativa</h3>
-          <p class="text-gray-400">Sua configuração de e-mail está funcionando corretamente</p>
-        </div>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-        <div>
-          <span class="text-gray-400">Último teste:</span>
-          <span class="text-white ml-2" id="lastTestDate">-</span>
-        </div>
-        <div>
-          <span class="text-gray-400">Status:</span>
-          <span class="text-green-400 ml-2" id="testStatus">Sucesso</span>
-        </div>
-        <div>
-          <span class="text-gray-400">E-mails enviados:</span>
-          <span class="text-white ml-2" id="emailsSent">0</span>
-        </div>
-      </div>
-    </div>
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-    <!-- Guias de Configuração -->
-    <div class="bg-gray-800 rounded-lg p-6">
-      <h3 class="text-lg font-semibold text-white mb-4">
-        <i class="fas fa-info-circle mr-2 text-blue-400"></i>
-        Guias de Configuração
-      </h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Gmail -->
-        <div class="border border-gray-700 rounded-lg p-4">
-          <h4 class="font-medium text-white mb-2">Gmail</h4>
-          <ul class="text-sm text-gray-400 space-y-1">
-            <li>• Servidor: smtp.gmail.com</li>
-            <li>• Porta: 587 (TLS) ou 465 (SSL)</li>
-            <li>• Ative a verificação em 2 etapas</li>
-            <li>• Gere uma senha de aplicativo</li>
-          </ul>
-          <a href="https://support.google.com/accounts/answer/185833" target="_blank" 
-             class="text-blue-400 hover:text-blue-300 text-sm mt-2 inline-block">
-            Como gerar senha de app →
-          </a>
-        </div>
-
-        <!-- Outlook/Hotmail -->
-        <div class="border border-gray-700 rounded-lg p-4">
-          <h4 class="font-medium text-white mb-2">Outlook/Hotmail</h4>
-          <ul class="text-sm text-gray-400 space-y-1">
-            <li>• Servidor: smtp-mail.outlook.com</li>
-            <li>• Porta: 587 (TLS)</li>
-            <li>• Use sua senha normal</li>
-            <li>• Pode ser necessário ativar "Acesso menos seguro"</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script src="../js/config.js"></script>
-  <script src="../js/auth.js"></script>
-  <script src="../js/email-config.js"></script>
+    <!-- Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="../js/email-config.js"></script>
 </body>
 </html> 
