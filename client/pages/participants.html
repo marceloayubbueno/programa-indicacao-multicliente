@@ -175,14 +175,8 @@
     <script src="../js/modules/participants-manager.js"></script>
     <script src="../js/participants.js"></script>
     <script>
-        // 🔧 CORREÇÃO: Garantir ordem correta de inicialização
         checkAuth();
-        
-        setTimeout(() => {
-            if (localStorage.getItem('clientToken')) {
-                initSharedMenu('participants');
-            }
-        }, 100);
+        initSharedMenu('participants');
     </script>
 </body>
 </html> 

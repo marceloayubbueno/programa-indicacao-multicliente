@@ -266,8 +266,29 @@ function toggleConfiguracoesMenu() {
 
 /**
  * Função utilitária para inicializar o menu em qualquer página
+ * 🔧 MELHORADA: Com verificações de segurança para JWT multicliente
  */
 function initSharedMenu(activePage) {
-  const menu = new MenuComponent(activePage);
-  menu.init();
+  // 1. Verificar se está autenticado (JWT multicliente)
+  const token = localStorage.getItem('clientToken');
+  if (!token) {
+    console.warn('⚠️ [MENU] Token não encontrado - usuário não autenticado');
+    return;
+  }
+
+  // 2. Verificar se container existe
+  const container = document.getElementById('sidebar-container');
+  if (!container) {
+    console.warn('⚠️ [MENU] Container sidebar-container não encontrado');
+    return;
+  }
+
+  // 3. Inicializar menu apenas se passou nas verificações
+  try {
+    const menu = new MenuComponent(activePage);
+    menu.init();
+    console.log('✅ [MENU] Menu inicializado com sucesso para página:', activePage);
+  } catch (error) {
+    console.error('❌ [MENU] Erro ao renderizar menu:', error);
+  }
 } 

@@ -92,14 +92,8 @@
     <script src="../js/shared-menu.js"></script>
     <script src="../js/campaigns.js"></script>
     <script>
-        // 🔧 CORREÇÃO: Garantir ordem correta de inicialização
         checkAuth();
-        
-        setTimeout(() => {
-            if (localStorage.getItem('clientToken')) {
-                initSharedMenu('campaigns');
-            }
-        }, 100);
+        initSharedMenu('campaigns');
     </script>
     <!-- Frontend carregado -->
 </body>
