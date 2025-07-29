@@ -237,7 +237,9 @@ async function handleSubmit(event) {
 
     showLoading('Salvando configuração...');
 
-    const url = `${getApiUrl()}/email-templates/config/me`;
+    const url = currentConfig ? 
+      `${getApiUrl()}/email-templates/config/me` : 
+      `${getApiUrl()}/email-templates/config`;
     const method = currentConfig ? 'PATCH' : 'POST';
 
     const response = await fetch(url, {
@@ -343,7 +345,10 @@ async function testConfig() {
     showLoading('Testando configuração...');
 
     // Salvar configuração
-    const saveResponse = await fetch(`${getApiUrl()}/email-templates/config/me`, {
+    const saveUrl = currentConfig ? 
+      `${getApiUrl()}/email-templates/config/me` : 
+      `${getApiUrl()}/email-templates/config`;
+    const saveResponse = await fetch(saveUrl, {
       method: currentConfig ? 'PATCH' : 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

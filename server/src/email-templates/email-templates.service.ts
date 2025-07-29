@@ -236,14 +236,10 @@ export class EmailTemplatesService {
       .findOneAndUpdate(
         { clientId: new Types.ObjectId(clientId) },
         updateEmailConfigDto,
-        { new: true }
+        { new: true, upsert: true }
       )
       .populate('clientId', 'companyName accessEmail')
       .exec();
-
-    if (!config) {
-      throw new NotFoundException('Configuração de e-mail não encontrada');
-    }
 
     return config;
   }
