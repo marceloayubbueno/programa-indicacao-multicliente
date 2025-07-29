@@ -1,6 +1,8 @@
 // Editor de E-mail Marketing (GrapesJS) - Versão Moderna e Centralizada
 // Este arquivo deve ser importado em engajamento-email-template-editor.html
 
+console.log('📁 [FILE] Arquivo engajamento-email-template-editor.js carregado');
+
 // Tabs
 function switchTab(tabName) {
   document.querySelectorAll('.panel__tab').forEach(tab => tab.classList.remove('active'));
