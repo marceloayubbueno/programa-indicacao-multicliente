@@ -561,12 +561,12 @@
     
     // Verificar se há parâmetro 'id' na URL
     const urlParams = new URLSearchParams(window.location.search);
-    const templateId = urlParams.get('id');
-    console.log('🔍 [HTML] templateId da URL:', templateId);
+    const templateIdFromUrl = urlParams.get('id');
+    console.log('🔍 [HTML] templateId da URL:', templateIdFromUrl);
     
     // Verificar se há parâmetro 'type' na URL
-    const templateType = urlParams.get('type');
-    console.log('🔍 [HTML] templateType da URL:', templateType);
+    const templateTypeFromUrl = urlParams.get('type');
+    console.log('🔍 [HTML] templateType da URL:', templateTypeFromUrl);
   </script>
   <script>
 function forceBlocksGrid() {
