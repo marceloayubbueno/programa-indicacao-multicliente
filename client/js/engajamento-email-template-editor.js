@@ -12,6 +12,26 @@ for (const [key, value] of allParams.entries()) {
   console.log(`🔍 [URL_DEBUG] - ${key}: ${value}`);
 }
 
+// 🎯 [FLOW_DEBUG] Identificar tipo de fluxo: NOVO vs EDITAR
+const hasUrlParams = window.location.search.length > 0;
+const isNewTemplate = !hasUrlParams;
+const isEditingTemplate = hasUrlParams;
+
+console.log('🎯 [FLOW_DEBUG] ========== DETECÇÃO DE FLUXO ==========');
+console.log('🎯 [FLOW_DEBUG] URL tem parâmetros?', hasUrlParams);
+console.log('🎯 [FLOW_DEBUG] É NOVO template?', isNewTemplate);
+console.log('🎯 [FLOW_DEBUG] É EDIÇÃO de template?', isEditingTemplate);
+
+if (isNewTemplate) {
+  console.log('🆕 [NEW_TEMPLATE] ========== MODO CRIAÇÃO DETECTADO ==========');
+  console.log('🆕 [NEW_TEMPLATE] Template será criado do zero com estrutura GrapesJS nativa');
+  console.log('🆕 [NEW_TEMPLATE] CSS e layout serão aplicados automaticamente pelo GrapesJS');
+} else {
+  console.log('✏️ [EDIT_TEMPLATE] ========== MODO EDIÇÃO DETECTADO ==========');
+  console.log('✏️ [EDIT_TEMPLATE] Template será carregado do banco de dados');
+  console.log('✏️ [EDIT_TEMPLATE] HTML será reconstruído e re-renderizado');
+}
+
 // Tabs
 function switchTab(tabName) {
   document.querySelectorAll('.panel__tab').forEach(tab => tab.classList.remove('active'));
@@ -494,36 +514,33 @@ function initializeEditor() {
     console.log('✅ [INIT] Editor GrapesJS carregado');
     console.log('🔍 [TIMING_DEBUG] Editor load event disparado');
     
-    // Aguardar um pouco mais para garantir que o editor esteja totalmente pronto
+    // 🎯 [FLOW_DEBUG] Capturar estado inicial baseado no modo
     setTimeout(() => {
-      console.log('🔍 [TIMING_DEBUG] Timeout de inicialização executado');
-      if (templateId) {
-        console.log('🔍 [INIT] Carregando template existente:', templateId);
-        console.log('🔍 [TIMING_DEBUG] Chamando fetchTemplate com ID:', templateId);
-        fetchTemplate(templateId);
+      if (isNewTemplate) {
+        captureInitialEditorState('NEW_TEMPLATE');
       } else {
-        console.log('🔍 [INIT] Criando novo template');
-        console.log('🔍 [TIMING_DEBUG] Nenhum templateId encontrado, criando template novo');
-        // Criar estrutura inicial simples
-        const wrapper = editor.getWrapper();
-        if (wrapper && wrapper.set) {
-          wrapper.set('content', `
-            <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
-              <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Bem-vindo ao Editor de E-mail</h2>
-              <p style="color: #666; font-size: 16px; margin-bottom: 24px;">Arraste blocos da barra lateral para começar a criar seu e-mail</p>
-              <div style="background: #3498db; color: white; padding: 12px 24px; border-radius: 8px; display: inline-block; font-weight: 600;">
-                Comece arrastando um bloco aqui
-              </div>
-            </div>
-          `);
-        }
+        captureInitialEditorState('EDIT_TEMPLATE_BEFORE_LOAD');
       }
-      
-      console.log('✅ [INIT] Editor inicializado com sucesso');
-      
-      // Ajustar altura após inicialização
-      setTimeout(adjustCanvasHeight, 1000);
     }, 500);
+    
+    // Garantir estrutura centralizada
+    addCentralizedStructure();
+    
+    // Carregar template se estiver em modo de edição
+    if (templateId) {
+      console.log('🟢 [MODE] MODO DE EDIÇÃO detectado');
+      console.log('🔍 [LOAD] templateId detectado no load:', templateId);
+      console.log('🔍 [LOAD] Chamando fetchTemplate...');
+      fetchTemplate(templateId);
+    } else {
+      console.log('🆕 [MODE] MODO DE CRIAÇÃO detectado');
+      console.log('🔍 [LOAD] Nenhum templateId - modo de criação de novo template');
+      
+      // 🎯 [FLOW_DEBUG] Capturar estado após estrutura estar pronta
+      setTimeout(() => {
+        captureInitialEditorState('NEW_TEMPLATE_AFTER_STRUCTURE');
+      }, 1000);
+    }
   });
   
   // Fallback se o evento load não disparar
@@ -800,12 +817,14 @@ function fetchTemplate(id) {
             console.log('✅ [FETCH] Template reconstruído carregado no editor');
             console.log('✅ [EDITOR_DEBUG] setComponents executado com HTML limpo');
             
-            // Forçar atualização completa
+            // Force refresh do editor para re-renderizar tudo
+            editor.refresh();
+            console.log('🔧 [VISUAL_FIX] Editor refreshed e re-renderizado');
+            
+            // 🎯 [FLOW_DEBUG] Capturar estado APÓS carregamento do template
             setTimeout(() => {
-              editor.refresh();
-              editor.render();
-              console.log('🔧 [VISUAL_FIX] Editor refreshed e re-renderizado');
-            }, 500);
+              captureInitialEditorState('EDIT_TEMPLATE_AFTER_LOAD');
+            }, 1000);
             
           } catch (error) {
             console.error('❌ [EDITOR_DEBUG] Erro ao executar setComponents:', error);
@@ -1624,4 +1643,49 @@ editor.BlockManager.add('indicacao-new-campaign', {
   `,
   category: 'Indicação',
   attributes: { class: 'fas fa-rocket' }
-}); 
+  }); 
+
+// 🎯 [FLOW_DEBUG] Função para capturar estado inicial do editor
+function captureInitialEditorState(mode) {
+  console.log(`🎯 [${mode}] ========== CAPTURANDO ESTADO INICIAL ==========`);
+  
+  if (!editor) {
+    console.log(`🎯 [${mode}] Editor ainda não disponível`);
+    return;
+  }
+  
+  // Capturar HTML inicial
+  const initialHtml = editor.getHtml();
+  console.log(`🎯 [${mode}] HTML inicial (length):`, initialHtml.length);
+  console.log(`🎯 [${mode}] HTML inicial:`, initialHtml);
+  
+  // Capturar CSS inicial
+  const initialCss = editor.getCss();
+  console.log(`🎯 [${mode}] CSS inicial (length):`, initialCss.length);
+  console.log(`🎯 [${mode}] CSS inicial:`, initialCss);
+  
+  // Capturar componentes iniciais
+  const components = editor.getComponents();
+  console.log(`🎯 [${mode}] Componentes iniciais:`, components.length);
+  
+  // Verificar wrapper e canvas
+  const wrapper = editor.getWrapper();
+  console.log(`🎯 [${mode}] Wrapper disponível:`, !!wrapper);
+  
+  if (wrapper) {
+    const wrapperHtml = wrapper.getEl()?.outerHTML;
+    console.log(`🎯 [${mode}] Wrapper HTML:`, wrapperHtml?.substring(0, 200) + '...');
+  }
+  
+  // Verificar estrutura do canvas
+  const canvas = editor.Canvas;
+  if (canvas) {
+    const canvasBody = canvas.getBody();
+    console.log(`🎯 [${mode}] Canvas body disponível:`, !!canvasBody);
+    if (canvasBody) {
+      console.log(`🎯 [${mode}] Canvas innerHTML:`, canvasBody.innerHTML.substring(0, 200) + '...');
+    }
+  }
+  
+  console.log(`🎯 [${mode}] ========== FIM CAPTURA ESTADO INICIAL ==========`);
+}
