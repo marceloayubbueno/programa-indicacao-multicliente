@@ -3,6 +3,15 @@
 
 console.log('📁 [FILE] Arquivo engajamento-email-template-editor.js carregado - VERSÃO DEBUG');
 
+// 🔍 [URL_DEBUG] Diagnóstico de URL e parâmetros - ADICIONADO PARA DEBUG
+console.log('🔍 [URL_DEBUG] URL completa:', window.location.href);
+console.log('🔍 [URL_DEBUG] Search params:', window.location.search);
+console.log('🔍 [URL_DEBUG] Parâmetros extraídos:');
+const allParams = new URLSearchParams(window.location.search);
+for (const [key, value] of allParams.entries()) {
+  console.log(`🔍 [URL_DEBUG] - ${key}: ${value}`);
+}
+
 // Tabs
 function switchTab(tabName) {
   document.querySelectorAll('.panel__tab').forEach(tab => tab.classList.remove('active'));
@@ -368,9 +377,17 @@ window.previewEmail = function() {
 function getUrlParam(name) {
   console.log('🔍 [URL_PARAM] Buscando parâmetro:', name);
   console.log('🔍 [URL_PARAM] URL atual:', window.location.href);
+  
+  // 🔍 [URL_DEBUG] Diagnóstico detalhado da extração de parâmetros
   const url = new URL(window.location.href);
+  console.log('🔍 [URL_PARAM] URL objeto criado:', url);
+  console.log('🔍 [URL_PARAM] SearchParams disponíveis:', url.searchParams.toString());
+  
   const value = url.searchParams.get(name);
-  console.log('🔍 [URL_PARAM] Valor encontrado:', value);
+  console.log('🔍 [URL_PARAM] Valor encontrado para', name + ':', value);
+  console.log('🔍 [URL_PARAM] Tipo do valor:', typeof value);
+  console.log('🔍 [URL_PARAM] Valor é válido?', value && value.length > 0);
+  
   return value;
 }
 
@@ -379,6 +396,20 @@ const templateId = getUrlParam('id');
 console.log('🔍 [URL] templateId obtido da URL:', templateId);
 console.log('🔍 [URL] URL completa:', window.location.href);
 console.log('🔍 [URL] Parâmetros da URL:', window.location.search);
+
+// 🔍 [URL_DEBUG] Diagnóstico crítico do templateId
+console.log('🔍 [URL_CRITICAL] templateId extraído:', templateId);
+console.log('🔍 [URL_CRITICAL] templateId tipo:', typeof templateId);
+console.log('🔍 [URL_CRITICAL] templateId truthy?', !!templateId);
+console.log('🔍 [URL_CRITICAL] templateId length:', templateId ? templateId.length : 0);
+console.log('🔍 [URL_CRITICAL] templateId é string não-vazia?', typeof templateId === 'string' && templateId.length > 0);
+
+// Verificar se estamos em modo de edição
+if (templateId) {
+  console.log('🟢 [MODE] MODO DE EDIÇÃO detectado - templateId:', templateId);
+} else {
+  console.log('🟡 [MODE] MODO DE CRIAÇÃO detectado - sem templateId');
+}
 
 // Função que FORÇA o recálculo da altura baseada no conteúdo real
 function adjustCanvasHeight() {
@@ -436,6 +467,13 @@ function initializeEditor() {
   console.log('🔍 [INIT] templateId:', templateId);
   console.log('🔍 [INIT] editor disponível:', typeof editor !== 'undefined');
   
+  // 🔍 [TIMING_DEBUG] Diagnóstico detalhado do timing
+  console.log('🔍 [TIMING_DEBUG] Editor carregado?', editor ? 'SIM' : 'NÃO');
+  console.log('🔍 [TIMING_DEBUG] Wrapper disponível?', editor?.getWrapper ? 'SIM' : 'NÃO');
+  console.log('🔍 [TIMING_DEBUG] Momento da execução:', new Date().toISOString());
+  console.log('🔍 [TIMING_DEBUG] templateId presente?', templateId ? 'SIM' : 'NÃO');
+  console.log('🔍 [TIMING_DEBUG] templateId valor:', templateId);
+  
   // Verificar se o editor está disponível
   if (typeof editor === 'undefined') {
     console.error('❌ [INIT] Editor não está disponível!');
@@ -445,14 +483,18 @@ function initializeEditor() {
   // Aguardar o editor estar pronto
   editor.on('load', () => {
     console.log('✅ [INIT] Editor GrapesJS carregado');
+    console.log('🔍 [TIMING_DEBUG] Editor load event disparado');
     
     // Aguardar um pouco mais para garantir que o editor esteja totalmente pronto
     setTimeout(() => {
+      console.log('🔍 [TIMING_DEBUG] Timeout de inicialização executado');
       if (templateId) {
         console.log('🔍 [INIT] Carregando template existente:', templateId);
+        console.log('🔍 [TIMING_DEBUG] Chamando fetchTemplate com ID:', templateId);
         fetchTemplate(templateId);
       } else {
         console.log('🔍 [INIT] Criando novo template');
+        console.log('🔍 [TIMING_DEBUG] Nenhum templateId encontrado, criando template novo');
         // Criar estrutura inicial simples
         const wrapper = editor.getWrapper();
         if (wrapper && wrapper.set) {
@@ -477,10 +519,12 @@ function initializeEditor() {
   
   // Fallback se o evento load não disparar
   setTimeout(() => {
+    console.log('🔍 [TIMING_DEBUG] Fallback de inicialização executado');
     try {
       const wrapper = editor.getWrapper();
       if (wrapper && wrapper.getComponents && wrapper.getComponents().length === 0) {
         console.log('🔧 [INIT] Aplicando fallback...');
+        console.log('🔍 [TIMING_DEBUG] Wrapper encontrado mas sem componentes');
         if (wrapper.set) {
           wrapper.set('content', `
             <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
@@ -492,6 +536,7 @@ function initializeEditor() {
       }
     } catch (error) {
       console.log('⚠️ [INIT] Erro no fallback:', error.message);
+      console.log('⚠️ [TIMING_DEBUG] Erro no fallback:', error);
     }
   }, 3000);
 }
@@ -553,8 +598,14 @@ function fetchTemplate(id) {
   console.log('🔍 [FETCH] Iniciando busca do template:', id);
   console.log('🔍 [FETCH] Tipo do ID:', typeof id);
   console.log('🔍 [FETCH] ID é válido?', id && id.length > 0);
+  console.log('🔍 [FETCH] Função fetchTemplate chamada - VERSÃO DEBUG');
   
+  // 🔍 [API_DEBUG] Diagnóstico de autenticação
   const token = localStorage.getItem('clientToken');
+  console.log('🔍 [API_DEBUG] Token presente?', token ? 'SIM' : 'NÃO');
+  console.log('🔍 [API_DEBUG] Token length:', token ? token.length : 0);
+  console.log('🔍 [API_DEBUG] Token válido?', token && token.length > 10);
+  
   if (!token) {
     console.error('❌ [FETCH] Token não encontrado');
     return alert('Token não encontrado');
@@ -567,15 +618,27 @@ function fetchTemplate(id) {
   console.log('🔍 [FETCH] URL da requisição:', url);
   console.log('🔍 [FETCH] Token presente:', token ? 'SIM' : 'NÃO');
   
+  // 🔍 [API_DEBUG] Log detalhado da requisição
+  console.log('🔍 [API_DEBUG] Iniciando requisição para:', url);
+  console.log('🔍 [API_DEBUG] Headers da requisição:', { 'Authorization': 'Bearer ' + (token ? '[TOKEN_PRESENTE]' : '[TOKEN_AUSENTE]') });
+  
   fetch(url, {
     headers: { 'Authorization': `Bearer ${token}` }
   })
     .then(async res => {
       console.log('🔍 [FETCH] Status da resposta:', res.status);
+      console.log('🔍 [API_DEBUG] Status da resposta:', res.status);
+      console.log('🔍 [API_DEBUG] Headers da resposta:', Object.fromEntries(res.headers.entries()));
+      console.log('🔍 [API_DEBUG] Resposta OK?', res.ok);
       
       if (!res.ok) {
         const errorText = await res.text();
         console.error('❌ [FETCH] Erro na resposta:', errorText);
+        console.error('❌ [API_DEBUG] Erro detalhado:', {
+          status: res.status,
+          statusText: res.statusText,
+          errorText: errorText
+        });
         throw new Error(`HTTP ${res.status}: ${errorText}`);
       }
       
@@ -583,6 +646,12 @@ function fetchTemplate(id) {
     })
     .then(data => {
       console.log('🔍 [FETCH] Dados recebidos:', data);
+      console.log('🔍 [API_DEBUG] Dados retornados pela API:', data);
+      console.log('🔍 [DATA_DEBUG] Estrutura completa dos dados:', JSON.stringify(data, null, 2));
+      console.log('🔍 [DATA_DEBUG] Campos disponíveis:', Object.keys(data));
+      console.log('🔍 [DATA_DEBUG] htmlContent existe?', 'htmlContent' in data);
+      console.log('🔍 [DATA_DEBUG] htmlContent tipo:', typeof data.htmlContent);
+      console.log('🔍 [DATA_DEBUG] htmlContent length:', data.htmlContent ? data.htmlContent.length : 0);
       
       if (data && data.name) {
         document.getElementById('templateName').value = data.name;
@@ -596,6 +665,13 @@ function fetchTemplate(id) {
       
       if (data && data.htmlContent) {
         console.log('🔍 [FETCH] HTML Content encontrado, tamanho:', data.htmlContent.length);
+        console.log('🔍 [DATA_DEBUG] htmlContent preview:', data.htmlContent.substring(0, 200) + '...');
+        
+        // 🔍 [EDITOR_DEBUG] Diagnóstico do estado do editor
+        console.log('🔍 [EDITOR_DEBUG] Editor disponível?', !!editor);
+        console.log('🔍 [EDITOR_DEBUG] setComponents disponível?', !!(editor && editor.setComponents));
+        console.log('🔍 [EDITOR_DEBUG] getWrapper disponível?', !!(editor && editor.getWrapper));
+        console.log('🔍 [TIMING_DEBUG] Momento da execução:', new Date().toISOString());
         
         // Garantir que o conteúdo tenha a estrutura centralizada
         let htmlContent = data.htmlContent;
@@ -612,17 +688,33 @@ function fetchTemplate(id) {
         
         // Verificar se o editor está pronto
         if (editor && editor.setComponents) {
-          editor.setComponents(htmlContent);
-          console.log('✅ [FETCH] Template carregado no editor com sucesso');
+          console.log('🔍 [EDITOR_DEBUG] Tentando carregar conteúdo no editor...');
+          try {
+            editor.setComponents(htmlContent);
+            console.log('✅ [FETCH] Template carregado no editor com sucesso');
+            console.log('✅ [EDITOR_DEBUG] setComponents executado com sucesso');
+          } catch (error) {
+            console.error('❌ [EDITOR_DEBUG] Erro ao executar setComponents:', error);
+          }
         } else {
           console.error('❌ [FETCH] Editor não está pronto para receber componentes');
+          console.error('❌ [EDITOR_DEBUG] Estado do editor:', {
+            editorExists: !!editor,
+            setComponentsExists: !!(editor && editor.setComponents),
+            getWrapperExists: !!(editor && editor.getWrapper)
+          });
         }
       } else {
         console.warn('⚠️ [FETCH] HTML Content não encontrado nos dados');
+        console.warn('⚠️ [DATA_DEBUG] Campo htmlContent ausente ou vazio');
       }
     })
     .catch(error => {
       console.error('❌ [FETCH] Erro ao buscar template:', error);
+      console.error('❌ [API_DEBUG] Erro completo:', {
+        message: error.message,
+        stack: error.stack
+      });
       alert(`Erro ao carregar template: ${error.message}`);
     });
 }
