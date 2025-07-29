@@ -932,7 +932,7 @@ function sendTestEmailDirect(testEmail) {
 // Forçar grid de 2 colunas nos blocos do GrapesJS (garantia máxima)
 function fixBlocksGrid() {
   const blocks = document.querySelectorAll('.blocks-container .gjs-block');
-  console.log('🔧 [FIX] Aplicando grid fix em', blocks.length, 'blocos');
+  // console.log('🔧 [FIX] Aplicando grid fix em', blocks.length, 'blocos');
   
   blocks.forEach((block, index) => {
     // Forçar estilos inline (maior prioridade)
@@ -949,7 +949,7 @@ function fixBlocksGrid() {
     block.style.setProperty('clear', 'none', 'important');
     block.style.setProperty('box-sizing', 'border-box', 'important');
     
-    console.log(`🔧 [FIX] Bloco ${index + 1} processado`);
+    // console.log(`🔧 [FIX] Bloco ${index + 1} processado`);
   });
   
   // Forçar o container também
@@ -958,7 +958,7 @@ function fixBlocksGrid() {
     container.style.setProperty('display', 'grid', 'important');
     container.style.setProperty('grid-template-columns', '1fr 1fr', 'important');
     container.style.setProperty('gap', '16px', 'important');
-    console.log('🔧 [FIX] Container grid forçado');
+    // console.log('🔧 [FIX] Container grid forçado');
   }
 }
 editor.on('block:add', fixBlocksGrid);
