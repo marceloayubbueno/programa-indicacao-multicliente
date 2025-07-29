@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ClientsService } from './clients.service';
 import { ClientsController } from './clients.controller';
 import { Client, ClientSchema } from './entities/client.schema';
-import { MailService } from '../common/mail.service';
+import { MailModule } from '../common/mail.module';
 import { JwtModule } from '@nestjs/jwt';
 import { Participant, ParticipantSchema } from './entities/participant.schema';
 import { ParticipantList, ParticipantListSchema } from './entities/participant-list.schema';
@@ -23,9 +23,10 @@ import { ParticipantListsController } from './participant-lists.controller';
       secret: process.env.JWT_SECRET || 'sua-chave-secreta-aqui',
       signOptions: { expiresIn: '1d' },
     }),
+    MailModule,
   ],
   controllers: [ClientsController, ParticipantsController, ParticipantListsController],
-  providers: [ClientsService, MailService, ParticipantsService, ParticipantListsService],
+  providers: [ClientsService, ParticipantsService, ParticipantListsService],
   exports: [ClientsService, ParticipantsService, ParticipantListsService],
 })
 export class ClientsModule {} 
