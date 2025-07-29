@@ -76,12 +76,20 @@ async function bootstrap() {
     }
   });
 
-    // 🔧 CORREÇÃO: Configurar prefixo global, mas excluir rotas públicas de indicação
+    // 🔧 CORREÇÃO: Configurar prefixo global, mas excluir rotas públicas e arquivos estáticos
   app.setGlobalPrefix('api', {
     exclude: [
+      // Rotas públicas de indicação
       { path: 'indicacao', method: RequestMethod.GET },
       { path: 'indicacao/*', method: RequestMethod.GET },
       { path: 'indicacao/*/preview', method: RequestMethod.GET },
+      // Rota raiz e health check
+      { path: '', method: RequestMethod.GET },
+      { path: 'health', method: RequestMethod.GET },
+      // Arquivos estáticos JavaScript e CSS
+      { path: 'js/*', method: RequestMethod.GET },
+      { path: 'css/*', method: RequestMethod.GET },
+      { path: 'assets/*', method: RequestMethod.GET },
     ],
   });
   
@@ -107,8 +115,11 @@ async function bootstrap() {
   // 🚨 DIAGNÓSTICO: Log de configuração de rotas
   console.log(`[BOOT] 🛣️ CONFIGURAÇÃO DE ROTAS:`);
   console.log(`[BOOT] 🛣️ - Prefixo global: /api`);
-  console.log(`[BOOT] 🛣️ - Rotas excluídas: /indicacao/*, /indicacao/*/preview`);
-  console.log(`[BOOT] 🛣️ - Rotas públicas acessíveis diretamente`);
+  console.log(`[BOOT] 🛣️ - Rotas excluídas do prefixo:`);
+  console.log(`[BOOT] 🛣️   - Indicação: /indicacao/*`);
+  console.log(`[BOOT] 🛣️   - Raiz: / e /health`);
+  console.log(`[BOOT] 🛣️   - Estáticos: /js/*, /css/*, /assets/*`);
+  console.log(`[BOOT] 🛣️ - Arquivos estáticos servidos de: ${clientPath} e ${publicPath}`);
 
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');

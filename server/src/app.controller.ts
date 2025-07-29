@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Head } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -10,6 +10,12 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  @Head()
+  headHello() {
+    // HEAD request para rota raiz (health checks)
+    return;
+  }
+
   @Get('health')
   getHealth() {
     return {
@@ -19,5 +25,11 @@ export class AppController {
       environment: process.env.NODE_ENV || 'development',
       version: '1.0.0'
     };
+  }
+
+  @Head('health')
+  headHealth() {
+    // HEAD request para health check
+    return;
   }
 }
