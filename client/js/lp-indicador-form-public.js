@@ -63,7 +63,7 @@ window.submitIndicadorForm = async function(event, form) {
                   (window.location.hostname === 'localhost' ? 
                    'http://localhost:3000/api' : 
                    'https://programa-indicacao-multicliente-production.up.railway.app/api');
-    const response = await fetch(`${apiUrl}/lp-indicadores/submit`, {
+    const response = await fetch(`${apiUrl}/lp-indicadores/submit-form`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

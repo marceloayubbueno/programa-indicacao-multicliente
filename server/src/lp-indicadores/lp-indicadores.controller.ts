@@ -121,8 +121,8 @@ export class LPIndicadoresController {
         
         // Configuração de API
         window.APP_CONFIG = {
-          API_URL: '${process.env.API_BASE_URL || 'http://localhost:3000'}/api',
-          CLIENT_URL: '${process.env.CLIENT_BASE_URL || 'http://localhost:5501'}'
+          API_URL: '${process.env.API_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://programa-indicacao-multicliente-production.up.railway.app' : 'http://localhost:3000')}/api',
+          CLIENT_URL: '${process.env.CLIENT_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://app.virallead.com.br' : 'http://localhost:5501')}'
         };
         
         // JavaScript do formulário de indicadores
