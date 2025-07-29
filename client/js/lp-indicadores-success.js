@@ -251,7 +251,7 @@ function shareOnTwitter() {
  */
 function goToDashboard() {
     console.log('📊 [SUCCESS] Redirecionando para o dashboard...');
-    window.location.href = 'dashboard.html';
+    window.location.href = 'https://app.virallead.com.br/indicador/login.html';
 }
 
 /**

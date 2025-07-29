@@ -372,6 +372,10 @@ export class LPIndicadoresService {
       const indicatorId = uuidv4();
       console.log('[LP] 🆔 ID do novo indicador:', indicatorId);
 
+      // Gerar senha automática para o indicador
+      const plainPassword = Math.random().toString(36).slice(-8);
+      console.log('[LP] 🔑 Senha gerada para indicador:', plainPassword);
+
     // Criar novo indicador
       const indicatorData = {
       participantId: indicatorId,
@@ -380,6 +384,7 @@ export class LPIndicadoresService {
       phone: submitFormDto.phone,
         company: submitFormDto.company,
         tipo: 'indicador', // 🆕 ESSENCIAL: Definir como indicador
+        plainPassword, // 🆕 SENHA: Adicionar senha gerada
         originLandingPageId: (lp as any)._id?.toString(),
         originLandingPageName: lp.name,
         status: 'ativo',
