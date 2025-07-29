@@ -217,6 +217,10 @@ function previewEmailTemplate(templateId, type) {
 }
 
 function editEmailTemplate(templateId, type) {
+  console.log('🔍 [EDIT] Função editEmailTemplate chamada');
+  console.log('🔍 [EDIT] templateId:', templateId);
+  console.log('🔍 [EDIT] type:', type);
+  console.log('🔍 [EDIT] URL que será redirecionada:', `engajamento-email-template-editor.html?id=${templateId}&type=${type || ''}`);
   window.location.href = `engajamento-email-template-editor.html?id=${templateId}&type=${type || ''}`;
 }
 
