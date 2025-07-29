@@ -228,59 +228,248 @@
                         </form>
                     </div>
 
-                    <!-- Informações e Dicas -->
+                    <!-- Informações e Dicas para E-mails Corporativos -->
                     <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mr-4">
-                                <i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-building text-blue-400 text-xl"></i>
                             </div>
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-100">Dicas de Configuração</h3>
-                                <p class="text-gray-400">Informações importantes para configurar seu SMTP</p>
+                                <h3 class="text-lg font-semibold text-gray-100">Configuração de E-mail Corporativo</h3>
+                                <p class="text-gray-400">Configure seu domínio empresarial para envio profissional</p>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-4">
-                                <div>
-                                    <h4 class="font-medium text-gray-100 mb-2">
-                                        <i class="fas fa-envelope mr-2 text-blue-400"></i>Gmail
-                                    </h4>
-                                    <div class="text-sm text-gray-300 space-y-1">
-                                        <p><strong>Servidor:</strong> smtp.gmail.com</p>
-                                        <p><strong>Porta:</strong> 587</p>
-                                        <p><strong>Segurança:</strong> TLS</p>
-                                        <p><strong>Dica:</strong> Use senha de aplicativo</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-4">
-                                <div>
-                                    <h4 class="font-medium text-gray-100 mb-2">
-                                        <i class="fas fa-envelope mr-2 text-green-400"></i>Outlook/Hotmail
-                                    </h4>
-                                    <div class="text-sm text-gray-300 space-y-1">
-                                        <p><strong>Servidor:</strong> smtp-mail.outlook.com</p>
-                                        <p><strong>Porta:</strong> 587</p>
-                                        <p><strong>Segurança:</strong> TLS</p>
-                                        <p><strong>Dica:</strong> Use senha normal</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                        <!-- Passo a Passo para E-mail Corporativo -->
+                        <div class="mb-8 p-6 bg-blue-900/20 border border-blue-500/30 rounded-lg">
                             <div class="flex items-start gap-3">
                                 <i class="fas fa-info-circle text-blue-400 text-lg mt-0.5"></i>
                                 <div>
-                                    <h4 class="font-medium text-blue-400 mb-1">Informação Importante</h4>
-                                    <p class="text-sm text-gray-300">
-                                        Para o Gmail, você precisa ativar a verificação em duas etapas e gerar uma senha de aplicativo específica. 
-                                        Esta é uma medida de segurança obrigatória.
-                                    </p>
+                                    <h4 class="font-medium text-blue-400 mb-2">📋 Passo a Passo: Configurar E-mail Corporativo</h4>
+                                    <div class="text-sm text-gray-300 space-y-3">
+                                        <div class="flex items-start gap-2">
+                                            <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded font-medium">1</span>
+                                            <div>
+                                                <p class="font-medium text-gray-100">Acesse o painel do seu provedor de e-mail</p>
+                                                <p>Ex: cPanel, Locaweb, UOL Host, GoDaddy, etc.</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-2">
+                                            <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded font-medium">2</span>
+                                            <div>
+                                                <p class="font-medium text-gray-100">Crie uma conta de e-mail para o sistema</p>
+                                                <p>Sugestões: <code class="bg-gray-700 px-2 py-1 rounded">noreply@suaempresa.com</code> ou <code class="bg-gray-700 px-2 py-1 rounded">sistema@suaempresa.com</code></p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-2">
+                                            <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded font-medium">3</span>
+                                            <div>
+                                                <p class="font-medium text-gray-100">Obtenha as configurações SMTP</p>
+                                                <p>Procure por "Configurações de E-mail" ou "SMTP" no painel</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-2">
+                                            <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded font-medium">4</span>
+                                            <div>
+                                                <p class="font-medium text-gray-100">Preencha os dados no formulário acima</p>
+                                                <p>Use as informações SMTP fornecidas pelo seu provedor</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Configurações por Provedor Corporativo -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                            <!-- Locaweb -->
+                            <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 bg-orange-500/20 rounded flex items-center justify-center mr-3">
+                                        <i class="fas fa-server text-orange-400"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-100">Locaweb</h4>
+                                </div>
+                                <div class="text-sm text-gray-300 space-y-1">
+                                    <p><strong>Servidor:</strong> <code class="bg-gray-800 px-2 py-1 rounded">smtp.seudominio.com.br</code></p>
+                                    <p><strong>Porta:</strong> <code class="bg-gray-800 px-2 py-1 rounded">587</code> ou <code class="bg-gray-800 px-2 py-1 rounded">465</code></p>
+                                    <p><strong>Segurança:</strong> TLS/SSL</p>
+                                    <p><strong>Usuário:</strong> E-mail completo</p>
+                                </div>
+                            </div>
+
+                            <!-- UOL Host -->
+                            <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 bg-purple-500/20 rounded flex items-center justify-center mr-3">
+                                        <i class="fas fa-server text-purple-400"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-100">UOL Host</h4>
+                                </div>
+                                <div class="text-sm text-gray-300 space-y-1">
+                                    <p><strong>Servidor:</strong> <code class="bg-gray-800 px-2 py-1 rounded">smtplw.com.br</code></p>
+                                    <p><strong>Porta:</strong> <code class="bg-gray-800 px-2 py-1 rounded">587</code></p>
+                                    <p><strong>Segurança:</strong> TLS</p>
+                                    <p><strong>Usuário:</strong> E-mail completo</p>
+                                </div>
+                            </div>
+
+                            <!-- cPanel Genérico -->
+                            <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 bg-green-500/20 rounded flex items-center justify-center mr-3">
+                                        <i class="fas fa-server text-green-400"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-100">cPanel (Genérico)</h4>
+                                </div>
+                                <div class="text-sm text-gray-300 space-y-1">
+                                    <p><strong>Servidor:</strong> <code class="bg-gray-800 px-2 py-1 rounded">mail.seudominio.com</code></p>
+                                    <p><strong>Porta:</strong> <code class="bg-gray-800 px-2 py-1 rounded">587</code> ou <code class="bg-gray-800 px-2 py-1 rounded">465</code></p>
+                                    <p><strong>Segurança:</strong> TLS/SSL</p>
+                                    <p><strong>Usuário:</strong> E-mail completo</p>
+                                </div>
+                            </div>
+
+                            <!-- Microsoft 365 -->
+                            <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 bg-blue-500/20 rounded flex items-center justify-center mr-3">
+                                        <i class="fab fa-microsoft text-blue-400"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-100">Microsoft 365</h4>
+                                </div>
+                                <div class="text-sm text-gray-300 space-y-1">
+                                    <p><strong>Servidor:</strong> <code class="bg-gray-800 px-2 py-1 rounded">smtp.office365.com</code></p>
+                                    <p><strong>Porta:</strong> <code class="bg-gray-800 px-2 py-1 rounded">587</code></p>
+                                    <p><strong>Segurança:</strong> TLS</p>
+                                    <p><strong>Usuário:</strong> E-mail completo</p>
+                                </div>
+                            </div>
+
+                            <!-- Google Workspace -->
+                            <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 bg-red-500/20 rounded flex items-center justify-center mr-3">
+                                        <i class="fab fa-google text-red-400"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-100">Google Workspace</h4>
+                                </div>
+                                <div class="text-sm text-gray-300 space-y-1">
+                                    <p><strong>Servidor:</strong> <code class="bg-gray-800 px-2 py-1 rounded">smtp.gmail.com</code></p>
+                                    <p><strong>Porta:</strong> <code class="bg-gray-800 px-2 py-1 rounded">587</code></p>
+                                    <p><strong>Segurança:</strong> TLS</p>
+                                    <p><strong>Dica:</strong> Use senha de aplicativo</p>
+                                </div>
+                            </div>
+
+                            <!-- Provedor Genérico -->
+                            <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 bg-gray-500/20 rounded flex items-center justify-center mr-3">
+                                        <i class="fas fa-server text-gray-400"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-100">Outro Provedor</h4>
+                                </div>
+                                <div class="text-sm text-gray-300 space-y-1">
+                                    <p><strong>Servidor:</strong> <code class="bg-gray-800 px-2 py-1 rounded">smtp.seudominio.com</code></p>
+                                    <p><strong>Porta:</strong> <code class="bg-gray-800 px-2 py-1 rounded">587</code> ou <code class="bg-gray-800 px-2 py-1 rounded">465</code></p>
+                                    <p><strong>Segurança:</strong> TLS/SSL</p>
+                                    <p><strong>Usuário:</strong> E-mail completo</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Como Encontrar as Configurações -->
+                        <div class="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-search text-yellow-400 text-lg mt-0.5"></i>
+                                <div>
+                                    <h4 class="font-medium text-yellow-400 mb-2">💡 Como Encontrar as Configurações SMTP no seu Provedor</h4>
+                                    <div class="text-sm text-gray-300 space-y-2">
+                                        <p><strong>1. Acesse o painel de controle</strong> da sua hospedagem</p>
+                                        <p><strong>2. Procure por:</strong> "E-mail", "Configurações de E-mail", "SMTP" ou "Contas de E-mail"</p>
+                                        <p><strong>3. Busque por:</strong> "Configurações do servidor", "Configurações SMTP" ou "Configurações de cliente de e-mail"</p>
+                                        <p><strong>4. Anote:</strong> Servidor SMTP, Porta, Tipo de segurança (TLS/SSL)</p>
+                                        <p><strong>5. Em caso de dúvida:</strong> Entre em contato com o suporte do seu provedor</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configurações Recomendadas -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                    <h4 class="font-medium text-green-400">✅ Boas Práticas</h4>
+                                </div>
+                                <div class="text-sm text-gray-300 space-y-2">
+                                    <p>• Use um e-mail dedicado (ex: sistema@empresa.com)</p>
+                                    <p>• Sempre use TLS/SSL para segurança</p>
+                                    <p>• Teste a configuração antes de ativar</p>
+                                    <p>• Mantenha as credenciais em local seguro</p>
+                                    <p>• Configure SPF/DKIM no seu domínio</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-exclamation-triangle text-red-400 mr-2"></i>
+                                    <h4 class="font-medium text-red-400">⚠️ Evite</h4>
+                                </div>
+                                <div class="text-sm text-gray-300 space-y-2">
+                                    <p>• Usar e-mails pessoais (Gmail/Hotmail)</p>
+                                    <p>• Conexões sem criptografia</p>
+                                    <p>• Senhas fracas ou reutilizadas</p>
+                                    <p>• E-mails com termos genéricos</p>
+                                    <p>• Deixar configurações abertas</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção Gmail/Hotmail (reduzida) -->
+                        <div class="mt-8 pt-6 border-t border-gray-700">
+                            <h4 class="text-lg font-medium text-gray-300 mb-4">
+                                <i class="fas fa-user mr-2 text-gray-400"></i>
+                                Configurações para E-mails Pessoais (Não Recomendado)
+                            </h4>
+                            <p class="text-sm text-gray-400 mb-4">
+                                <strong>Importante:</strong> Para uso profissional, recomendamos sempre usar e-mail corporativo. 
+                                As configurações abaixo são apenas para testes ou uso pessoal.
+                            </p>
+                            
+                            <details class="bg-gray-700 rounded-lg">
+                                <summary class="p-4 cursor-pointer text-gray-300 hover:text-white">
+                                    <i class="fas fa-chevron-right mr-2"></i>
+                                    Mostrar configurações Gmail/Hotmail (clique para expandir)
+                                </summary>
+                                <div class="p-4 border-t border-gray-600">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <h5 class="font-medium text-gray-200 mb-2">
+                                                <i class="fab fa-google mr-2 text-blue-400"></i>Gmail Pessoal
+                                            </h5>
+                                            <div class="text-sm text-gray-400 space-y-1">
+                                                <p><strong>Servidor:</strong> smtp.gmail.com</p>
+                                                <p><strong>Porta:</strong> 587</p>
+                                                <p><strong>Segurança:</strong> TLS</p>
+                                                <p><strong>Importante:</strong> Use senha de aplicativo</p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-medium text-gray-200 mb-2">
+                                                <i class="fab fa-microsoft mr-2 text-green-400"></i>Hotmail/Outlook
+                                            </h5>
+                                            <div class="text-sm text-gray-400 space-y-1">
+                                                <p><strong>Servidor:</strong> smtp-mail.outlook.com</p>
+                                                <p><strong>Porta:</strong> 587</p>
+                                                <p><strong>Segurança:</strong> TLS</p>
+                                                <p><strong>Usuário:</strong> E-mail completo</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </details>
                         </div>
                     </div>
 
