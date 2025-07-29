@@ -835,21 +835,59 @@ function fetchTemplate(id) {
 
 // Salvar template
 window.saveTemplate = function() {
-  console.log('🔍 [DEBUG] Função saveTemplate iniciada');
+  console.log('💾 [SAVE_DEBUG] ========== INICIANDO SAVE DEBUG ==========');
+  console.log('💾 [SAVE_DEBUG] Função saveTemplate iniciada');
   
   const name = document.getElementById('templateName').value.trim();
-  console.log('🔍 [DEBUG] Nome do template:', name);
+  console.log('💾 [SAVE_DEBUG] Nome do template:', name);
   
   if (!name) {
-    console.log('🔍 [DEBUG] Nome vazio - retornando');
+    console.log('💾 [SAVE_DEBUG] Nome vazio - retornando');
     alert('Por favor, informe o nome do template.');
     return;
   }
   
+  // 🔍 ANÁLISE DETALHADA DO HTML ATUAL NO EDITOR
   let htmlContent = editor.getHtml();
-  console.log('🔍 [DEBUG] HTML content obtido, tamanho:', htmlContent.length);
+  console.log('💾 [SAVE_DEBUG] ========== HTML OBTIDO DO EDITOR ==========');
+  console.log('💾 [SAVE_DEBUG] HTML content original (length):', htmlContent.length);
+  console.log('💾 [SAVE_DEBUG] HTML content preview:', htmlContent.substring(0, 200) + '...');
+  console.log('💾 [SAVE_DEBUG] HTML content completo:', htmlContent);
+  
+  // 🔍 ANÁLISE DOS ESTILOS ATUAIS
+  let cssContent = editor.getCss();
+  console.log('💾 [SAVE_DEBUG] ========== CSS OBTIDO DO EDITOR ==========');
+  console.log('💾 [SAVE_DEBUG] CSS content (length):', cssContent.length);
+  console.log('💾 [SAVE_DEBUG] CSS content:', cssContent);
+  
+  // 🔍 ANÁLISE DA ESTRUTURA DE COMPONENTES
+  const components = editor.getComponents();
+  console.log('💾 [SAVE_DEBUG] ========== COMPONENTES DO EDITOR ==========');
+  console.log('💾 [SAVE_DEBUG] Número de componentes:', components.length);
+  console.log('💾 [SAVE_DEBUG] Componentes:', components);
+  
+  // 🔧 LIMPEZA ANTERIOR (comentada para ver HTML original)
+  // console.log('🔧 [CLEAN] Limpando estrutura HTML...');
+  // htmlContent = htmlContent.replace(/<\/?body[^>]*>/gi, '');
+  // htmlContent = htmlContent.replace(/<\/?html[^>]*>/gi, '');
+  // htmlContent = htmlContent.replace(/<\/?head[^>]*>/gi, '');
+  
+  console.log('💾 [SAVE_DEBUG] ========== HTML APÓS LIMPEZA ==========');
+  console.log('💾 [SAVE_DEBUG] HTML após limpeza (length):', htmlContent.length);
+  console.log('💾 [SAVE_DEBUG] HTML após limpeza:', htmlContent);
+  
+  // 🔍 VERIFICAÇÃO DE ESTRUTURAS ESPECÍFICAS
+  const hasWrappers = htmlContent.includes('email-wrapper') || htmlContent.includes('email-container');
+  const hasGrapesIds = /id="i[a-z0-9]+"/gi.test(htmlContent);
+  const hasInlineStyles = htmlContent.includes('style=');
+  
+  console.log('💾 [SAVE_DEBUG] ========== ANÁLISE DE ESTRUTURA ==========');
+  console.log('💾 [SAVE_DEBUG] Tem wrappers email?', hasWrappers);
+  console.log('💾 [SAVE_DEBUG] Tem IDs GrapesJS?', hasGrapesIds);
+  console.log('💾 [SAVE_DEBUG] Tem estilos inline?', hasInlineStyles);
   
   // 🔧 CORREÇÃO: Limpar estrutura HTML incorreta
+  console.log('💾 [SAVE_DEBUG] ========== LIMPEZA DE HTML ==========');
   console.log('🔧 [CLEAN] Limpando estrutura HTML...');
   
   // Remover tags <body> incorretas que podem estar dentro do conteúdo
@@ -865,23 +903,25 @@ window.saveTemplate = function() {
   if (!htmlContent.includes('email-wrapper')) {
     if (!htmlContent.includes('email-container')) {
       htmlContent = `<div class="email-container">${htmlContent}</div>`;
-      console.log('🔍 [DEBUG] Container principal adicionado');
+      console.log('💾 [SAVE_DEBUG] Container principal adicionado');
     }
     htmlContent = `<div class="email-wrapper">${htmlContent}</div>`;
-    console.log('🔍 [DEBUG] Wrapper centralizado adicionado');
+    console.log('💾 [SAVE_DEBUG] Wrapper centralizado adicionado');
   }
   
+  console.log('💾 [SAVE_DEBUG] ========== HTML FINAL PARA SALVAR ==========');
   console.log('🔧 [CLEAN] HTML final, tamanho:', htmlContent.length);
   console.log('🔧 [CLEAN] HTML preview:', htmlContent.substring(0, 200) + '...');
+  console.log('💾 [SAVE_DEBUG] HTML final completo:', htmlContent);
   
   const type = document.getElementById('templateType').value || 'welcome';
-  console.log('🔍 [DEBUG] Tipo do template:', type);
+  console.log('💾 [SAVE_DEBUG] Tipo do template:', type);
   
   const token = localStorage.getItem('clientToken');
-  console.log('🔍 [DEBUG] Token encontrado:', token ? 'SIM' : 'NÃO');
+  console.log('💾 [SAVE_DEBUG] Token encontrado:', token ? 'SIM' : 'NÃO');
   
   if (!token) {
-    console.log('🔍 [DEBUG] Token não encontrado - retornando');
+    console.log('💾 [SAVE_DEBUG] Token não encontrado - retornando');
     return alert('Token não encontrado');
   }
   
@@ -890,7 +930,8 @@ window.saveTemplate = function() {
     htmlContent,
     type
   };
-  console.log('🔍 [DEBUG] Payload preparado:', payload);
+  console.log('💾 [SAVE_DEBUG] ========== PAYLOAD PARA API ==========');
+  console.log('💾 [SAVE_DEBUG] Payload preparado:', payload);
   
   let url = `${window.APP_CONFIG ? window.APP_CONFIG.API_URL : (window.API_URL || 'http://localhost:3000/api')}/email-templates`;
   let method = 'POST';
@@ -898,7 +939,7 @@ window.saveTemplate = function() {
     url += `/${templateId}`;
     method = 'PATCH';
   }
-  console.log('🔍 [DEBUG] URL e método:', { url, method });
+  console.log('💾 [SAVE_DEBUG] URL e método:', { url, method });
   
   const headers = {
     'Content-Type': 'application/json',
@@ -906,16 +947,18 @@ window.saveTemplate = function() {
   };
   
   // LOG: Exibir detalhes da requisição
+  console.log('💾 [SAVE_DEBUG] ========== REQUISIÇÃO PARA API ==========');
   console.log('[EMAIL TEMPLATE][REQUEST]', { url, method, headers, payload });
   
-  console.log('🔍 [DEBUG] Iniciando fetch...');
+  console.log('💾 [SAVE_DEBUG] Iniciando fetch...');
   fetch(url, {
     method,
     headers,
     body: JSON.stringify(payload)
   })
     .then(async res => {
-      console.log('🔍 [DEBUG] Resposta recebida, status:', res.status);
+      console.log('💾 [SAVE_DEBUG] ========== RESPOSTA DA API ==========');
+      console.log('💾 [SAVE_DEBUG] Resposta recebida, status:', res.status);
       const contentType = res.headers.get('content-type');
       let data;
       if (contentType && contentType.includes('application/json')) {
@@ -926,19 +969,23 @@ window.saveTemplate = function() {
       // LOG: Exibir resposta da API
       console.log('[EMAIL TEMPLATE][RESPONSE]', { status: res.status, data });
       if (!res.ok) {
-        console.log('🔍 [DEBUG] Erro na resposta - exibindo alerta');
+        console.log('💾 [SAVE_DEBUG] Erro na resposta - exibindo alerta');
         alert('Erro ao salvar template: ' + (data?.message || res.status));
         return;
       }
-      console.log('🔍 [DEBUG] Sucesso - exibindo alerta de sucesso');
+      console.log('💾 [SAVE_DEBUG] ========== SUCESSO NO SAVE ==========');
+      console.log('💾 [SAVE_DEBUG] Sucesso - exibindo alerta de sucesso');
       alert('Template salvo com sucesso!');
       // Redirecionar ou atualizar a página, se necessário
     })
     .catch((err) => {
-      console.log('🔍 [DEBUG] Erro de rede capturado:', err);
+      console.log('💾 [SAVE_DEBUG] ========== ERRO NO SAVE ==========');
+      console.log('💾 [SAVE_DEBUG] Erro de rede capturado:', err);
       console.error('[EMAIL TEMPLATE][NETWORK ERROR]', err);
       alert('Erro de rede ao salvar template. Veja o console para detalhes.');
     });
+  
+  console.log('💾 [SAVE_DEBUG] ========== FIM DO SAVE DEBUG ==========');
 }
 // Funções para teste de e-mail
 window.testEmail = function() {
