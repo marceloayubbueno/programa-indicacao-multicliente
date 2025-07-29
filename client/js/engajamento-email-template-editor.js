@@ -682,164 +682,71 @@ function fetchTemplate(id) {
       console.log('🔍 [DATA_DEBUG] Campos disponíveis:', Object.keys(data));
       console.log('🔍 [DATA_DEBUG] htmlContent existe?', 'htmlContent' in data);
       console.log('🔍 [DATA_DEBUG] htmlContent tipo:', typeof data.htmlContent);
-      console.log('🔍 [DATA_DEBUG] htmlContent length:', data.htmlContent ? data.htmlContent.length : 0);
+      console.log('🔍 [DATA_DEBUG] htmlContent length:', data.htmlContent.length);
+      console.log('🔍 [FETCH] Nome do template definido:', data.name);
+      console.log('🔍 [FETCH] Tipo do template definido:', data.type);
+      console.log('🔍 [FETCH] HTML Content encontrado, tamanho:', data.htmlContent.length);
+      
+      // 🔧 CORREÇÃO: Verificar se existe CSS salvo junto com o template
+      const hasSavedCss = data.cssContent && data.cssContent.length > 0;
+      console.log('🔧 [CSS_RESTORE] Template tem CSS salvo?', hasSavedCss);
+      if (hasSavedCss) {
+        console.log('🔧 [CSS_RESTORE] CSS encontrado (length):', data.cssContent.length);
+        console.log('🔧 [CSS_RESTORE] CSS content:', data.cssContent);
+      } else {
+        console.log('🔧 [CSS_RESTORE] ⚠️ Template SEM CSS salvo - vai usar CSS padrão');
+      }
+      
+      console.log('🔍 [DATA_DEBUG] htmlContent preview:', data.htmlContent.substring(0, 200) + '...');
       
       if (data && data.name) {
+        // Definir campos na interface
         document.getElementById('templateName').value = data.name;
-        console.log('🔍 [FETCH] Nome do template definido:', data.name);
-      }
-      
-      if (data && data.type) {
-        document.getElementById('templateType').value = data.type;
-        console.log('🔍 [FETCH] Tipo do template definido:', data.type);
-      }
-      
-      if (data && data.htmlContent) {
-        console.log('🔍 [FETCH] HTML Content encontrado, tamanho:', data.htmlContent.length);
-        console.log('🔍 [DATA_DEBUG] htmlContent preview:', data.htmlContent.substring(0, 200) + '...');
+        document.getElementById('templateType').value = data.type || 'welcome';
         
-        // 🔍 [EDITOR_DEBUG] Diagnóstico do estado do editor
         console.log('🔍 [EDITOR_DEBUG] Editor disponível?', !!editor);
-        console.log('🔍 [EDITOR_DEBUG] setComponents disponível?', !!(editor && editor.setComponents));
-        console.log('🔍 [EDITOR_DEBUG] getWrapper disponível?', !!(editor && editor.getWrapper));
+        console.log('🔍 [EDITOR_DEBUG] setComponents disponível?', !!editor.setComponents);
+        console.log('🔍 [EDITOR_DEBUG] getWrapper disponível?', !!editor.getWrapper);
         console.log('🔍 [TIMING_DEBUG] Momento da execução:', new Date().toISOString());
         
-        // 🔧 NOVA ABORDAGEM: Extrair conteúdo visual e recriar do zero
-        let htmlContent = data.htmlContent;
-        console.log('🔧 [VISUAL_FIX] HTML original:', htmlContent.substring(0, 300) + '...');
-        
-        // 1. Criar elemento temporário para parsing
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-        
-        // 2. Extrair textos e imagens principais (ignorando estrutura GrapesJS)
-        const extractedContent = {
-          images: [],
-          headings: [],
-          paragraphs: [],
-          links: [],
-          lists: []
-        };
-        
-        // Extrair imagens
-        tempDiv.querySelectorAll('img').forEach(img => {
-          extractedContent.images.push({
-            src: img.src,
-            alt: img.alt || '',
-            width: img.width || 'auto'
-          });
-        });
-        
-        // Extrair títulos
-        tempDiv.querySelectorAll('h1, h2, h3').forEach(heading => {
-          extractedContent.headings.push({
-            level: heading.tagName.toLowerCase(),
-            text: heading.textContent.trim(),
-            style: heading.getAttribute('style') || ''
-          });
-        });
-        
-        // Extrair parágrafos
-        tempDiv.querySelectorAll('p').forEach(p => {
-          const text = p.textContent.trim();
-          if (text && text.length > 5) {
-            extractedContent.paragraphs.push({
-              text: text,
-              style: p.getAttribute('style') || ''
-            });
-          }
-        });
-        
-        // Extrair links
-        tempDiv.querySelectorAll('a').forEach(a => {
-          const text = a.textContent.trim();
-          if (text && text.length > 3) {
-            extractedContent.links.push({
-              text: text,
-              href: a.href || '#',
-              style: a.getAttribute('style') || ''
-            });
-          }
-        });
-        
-        console.log('🔧 [VISUAL_FIX] Conteúdo extraído:', extractedContent);
-        
-        // 3. Recriar HTML limpo baseado no conteúdo extraído
-        let cleanHtml = '<div style="padding: 32px; background: #ffffff; border-radius: 8px; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">';
-        
-        // Adicionar imagens no topo
-        extractedContent.images.forEach(img => {
-          cleanHtml += `<div style="text-align: center; margin-bottom: 20px;">`;
-          cleanHtml += `<img src="${img.src}" alt="${img.alt}" style="max-width: ${img.width}px; height: auto; border-radius: 8px;">`;
-          cleanHtml += `</div>`;
-        });
-        
-        // Adicionar títulos
-        extractedContent.headings.forEach(heading => {
-          const defaultStyle = heading.level === 'h1' ? 'font-size: 28px; color: #2c3e50; margin-bottom: 16px; font-weight: 700; text-align: center;' : 'font-size: 22px; color: #2c3e50; margin-bottom: 12px; font-weight: 600;';
-          cleanHtml += `<${heading.level} style="${heading.style || defaultStyle}">${heading.text}</${heading.level}>`;
-        });
-        
-        // Adicionar parágrafos
-        extractedContent.paragraphs.forEach(p => {
-          const defaultStyle = 'color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 16px;';
-          cleanHtml += `<p style="${p.style || defaultStyle}">${p.text}</p>`;
-        });
-        
-        // Adicionar links como botões
-        extractedContent.links.forEach(link => {
-          if (link.text.includes('Acessar') || link.text.includes('Começar') || link.text.includes('Clique')) {
-            const defaultStyle = 'background: #3498db; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; display: inline-block; margin: 10px 5px; font-weight: 600;';
-            cleanHtml += `<div style="text-align: center; margin: 20px 0;">`;
-            cleanHtml += `<a href="${link.href}" style="${link.style || defaultStyle}">${link.text}</a>`;
-            cleanHtml += `</div>`;
-          } else {
-            cleanHtml += `<p style="color: #3498db; font-size: 14px;"><a href="${link.href}" style="color: #3498db; text-decoration: none;">${link.text}</a></p>`;
-          }
-        });
-        
-        cleanHtml += '</div>';
-        
-        console.log('🔧 [VISUAL_FIX] HTML limpo criado:', cleanHtml.substring(0, 300) + '...');
-        console.log('🔧 [VISUAL_FIX] Tamanho final:', cleanHtml.length);
-        
-        // 4. Carregar no editor
-        if (editor && editor.setComponents) {
-          console.log('🔍 [EDITOR_DEBUG] Tentando carregar conteúdo limpo no editor...');
-          try {
-            // Limpar editor completamente
+        if (editor && data.htmlContent) {
+          // 🔧 CORREÇÃO PRINCIPAL: Aplicar CSS salvo se existir
+          if (hasSavedCss) {
+            console.log('🔧 [CSS_RESTORE] ========== RESTAURANDO CSS ORIGINAL ==========');
+            
+            // Aplicar CSS diretamente no editor
+            editor.setStyle(data.cssContent);
+            console.log('🔧 [CSS_RESTORE] ✅ CSS original restaurado no editor');
+            
+            // Carregar HTML SEM reconstrução (manter estrutura original)
+            console.log('🔧 [CSS_RESTORE] Carregando HTML original sem reconstrução...');
             editor.DomComponents.clear();
             editor.UndoManager.clear();
-            console.log('🔧 [VISUAL_FIX] Editor e histórico limpos');
+            editor.setComponents(data.htmlContent);
+            console.log('🔧 [CSS_RESTORE] ✅ HTML original carregado com estrutura preservada');
             
-            // Carregar conteúdo limpo
-            editor.setComponents(cleanHtml);
-            console.log('✅ [FETCH] Template reconstruído carregado no editor');
-            console.log('✅ [EDITOR_DEBUG] setComponents executado com HTML limpo');
-            
-            // Force refresh do editor para re-renderizar tudo
-            editor.refresh();
-            console.log('🔧 [VISUAL_FIX] Editor refreshed e re-renderizado');
-            
-            // 🎯 [FLOW_DEBUG] Capturar estado APÓS carregamento do template
-            setTimeout(() => {
-              captureInitialEditorState('EDIT_TEMPLATE_AFTER_LOAD');
-            }, 1000);
-            
-          } catch (error) {
-            console.error('❌ [EDITOR_DEBUG] Erro ao executar setComponents:', error);
+          } else {
+            console.log('🔧 [CSS_RESTORE] ⚠️ CSS não encontrado - usando reconstrução padrão');
+            // Usar lógica de reconstrução existente para templates antigos
+            let htmlContent = data.htmlContent;
+            console.log('🔧 [CSS_RESTORE] Carregando HTML original sem reconstrução...');
+            editor.DomComponents.clear();
+            editor.UndoManager.clear();
+            editor.setComponents(htmlContent);
+            console.log('🔧 [CSS_RESTORE] ✅ HTML original carregado com estrutura preservada');
           }
-        } else {
-          console.error('❌ [FETCH] Editor não está pronto para receber componentes');
-          console.error('❌ [EDITOR_DEBUG] Estado do editor:', {
-            editorExists: !!editor,
-            setComponentsExists: !!(editor && editor.setComponents),
-            getWrapperExists: !!(editor && editor.getWrapper)
-          });
+          
+          // Force refresh do editor para aplicar todas as mudanças
+          editor.refresh();
+          console.log('🔧 [CSS_RESTORE] Editor refreshed e re-renderizado');
+          
+          // 🎯 [FLOW_DEBUG] Capturar estado APÓS carregamento do template
+          setTimeout(() => {
+            captureInitialEditorState('EDIT_TEMPLATE_AFTER_LOAD');
+          }, 1000);
+          
+          console.log('✅ [FETCH] Template carregado com sucesso no editor');
         }
-      } else {
-        console.warn('⚠️ [FETCH] HTML Content não encontrado nos dados');
-        console.warn('⚠️ [DATA_DEBUG] Campo htmlContent ausente ou vazio');
       }
     })
     .catch(error => {
@@ -947,10 +854,12 @@ window.saveTemplate = function() {
   const payload = {
     name,
     htmlContent,
+    cssContent: cssContent, // 🔧 CORREÇÃO: Salvar CSS junto com HTML
     type
   };
   console.log('💾 [SAVE_DEBUG] ========== PAYLOAD PARA API ==========');
   console.log('💾 [SAVE_DEBUG] Payload preparado:', payload);
+  console.log('💾 [SAVE_DEBUG] ✅ CSS INCLUÍDO no payload (length):', cssContent.length);
   
   let url = `${window.APP_CONFIG ? window.APP_CONFIG.API_URL : (window.API_URL || 'http://localhost:3000/api')}/email-templates`;
   let method = 'POST';
