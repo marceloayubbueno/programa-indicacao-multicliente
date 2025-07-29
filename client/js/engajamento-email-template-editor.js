@@ -687,61 +687,124 @@ function fetchTemplate(id) {
         console.log('🔍 [EDITOR_DEBUG] getWrapper disponível?', !!(editor && editor.getWrapper));
         console.log('🔍 [TIMING_DEBUG] Momento da execução:', new Date().toISOString());
         
-        // 🔧 CORREÇÃO APRIMORADA: Limpar e corrigir HTML antes de carregar
+        // 🔧 NOVA ABORDAGEM: Extrair conteúdo visual e recriar do zero
         let htmlContent = data.htmlContent;
-        console.log('🔧 [RENDER_FIX] HTML original:', htmlContent.substring(0, 300) + '...');
+        console.log('🔧 [VISUAL_FIX] HTML original:', htmlContent.substring(0, 300) + '...');
         
-        // 1. Remover estruturas problemáticas
-        htmlContent = htmlContent.replace(/<\/?body[^>]*>/gi, '');
-        htmlContent = htmlContent.replace(/<\/?html[^>]*>/gi, '');
-        htmlContent = htmlContent.replace(/<\/?head[^>]*>/gi, '');
-        console.log('🔧 [RENDER_FIX] Tags estruturais removidas');
+        // 1. Criar elemento temporário para parsing
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
         
-        // 2. Remover wrappers externos se existirem (para re-adicionar limpos)
-        htmlContent = htmlContent.replace(/<div\s+class=["']email-wrapper["'][^>]*>/gi, '');
-        htmlContent = htmlContent.replace(/<div\s+class=["']email-container["'][^>]*>/gi, '');
-        // Contar e remover </div> correspondentes do final
-        const wrapperCount = (htmlContent.match(/<\/div>\s*<\/div>\s*$/gi) || []).length;
-        if (wrapperCount > 0) {
-          htmlContent = htmlContent.replace(/<\/div>\s*<\/div>\s*$/gi, '');
-        } else {
-          // Se não achou no final, remover os últimos </div>
-          htmlContent = htmlContent.replace(/<\/div>\s*$/g, '').replace(/<\/div>\s*$/g, '');
-        }
-        console.log('🔧 [RENDER_FIX] Wrappers externos removidos');
+        // 2. Extrair textos e imagens principais (ignorando estrutura GrapesJS)
+        const extractedContent = {
+          images: [],
+          headings: [],
+          paragraphs: [],
+          links: [],
+          lists: []
+        };
         
-        // 3. Garantir que não tenha múltiplas camadas de wrapper
-        while (htmlContent.includes('email-wrapper') && htmlContent.includes('email-container')) {
-          htmlContent = htmlContent.replace(/<div[^>]*class=["'][^"']*email-wrapper[^"']*["'][^>]*>/gi, '');
-          htmlContent = htmlContent.replace(/<div[^>]*class=["'][^"']*email-container[^"']*["'][^>]*>/gi, '');
-          htmlContent = htmlContent.replace(/<\/div>\s*<\/div>\s*$/gi, '');
-        }
-        console.log('🔧 [RENDER_FIX] Múltiplas camadas removidas');
+        // Extrair imagens
+        tempDiv.querySelectorAll('img').forEach(img => {
+          extractedContent.images.push({
+            src: img.src,
+            alt: img.alt || '',
+            width: img.width || 'auto'
+          });
+        });
         
-        // 4. Adicionar estrutura limpa e correta
-        htmlContent = `<div class="email-container" style="background: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 600px; width: 100%; margin: 0 auto; overflow: hidden; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; position: relative;">${htmlContent}</div>`;
-        htmlContent = `<div class="email-wrapper" style="width: 100%; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden;">${htmlContent}</div>`;
+        // Extrair títulos
+        tempDiv.querySelectorAll('h1, h2, h3').forEach(heading => {
+          extractedContent.headings.push({
+            level: heading.tagName.toLowerCase(),
+            text: heading.textContent.trim(),
+            style: heading.getAttribute('style') || ''
+          });
+        });
         
-        console.log('🔧 [RENDER_FIX] HTML final:', htmlContent.substring(0, 300) + '...');
-        console.log('🔧 [RENDER_FIX] Tamanho final:', htmlContent.length);
+        // Extrair parágrafos
+        tempDiv.querySelectorAll('p').forEach(p => {
+          const text = p.textContent.trim();
+          if (text && text.length > 5) {
+            extractedContent.paragraphs.push({
+              text: text,
+              style: p.getAttribute('style') || ''
+            });
+          }
+        });
         
-        // Verificar se o editor está pronto
+        // Extrair links
+        tempDiv.querySelectorAll('a').forEach(a => {
+          const text = a.textContent.trim();
+          if (text && text.length > 3) {
+            extractedContent.links.push({
+              text: text,
+              href: a.href || '#',
+              style: a.getAttribute('style') || ''
+            });
+          }
+        });
+        
+        console.log('🔧 [VISUAL_FIX] Conteúdo extraído:', extractedContent);
+        
+        // 3. Recriar HTML limpo baseado no conteúdo extraído
+        let cleanHtml = '<div style="padding: 32px; background: #ffffff; border-radius: 8px; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">';
+        
+        // Adicionar imagens no topo
+        extractedContent.images.forEach(img => {
+          cleanHtml += `<div style="text-align: center; margin-bottom: 20px;">`;
+          cleanHtml += `<img src="${img.src}" alt="${img.alt}" style="max-width: ${img.width}px; height: auto; border-radius: 8px;">`;
+          cleanHtml += `</div>`;
+        });
+        
+        // Adicionar títulos
+        extractedContent.headings.forEach(heading => {
+          const defaultStyle = heading.level === 'h1' ? 'font-size: 28px; color: #2c3e50; margin-bottom: 16px; font-weight: 700; text-align: center;' : 'font-size: 22px; color: #2c3e50; margin-bottom: 12px; font-weight: 600;';
+          cleanHtml += `<${heading.level} style="${heading.style || defaultStyle}">${heading.text}</${heading.level}>`;
+        });
+        
+        // Adicionar parágrafos
+        extractedContent.paragraphs.forEach(p => {
+          const defaultStyle = 'color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 16px;';
+          cleanHtml += `<p style="${p.style || defaultStyle}">${p.text}</p>`;
+        });
+        
+        // Adicionar links como botões
+        extractedContent.links.forEach(link => {
+          if (link.text.includes('Acessar') || link.text.includes('Começar') || link.text.includes('Clique')) {
+            const defaultStyle = 'background: #3498db; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; display: inline-block; margin: 10px 5px; font-weight: 600;';
+            cleanHtml += `<div style="text-align: center; margin: 20px 0;">`;
+            cleanHtml += `<a href="${link.href}" style="${link.style || defaultStyle}">${link.text}</a>`;
+            cleanHtml += `</div>`;
+          } else {
+            cleanHtml += `<p style="color: #3498db; font-size: 14px;"><a href="${link.href}" style="color: #3498db; text-decoration: none;">${link.text}</a></p>`;
+          }
+        });
+        
+        cleanHtml += '</div>';
+        
+        console.log('🔧 [VISUAL_FIX] HTML limpo criado:', cleanHtml.substring(0, 300) + '...');
+        console.log('🔧 [VISUAL_FIX] Tamanho final:', cleanHtml.length);
+        
+        // 4. Carregar no editor
         if (editor && editor.setComponents) {
-          console.log('🔍 [EDITOR_DEBUG] Tentando carregar conteúdo no editor...');
+          console.log('🔍 [EDITOR_DEBUG] Tentando carregar conteúdo limpo no editor...');
           try {
-            // Limpar editor primeiro
+            // Limpar editor completamente
             editor.DomComponents.clear();
-            console.log('🔧 [RENDER_FIX] Editor limpo');
+            editor.UndoManager.clear();
+            console.log('🔧 [VISUAL_FIX] Editor e histórico limpos');
             
-            // Carregar novo conteúdo
-            editor.setComponents(htmlContent);
-            console.log('✅ [FETCH] Template carregado no editor com sucesso');
-            console.log('✅ [EDITOR_DEBUG] setComponents executado com sucesso');
+            // Carregar conteúdo limpo
+            editor.setComponents(cleanHtml);
+            console.log('✅ [FETCH] Template reconstruído carregado no editor');
+            console.log('✅ [EDITOR_DEBUG] setComponents executado com HTML limpo');
             
-            // Forçar atualização da canvas
+            // Forçar atualização completa
             setTimeout(() => {
               editor.refresh();
-              console.log('🔧 [RENDER_FIX] Editor refreshed');
+              editor.render();
+              console.log('🔧 [VISUAL_FIX] Editor refreshed e re-renderizado');
             }, 500);
             
           } catch (error) {
