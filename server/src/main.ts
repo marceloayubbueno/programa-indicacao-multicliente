@@ -90,6 +90,7 @@ async function bootstrap() {
       { path: 'js/*', method: RequestMethod.GET },
       { path: 'css/*', method: RequestMethod.GET },
       { path: 'assets/*', method: RequestMethod.GET },
+      { path: 'favicon.ico', method: RequestMethod.GET },
     ],
   });
   
