@@ -480,6 +480,15 @@ function initializeEditor() {
     return;
   }
   
+  // 🔧 CORREÇÃO: Chamar fetchTemplate diretamente se templateId existe
+  if (templateId) {
+    console.log('🚀 [CORREÇÃO] Chamando fetchTemplate diretamente - templateId:', templateId);
+    // Aguardar um pouco para garantir que o editor esteja pronto
+    setTimeout(() => {
+      fetchTemplate(templateId);
+    }, 1000);
+  }
+  
   // Aguardar o editor estar pronto
   editor.on('load', () => {
     console.log('✅ [INIT] Editor GrapesJS carregado');
@@ -525,7 +534,12 @@ function initializeEditor() {
       if (wrapper && wrapper.getComponents && wrapper.getComponents().length === 0) {
         console.log('🔧 [INIT] Aplicando fallback...');
         console.log('🔍 [TIMING_DEBUG] Wrapper encontrado mas sem componentes');
-        if (wrapper.set) {
+        
+        // 🔧 CORREÇÃO: Se templateId existe no fallback, chamar fetchTemplate
+        if (templateId) {
+          console.log('🚀 [FALLBACK_CORREÇÃO] Chamando fetchTemplate via fallback - templateId:', templateId);
+          fetchTemplate(templateId);
+        } else if (wrapper.set) {
           wrapper.set('content', `
             <div style="padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin: 20px;">
               <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 16px;">Editor Carregado</h2>
@@ -1014,7 +1028,7 @@ editor.BlockManager.add('welcome-coinbase', {
       <div style="padding:32px 32px 0 32px; text-align:center;">
         <h2 style="color:#232c3d; font-size:26px; margin-bottom:10px; font-weight:700;">Bem-vindo(a), {{nome}}!</h2>
         <p style="color:#555; font-size:15px; margin-bottom:20px;">Você acaba de dar o primeiro passo para aproveitar todos os benefícios do nosso programa.<br>Confira seu acesso exclusivo abaixo:</p>
-        <a href="{{linkAcesso}}" style="background:#232c3d; color:#fff; padding:14px 32px; border-radius:8px; font-weight:bold; font-size:17px; text-decoration:none; display:inline-block; margin-bottom:18px;">Acessar minha área exclusiva</a>
+        <a href="{{linkAcesso}}" style="background:#232c3d; color:#fff; padding:14px 36px; border-radius:8px; font-weight:bold; font-size:17px; text-decoration:none; display:inline-block; margin-bottom:18px;">Acessar minha área exclusiva</a>
       </div>
       <div style="padding:0 32px; margin-top:18px;">
         <div style="background:#f8f9fa; border-radius:8px; padding:14px 18px; color:#232c3d; font-size:14px; display:flex; gap:18px; justify-content:center;">
