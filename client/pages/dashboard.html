@@ -9,50 +9,11 @@
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
     <div class="flex min-h-screen">
-      <!-- Sidebar -->
-      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
-        <div class="flex items-center mb-8">
-          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
-        </div>
-        <ul class="space-y-2 flex-1">
-          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
-          <li><a href="my-data.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
-          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
-          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> LP de Indicadores</a></li>
-          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
-          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> LP de divulgação</a></li>
-          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
-          <li>
-            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementMenu()">
-              <i class="fas fa-chart-bar mr-2"></i> Engajamentos
-              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementArrow" style="transform: rotate(0deg);"></i>
-            </div>
-            <ul id="engagementMenu" class="ml-8 mt-1 space-y-1 hidden">
-              <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail Marketing</a></li>
-              <li><a href="engajamento-email-campaigns.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> E-mail de Campanha</a></li>
-              <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
-            </ul>
-          </li>
-          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de Leads</a></li>
-          <!-- Início do novo menu Financeiro -->
-          <li>
-            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleFinanceMenu()">
-              <i class="fas fa-wallet mr-2"></i> Financeiro
-              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="financeArrow" style="transform: rotate(0deg);"></i>
-            </div>
-            <ul id="financeMenu" class="ml-8 mt-1 space-y-1 hidden">
-              <li><a href="carteira.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-piggy-bank mr-2"></i> Carteira</a></li>
-              <li><a href="payments.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
-            </ul>
-          </li>
-          <!-- Fim do novo menu Financeiro -->
-          <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
-          <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
-        </ul>
-      </nav>
-      <!-- Main Content -->
-      <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
-        <div class="flex-1 flex flex-col">
+        <!-- Sidebar -->
+        <div id="sidebar-container"></div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
           <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
             <h1 class="text-3xl font-bold text-blue-400">Dashboard</h1>
             <div class="flex items-center gap-4">
@@ -61,94 +22,113 @@
             </div>
           </header>
           <main class="flex-1 p-8">
-            <!-- Cards -->
+            <!-- Cards de Estatísticas -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
-                <span class="text-gray-400 text-sm mb-2">Campanhas Ativas</span>
-                <span class="text-2xl font-bold text-gray-100">0</span>
-              </div>
-              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
-                <span class="text-gray-400 text-sm mb-2">Total de Participantes</span>
-                <span class="text-2xl font-bold text-gray-100">0</span>
-              </div>
-              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
-                <span class="text-gray-400 text-sm mb-2">Indicações Recebidas</span>
-                <span class="text-2xl font-bold text-gray-100">0</span>
-              </div>
-              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
-                <span class="text-gray-400 text-sm mb-2">Recompensas Pagas</span>
-                <span class="text-2xl font-bold text-gray-100">R$ 0,00</span>
-              </div>
-            </div>
-            <!-- Gráficos -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div class="bg-gray-800 rounded-xl p-6 shadow border-none flex flex-col">
-                <h3 class="text-lg font-semibold text-gray-100 mb-4">Indicações por Campanha</h3>
-                <div id="campaignChart" class="flex-1 flex items-center justify-center text-gray-500">[Gráfico aqui]</div>
-              </div>
-              <div class="bg-gray-800 rounded-xl p-6 shadow border-none flex flex-col">
-                <h3 class="text-lg font-semibold text-gray-100 mb-4">Conversão de Indicações</h3>
-                <div id="conversionChart" class="flex-1 flex items-center justify-center text-gray-500">[Gráfico aqui]</div>
-              </div>
-            </div>
-            <!-- Atividade Recente -->
-            <div class="bg-gray-800 rounded-xl p-6 shadow border-none">
-              <h3 class="text-lg font-semibold text-gray-100 mb-4">Atividade Recente</h3>
-              <div class="divide-y divide-gray-700">
-                <div class="flex items-center gap-4 py-4">
-                  <span class="text-2xl">📊</span>
-                  <div class="flex-1">
-                    <p class="text-gray-100">Nova campanha criada: "Indique e Ganhe"</p>
-                    <small class="text-gray-400">Há 2 horas</small>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <div class="flex items-center">
+                  <div class="p-3 rounded-full bg-blue-600 text-white">
+                    <i class="fas fa-users text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-gray-400 text-sm">Total Participantes</p>
+                    <p class="text-3xl font-bold text-gray-100">125</p>
+                    <p class="text-green-400 text-sm"><i class="fas fa-arrow-up"></i> +12% desde ontem</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-4 py-4">
-                  <span class="text-2xl">👥</span>
-                  <div class="flex-1">
-                    <p class="text-gray-100">Novo participante registrado</p>
-                    <small class="text-gray-400">Há 3 horas</small>
+              </div>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <div class="flex items-center">
+                  <div class="p-3 rounded-full bg-green-600 text-white">
+                    <i class="fas fa-user-plus text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-gray-400 text-sm">Novos este mês</p>
+                    <p class="text-3xl font-bold text-gray-100">23</p>
+                    <p class="text-green-400 text-sm"><i class="fas fa-arrow-up"></i> +18% vs. mês passado</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-4 py-4">
-                  <span class="text-2xl">🎁</span>
-                  <div class="flex-1">
-                    <p class="text-gray-100">Recompensa paga para João Silva</p>
-                    <small class="text-gray-400">Há 5 horas</small>
+              </div>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <div class="flex items-center">
+                  <div class="p-3 rounded-full bg-purple-600 text-white">
+                    <i class="fas fa-chart-line text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-gray-400 text-sm">Taxa de Conversão</p>
+                    <p class="text-3xl font-bold text-gray-100">12.5%</p>
+                    <p class="text-red-400 text-sm"><i class="fas fa-arrow-down"></i> -2.3% vs. mês passado</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <div class="flex items-center">
+                  <div class="p-3 rounded-full bg-yellow-600 text-white">
+                    <i class="fas fa-gift text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-gray-400 text-sm">Recompensas Entregues</p>
+                    <p class="text-3xl font-bold text-gray-100">87</p>
+                    <p class="text-green-400 text-sm"><i class="fas fa-arrow-up"></i> +5% vs. mês passado</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Gráficos e outras seções podem ser adicionadas aqui -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <h3 class="text-xl font-bold text-gray-100 mb-4">Participantes por Mês</h3>
+                <div class="h-64 flex items-center justify-center text-gray-400">
+                  <i class="fas fa-chart-area text-4xl mr-4"></i>
+                  <span>Gráfico será implementado aqui</span>
+                </div>
+              </div>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <h3 class="text-xl font-bold text-gray-100 mb-4">Últimas Atividades</h3>
+                <div class="space-y-4">
+                  <div class="flex items-center p-3 bg-gray-700 rounded-lg">
+                    <div class="p-2 rounded-full bg-blue-600 text-white mr-3">
+                      <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div>
+                      <p class="text-gray-100 font-medium">Novo participante registrado</p>
+                      <p class="text-gray-400 text-sm">há 2 horas</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center p-3 bg-gray-700 rounded-lg">
+                    <div class="p-2 rounded-full bg-green-600 text-white mr-3">
+                      <i class="fas fa-gift"></i>
+                    </div>
+                    <div>
+                      <p class="text-gray-100 font-medium">Recompensa entregue</p>
+                      <p class="text-gray-400 text-sm">há 4 horas</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center p-3 bg-gray-700 rounded-lg">
+                    <div class="p-2 rounded-full bg-purple-600 text-white mr-3">
+                      <i class="fas fa-rocket"></i>
+                    </div>
+                    <div>
+                      <p class="text-gray-100 font-medium">Nova campanha criada</p>
+                      <p class="text-gray-400 text-sm">há 1 dia</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </main>
         </div>
-      </div>
     </div>
-    <script src="../js/config.js"></script>
-    <script src="../js/dashboard.js"></script>
-    <script src="../js/auth.js"></script>
-    <script>checkAuth();
-    // Script para expandir/colapsar o menu Financeiro
-    function toggleFinanceMenu() {
-      const menu = document.getElementById('financeMenu');
-      const arrow = document.getElementById('financeArrow');
-      menu.classList.toggle('hidden');
-      if (menu.classList.contains('hidden')) {
-        arrow.style.transform = 'rotate(0deg)';
-      } else {
-        arrow.style.transform = 'rotate(90deg)';
-      }
-    }
 
-    // Toggle Engagement Menu
-    function toggleEngagementMenu() {
-      const menu = document.getElementById('engagementMenu');
-      const arrow = document.getElementById('engagementArrow');
-      menu.classList.toggle('hidden');
-      if (menu.classList.contains('hidden')) {
-        arrow.style.transform = 'rotate(0deg)';
-      } else {
-        arrow.style.transform = 'rotate(90deg)';
-      }
-    }
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/shared-menu.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        // Verificar autenticação
+        checkAuth();
+        
+        // Inicializar menu com página ativa
+        initSharedMenu('dashboard');
     </script>
 </body>
 </html> 

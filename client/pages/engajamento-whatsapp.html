@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurações - Área do Cliente</title>
+    <title>Engajamentos WhatsApp - Área do Cliente</title>
     <link rel="stylesheet" href="../css/tailwind.output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -15,38 +15,43 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
             <header class="px-8 py-6 bg-gray-900 flex items-center shadow-sm">
-                <h1 class="text-3xl font-bold text-blue-400">Configurações</h1>
+                <h1 class="text-3xl font-bold text-blue-400">
+                    <i class="fab fa-whatsapp mr-3"></i>Engajamentos WhatsApp
+                </h1>
             </header>
             <main class="flex-1 p-8 flex items-center justify-center">
                 <div class="text-center max-w-md">
                     <div class="mb-8">
-                        <i class="fas fa-cog text-8xl text-blue-400 mb-4"></i>
+                        <i class="fab fa-whatsapp text-8xl text-green-400 mb-4"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-100 mb-4">Central de Configurações</h2>
+                    <h2 class="text-2xl font-bold text-gray-100 mb-4">Em Construção</h2>
                     <p class="text-gray-400 text-lg mb-6">
-                        Use o menu lateral para acessar as diferentes opções de configuração disponíveis.
+                        A funcionalidade de Engajamentos WhatsApp está sendo desenvolvida e estará disponível em breve.
                     </p>
                     <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-                        <h3 class="text-lg font-semibold text-blue-400 mb-3">Configurações Disponíveis:</h3>
+                        <h3 class="text-lg font-semibold text-blue-400 mb-3">Funcionalidades Planejadas:</h3>
                         <ul class="text-left text-gray-300 space-y-2">
                             <li class="flex items-center">
-                                <i class="fas fa-user text-blue-400 mr-2"></i>
-                                Meus Dados - Informações pessoais
+                                <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                Campanhas de WhatsApp automatizadas
                             </li>
                             <li class="flex items-center">
-                                <i class="fas fa-envelope text-green-400 mr-2"></i>
-                                Configuração de E-mail
+                                <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                Templates de mensagens personalizáveis
                             </li>
                             <li class="flex items-center">
-                                <i class="fab fa-whatsapp text-green-400 mr-2"></i>
-                                Configuração de WhatsApp
+                                <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                Fluxos de conversa inteligentes
                             </li>
                             <li class="flex items-center">
-                                <i class="fas fa-plug text-purple-400 mr-2"></i>
-                                Configuração de Integrações
+                                <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                Relatórios de engajamento
                             </li>
                         </ul>
                     </div>
+                    <button onclick="window.history.back()" class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
                 </div>
             </main>
         </div>
@@ -56,8 +61,11 @@
     <script src="../js/auth.js"></script>
     <script src="../js/shared-menu.js"></script>
     <script>
+        // Verificar autenticação
         checkAuth();
-        initSharedMenu('configuracoes');
+        
+        // Inicializar menu com página ativa
+        initSharedMenu('engajamento-whatsapp');
     </script>
 </body>
 </html> 
