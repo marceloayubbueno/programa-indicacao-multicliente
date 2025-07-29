@@ -697,7 +697,51 @@ function fetchTemplate(id) {
         console.log('🔧 [CSS_RESTORE] ⚠️ Template SEM CSS salvo - vai usar CSS padrão');
       }
       
-      console.log('🔍 [DATA_DEBUG] htmlContent preview:', data.htmlContent.substring(0, 200) + '...');
+      // 🔧 NOVA ABORDAGEM: Verificar CSS embebido no HTML
+      let embeddedCss = null;
+      let cleanHtml = data.htmlContent;
+      
+      if (!hasSavedCss && data.htmlContent.includes('<style')) {
+        console.log('🔧 [CSS_EXTRACT] ========== EXTRAINDO CSS EMBEBIDO ==========');
+        
+        // Extrair CSS de tags <style>
+        const styleRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+        const styleMatches = data.htmlContent.match(styleRegex);
+        
+        if (styleMatches && styleMatches.length > 0) {
+          console.log('🔧 [CSS_EXTRACT] Tags <style> encontradas:', styleMatches.length);
+          
+          // Extrair conteúdo CSS
+          embeddedCss = '';
+          styleMatches.forEach((styleTag, index) => {
+            const cssMatch = styleTag.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+            if (cssMatch && cssMatch[1]) {
+              embeddedCss += cssMatch[1].trim() + '\n';
+              console.log(`🔧 [CSS_EXTRACT] CSS extraído ${index + 1}:`, cssMatch[1].substring(0, 100) + '...');
+            }
+          });
+          
+          // Remover tags <style> do HTML
+          cleanHtml = data.htmlContent.replace(styleRegex, '');
+          console.log('🔧 [CSS_EXTRACT] ✅ CSS extraído (length):', embeddedCss.length);
+          console.log('🔧 [CSS_EXTRACT] ✅ Tags <style> removidas do HTML');
+          console.log('🔧 [CSS_EXTRACT] HTML limpo (length):', cleanHtml.length);
+        } else {
+          console.log('🔧 [CSS_EXTRACT] ⚠️ Tags <style> não encontradas ou vazias');
+        }
+      }
+      
+      const finalCss = hasSavedCss ? data.cssContent : embeddedCss;
+      const hasFinalCss = finalCss && finalCss.length > 50;
+      
+      console.log('🔧 [CSS_FINAL] ========== CSS FINAL PARA APLICAR ==========');
+      console.log('🔧 [CSS_FINAL] Tem CSS para aplicar?', hasFinalCss);
+      if (hasFinalCss) {
+        console.log('🔧 [CSS_FINAL] CSS final (length):', finalCss.length);
+        console.log('🔧 [CSS_FINAL] CSS final content:', finalCss.substring(0, 200) + '...');
+      }
+      
+      console.log('🔍 [DATA_DEBUG] htmlContent preview:', cleanHtml.substring(0, 200) + '...');
       
       if (data && data.name) {
         // Definir campos na interface
@@ -711,24 +755,24 @@ function fetchTemplate(id) {
         
         if (editor && data.htmlContent) {
           // 🔧 CORREÇÃO PRINCIPAL: Aplicar CSS salvo se existir
-          if (hasSavedCss) {
+          if (hasFinalCss) {
             console.log('🔧 [CSS_RESTORE] ========== RESTAURANDO CSS ORIGINAL ==========');
             
             // Aplicar CSS diretamente no editor
-            editor.setStyle(data.cssContent);
+            editor.setStyle(finalCss);
             console.log('🔧 [CSS_RESTORE] ✅ CSS original restaurado no editor');
             
             // Carregar HTML SEM reconstrução (manter estrutura original)
             console.log('🔧 [CSS_RESTORE] Carregando HTML original sem reconstrução...');
             editor.DomComponents.clear();
             editor.UndoManager.clear();
-            editor.setComponents(data.htmlContent);
+            editor.setComponents(cleanHtml);
             console.log('🔧 [CSS_RESTORE] ✅ HTML original carregado com estrutura preservada');
             
           } else {
-            console.log('🔧 [CSS_RESTORE] ⚠️ CSS não encontrado - usando reconstrução padrão');
-            // Usar lógica de reconstrução existente para templates antigos
-            let htmlContent = data.htmlContent;
+            console.log('🔧 [CSS_RESTORE] ⚠️ CSS não encontrado - usando carregamento padrão');
+            // Usar HTML original sem reconstrução para templates antigos
+            let htmlContent = cleanHtml;
             console.log('🔧 [CSS_RESTORE] Carregando HTML original sem reconstrução...');
             editor.DomComponents.clear();
             editor.UndoManager.clear();
@@ -825,6 +869,23 @@ window.saveTemplate = function() {
   htmlContent = htmlContent.replace(/<\/?head[^>]*>/gi, '');
   console.log('🔧 [CLEAN] Tags estruturais removidas');
   
+  // 🔧 NOVA ABORDAGEM: Embebir CSS no HTML para compatibilidade total
+  if (cssContent && cssContent.length > 50) {
+    console.log('🔧 [CSS_EMBED] ========== EMBEBINDO CSS NO HTML ==========');
+    console.log('🔧 [CSS_EMBED] CSS length:', cssContent.length);
+    
+    // Criar tag <style> com CSS
+    const styleTag = `<style type="text/css">\n${cssContent}\n</style>\n`;
+    console.log('🔧 [CSS_EMBED] Style tag criada (length):', styleTag.length);
+    
+    // Embebir CSS no início do HTML
+    htmlContent = styleTag + htmlContent;
+    console.log('🔧 [CSS_EMBED] ✅ CSS embebido no HTML');
+    console.log('🔧 [CSS_EMBED] HTML com CSS (length):', htmlContent.length);
+  } else {
+    console.log('🔧 [CSS_EMBED] ⚠️ CSS muito pequeno ou inexistente - não embebido');
+  }
+  
   // Garantir que o conteúdo tenha a estrutura centralizada completa
   if (!htmlContent.includes('email-wrapper')) {
     if (!htmlContent.includes('email-container')) {
@@ -854,12 +915,11 @@ window.saveTemplate = function() {
   const payload = {
     name,
     htmlContent,
-    cssContent: cssContent, // 🔧 CORREÇÃO: Salvar CSS junto com HTML
     type
   };
   console.log('💾 [SAVE_DEBUG] ========== PAYLOAD PARA API ==========');
   console.log('💾 [SAVE_DEBUG] Payload preparado:', payload);
-  console.log('💾 [SAVE_DEBUG] ✅ CSS INCLUÍDO no payload (length):', cssContent.length);
+  console.log('💾 [SAVE_DEBUG] ✅ CSS EMBEBIDO no HTML (não precisa campo separado)');
   
   let url = `${window.APP_CONFIG ? window.APP_CONFIG.API_URL : (window.API_URL || 'http://localhost:3000/api')}/email-templates`;
   let method = 'POST';
