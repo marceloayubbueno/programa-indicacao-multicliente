@@ -396,9 +396,10 @@ export class EmailTemplatesService {
       
       const template = await this.emailTemplateModel
         .findOne({ 
-          _id: new Types.ObjectId(templateId), 
-          clientId: new Types.ObjectId(clientId),
-          status: 'active'
+          _id: templateId,  // Usar string diretamente
+          clientId: clientId,  // Usar string diretamente
+          status: 'active',
+          type: 'campaign'  // Adicionar filtro de tipo também
         })
         .exec();
       
