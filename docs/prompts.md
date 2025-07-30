@@ -35,11 +35,17 @@ Esta seção define a "personalidade" e as regras não negociáveis da nossa IA 
 - **Estratégia de Testes:** Para cada solução proposta, forneça também uma estratégia de testes e validação.
 - **Edições Cirúrgicas:** Ao sugerir mudanças em arquivos existentes, mostre apenas as linhas relevantes que precisam ser alteradas, usando `// ... existing code ...` para omitir o resto.
 
-#### 5. Comunicação e Formato
+#### 5. Dependências e Inicialização
+- **Mapeamento de Dependências:** Sempre verifique se todos os scripts necessários estão incluídos nas páginas HTML antes de usar suas funções/classes.
+- **Ordem de Carregamento:** Garanta que dependências sejam carregadas antes dos scripts que as utilizam (ex: api-client.js antes de scripts que usam window.apiClient).
+- **Inicialização Defensiva:** Use verificações typeof e DOMContentLoaded para garantir que objetos existam antes de serem usados.
+- **Debug Sistemático:** Em caso de erro, sempre verifique console.error, network logs e undefined objects primeiro.
+
+#### 6. Comunicação e Formato
 - **Explicações Técnicas:** Forneça explicações detalhadas sobre *como* e *por que* seu código funciona, não apenas *o que* ele faz.
 - **Visão Geral Primeiro:** Sempre dê um resumo do problema e da solução no início da sua resposta, antes de mergulhar nos detalhes técnicos.
 
-#### 6. Adaptação ao Projeto
+#### 7. Adaptação ao Projeto
 - **Reutilize Antes de Adicionar:** Antes de sugerir bibliotecas externas, verifique se a funcionalidade pode ser implementada com o que já existe no projeto.
 - **Consciência de Ambiente:** Considere os diferentes ambientes (desenvolvimento, teste, produção) ao propor soluções.
 - **Análise Pós-Implementação:** Após implementar uma solução, forneça uma análise crítica sobre possíveis melhorias futuras ou otimizações.
@@ -80,7 +86,11 @@ Este prompt força uma análise estruturada em vez de um "conserto" apressado.
 > **Sua Missão:** Você atuará como um detetive de software. Sua tarefa é analisar, identificar a causa raiz e corrigir um bug, seguindo estritamente as nossas Diretrizes Fundamentais.
 > 
 > **Workflow Obrigatório:**
-> 1.  **Análise e Hipóteses:** Com base no problema descrito, analise o(s) arquivo(s) de contexto (`@`) e liste de 3 a 5 hipóteses distintas sobre a possível causa raiz do bug.
+> 1.  **Análise e Hipóteses:** Com base no problema descrito, analise o(s) arquivo(s) de contexto (`@`) e liste de 3 a 5 hipóteses distintas sobre a possível causa raiz do bug. **OBRIGATÓRIO verificar:**
+>     - **Dependências Frontend:** Se todos os scripts necessários estão incluídos (ex: api-client.js antes dos scripts que o utilizam)
+>     - **Ordem de Carregamento:** Se classes/objetos são criados antes de serem usados (ex: APIClient deve existir antes de window.apiClient.method())
+>     - **Inicialização Segura:** Se há verificações typeof/undefined antes de instanciar objetos
+>     - **Erros de Console:** Console.error, network failures, undefined objects nos logs do navegador
 > 2.  **Plano de Diagnóstico:** Para cada hipótese, descreva que tipo de `console.log` ou verificação você adicionaria para confirmar ou refutar a hipótese.
 > 3.  **Aguarde Confirmação:** Pare e aguarde minha aprovação para inserir os logs.
 > 4.  **Implementação da Correção:** Após a análise dos logs, proponha um plano de correção. Após minha aprovação, implemente a correção.
@@ -137,6 +147,8 @@ Este template orquestra a criação de uma nova funcionalidade do zero, garantin
 >     *   As principais funções, componentes, ou classes a serem adicionados.
 >     *   Qualquer mudança necessária no schema do banco de dados ou em variáveis de ambiente.
 >     *   Uma estratégia de teste para a nova funcionalidade.
+>     *   **Dependências Frontend:** Lista completa de scripts necessários e ordem de carregamento (ex: config.js → api-client.js → auth.js → feature.js)
+>     *   **Inicialização Segura:** Como garantir que objetos/classes existem antes de serem usados (verificações typeof, DOMContentLoaded, etc.)
 > 3.  **Aguarde Aprovação:** Pare e aguarde minha aprovação do plano. **NÃO ESCREVA NENHUM CÓDIGO DE IMPLEMENTAÇÃO AINDA.**
 > 
 > **Workflow Obrigatório (Fase 2: Execução, após aprovação do plano):**
@@ -299,11 +311,12 @@ Focado em analisar, entender e evoluir funcionalidades que já possuem uma base 
 > - **Documentação de Mudanças:** Documente todas as extensões e modificações
 > 
 > **Análise Obrigatória:**
-> - Frontend: Componentes, estilos, JS modules, fluxos de UX
+> - Frontend: Componentes, estilos, JS modules, fluxos de UX, **dependências de scripts e ordem de carregamento**
 > - Backend: Controllers, services, DTOs, validações, middlewares
 > - Database: Schemas, relacionamentos, indexes, migrations necessárias
 > - Integrations: APIs, email templates, external services
 > - Security: Autenticação, autorização, validações de dados
+> - **Inicialização:** Verificar se objetos/classes são criados antes de serem usados, tratamento de undefined/null
 > 
 > **Segurança Máxima:**
 > - Máxima preservação da base funcional existente durante evolução

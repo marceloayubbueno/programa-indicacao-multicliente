@@ -1,6 +1,21 @@
 // Gerenciamento de Templates de E-mail Marketing
 // MVP: Listagem de templates de e-mail marketing
 
+// 🔧 Inicializar APIClient quando a página carregar
+let apiClient;
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof APIClient !== 'undefined') {
+    window.apiClient = new APIClient();
+    apiClient = window.apiClient;
+    console.log('✅ [TEMPLATES] APIClient inicializado');
+  } else {
+    console.error('❌ [TEMPLATES] APIClient não encontrado - verifique se api-client.js foi carregado');
+  }
+  
+  console.log('📧 [TEMPLATES] Página carregada, inicializando...');
+  renderEmailTemplatesList();
+});
+
 // 🔧 CORREÇÃO: Função para obter API_URL de forma segura
 function getApiUrl() {
     return window.API_URL ||
@@ -14,11 +29,6 @@ let emailTemplatesList = [];
 // Generalizar para carregar todos os tipos
 const DEFAULT_TYPE = 'all'; // ou 'welcome', 'promo', etc. se quiser filtrar
 let currentType = DEFAULT_TYPE;
-
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('📧 [TEMPLATES] Página carregada, inicializando...');
-  renderEmailTemplatesList();
-});
 
 function renderEmailTemplatesList() {
   console.log('🔍 [TEMPLATES] Carregando templates de e-mail...');
