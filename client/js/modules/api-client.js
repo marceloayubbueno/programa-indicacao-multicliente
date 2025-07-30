@@ -406,6 +406,63 @@ class APIClient {
         console.log('🧹 Cleared lists cache');
     }
 
+    // 📧 EMAIL TEMPLATES - Métodos para gerenciar templates
+    async getEmailTemplates(options = {}) {
+        const {
+            type = null,
+            useCache = true
+        } = options;
+
+        const cacheKey = this.getCacheKey('/email-templates', { type });
+        
+        if (useCache) {
+            const cached = this.getCache(cacheKey);
+            if (cached) {
+                console.log('📧 [CACHE] Email templates loaded from cache');
+                return cached;
+            }
+        }
+
+        try {
+            let url = '/email-templates';
+            if (type && type !== 'all') {
+                url += `?type=${type}`;
+            }
+
+            const data = await this.request(url);
+            this.setCache(cacheKey, data);
+            
+            console.log('📧 [API] Email templates loaded:', data.templates ? data.templates.length : 0);
+            return data;
+            
+        } catch (error) {
+            console.error('❌ [API] Error loading email templates:', error);
+            throw error;
+        }
+    }
+
+    async getEmailTemplateById(id) {
+        try {
+            const data = await this.request(`/email-templates/${id}`);
+            console.log('📧 [API] Email template loaded:', data.name);
+            return data;
+        } catch (error) {
+            console.error('❌ [API] Error loading email template:', error);
+            throw error;
+        }
+    }
+
+    clearEmailTemplatesCache() {
+        const keysToDelete = [];
+        for (let key of this.cache.keys()) {
+            if (key.includes('/email-templates')) {
+                keysToDelete.push(key);
+            }
+        }
+        keysToDelete.forEach(key => this.cache.delete(key));
+        console.log('🧹 Cleared email templates cache');
+    }
+
     // 🔍 Debug e Monitoramento
     getCacheStats() {
         return {
