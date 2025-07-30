@@ -26,9 +26,8 @@ export interface ProcessingResults {
 }
 
 export interface Recipient {
-  _id: string;
-  name: string;
   email: string;
+  name: string;
   source: string;
 }
 
@@ -509,13 +508,18 @@ export class EmailTemplatesService {
         });
         
         if (list.participants && Array.isArray(list.participants)) {
-          for (const participant of list.participants) {
+          for (const participantItem of list.participants) {
+            // Cast para o tipo correto - pode ser ObjectId ou Participant populado
+            const participant = participantItem as any;
+            
             console.log('🔍 [RESOLVE-RECIPIENTS] Participante encontrado:', {
               id: participant._id,
               email: participant.email,
-              name: participant.name
+              name: participant.name,
+              isPopulated: !!participant.email
             });
             
+            // Verificar se foi populado corretamente
             if (participant.email && !emailSet.has(participant.email)) {
               emailSet.add(participant.email);
               recipients.push({
@@ -523,6 +527,8 @@ export class EmailTemplatesService {
                 name: participant.name || 'Participante',
                 source: `Lista: ${list.name}`
               });
+            } else if (!participant.email) {
+              console.log('⚠️ [RESOLVE-RECIPIENTS] Participante não populado:', participant._id);
             }
           }
         }
