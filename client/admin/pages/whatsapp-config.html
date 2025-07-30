@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp - Área Administrativa</title>
+    <link rel="stylesheet" href="../../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+            <div class="flex items-center mb-8">
+                <span class="text-2xl font-bold text-red-400">
+                    <i class="fas fa-user-shield mr-2"></i>Admin Panel
+                </span>
+            </div>
+            <ul class="space-y-2 flex-1">
+                <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+                <li><a href="users.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-users mr-2"></i> Usuários</a></li>
+                <li><a href="clients.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-user-tie mr-2"></i> Clientes</a></li>
+                <li><a href="plans.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-layer-group mr-2"></i> Planos</a></li>
+                <li><a href="carteira.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-wallet mr-2"></i> Carteira</a></li>
+                <li><a href="apis.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-code mr-2"></i> APIs</a></li>
+                <li><a href="whatsapp-config.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-700 text-red-400 font-semibold"><i class="fas fa-whatsapp mr-2"></i> WhatsApp</a></li>
+                <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+                <li><a href="#" onclick="handleLogout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+            </ul>
+        </nav>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+            <div class="flex-1 flex flex-col">
+                <!-- Header -->
+                <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm border-b border-gray-700">
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-3xl font-bold text-red-400">Configuração WhatsApp</h1>
+                        <p class="text-gray-400">Gerenciar API WhatsApp Business e configurações globais</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-sm text-gray-400">Bem-vindo,</p>
+                            <p class="font-semibold text-gray-100">Administrador</p>
+                        </div>
+                        <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-shield text-white"></i>
+                        </div>
+                    </div>
+                </header>
+                
+                <!-- Main Content -->
+                <main class="flex-1 p-8">
+                    <!-- Status Geral -->
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-semibold text-gray-100">
+                                <i class="fas fa-whatsapp text-green-400 mr-2"></i>
+                                Status da API WhatsApp
+                            </h2>
+                            <div class="flex items-center gap-2">
+                                <span id="whatsapp-status" class="px-3 py-1 rounded-full text-xs font-medium bg-gray-600 text-gray-300">
+                                    <i class="fas fa-circle mr-1"></i>Não configurado
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-400">Provedor</span>
+                                    <span id="provider-name" class="text-sm font-medium text-gray-300">-</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-400">Status</span>
+                                    <span id="connection-status" class="text-sm font-medium text-gray-300">-</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-400">Mensagens Hoje</span>
+                                    <span id="messages-today" class="text-sm font-medium text-gray-300">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-400">Limite Diário</span>
+                                    <span id="daily-limit" class="text-sm font-medium text-gray-300">-</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-400">Clientes Ativos</span>
+                                    <span id="active-clients" class="text-sm font-medium text-gray-300">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-400">Templates</span>
+                                    <span id="total-templates" class="text-sm font-medium text-gray-300">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuração do Provedor -->
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
+                        <h2 class="text-xl font-semibold text-gray-100 mb-6">
+                            <i class="fas fa-cog text-blue-400 mr-2"></i>
+                            Configuração do Provedor
+                        </h2>
+
+                        <!-- Seleção de Provedor -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Provedor WhatsApp Business</label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="relative">
+                                    <input type="radio" id="provider-twilio" name="provider" value="twilio" class="sr-only">
+                                    <label for="provider-twilio" class="block p-4 border-2 border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                                        <div class="flex items-center mb-2">
+                                            <div class="w-4 h-4 border-2 border-gray-400 rounded-full mr-3"></div>
+                                            <span class="font-medium text-gray-100">Twilio</span>
+                                        </div>
+                                        <p class="text-sm text-gray-400">API oficial do WhatsApp Business</p>
+                                        <p class="text-xs text-gray-500 mt-1">Recomendado para MVP</p>
+                                    </label>
+                                </div>
+                                
+                                <div class="relative">
+                                    <input type="radio" id="provider-meta" name="provider" value="meta" class="sr-only">
+                                    <label for="provider-meta" class="block p-4 border-2 border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                                        <div class="flex items-center mb-2">
+                                            <div class="w-4 h-4 border-2 border-gray-400 rounded-full mr-3"></div>
+                                            <span class="font-medium text-gray-100">Meta (Facebook)</span>
+                                        </div>
+                                        <p class="text-sm text-gray-400">API nativa do WhatsApp</p>
+                                        <p class="text-xs text-gray-500 mt-1">Mais recursos</p>
+                                    </label>
+                                </div>
+                                
+                                <div class="relative">
+                                    <input type="radio" id="provider-360dialog" name="provider" value="360dialog" class="sr-only">
+                                    <label for="provider-360dialog" class="block p-4 border-2 border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                                        <div class="flex items-center mb-2">
+                                            <div class="w-4 h-4 border-2 border-gray-400 rounded-full mr-3"></div>
+                                            <span class="font-medium text-gray-100">360dialog</span>
+                                        </div>
+                                        <p class="text-sm text-gray-400">Provedor especializado</p>
+                                        <p class="text-xs text-gray-500 mt-1">Suporte premium</p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configuração Twilio -->
+                        <div id="twilio-config" class="provider-config hidden">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Account SID</label>
+                                    <input type="text" id="twilio-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
+                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Auth Token</label>
+                                    <div class="flex gap-2">
+                                        <input type="password" id="twilio-auth-token" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
+                                               class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <button onclick="togglePasswordVisibility('twilio-auth-token')" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">WhatsApp Number (Sandbox)</label>
+                                    <input type="text" id="twilio-whatsapp-number" placeholder="+14155238886" 
+                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <p class="text-xs text-gray-400 mt-1">Use o número sandbox para testes</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configuração Meta -->
+                        <div id="meta-config" class="provider-config hidden">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Access Token</label>
+                                    <div class="flex gap-2">
+                                        <input type="password" id="meta-access-token" placeholder="EAAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
+                                               class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <button onclick="togglePasswordVisibility('meta-access-token')" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Phone Number ID</label>
+                                    <input type="text" id="meta-phone-number-id" placeholder="123456789012345" 
+                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Business Account ID</label>
+                                    <input type="text" id="meta-business-account-id" placeholder="123456789012345" 
+                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configuração 360dialog -->
+                        <div id="360dialog-config" class="provider-config hidden">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">API Key</label>
+                                    <div class="flex gap-2">
+                                        <input type="password" id="360dialog-api-key" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
+                                               class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <button onclick="togglePasswordVisibility('360dialog-api-key')" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Instance ID</label>
+                                    <input type="text" id="360dialog-instance-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" 
+                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Teste de Conexão -->
+                        <div class="mt-6 bg-gray-700 rounded-lg p-4">
+                            <h3 class="text-lg font-medium text-gray-100 mb-3">Teste de Conectividade</h3>
+                            <div class="flex gap-3">
+                                <input type="text" id="test-phone" placeholder="+5511999999999" 
+                                       class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-4 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button onclick="testWhatsAppConnection()" class="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors">
+                                    <i class="fas fa-paper-plane mr-2"></i>Testar Conexão
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Envia uma mensagem de teste para verificar a conectividade</p>
+                        </div>
+
+                        <!-- Ações -->
+                        <div class="flex gap-3 mt-6">
+                            <button onclick="saveWhatsAppConfig()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                                <i class="fas fa-save mr-2"></i>Salvar Configuração
+                            </button>
+                            <button onclick="resetWhatsAppConfig()" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-medium transition-colors">
+                                <i class="fas fa-undo mr-2"></i>Resetar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Configurações Globais -->
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                        <h2 class="text-xl font-semibold text-gray-100 mb-6">
+                            <i class="fas fa-sliders-h text-purple-400 mr-2"></i>
+                            Configurações Globais
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Limite de Mensagens por Minuto</label>
+                                <input type="number" id="rate-limit-per-minute" value="30" min="1" max="100" 
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <p class="text-xs text-gray-400 mt-1">Evita bloqueios por rate limiting</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Horário de Envio (Início)</label>
+                                <input type="time" id="send-time-start" value="08:00" 
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Horário de Envio (Fim)</label>
+                                <input type="time" id="send-time-end" value="20:00" 
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Fuso Horário</label>
+                                <select id="timezone" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="America/Sao_Paulo">Brasil (GMT-3)</option>
+                                    <option value="America/New_York">EUA Leste (GMT-5)</option>
+                                    <option value="Europe/London">Londres (GMT+0)</option>
+                                    <option value="Asia/Tokyo">Tóquio (GMT+9)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="enable-webhooks" class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                                <span class="text-sm text-gray-300">Habilitar Webhooks para Status de Entrega</span>
+                            </label>
+                            <p class="text-xs text-gray-400 mt-1">Recebe atualizações em tempo real sobre o status das mensagens</p>
+                        </div>
+
+                        <div class="flex gap-3 mt-6">
+                            <button onclick="saveGlobalSettings()" class="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors">
+                                <i class="fas fa-save mr-2"></i>Salvar Configurações
+                            </button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/config.js"></script>
+    <script src="../../js/admin/auth.js"></script>
+    <script src="../../js/admin/whatsapp-config.js"></script>
+    <script>
+        // Função de logout
+        function handleLogout() {
+            localStorage.removeItem('adminToken');
+            window.location.href = 'login.html';
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html> 
