@@ -11,7 +11,7 @@ import {
   Query,
   BadRequestException 
 } from '@nestjs/common';
-import { EmailTemplatesService } from './email-templates.service';
+import { EmailTemplatesService, BulkSendResult } from './email-templates.service';
 import { CreateEmailTemplateDto } from './dto/create-email-template.dto';
 import { UpdateEmailTemplateDto } from './dto/update-email-template.dto';
 import { CreateEmailConfigDto } from './dto/create-email-config.dto';
@@ -80,6 +80,43 @@ export class EmailTemplatesController {
     }
     
     return this.emailTemplatesService.sendTestEmail(id, testEmail);
+  }
+
+  @UseGuards(JwtClientAuthGuard)
+  @Post(':id/send-bulk')
+  async sendBulkEmail(
+    @Param('id') templateId: string,
+    @Body() bulkData: {
+      recipients: {
+        listIds: string[];
+        participantIds: string[];
+      };
+      subject: string;
+      senderName?: string;
+      scheduleAt?: Date;
+    },
+    @Request() req
+  ) {
+    const clientId = req.user?.clientId || req.user?.sub;
+    
+    console.log('📤 [BULK-SEND] Endpoint chamado:', {
+      templateId,
+      clientId,
+      listIds: bulkData.recipients?.listIds?.length || 0,
+      participantIds: bulkData.recipients?.participantIds?.length || 0,
+      subject: bulkData.subject
+    });
+    
+    // Validações básicas
+    if (!bulkData.recipients || (!bulkData.recipients.listIds?.length && !bulkData.recipients.participantIds?.length)) {
+      throw new BadRequestException('Pelo menos uma lista ou participante deve ser selecionado');
+    }
+    
+    if (!bulkData.subject?.trim()) {
+      throw new BadRequestException('Assunto do e-mail é obrigatório');
+    }
+    
+    return this.emailTemplatesService.sendBulkEmail(templateId, clientId, bulkData);
   }
 
   @UseGuards(JwtClientAuthGuard)

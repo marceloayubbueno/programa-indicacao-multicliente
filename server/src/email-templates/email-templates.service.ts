@@ -8,12 +8,37 @@ import { UpdateEmailTemplateDto } from './dto/update-email-template.dto';
 import { CreateEmailConfigDto } from './dto/create-email-config.dto';
 import { UpdateEmailConfigDto } from './dto/update-email-config.dto';
 import { MailService } from '../common/mail.service';
+import { Participant } from '../clients/entities/participant.schema';
+import { ParticipantList } from '../clients/entities/participant-list.schema';
+
+// Interfaces para tipagem do envio em massa
+export interface BulkSendResult {
+  recipient: string;
+  status: 'success' | 'error';
+  method?: 'smtp' | 'brevo' | 'default';
+  message: string;
+}
+
+export interface ProcessingResults {
+  processed: number;
+  errors: number;
+  details: BulkSendResult[];
+}
+
+export interface Recipient {
+  _id: string;
+  name: string;
+  email: string;
+  source: string;
+}
 
 @Injectable()
 export class EmailTemplatesService {
   constructor(
     @InjectModel(EmailTemplate.name) private emailTemplateModel: Model<EmailTemplateDocument>,
     @InjectModel(EmailConfig.name) private emailConfigModel: Model<EmailConfigDocument>,
+    @InjectModel(Participant.name) private participantModel: Model<Participant>,
+    @InjectModel(ParticipantList.name) private participantListModel: Model<ParticipantList>,
     private mailService: MailService,
   ) {}
 
@@ -316,6 +341,281 @@ export class EmailTemplatesService {
     } catch (error) {
       throw new BadRequestException(`Erro ao enviar e-mail de teste: ${error.message}`);
     }
+  }
+
+  // ===== ENVIO EM MASSA =====
+
+  async sendBulkEmail(
+    templateId: string, 
+    clientId: string, 
+    bulkData: {
+      recipients: {
+        listIds: string[];
+        participantIds: string[];
+      };
+      subject: string;
+      senderName?: string;
+      scheduleAt?: Date;
+    }
+  ): Promise<{
+    success: boolean;
+    message: string;
+    totalRecipients: number;
+    processed: number;
+    errors: number;
+    details: BulkSendResult[];
+  }> {
+    
+    console.log('📤 [BULK-SEND] Iniciando envio em massa:', {
+      templateId,
+      clientId,
+      listIds: bulkData.recipients.listIds?.length || 0,
+      participantIds: bulkData.recipients.participantIds?.length || 0
+    });
+
+    try {
+      // 1. Buscar e validar template
+      const template = await this.emailTemplateModel
+        .findOne({ 
+          _id: new Types.ObjectId(templateId), 
+          clientId: new Types.ObjectId(clientId),
+          status: 'active'
+        })
+        .exec();
+
+      if (!template) {
+        throw new NotFoundException('Template não encontrado ou não está ativo');
+      }
+
+      if (template.type !== 'campaign') {
+        throw new BadRequestException('Apenas templates do tipo "campaign" podem ser enviados em massa');
+      }
+
+      console.log('✅ [BULK-SEND] Template encontrado:', template.name);
+
+      // 2. Resolver destinatários únicos
+      const recipients = await this.resolveRecipients(clientId, bulkData.recipients);
+      const totalRecipients = recipients.length;
+
+      if (totalRecipients === 0) {
+        throw new BadRequestException('Nenhum destinatário válido encontrado');
+      }
+
+      console.log(`📊 [BULK-SEND] ${totalRecipients} destinatários únicos encontrados`);
+
+      // 3. Processar envios
+      const results = await this.processBulkSending(
+        template,
+        clientId,
+        recipients,
+        bulkData.subject,
+        bulkData.senderName
+      );
+
+      // 4. Atualizar estatísticas do template
+      await this.emailTemplateModel.findByIdAndUpdate(templateId, {
+        $inc: { emailsSent: results.processed },
+        lastSentAt: new Date()
+      });
+
+      console.log('✅ [BULK-SEND] Processamento concluído:', {
+        total: totalRecipients,
+        processed: results.processed,
+        errors: results.errors
+      });
+
+      return {
+        success: true,
+        message: `Envio em massa processado com sucesso`,
+        totalRecipients,
+        processed: results.processed,
+        errors: results.errors,
+        details: results.details
+      };
+
+    } catch (error) {
+      console.error('❌ [BULK-SEND] Erro no envio em massa:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 🔍 Resolve destinatários únicos a partir de listas e IDs individuais
+   */
+  private async resolveRecipients(
+    clientId: string, 
+    recipients: { listIds: string[]; participantIds: string[] }
+  ): Promise<Recipient[]> {
+    
+    const allRecipients = new Map(); // Usar Map para evitar duplicatas por email
+    const clientObjectId = new Types.ObjectId(clientId);
+
+    // Buscar participantes das listas selecionadas
+    if (recipients.listIds && recipients.listIds.length > 0) {
+      console.log('📋 [BULK-SEND] Buscando participantes de listas...');
+      
+      for (const listId of recipients.listIds) {
+        try {
+          const list = await this.participantListModel
+            .findOne({ 
+              _id: new Types.ObjectId(listId), 
+              clientId: clientObjectId 
+            })
+            .populate('participants')
+            .exec();
+
+          if (list && list.participants) {
+            list.participants.forEach((participant: any) => {
+              if (participant.email && participant.status === 'ativo') {
+                allRecipients.set(participant.email, {
+                  _id: participant._id,
+                  name: participant.name,
+                  email: participant.email,
+                  source: `lista:${list.name}`
+                });
+              }
+            });
+          }
+        } catch (error) {
+          console.error(`❌ [BULK-SEND] Erro ao buscar lista ${listId}:`, error);
+        }
+      }
+    }
+
+    // Buscar participantes individuais selecionados
+    if (recipients.participantIds && recipients.participantIds.length > 0) {
+      console.log('👤 [BULK-SEND] Buscando participantes individuais...');
+      
+      const individualParticipants = await this.participantModel
+        .find({
+          _id: { $in: recipients.participantIds.map(id => new Types.ObjectId(id)) },
+          clientId: clientObjectId,
+          status: 'ativo'
+        })
+        .exec();
+
+      individualParticipants.forEach(participant => {
+        if (participant.email) {
+          allRecipients.set(participant.email, {
+            _id: participant._id,
+            name: participant.name,
+            email: participant.email,
+            source: 'individual'
+          });
+        }
+      });
+    }
+
+    const uniqueRecipients = Array.from(allRecipients.values());
+    
+    console.log(`🔍 [BULK-SEND] Destinatários resolvidos: ${uniqueRecipients.length} únicos`);
+    
+    return uniqueRecipients;
+  }
+
+  /**
+   * 📤 Processa envios em lote
+   */
+  private async processBulkSending(
+    template: any,
+    clientId: string,
+    recipients: Recipient[],
+    subject: string,
+    senderName?: string
+  ): Promise<ProcessingResults> {
+    
+    const results: ProcessingResults = {
+      processed: 0,
+      errors: 0,
+      details: []
+    };
+
+    console.log(`📤 [BULK-SEND] Iniciando processamento de ${recipients.length} envios...`);
+
+    // Processar em lotes de 10 para não sobrecarregar
+    const batchSize = 10;
+    const batches: Recipient[][] = [];
+    
+    for (let i = 0; i < recipients.length; i += batchSize) {
+      batches.push(recipients.slice(i, i + batchSize));
+    }
+
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex];
+      console.log(`📦 [BULK-SEND] Processando lote ${batchIndex + 1}/${batches.length} (${batch.length} destinatários)`);
+
+      const batchPromises = batch.map(async (recipient) => {
+        try {
+          // Personalizar HTML com variáveis do destinatário
+          const personalizedHtml = this.personalizeTemplate(template.htmlContent, {
+            nome: recipient.name,
+            email: recipient.email,
+            // Adicionar mais variáveis conforme necessário
+          });
+
+          // Enviar e-mail
+          const result = await this.mailService.sendMailWithClientConfig({
+            clientId,
+            to: recipient.email,
+            subject: subject,
+            html: personalizedHtml,
+            fallbackToBrevo: true
+          });
+
+          results.processed++;
+          results.details.push({
+            recipient: recipient.email,
+            status: 'success',
+            method: result.method,
+            message: result.message
+          });
+
+          console.log(`✅ [BULK-SEND] Enviado para ${recipient.email} via ${result.method}`);
+
+        } catch (error) {
+          results.errors++;
+          results.details.push({
+            recipient: recipient.email,
+            status: 'error',
+            message: error.message
+          });
+
+          console.error(`❌ [BULK-SEND] Erro ao enviar para ${recipient.email}:`, error.message);
+        }
+      });
+
+      // Aguardar conclusão do lote atual
+      await Promise.all(batchPromises);
+      
+      // Pequena pausa entre lotes para não sobrecarregar
+      if (batchIndex < batches.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+
+    console.log(`🎯 [BULK-SEND] Processamento concluído: ${results.processed} sucessos, ${results.errors} erros`);
+    
+    return results;
+  }
+
+  /**
+   * 🎨 Personaliza template com variáveis do destinatário
+   */
+  private personalizeTemplate(htmlContent: string, variables: Record<string, string>): string {
+    let personalizedHtml = htmlContent;
+    
+    // Substituir variáveis básicas
+    Object.entries(variables).forEach(([key, value]) => {
+      const regex = new RegExp(`{{${key}}}`, 'g');
+      personalizedHtml = personalizedHtml.replace(regex, value || '');
+    });
+
+    // Adicionar variáveis de data/hora se não existirem
+    if (!variables.dataCriacao) {
+      personalizedHtml = personalizedHtml.replace(/{{dataCriacao}}/g, new Date().toLocaleDateString('pt-BR'));
+    }
+
+    return personalizedHtml;
   }
 
   // ===== MÉTODOS AUXILIARES =====

@@ -256,27 +256,30 @@ class APIClient {
         const clientId = this.getClientId();
         
         if (!clientId) {
-            throw new Error('Client ID não encontrado');
+            throw new Error('ClientId não encontrado');
         }
-
-        const url = `/participant-lists?clientId=${clientId}`;
-        const cacheKey = this.getCacheKey(url);
+        
+        const endpoint = '/participant-lists';
+        const cacheKey = this.getCacheKey(endpoint, { clientId });
         
         if (useCache) {
             const cached = this.getCache(cacheKey);
             if (cached) {
-                console.log('📦 Cache hit - Lists:', url);
+                console.log('🗄️ Cache hit for participant lists');
                 return cached;
             }
         }
-
-        const data = await this.request(url);
         
-        if (useCache) {
-            this.setCache(cacheKey, data);
+        console.log('🔍 [API-CLIENT] Buscando listas do cliente:', clientId);
+        
+        const result = await this.request(endpoint);
+        
+        if (useCache && result) {
+            this.setCache(cacheKey, result);
         }
         
-        return data;
+        console.log(`✅ [API-CLIENT] ${Array.isArray(result) ? result.length : 0} listas carregadas`);
+        return result;
     }
 
     async getParticipantListById(id, includeParticipants = true) {

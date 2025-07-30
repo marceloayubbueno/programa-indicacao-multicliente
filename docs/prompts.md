@@ -86,7 +86,19 @@ Este prompt força uma análise estruturada em vez de um "conserto" apressado.
 > 4.  **Implementação da Correção:** Após a análise dos logs, proponha um plano de correção. Após minha aprovação, implemente a correção.
 > 5.  **Limpeza:** Após a validação da correção, remova todos os logs de diagnóstico adicionados.
 > 
+> **Segurança Máxima:**
+> - Máxima preservação do sistema existente e funcionalidades atuais
+> - Zero impacto em fluxos de trabalho e componentes não relacionados ao bug
+> - Verificação rigorosa para não duplicar código ou componentes existentes
+> - Testes de regressão obrigatórios antes de finalizar a correção
+> - Rollback imediato se detectada quebra de outras funcionalidades
 > 
+> **Preparação para Integrações Futuras:**
+> - Correção deve manter arquitetura extensível e modular
+> - Interfaces bem definidas que facilitem futuras manutenções
+> - Documentação clara dos pontos alterados para futuras referências
+> - Padrões de código que facilitem evolução e debugging
+> - Compatibilidade preservada com ferramentas de monitoramento e logging
 > 
 > **[ESCREVA SEU CONTEXTO AQUI]**
 > 
@@ -131,7 +143,19 @@ Este template orquestra a criação de uma nova funcionalidade do zero, garantin
 > 1.  **Converter Plano em Checklist:** Crie o arquivo `TASK-[nome-da-feature].md` com a checklist.
 > 2.  **Execução Sequencial:** Implemente a feature passo a passo, seguindo a checklist e atualizando-a após cada etapa concluída.
 > 
+> **Segurança Máxima:**
+> - Máxima preservação do sistema existente e funcionalidades atuais
+> - Zero impacto em fluxos de trabalho estabelecidos e componentes não relacionados
+> - Verificação rigorosa para reutilizar componentes existentes antes de criar novos
+> - Testes de integração obrigatórios para garantir compatibilidade
+> - Validação contínua de que funcionalidades existentes permanecem intactas
 > 
+> **Preparação para Integrações Futuras:**
+> - Arquitetura modular e extensível que facilite futuras evoluções
+> - Interfaces bem definidas e documentadas para facilitar integrações
+> - Padrões de código consistentes que simplifiquem manutenção futura
+> - Pontos de extensão claramente identificados e documentados
+> - Compatibilidade com ferramentas de monitoramento, analytics e automação
 > 
 > **[ESCREVA SEU CONTEXTO AQUI]**
 > 
@@ -163,6 +187,19 @@ Focado em melhorar a qualidade, manutenibilidade e performance de código existe
 > 3.  **Aguarde Aprovação:** Pare e aguarde minha aprovação do plano. **NÃO ALTERE O CÓDIGO AINDA.**
 > 4.  **Implementação:** Após a aprovação, aplique as mudanças de refatoração.
 > 
+> **Segurança Máxima:**
+> - Máxima preservação da funcionalidade existente durante a refatoração
+> - Zero alteração no comportamento externo e interfaces públicas
+> - Verificação rigorosa de dependências e pontos de integração
+> - Testes de regressão obrigatórios antes e após cada mudança
+> - Refatoração incremental para minimizar riscos e facilitar rollback
+> 
+> **Preparação para Integrações Futuras:**
+> - Código refatorado deve seguir padrões que facilitem futuras extensões
+> - Estrutura mais limpa e modular para simplificar integrações futuras
+> - Documentação clara das mudanças arquiteturais realizadas
+> - Interfaces bem definidas que facilitem testes e manutenção
+> - Compatibilidade preservada com ferramentas de análise de código e CI/CD
 > 
 > **[ESCREVA SEU CONTEXTO AQUI]**
 > 
@@ -201,6 +238,20 @@ Focado em analisar funcionalidades existentes e propor melhorias incrementais qu
 > - **Testes de Regressão:** Validar que o que funcionava antes continua funcionando
 > - **Documentação:** Atualizar documentação conforme necessário
 > 
+> **Segurança Máxima:**
+> - Máxima preservação da estabilidade e funcionalidades críticas atuais
+> - Zero impacto em workflows e integrações existentes durante melhorias
+> - Verificação rigorosa para não duplicar funcionalidades já disponíveis
+> - Validação contínua de que melhorias não introduzem regressões
+> - Rollback imediato disponível para cada fase de melhoria implementada
+> 
+> **Preparação para Integrações Futuras:**
+> - Melhorias devem facilitar futuras extensões e integrações
+> - Arquitetura aprimorada que suporte crescimento e evolução
+> - Interfaces padronizadas que simplifiquem conexões com novos sistemas
+> - Documentação técnica atualizada para facilitar onboarding de desenvolvedores
+> - Compatibilidade com ferramentas de monitoramento, analytics e automação
+> 
 > **[ESCREVA SEU CONTEXTO AQUI]**
 > 
 > **1. Funcionalidade a ser Analisada:**
@@ -221,6 +272,86 @@ Focado em analisar funcionalidades existentes e propor melhorias incrementais qu
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+### PARA CONTINUAR DESENVOLVIMENTO DE FUNCIONALIDADE EXISTENTE (Modo Evolução e Extensão)
+
+Focado em analisar, entender e evoluir funcionalidades que já possuem uma base implementada, reutilizando componentes existentes.
+
+> **COPIE E COLE ABAIXO**
+> ```markdown
+> # MISSÃO: CONTINUAR DESENVOLVIMENTO DE FUNCIONALIDADE EXISTENTE
+> 
+> **Sua Missão:** Você atuará como Engenheiro de Software Especialista em Evolução de Sistemas. Sua tarefa é analisar uma funcionalidade existente, entender sua arquitetura atual, identificar componentes reutilizáveis e propor extensões/melhorias mantendo coerência com o sistema atual.
+> 
+> **Workflow Obrigatório:**
+> 1. **Análise Arquitetural:** Mapeie a funcionalidade existente (frontend, backend, schemas, fluxos)
+> 2. **Inventário de Componentes:** Identifique componentes, serviços e schemas reutilizáveis
+> 3. **Análise de Fluxos:** Documente fluxos de dados e interações atuais
+> 4. **Gap Analysis:** Compare o estado atual com os requisitos da evolução
+> 5. **Plano de Evolução:** Proponha extensões aproveitando máximo da base existente
+> 6. **Aguarde Aprovação:** Pare e aguarde minha aprovação do plano. **NÃO IMPLEMENTE AINDA.**
+> 7. **Implementação Incremental:** Execute as evoluções mantendo compatibilidade
+> 
+> **Princípios de Evolução:**
+> - **Máximo Reuso:** Reutilize componentes, schemas e lógicas existentes sempre que possível
+> - **Compatibilidade:** Mantenha funcionalidades existentes intactas
+> - **Coerência Arquitetural:** Siga padrões já estabelecidos no sistema
+> - **Extensibilidade:** Projete extensões que facilitem futuras evoluções
+> - **Documentação de Mudanças:** Documente todas as extensões e modificações
+> 
+> **Análise Obrigatória:**
+> - Frontend: Componentes, estilos, JS modules, fluxos de UX
+> - Backend: Controllers, services, DTOs, validações, middlewares
+> - Database: Schemas, relacionamentos, indexes, migrations necessárias
+> - Integrations: APIs, email templates, external services
+> - Security: Autenticação, autorização, validações de dados
+> 
+> **Segurança Máxima:**
+> - Máxima preservação da base funcional existente durante evolução
+> - Zero impacto em funcionalidades e componentes não relacionados à evolução
+> - Verificação rigorosa para máximo reuso antes de criar novos componentes
+> - Testes de compatibilidade obrigatórios entre versão atual e evoluída
+> - Estratégia de rollback para cada fase da evolução implementada
+> 
+> **Preparação para Integrações Futuras:**
+> - Evolução deve ampliar capacidades de integração e extensibilidade
+> - Padrões consistentes que facilitem futuras adições e modificações
+> - APIs e interfaces bem definidas para facilitar conexões futuras
+> - Documentação técnica completa das evoluções implementadas
+> - Compatibilidade com ferramentas de desenvolvimento, testes e deployment
+> 
+> **[ESCREVA SEU CONTEXTO AQUI]**
+> 
+> **1. Funcionalidade Base Existente:**
+> *   [Descreva a funcionalidade que já existe e será evoluída. Ex: "Sistema de campanhas com criação básica", "Dashboard de indicadores com métricas simples"]
+> 
+> **2. Requisitos da Evolução:**
+> *   [Liste as novas capacidades desejadas. Ex: "Adicionar filtros avançados", "Implementar notificações por email", "Criar relatórios de performance"]
+> 
+> **3. Arquivos Base para Análise:**
+> *   [Use `@` para referenciar os arquivos principais da funcionalidade existente]
+> *   Frontend: @client/pages/[nome].html, @client/js/[nome].js, @client/css/[nome].css
+> *   Backend: @server/src/[modulo]/[nome].controller.ts, @server/src/[modulo]/[nome].service.ts
+> *   Schemas: @server/src/[modulo]/entities/[nome].schema.ts
+> 
+> **4. Funcionalidades Relacionadas para Reutilização:**
+> *   [Liste funcionalidades similares no sistema que podem ter componentes reutilizáveis]
+> 
+> **5. Casos de Uso da Evolução:**
+> *   [Descreva cenários específicos de como a evolução será usada pelos usuários]
+> 
+> **6. Critérios de Sucesso:**
+> *   [Defina métricas para validar que a evolução foi bem-sucedida]
+> 
+> **Resultado Esperado:**
+> *   📋 Mapeamento completo da arquitetura atual
+> *   🔄 Inventário de componentes reutilizáveis
+> *   📈 Plano de evolução com aproveitamento máximo da base
+> *   🛡️ Garantia de compatibilidade e segurança
+> *   🚀 Implementação incremental e testável
+> ```
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ## Parte 4: Biblioteca de Prompts Comuns
 
 ### PARA CRIAR TESTES
@@ -229,6 +360,18 @@ Focado em analisar funcionalidades existentes e propor melhorias incrementais qu
 ```
 Aja como um Engenheiro de Qualidade de Software.
 - **Sua Missão:** Criar testes para o arquivo e método abaixo, cobrindo os cenários descritos.
+
+**Segurança Máxima:**
+- Testes não devem interferir com funcionalidades existentes ou dados de produção
+- Verificação rigorosa para reutilizar fixtures e mocks já existentes no projeto
+- Isolation completo entre testes para evitar efeitos colaterais
+- Validação de que testes não quebram pipelines ou workflows estabelecidos
+
+**Preparação para Integrações Futuras:**
+- Testes estruturados que facilitem futuras expansões e modificações
+- Padrões de teste consistentes que simplifiquem manutenção
+- Documentação clara dos cenários testados para referência futura
+- Compatibilidade com ferramentas de CI/CD e relatórios de cobertura
 
 ---
 **[ESCREVA SEU CONTEXTO AQUI]**
@@ -249,6 +392,20 @@ Aja como um Engenheiro de Qualidade de Software.
 ```
 Aja como um Especialista em Segurança de Aplicações (AppSec).
 - **Sua Missão:** Fazer uma análise de segurança no arquivo abaixo, focando nos pontos que descrevi. Para cada risco, explique a vulnerabilidade e sugira a correção.
+
+**Segurança Máxima:**
+- Análise não deve comprometer a estabilidade ou funcionamento do sistema atual
+- Sugestões de correção devem preservar funcionalidades existentes integralmente
+- Verificação rigorosa para não introduzir novas vulnerabilidades ao corrigir outras
+- Priorização de correções que não quebrem compatibilidade com integrações existentes
+- Estratégia de implementação incremental para minimizar riscos operacionais
+
+**Preparação para Integrações Futuras:**
+- Análise deve considerar escalabilidade e futuras expansões do sistema
+- Padrões de segurança que facilitem auditorias e compliance futuras
+- Documentação técnica das vulnerabilidades e correções para referência
+- Compatibilidade com ferramentas de segurança, monitoring e compliance
+- Estrutura de segurança que simplifique futuras integrações e validações
 
 ---
 **[ESCREVA SEU CONTEXTO AQUI]**
@@ -293,6 +450,20 @@ Verificação completa antes de subir para GitHub e deploy em produção.
 > # Abrir client/pages/login.html no navegador
 > # Verificar F12 sem erros críticos
 > ```
+> 
+> **Segurança Máxima:**
+> - Validações não devem alterar dados de produção ou configurações existentes
+> - Verificação rigorosa para não expor credenciais ou informações sensíveis
+> - Testes devem preservar integridade do ambiente local e não afetar outros projetos
+> - Rollback imediato se validações detectarem problemas críticos de segurança
+> - Isolamento completo entre ambiente de teste e dados/configurações reais
+> 
+> **Preparação para Integrações Futuras:**
+> - Validações estruturadas que facilitem futuras automatizações de deploy
+> - Checklist padronizado que simplifique validações de novas funcionalidades
+> - Logs e relatórios organizados para facilitar debugging e monitoramento
+> - Compatibilidade com ferramentas de CI/CD e pipelines automatizados
+> - Documentação clara dos critérios de validação para futuras referências
 > 
 > **[ESCREVA SEU CONTEXTO AQUI]**
 > 
@@ -383,6 +554,20 @@ Setup de banco de dados em produção com configurações de segurança.
 > - Database User: Senha forte gerada automaticamente
 > - Cluster Name: programa-indicacao (padrão do projeto)
 > - Região: US East (melhor latência para Railway)
+> 
+> **Segurança Máxima:**
+> - Configurações não devem comprometer segurança de outros projetos ou dados
+> - Credenciais de acesso devem ser únicas e não reutilizar senhas existentes
+> - Verificação rigorosa de permissões para acesso mínimo necessário
+> - Backup automático de configurações antes de aplicar mudanças
+> - Monitoramento de acesso e atividades suspeitas habilitado
+> 
+> **Preparação para Integrações Futuras:**
+> - Estrutura de banco escalável que suporte crescimento da aplicação
+> - Configurações padronizadas que facilitem migrações e atualizações
+> - Índices e performance otimizados para consultas futuras
+> - Compatibilidade com ferramentas de backup, monitoramento e analytics
+> - Documentação técnica das configurações para referência da equipe
 > 
 > **[ESCREVA SEU CONTEXTO AQUI]**
 > 
@@ -578,6 +763,20 @@ Testes de integração final e validação de produção.
 > 4. Geração de landing page
 > 5. Envio de email de notificação
 > 6. Isolamento de dados entre clientes
+> 
+> **Segurança Máxima:**
+> - Testes não devem comprometer dados de produção ou afetar usuários reais
+> - Validações devem usar dados de teste isolados e não interferir com operações
+> - Verificação rigorosa de que testes não exponham informações sensíveis
+> - Rollback imediato se validações detectarem problemas críticos de segurança
+> - Isolamento completo entre ambiente de teste e dados reais de clientes
+> 
+> **Preparação para Integrações Futuras:**
+> - Testes estruturados que facilitem validações de novas funcionalidades
+> - Relatórios padronizados que simplifiquem monitoramento contínuo
+> - Métricas organizadas para facilitar análise de performance e trends
+> - Compatibilidade com ferramentas de monitoramento, alertas e analytics
+> - Documentação clara dos procedimentos de validação para referência
 > 
 > **[ESCREVA SEU CONTEXTO AQUI]**
 > 
