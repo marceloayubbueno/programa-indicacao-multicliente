@@ -97,6 +97,14 @@ export class EmailTemplatesController {
     },
     @Request() req
   ) {
+    // 🚨 DEBUG: Log imediato para verificar se requisição chega
+    console.log('🚨 [DEBUG-SEND-BULK] ===== ENDPOINT CHAMADO =====');
+    console.log('🚨 [DEBUG-SEND-BULK] Template ID:', templateId);
+    console.log('🚨 [DEBUG-SEND-BULK] Bulk Data:', JSON.stringify(bulkData, null, 2));
+    console.log('🚨 [DEBUG-SEND-BULK] Request URL:', req.url);
+    console.log('🚨 [DEBUG-SEND-BULK] Request Method:', req.method);
+    console.log('🚨 [DEBUG-SEND-BULK] ================================');
+    
     const clientId = req.user?.clientId || req.user?.sub;
     
     console.log('📤 [BULK-SEND] Endpoint chamado:', {
