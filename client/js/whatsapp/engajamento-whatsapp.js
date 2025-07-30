@@ -498,59 +498,7 @@ function viewAllFlows() {
     }
 }
 
-// Funções do menu (reutilizadas do sistema existente)
-function toggleEngagementEmailMenu() {
-    const menu = document.getElementById('engagementEmailMenu');
-    const arrow = document.getElementById('engagementEmailArrow');
-    
-    if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-        arrow.style.transform = 'rotate(90deg)';
-    } else {
-        menu.classList.add('hidden');
-        arrow.style.transform = 'rotate(0deg)';
-    }
-}
-
-function toggleFinanceMenu() {
-    const menu = document.getElementById('financeMenu');
-    const arrow = document.getElementById('financeArrow');
-    
-    if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-        arrow.style.transform = 'rotate(90deg)';
-    } else {
-        menu.classList.add('hidden');
-        arrow.style.transform = 'rotate(0deg)';
-    }
-}
-
-function toggleSettingsMenu() {
-    const menu = document.getElementById('settingsMenu');
-    const arrow = document.getElementById('settingsArrow');
-    
-    if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-        arrow.style.transform = 'rotate(90deg)';
-    } else {
-        menu.classList.add('hidden');
-        arrow.style.transform = 'rotate(0deg)';
-    }
-}
-
-function toggleWhatsAppMenu() {
-    const menu = document.getElementById('whatsappMenu');
-    const arrow = document.getElementById('whatsappArrow');
-    
-    if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-        arrow.style.transform = 'rotate(90deg)';
-    } else {
-        menu.classList.add('hidden');
-        arrow.style.transform = 'rotate(0deg)';
-    }
-}
-
+// Função de logout (reutilizada do sistema existente)
 function logout() {
     if (window.auth) {
         window.auth.logout();
