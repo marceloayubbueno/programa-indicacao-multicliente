@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar E-mail em Massa - Programa de Indicação</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+        <div class="flex items-center mb-8">
+          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+        </div>
+        <ul class="space-y-2 flex-1">
+          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> Lp de indicadores</a></li>
+          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> Lp de divulgação</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold cursor-pointer group" onclick="toggleEngagementEmailMenu()">
+              <i class="fas fa-envelope mr-2"></i> Engajamento e-mail
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementEmailArrow" style="transform: rotate(90deg);"></i>
+            </div>
+            <ul id="engagementEmailMenu" class="ml-8 mt-1 space-y-1">
+              <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail marketing</a></li>
+              <li><a href="send-bulk-email.html" class="flex items-center pl-10 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold hover:bg-gray-700"><i class="fas fa-paper-plane mr-2"></i> Enviar E-mail em Massa</a></li>
+              <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
+            </ul>
+          </li>
+          <li><a href="engajamento-whatsapp.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-whatsapp mr-2"></i> Engajamentos Whatsapp</a></li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de leads</a></li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleFinanceMenu()">
+              <i class="fas fa-wallet mr-2"></i> Financeiro
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="financeArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="financeMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="carteira.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-piggy-bank mr-2"></i> Carteira</a></li>
+              <li><a href="payments.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+            </ul>
+          </li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleSettingsMenu()">
+              <i class="fas fa-cog mr-2"></i> Configurações
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="settingsArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="settingsMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="my-data.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+              <li><a href="email-config.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope-square mr-2"></i> Configurações de E-mail</a></li>
+              <li><a href="configuracao-integracoes.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-plug mr-2"></i> Integrações</a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <div class="border-t border-gray-700 pt-4">
+          <button onclick="logout()" class="w-full flex items-center justify-start pl-4 px-3 py-3 rounded-lg hover:bg-red-600 transition-colors text-gray-300 hover:text-white">
+            <i class="fas fa-sign-out-alt mr-2"></i> Sair
+          </button>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="flex-1 p-8">
+        <div class="max-w-7xl mx-auto">
+          <div class="flex items-center justify-between mb-8">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-100">Enviar E-mail em Massa</h1>
+              <p class="text-gray-400 mt-2">Selecione um template e os destinatários para envio</p>
+            </div>
+          </div>
+
+          <!-- Formulário Principal -->
+          <div class="bg-gray-800 rounded-lg p-6">
+            
+            <!-- Seleção de Template -->
+            <div class="mb-6">
+              <h3 class="text-xl font-bold text-gray-100 mb-4">
+                <i class="fas fa-envelope mr-2 text-purple-400"></i>
+                Selecionar Template
+              </h3>
+              <div class="bg-gray-700 rounded-lg p-4">
+                <select id="templateSelect" class="w-full bg-gray-600 text-gray-100 rounded-lg p-3 border border-gray-500 focus:border-blue-400 focus:outline-none">
+                  <option value="">Carregando templates...</option>
+                </select>
+                <p class="text-gray-400 text-sm mt-2">Apenas templates do tipo "campanha" podem ser enviados em massa</p>
+              </div>
+            </div>
+
+            <!-- Configurações do Envio -->
+            <div class="mb-6">
+              <h3 class="text-xl font-bold text-gray-100 mb-4">
+                <i class="fas fa-cog mr-2 text-blue-400"></i>
+                Configurações do Envio
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-gray-300 mb-2">Assunto do E-mail</label>
+                  <input type="text" id="emailSubject"
+                         class="w-full bg-gray-600 text-gray-100 rounded-lg p-3 border border-gray-500 focus:border-blue-400 focus:outline-none"
+                         placeholder="Digite o assunto do e-mail">
+                </div>
+                <div>
+                  <label class="block text-gray-300 mb-2">Nome do Remetente</label>
+                  <input type="text" id="senderName"
+                         class="w-full bg-gray-600 text-gray-100 rounded-lg p-3 border border-gray-500 focus:border-blue-400 focus:outline-none"
+                         placeholder="Ex: Sua Empresa">
+                </div>
+              </div>
+            </div>
+
+            <!-- Seleção de Destinatários -->
+            <div class="mb-6">
+              <h3 class="text-xl font-bold text-gray-100 mb-4">
+                <i class="fas fa-users mr-2 text-green-400"></i>
+                Destinatários Selecionados
+              </h3>
+
+              <!-- Estatísticas -->
+              <div class="bg-gray-700 rounded-lg p-4 mb-4">
+                <div class="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div class="text-2xl font-bold text-green-400" id="selectedLists">0</div>
+                    <div class="text-gray-400 text-sm">Listas</div>
+                  </div>
+                  <div>
+                    <div class="text-2xl font-bold text-blue-400" id="selectedIndividuals">0</div>
+                    <div class="text-gray-400 text-sm">Individuais</div>
+                  </div>
+                  <div>
+                    <div class="text-2xl font-bold text-purple-400" id="totalRecipients">0</div>
+                    <div class="text-gray-400 text-sm">Total</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Seleção por Listas -->
+              <div class="mb-4">
+                <h4 class="text-lg font-semibold text-gray-200 mb-3">
+                  <i class="fas fa-list mr-2"></i>
+                  Selecionar por Listas
+                </h4>
+                <div id="listsContainer" class="space-y-2 max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-4">
+                  <p class="text-gray-400">Carregando listas...</p>
+                </div>
+              </div>
+
+              <!-- Seleção Individual -->
+              <div class="mb-4">
+                <h4 class="text-lg font-semibold text-gray-200 mb-3">
+                  <i class="fas fa-user mr-2"></i>
+                  Seleção Individual
+                </h4>
+                <div class="bg-gray-700 rounded-lg p-4">
+                  <div class="mb-3">
+                    <input type="text" id="participantSearch"
+                           class="w-full bg-gray-600 text-gray-100 rounded-lg p-3 border border-gray-500 focus:border-blue-400 focus:outline-none"
+                           placeholder="Digite nome ou email para buscar participantes...">
+                  </div>
+                  <div id="participantsSearchResults" class="space-y-2 max-h-40 overflow-y-auto">
+                    <p class="text-gray-400">Digite para buscar participantes...</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Ações -->
+            <div class="flex justify-between items-center pt-6 border-t border-gray-600">
+              <div class="text-gray-400">
+                <i class="fas fa-info-circle mr-2"></i>
+                <span id="statusMessage">Selecione um template e destinatários para continuar</span>
+              </div>
+              
+              <div class="flex space-x-3">
+                <button onclick="clearSelections()"
+                        class="px-6 py-3 bg-gray-600 text-gray-300 rounded-lg hover:bg-gray-500 transition-colors flex items-center">
+                  <i class="fas fa-times mr-2"></i>
+                  Limpar
+                </button>
+                
+                <button onclick="sendBulkEmail()"
+                        id="sendButton"
+                        class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center disabled:bg-gray-600 disabled:cursor-not-allowed"
+                        disabled>
+                  <i class="fas fa-paper-plane mr-2"></i>
+                  Enviar E-mails
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/modules/api-client.js"></script>
+    <script src="../js/send-bulk-email.js"></script>
+</body>
+</html> 
