@@ -423,7 +423,7 @@ export class EmailTemplatesService {
       console.log('✅ [BULK-SEND] Template encontrado:', template.name);
 
       // 2. Resolver destinatários únicos
-      const recipients = await this.resolveRecipients(clientId, bulkData.recipients);
+      const recipients = await this.resolveRecipients(bulkData.recipients.listIds, bulkData.recipients.participantIds);
       const totalRecipients = recipients.length;
 
       if (totalRecipients === 0) {
@@ -472,74 +472,91 @@ export class EmailTemplatesService {
    * 🔍 Resolve destinatários únicos a partir de listas e IDs individuais
    */
   private async resolveRecipients(
-    clientId: string, 
-    recipients: { listIds: string[]; participantIds: string[] }
+    listIds: string[], 
+    participantIds: string[]
   ): Promise<Recipient[]> {
+    console.log('🔍 [RESOLVE-RECIPIENTS] Iniciando resolução...');
+    console.log('🔍 [RESOLVE-RECIPIENTS] Lista IDs recebidos:', listIds);
+    console.log('🔍 [RESOLVE-RECIPIENTS] Participant IDs recebidos:', participantIds);
     
-    const allRecipients = new Map(); // Usar Map para evitar duplicatas por email
-    const clientObjectId = new Types.ObjectId(clientId);
+    const recipients: Recipient[] = [];
+    const emailSet = new Set<string>();
 
-    // Buscar participantes das listas selecionadas
-    if (recipients.listIds && recipients.listIds.length > 0) {
-      console.log('📋 [BULK-SEND] Buscando participantes de listas...');
+    // Buscar participantes das listas
+    if (listIds && listIds.length > 0) {
+      console.log('🔍 [RESOLVE-RECIPIENTS] Buscando listas...');
       
-      for (const listId of recipients.listIds) {
-        try {
-          const list = await this.participantListModel
-            .findOne({ 
-              _id: new Types.ObjectId(listId), 
-              clientId: clientObjectId 
-            })
-            .populate('participants')
-            .exec();
+      const lists = await this.participantListModel
+        .find({ _id: { $in: listIds } })
+        .populate('participants')
+        .exec();
+      
+      console.log('🔍 [RESOLVE-RECIPIENTS] Listas encontradas:', {
+        count: lists.length,
+        listDetails: lists.map(list => ({
+          id: list._id,
+          name: list.name,
+          participantCount: list.participants?.length || 0,
+          participants: list.participants?.slice(0, 3) // Primeiros 3 para debug
+        }))
+      });
 
-          if (list && list.participants) {
-            list.participants.forEach((participant: any) => {
-              if (participant.email && participant.status === 'ativo') {
-                allRecipients.set(participant.email, {
-                  _id: participant._id,
-                  name: participant.name,
-                  email: participant.email,
-                  source: `lista:${list.name}`
-                });
-              }
+      for (const list of lists) {
+        console.log('🔍 [RESOLVE-RECIPIENTS] Processando lista:', {
+          id: list._id,
+          name: list.name,
+          participantCount: list.participants?.length || 0
+        });
+        
+        if (list.participants && Array.isArray(list.participants)) {
+          for (const participant of list.participants) {
+            console.log('🔍 [RESOLVE-RECIPIENTS] Participante encontrado:', {
+              id: participant._id,
+              email: participant.email,
+              name: participant.name
             });
+            
+            if (participant.email && !emailSet.has(participant.email)) {
+              emailSet.add(participant.email);
+              recipients.push({
+                email: participant.email,
+                name: participant.name || 'Participante',
+                source: `Lista: ${list.name}`
+              });
+            }
           }
-        } catch (error) {
-          console.error(`❌ [BULK-SEND] Erro ao buscar lista ${listId}:`, error);
         }
       }
     }
 
-    // Buscar participantes individuais selecionados
-    if (recipients.participantIds && recipients.participantIds.length > 0) {
-      console.log('👤 [BULK-SEND] Buscando participantes individuais...');
+    // Buscar participantes individuais
+    if (participantIds && participantIds.length > 0) {
+      console.log('🔍 [RESOLVE-RECIPIENTS] Buscando participantes individuais...');
       
-      const individualParticipants = await this.participantModel
-        .find({
-          _id: { $in: recipients.participantIds.map(id => new Types.ObjectId(id)) },
-          clientId: clientObjectId,
-          status: 'ativo'
-        })
+      const individuals = await this.participantModel
+        .find({ _id: { $in: participantIds } })
         .exec();
+      
+      console.log('🔍 [RESOLVE-RECIPIENTS] Participantes individuais encontrados:', individuals.length);
 
-      individualParticipants.forEach(participant => {
-        if (participant.email) {
-          allRecipients.set(participant.email, {
-            _id: participant._id,
-            name: participant.name,
+      for (const participant of individuals) {
+        if (participant.email && !emailSet.has(participant.email)) {
+          emailSet.add(participant.email);
+          recipients.push({
             email: participant.email,
-            source: 'individual'
+            name: participant.name || 'Participante',
+            source: 'Seleção individual'
           });
         }
-      });
+      }
     }
 
-    const uniqueRecipients = Array.from(allRecipients.values());
-    
-    console.log(`🔍 [BULK-SEND] Destinatários resolvidos: ${uniqueRecipients.length} únicos`);
-    
-    return uniqueRecipients;
+    console.log('🔍 [RESOLVE-RECIPIENTS] Resolução final:', {
+      totalRecipients: recipients.length,
+      emails: recipients.slice(0, 5).map(r => r.email) // Primeiros 5 emails para debug
+    });
+
+    return recipients;
   }
 
   /**
