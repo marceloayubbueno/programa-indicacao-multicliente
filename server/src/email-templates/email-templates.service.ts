@@ -375,6 +375,25 @@ export class EmailTemplatesService {
 
     try {
       // 1. Buscar e validar template
+      console.log('🔍 [DEBUG-TEMPLATE] Iniciando busca do template...');
+      console.log('🔍 [DEBUG-TEMPLATE] Template ID:', templateId);
+      console.log('🔍 [DEBUG-TEMPLATE] Client ID:', clientId);
+      
+      // Primeiro, buscar o template sem filtros para ver se existe
+      const templateAny = await this.emailTemplateModel
+        .findOne({ _id: new Types.ObjectId(templateId) })
+        .exec();
+      
+      console.log('🔍 [DEBUG-TEMPLATE] Template encontrado (sem filtros):', {
+        exists: !!templateAny,
+        id: templateAny?._id,
+        name: templateAny?.name,
+        status: templateAny?.status,
+        type: templateAny?.type,
+        clientId: templateAny?.clientId,
+        clientIdMatch: templateAny?.clientId?.toString() === clientId
+      });
+      
       const template = await this.emailTemplateModel
         .findOne({ 
           _id: new Types.ObjectId(templateId), 
@@ -382,6 +401,15 @@ export class EmailTemplatesService {
           status: 'active'
         })
         .exec();
+      
+      console.log('🔍 [DEBUG-TEMPLATE] Template encontrado (com filtros):', {
+        exists: !!template,
+        queryUsed: {
+          _id: templateId,
+          clientId: clientId,
+          status: 'active'
+        }
+      });
 
       if (!template) {
         throw new NotFoundException('Template não encontrado ou não está ativo');
