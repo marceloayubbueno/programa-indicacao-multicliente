@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Templates WhatsApp - Área do Cliente</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+        <div class="flex items-center mb-8">
+          <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
+        </div>
+        <ul class="space-y-2 flex-1">
+          <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+          <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> Lp de indicadores</a></li>
+          <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+          <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> Lp de divulgação</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementEmailMenu()">
+              <i class="fas fa-envelope mr-2"></i> Engajamento e-mail
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementEmailArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="engagementEmailMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail marketing</a></li>
+              <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
+            </ul>
+          </li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold cursor-pointer group" onclick="toggleWhatsAppMenu()">
+              <i class="fas fa-whatsapp mr-2"></i> Engajamentos Whatsapp
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="whatsappArrow" style="transform: rotate(90deg);"></i>
+            </div>
+            <ul id="whatsappMenu" class="ml-8 mt-1 space-y-1">
+              <li><a href="engajamento-whatsapp.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-whatsapp mr-2"></i> Dashboard WhatsApp</a></li>
+              <li><a href="whatsapp-templates.html" class="flex items-center pl-10 py-2 rounded-lg bg-gray-700 text-blue-400"><i class="fas fa-envelope mr-2"></i> Templates</a></li>
+              <li><a href="whatsapp-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos</a></li>
+              <li><a href="whatsapp-config.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configuração</a></li>
+            </ul>
+          </li>
+          <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de leads</a></li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleFinanceMenu()">
+              <i class="fas fa-wallet mr-2"></i> Financeiro
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="financeArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="financeMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="carteira.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-piggy-bank mr-2"></i> Carteira</a></li>
+              <li><a href="payments.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+            </ul>
+          </li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleSettingsMenu()">
+              <i class="fas fa-cog mr-2"></i> Configurações
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="settingsArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="settingsMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="my-data.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+              <li><a href="email-config.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope-open mr-2"></i> Configuração de e-mail</a></li>
+              <li><a href="configuracao-whatsapp.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-whatsapp mr-2"></i> Configuração de whatsapp</a></li>
+              <li><a href="configuracao-integracoes.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-plug mr-2"></i> Configuração Integrações</a></li>
+            </ul>
+          </li>
+          <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+        </ul>
+      </nav>
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+        <div class="flex-1 flex flex-col">
+          <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
+            <h1 class="text-3xl font-bold text-blue-400">Templates WhatsApp</h1>
+            <div class="flex items-center gap-4">
+              <button onclick="openCreateTemplateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                <i class="fas fa-plus mr-2"></i>Novo Template
+              </button>
+              <span id="clientName" class="block text-gray-200 font-medium">Nome do Cliente</span>
+              <i class="fas fa-user-circle text-2xl text-gray-400"></i>
+            </div>
+          </header>
+          <main class="flex-1 p-8">
+            <!-- Filtros e Busca -->
+            <div class="flex flex-col md:flex-row gap-4 mb-6">
+              <div class="flex-1 relative">
+                <input type="text" id="searchTemplates" placeholder="Buscar templates..." 
+                       class="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="filterByCategory('all')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
+                  Todos
+                </button>
+                <button onclick="filterByCategory('marketing')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
+                  Marketing
+                </button>
+                <button onclick="filterByCategory('utility')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
+                  Utility
+                </button>
+                <button onclick="filterByCategory('authentication')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
+                  Authentication
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid de Templates -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="templatesGrid">
+              <!-- Templates serão carregados dinamicamente -->
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Criação/Edição de Template -->
+    <div id="templateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div class="p-6 border-b border-gray-700">
+            <div class="flex items-center justify-between">
+              <h2 id="modalTitle" class="text-xl font-semibold text-gray-100">Novo Template WhatsApp</h2>
+              <button onclick="closeTemplateModal()" class="text-gray-400 hover:text-gray-300">
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+          </div>
+          <div class="p-6">
+            <form id="templateForm" class="space-y-4">
+              <div>
+                <label class="block text-gray-300 text-sm font-medium mb-2">Nome do Template</label>
+                <input type="text" id="templateName" name="name" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-gray-300 text-sm font-medium mb-2">Categoria</label>
+                  <select id="templateCategory" name="category" required
+                          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="marketing">Marketing</option>
+                    <option value="utility">Utility</option>
+                    <option value="authentication">Authentication</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="block text-gray-300 text-sm font-medium mb-2">Idioma</label>
+                  <select id="templateLanguage" name="language" required
+                          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="pt_BR">Português (Brasil)</option>
+                    <option value="en_US">English (US)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-gray-300 text-sm font-medium mb-2">Corpo da Mensagem</label>
+                <textarea id="templateBody" name="body" rows="6" required
+                          placeholder="Digite o conteúdo da mensagem. Use {{variavel}} para variáveis dinâmicas."
+                          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                <p class="text-gray-400 text-xs mt-1">Variáveis disponíveis: {{nome}}, {{empresa}}, {{link}}, {{recompensa}}, etc.</p>
+              </div>
+
+              <div>
+                <label class="block text-gray-300 text-sm font-medium mb-2">Footer (Opcional)</label>
+                <input type="text" id="templateFooter" name="footer" placeholder="Texto do footer"
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+
+              <div>
+                <label class="block text-gray-300 text-sm font-medium mb-2">Variáveis Disponíveis</label>
+                <input type="text" id="templateVariables" name="variables" placeholder="nome,empresa,link,recompensa"
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-gray-400 text-xs mt-1">Separe as variáveis por vírgula</p>
+              </div>
+            </form>
+          </div>
+          <div class="p-6 border-t border-gray-700 flex justify-end gap-3">
+            <button onclick="closeTemplateModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-gray-200 rounded-lg transition-colors">
+              Cancelar
+            </button>
+            <button onclick="saveTemplate()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+              Salvar Template
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/modules/config.js"></script>
+    <script src="../js/modules/api-client.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/whatsapp/templates.js"></script>
+</body>
+</html> 
