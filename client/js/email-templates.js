@@ -505,7 +505,7 @@ async function searchParticipants(query) {
       }
     });
     
-    allParticipants = participants.data || participants || [];
+    allParticipants = participants.participants || [];
     console.log(`🔍 [BULK-SEND] ${allParticipants.length} participantes encontrados`);
     
     if (allParticipants.length === 0) {
@@ -623,10 +623,12 @@ async function processBulkSend() {
   
   console.log('📤 [BULK-SEND] Dados preparados:', bulkData);
   
+  // Preparar variáveis para controle do botão
+  const sendButton = document.getElementById('bulkSendButton');
+  let originalText = sendButton.innerHTML;
+  
   try {
     // Desabilitar botão e mostrar loading
-    const sendButton = document.getElementById('bulkSendButton');
-    const originalText = sendButton.innerHTML;
     sendButton.disabled = true;
     sendButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
     
