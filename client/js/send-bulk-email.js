@@ -34,6 +34,14 @@ function setupEventListeners() {
     const templateSelect = document.getElementById('templateSelect');
     if (templateSelect) {
         templateSelect.addEventListener('change', onTemplateChange);
+        
+        // Adicionar funcionalidade para recarregar em caso de erro
+        templateSelect.addEventListener('click', function() {
+            if (this.innerHTML.includes('Erro ao carregar')) {
+                console.log('[BULK-SEND] Tentativa de recarregar templates...');
+                loadTemplates();
+            }
+        });
     }
     
     // Participant search
@@ -52,38 +60,78 @@ function setupEventListeners() {
 
 // Carregar templates
 async function loadTemplates() {
+    const select = document.getElementById('templateSelect');
+    
     try {
         console.log('[BULK-SEND] Carregando templates...');
-        const response = await apiClient.getEmailTemplates();
-        const templates = response.templates || [];
         
-        // Filtrar apenas templates de campanha
-        const campaignTemplates = templates.filter(template => 
-            template.type === 'campaign' && template.status === 'active'
-        );
-        
-        console.log('[BULK-SEND] Templates de campanha encontrados:', campaignTemplates.length);
-        
-        const select = document.getElementById('templateSelect');
+        // Mostrar loading
         if (select) {
-            select.innerHTML = '<option value="">Selecione um template...</option>';
+            select.innerHTML = '<option value="">Carregando templates...</option>';
+            select.disabled = true;
+        }
+        
+        const response = await apiClient.getEmailTemplates();
+        
+        // Verificar se a resposta é válida
+        if (!response || typeof response !== 'object') {
+            throw new Error('Resposta inválida da API');
+        }
+        
+        const templates = response.templates || [];
+        console.log('[BULK-SEND] Total de templates recebidos:', templates.length);
+        
+        // Filtrar apenas templates de campanha ativos
+        const campaignTemplates = templates.filter(template => {
+            const isValid = template && 
+                           template._id && 
+                           template.name && 
+                           template.type === 'campaign' && 
+                           template.status === 'active';
             
-            campaignTemplates.forEach(template => {
-                const option = document.createElement('option');
-                option.value = template._id;
-                option.textContent = template.name;
-                select.appendChild(option);
-            });
+            if (!isValid) {
+                console.log('[BULK-SEND] Template ignorado:', template);
+            }
+            
+            return isValid;
+        });
+        
+        console.log('[BULK-SEND] Templates de campanha válidos:', campaignTemplates.length);
+        
+        if (select) {
+            select.disabled = false;
             
             if (campaignTemplates.length === 0) {
-                select.innerHTML = '<option value="">Nenhum template de campanha encontrado</option>';
+                select.innerHTML = '<option value="">Nenhum template de campanha ativo encontrado</option>';
+                console.warn('[BULK-SEND] Nenhum template de campanha disponível');
+            } else {
+                select.innerHTML = '<option value="">Selecione um template...</option>';
+                
+                campaignTemplates.forEach(template => {
+                    const option = document.createElement('option');
+                    option.value = template._id;
+                    option.textContent = template.name;
+                    option.title = `Tipo: ${template.type} | Status: ${template.status}`;
+                    select.appendChild(option);
+                });
+                
+                console.log('[BULK-SEND] Templates carregados com sucesso');
             }
         }
+        
     } catch (error) {
         console.error('[BULK-SEND] Erro ao carregar templates:', error);
-        const select = document.getElementById('templateSelect');
+        
         if (select) {
-            select.innerHTML = '<option value="">Erro ao carregar templates</option>';
+            select.disabled = false;
+            select.innerHTML = '<option value="">Erro ao carregar templates - Clique para tentar novamente</option>';
+        }
+        
+        // Mostrar erro visual
+        const statusMessage = document.getElementById('statusMessage');
+        if (statusMessage) {
+            statusMessage.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Erro ao carregar templates';
+            statusMessage.className = 'text-red-400';
         }
     }
 }
@@ -265,20 +313,27 @@ function validateForm() {
     
     if (statusMessage) {
         if (isValid) {
-            statusMessage.textContent = 'Pronto para enviar!';
+            statusMessage.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Pronto para enviar!';
             statusMessage.className = 'text-green-400';
         } else {
-            let message = 'Pendente: ';
-            let missing = [];
-            
-            if (!templateId) missing.push('template');
-            if (!subject) missing.push('assunto');
-            if (!senderName) missing.push('remetente');
-            if (!hasRecipients) missing.push('destinatários');
-            
-            message += missing.join(', ');
-            statusMessage.textContent = message;
-            statusMessage.className = 'text-gray-400';
+            // Se template foi selecionado, manter o feedback positivo do template
+            if (templateId && !statusMessage.innerHTML.includes('Template')) {
+                let message = 'Pendente: ';
+                let missing = [];
+                
+                if (!subject) missing.push('assunto');
+                if (!senderName) missing.push('remetente');
+                if (!hasRecipients) missing.push('destinatários');
+                
+                if (missing.length > 0) {
+                    message += missing.join(', ');
+                    statusMessage.innerHTML = `<i class="fas fa-info-circle mr-2"></i>${message}`;
+                    statusMessage.className = 'text-yellow-400';
+                }
+            } else if (!templateId) {
+                statusMessage.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>Selecione um template para continuar';
+                statusMessage.className = 'text-gray-400';
+            }
         }
     }
 }
@@ -303,6 +358,32 @@ function clearSelections() {
 
 // Event handler para mudança de template
 function onTemplateChange() {
+    const templateSelect = document.getElementById('templateSelect');
+    const selectedTemplateId = templateSelect.value;
+    
+    if (selectedTemplateId) {
+        const selectedTemplate = templateSelect.options[templateSelect.selectedIndex];
+        console.log('[BULK-SEND] Template selecionado:', {
+            id: selectedTemplateId,
+            name: selectedTemplate.textContent
+        });
+        
+        // Feedback visual de que template foi selecionado
+        templateSelect.classList.remove('border-gray-500');
+        templateSelect.classList.add('border-green-500');
+        
+        // Atualizar status message
+        const statusMessage = document.getElementById('statusMessage');
+        if (statusMessage) {
+            statusMessage.innerHTML = `<i class="fas fa-check-circle mr-2 text-green-400"></i>Template "${selectedTemplate.textContent}" selecionado`;
+            statusMessage.className = 'text-green-400';
+        }
+    } else {
+        // Remover feedback visual se nenhum template selecionado
+        templateSelect.classList.remove('border-green-500');
+        templateSelect.classList.add('border-gray-500');
+    }
+    
     validateForm();
 }
 
