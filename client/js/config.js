@@ -109,4 +109,8 @@ if (CURRENT_ENV === 'development') {
 
 // 🔄 Compatibilidade com arquivos existentes
 // Exporta API_URL para compatibilidade com arquivos antigos que ainda usam window.API_URL
-window.API_URL = config.API_URL; 
+window.API_URL = config.API_URL;
+
+// 📡 Compatibilidade com módulos WhatsApp
+// Exporta API_BASE_URL para os módulos WhatsApp
+window.API_BASE_URL = config.API_URL; 
