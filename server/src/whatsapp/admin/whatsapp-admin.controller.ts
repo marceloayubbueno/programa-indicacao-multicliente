@@ -32,12 +32,27 @@ export class WhatsAppAdminController {
   }
 
   @Post('test')
-  async testConnection(@Body() testData: { testPhone: string; [key: string]: any }) {
+  async testConnection(@Body() testData: any) {
     try {
-      return await this.whatsappAdminService.testConnection(testData);
+      console.log('=== CONTROLLER: INÍCIO TESTE ===');
+      console.log('Dados recebidos:', JSON.stringify(testData, null, 2));
+      
+      const result = await this.whatsappAdminService.testConnection(testData);
+      
+      console.log('=== CONTROLLER: TESTE CONCLUÍDO ===');
+      return result;
     } catch (error) {
+      console.error('=== CONTROLLER: ERRO NO TESTE ===');
+      console.error('Erro completo:', error);
+      console.error('Stack trace:', error.stack);
+      console.error('Mensagem:', error.message);
+      
       throw new HttpException(
-        'Erro ao testar conexão WhatsApp',
+        {
+          message: 'Erro ao testar conexão WhatsApp',
+          details: error.message,
+          code: error.code || 'UNKNOWN'
+        },
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }

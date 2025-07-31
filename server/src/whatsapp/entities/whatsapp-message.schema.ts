@@ -5,8 +5,8 @@ export type WhatsAppMessageDocument = WhatsAppMessage & Document;
 
 @Schema({ timestamps: true })
 export class WhatsAppMessage {
-  @Prop({ type: Types.ObjectId, ref: 'Client', required: true })
-  clientId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Client', required: false })
+  clientId?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'WhatsAppTemplate' })
   templateId?: Types.ObjectId;
