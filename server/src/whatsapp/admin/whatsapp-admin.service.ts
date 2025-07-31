@@ -246,24 +246,67 @@ export class WhatsAppAdminService {
           throw new Error(`Provedor não suportado: ${provider}`);
       }
 
-      // Salva mensagem no banco
-      const testMessage = new this.whatsappMessageModel({
-        clientId: null, // Mensagem administrativa
-        to: phoneNumber,
-        from: credentials.whatsappNumber || 'admin',
-        content: {
-          body: 'Teste de conectividade WhatsApp - Sistema de Indicação'
-        },
-        status: 'sent',
-        providerResponse: {
-          messageId,
-          status,
-          provider
-        }
-      });
+             // Salva mensagem no banco
+       const testMessage = new this.whatsappMessageModel({
+         clientId: null, // Mensagem administrativa
+         to: phoneNumber,
+         from: credentials.whatsappNumber || 'admin',
+         content: {
+           body: 'Teste de conectividade WhatsApp - Sistema de Indicação'
+         },
+         status: status || 'sent',
+         providerResponse: {
+           messageId,
+           status,
+           provider
+         },
+         sentAt: new Date()
+       });
 
-      await testMessage.save();
-      return testMessage.toObject();
+       await testMessage.save();
+       
+       // Para Twilio, vamos verificar o status da mensagem
+       if (provider === 'twilio' && messageId) {
+         try {
+           const client = twilio(credentials.accountSid, credentials.authToken);
+           const messageStatus = await client.messages(messageId).fetch();
+           
+           console.log('Status detalhado da mensagem Twilio:', {
+             sid: messageStatus.sid,
+             status: messageStatus.status,
+             errorCode: messageStatus.errorCode,
+             errorMessage: messageStatus.errorMessage,
+             direction: messageStatus.direction,
+             from: messageStatus.from,
+             to: messageStatus.to
+           });
+           
+           // Atualiza o status no banco
+           await this.whatsappMessageModel.updateOne(
+             { _id: testMessage._id },
+             { 
+               $set: { 
+                 status: messageStatus.status,
+                 'providerResponse.errorCode': messageStatus.errorCode,
+                 'providerResponse.errorMessage': messageStatus.errorMessage
+               }
+             }
+           );
+           
+           return {
+             ...testMessage.toObject(),
+             detailedStatus: {
+               status: messageStatus.status,
+               errorCode: messageStatus.errorCode,
+               errorMessage: messageStatus.errorMessage
+             }
+           };
+         } catch (statusError) {
+           console.error('Erro ao verificar status da mensagem:', statusError);
+         }
+       }
+       
+       return testMessage.toObject();
     } catch (error) {
       console.error('Erro ao enviar mensagem de teste:', error.message);
       throw error;
