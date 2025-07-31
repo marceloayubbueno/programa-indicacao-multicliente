@@ -239,22 +239,41 @@
         // Load templates
         async function loadTemplates() {
             try {
+                console.log('Carregando templates...');
+                console.log('API URL:', `${window.API_BASE_URL}/admin/whatsapp/templates`);
+                console.log('Token:', localStorage.getItem('adminToken') ? 'Presente' : 'Ausente');
+                
                 const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/templates`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                        'Content-Type': 'application/json'
                     }
                 });
 
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
                 if (response.ok) {
-                    templates = await response.json();
-                    renderTemplates();
+                    const responseText = await response.text();
+                    console.log('Response text:', responseText);
+                    
+                    try {
+                        templates = JSON.parse(responseText);
+                        console.log('Templates carregados:', templates);
+                        renderTemplates();
+                    } catch (parseError) {
+                        console.error('Erro ao fazer parse do JSON:', parseError);
+                        console.error('Response text:', responseText);
+                        showError('Erro ao processar resposta do servidor');
+                    }
                 } else {
-                    console.error('Erro ao carregar templates');
-                    showError('Erro ao carregar templates');
+                    const errorText = await response.text();
+                    console.error('Erro HTTP:', response.status, errorText);
+                    showError(`Erro ${response.status}: ${errorText}`);
                 }
             } catch (error) {
-                console.error('Erro:', error);
+                console.error('Erro de rede:', error);
                 showError('Erro ao conectar com o servidor');
             }
         }
