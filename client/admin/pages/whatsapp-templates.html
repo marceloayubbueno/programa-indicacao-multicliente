@@ -1,115 +1,126 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Templates WhatsApp - Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="../js/config.js"></script>
+    <title>Templates WhatsApp - Área Administrativa</title>
+    <link rel="stylesheet" href="../../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-gray-100">
-    <!-- Sidebar -->
-    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out" id="sidebar">
-        <div class="flex items-center justify-between h-16 px-6 bg-blue-600 text-white">
-            <h1 class="text-xl font-semibold">Admin Panel</h1>
-            <button onclick="toggleSidebar()" class="text-white hover:text-gray-200">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-        
-        <nav class="mt-6">
-            <div class="px-4 space-y-2">
-                <a href="dashboard.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                    <i class="fas fa-tachometer-alt mr-3"></i>
-                    Dashboard
-                </a>
-                <a href="users.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                    <i class="fas fa-users mr-3"></i>
-                    Usuários
-                </a>
-                <a href="clients.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                    <i class="fas fa-building mr-3"></i>
-                    Clientes
-                </a>
-                <a href="plans.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                    <i class="fas fa-credit-card mr-3"></i>
-                    Planos
-                </a>
-                <a href="whatsapp-config.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                    <i class="fab fa-whatsapp mr-3"></i>
-                    WhatsApp Config
-                </a>
-                <a href="whatsapp-templates.html" class="flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-lg">
-                    <i class="fas fa-file-alt mr-3"></i>
-                    Templates WhatsApp
-                </a>
-                <a href="apis.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                    <i class="fas fa-code mr-3"></i>
-                    APIs
-                </a>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+            <div class="flex items-center mb-8">
+                <span class="text-2xl font-bold text-red-400">
+                    <i class="fas fa-user-shield mr-2"></i>Admin Panel
+                </span>
             </div>
+            <ul class="space-y-2 flex-1">
+                <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+                <li><a href="users.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-users mr-2"></i> Usuários</a></li>
+                <li><a href="clients.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-user-tie mr-2"></i> Clientes</a></li>
+                <li><a href="plans.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-layer-group mr-2"></i> Planos</a></li>
+                <li><a href="carteira.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-wallet mr-2"></i> Carteira</a></li>
+                <li><a href="apis.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-code mr-2"></i> APIs</a></li>
+                <li><a href="whatsapp-config.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-whatsapp mr-2"></i> WhatsApp</a></li>
+                <li><a href="whatsapp-templates.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-700 text-red-400 font-semibold"><i class="fas fa-file-alt mr-2"></i> Templates WhatsApp</a></li>
+                <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+                <li><a href="#" onclick="handleLogout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+            </ul>
         </nav>
-    </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+            <div class="flex-1 flex flex-col">
+                <!-- Header -->
+                <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm border-b border-gray-700">
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-3xl font-bold text-red-400">Templates WhatsApp</h1>
+                        <p class="text-gray-400">Gerencie templates globais para mensagens WhatsApp</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-sm text-gray-400">Bem-vindo,</p>
+                            <p class="font-semibold text-gray-100">Administrador</p>
+                        </div>
+                        <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-shield text-white"></i>
+                        </div>
+                    </div>
+                </header>
+                
+                <!-- Main Content -->
+                <main class="flex-1 p-8">
+                    <!-- Header com Botão Novo Template -->
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-100">
+                                <i class="fas fa-file-alt text-blue-400 mr-2"></i>
+                                Templates Disponíveis
+                            </h2>
+                            <p class="text-gray-400 mt-1">Crie e gerencie templates reutilizáveis para mensagens WhatsApp</p>
+                        </div>
+                        <button onclick="openCreateTemplateModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            Novo Template
+                        </button>
+                    </div>
 
-    <!-- Main Content -->
-    <div class="ml-64 p-8">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Templates WhatsApp</h1>
-                <p class="text-gray-600 mt-2">Gerencie templates globais para mensagens WhatsApp</p>
-            </div>
-            <button onclick="openCreateTemplateModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center">
-                <i class="fas fa-plus mr-2"></i>
-                Novo Template
-            </button>
-        </div>
+                    <!-- Filtros -->
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
+                        <h3 class="text-lg font-semibold text-gray-100 mb-4">
+                            <i class="fas fa-filter text-blue-400 mr-2"></i>
+                            Filtros
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Categoria</label>
+                                <select id="filter-category" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todas</option>
+                                    <option value="indicadores">Indicadores</option>
+                                    <option value="leads">Leads</option>
+                                    <option value="geral">Geral</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Status</label>
+                                <select id="filter-status" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todos</option>
+                                    <option value="active">Ativo</option>
+                                    <option value="inactive">Inativo</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Buscar</label>
+                                <input type="text" id="search-input" placeholder="Nome do template..." class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="loadTemplates()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                    <i class="fas fa-search mr-2"></i>
+                                    Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Filters -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
-                    <select id="filter-category" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Todas</option>
-                        <option value="indicadores">Indicadores</option>
-                        <option value="leads">Leads</option>
-                        <option value="geral">Geral</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                    <select id="filter-status" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Todos</option>
-                        <option value="active">Ativo</option>
-                        <option value="inactive">Inativo</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
-                    <input type="text" id="search-input" placeholder="Nome do template..." class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="flex items-end">
-                    <button onclick="loadTemplates()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                        <i class="fas fa-search mr-2"></i>
-                        Filtrar
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Templates List -->
-        <div class="bg-white rounded-lg shadow-sm">
-            <div class="p-6 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900">Templates Disponíveis</h2>
-            </div>
-            <div id="templates-list" class="divide-y divide-gray-200">
-                <!-- Templates will be loaded here -->
-                <div class="p-6 text-center text-gray-500">
-                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                    <p>Carregando templates...</p>
-                </div>
+                    <!-- Lista de Templates -->
+                    <div class="bg-gray-800 rounded-xl border border-gray-700">
+                        <div class="p-6 border-b border-gray-700">
+                            <h3 class="text-lg font-semibold text-gray-100">
+                                <i class="fas fa-list text-blue-400 mr-2"></i>
+                                Templates
+                            </h3>
+                        </div>
+                        <div id="templates-list" class="divide-y divide-gray-700">
+                            <!-- Templates will be loaded here -->
+                            <div class="p-6 text-center text-gray-400">
+                                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                                <p>Carregando templates...</p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
         </div>
     </div>
@@ -117,10 +128,10 @@
     <!-- Create/Edit Template Modal -->
     <div id="template-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto">
-                <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                    <h3 id="modal-title" class="text-xl font-semibold text-gray-900">Novo Template</h3>
-                    <button onclick="closeTemplateModal()" class="text-gray-400 hover:text-gray-600">
+            <div class="bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto border border-gray-700">
+                <div class="flex items-center justify-between p-6 border-b border-gray-700">
+                    <h3 id="modal-title" class="text-xl font-semibold text-gray-100">Novo Template</h3>
+                    <button onclick="closeTemplateModal()" class="text-gray-400 hover:text-gray-200">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
@@ -128,12 +139,12 @@
                 <form id="template-form" class="p-6 space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Template *</label>
-                            <input type="text" id="template-name" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Boas-vindas Indicador">
+                            <label class="block text-sm font-medium text-gray-400 mb-2">Nome do Template *</label>
+                            <input type="text" id="template-name" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Boas-vindas Indicador">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Categoria *</label>
-                            <select id="template-category" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-sm font-medium text-gray-400 mb-2">Categoria *</label>
+                            <select id="template-category" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Selecione uma categoria</option>
                                 <option value="indicadores">Indicadores</option>
                                 <option value="leads">Leads</option>
@@ -143,13 +154,13 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Conteúdo da Mensagem *</label>
-                        <textarea id="template-content" rows="6" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Digite o conteúdo da mensagem...&#10;&#10;Use {{variavel}} para variáveis dinâmicas.&#10;Ex: Olá {{nome}}, bem-vindo à {{empresa}}!"></textarea>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Conteúdo da Mensagem *</label>
+                        <textarea id="template-content" rows="6" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Digite o conteúdo da mensagem...&#10;&#10;Use {{variavel}} para variáveis dinâmicas.&#10;Ex: Olá {{nome}}, bem-vindo à {{empresa}}!"></textarea>
                         <p class="text-sm text-gray-500 mt-2">Use {{variavel}} para variáveis dinâmicas</p>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Variáveis Detectadas</label>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Variáveis Detectadas</label>
                         <div id="variables-list" class="flex flex-wrap gap-2">
                             <!-- Variables will be detected and shown here -->
                         </div>
@@ -157,27 +168,27 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Idioma</label>
-                            <select id="template-language" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-sm font-medium text-gray-400 mb-2">Idioma</label>
+                            <select id="template-language" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="pt-BR">Português (Brasil)</option>
                                 <option value="en-US">English (US)</option>
                                 <option value="es-ES">Español</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                            <select id="template-status" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-sm font-medium text-gray-400 mb-2">Status</label>
+                            <select id="template-status" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="active">Ativo</option>
                                 <option value="inactive">Inativo</option>
                             </select>
                         </div>
                     </div>
                     
-                    <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-                        <button type="button" onclick="closeTemplateModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                    <div class="flex justify-end space-x-4 pt-6 border-t border-gray-700">
+                        <button type="button" onclick="closeTemplateModal()" class="px-6 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
                             Cancelar
                         </button>
-                        <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                        <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
                             <i class="fas fa-save mr-2"></i>
                             Salvar Template
                         </button>
@@ -190,18 +201,18 @@
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="bg-gray-800 rounded-xl shadow-xl w-full max-w-md border border-gray-700">
                 <div class="p-6">
                     <div class="flex items-center mb-4">
                         <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mr-3"></i>
-                        <h3 class="text-lg font-semibold text-gray-900">Confirmar Exclusão</h3>
+                        <h3 class="text-lg font-semibold text-gray-100">Confirmar Exclusão</h3>
                     </div>
-                    <p class="text-gray-600 mb-6">Tem certeza que deseja excluir este template? Esta ação não pode ser desfeita.</p>
+                    <p class="text-gray-400 mb-6">Tem certeza que deseja excluir este template? Esta ação não pode ser desfeita.</p>
                     <div class="flex justify-end space-x-4">
-                        <button onclick="closeDeleteModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                        <button onclick="closeDeleteModal()" class="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
                             Cancelar
                         </button>
-                        <button onclick="confirmDeleteTemplate()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">
+                        <button onclick="confirmDeleteTemplate()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
                             <i class="fas fa-trash mr-2"></i>
                             Excluir
                         </button>
@@ -224,12 +235,6 @@
             document.getElementById('template-content').addEventListener('input', detectVariables);
             document.getElementById('template-form').addEventListener('submit', saveTemplate);
         });
-
-        // Sidebar toggle
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-        }
 
         // Load templates
         async function loadTemplates() {
@@ -260,7 +265,7 @@
             
             if (templates.length === 0) {
                 container.innerHTML = `
-                    <div class="p-6 text-center text-gray-500">
+                    <div class="p-6 text-center text-gray-400">
                         <i class="fas fa-file-alt text-4xl mb-4"></i>
                         <p class="text-lg">Nenhum template encontrado</p>
                         <p class="text-sm">Clique em "Novo Template" para criar o primeiro</p>
@@ -270,30 +275,30 @@
             }
 
             container.innerHTML = templates.map(template => `
-                <div class="p-6 hover:bg-gray-50">
+                <div class="p-6 hover:bg-gray-750 transition-colors">
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
-                            <div class="flex items-center space-x-3">
-                                <h3 class="text-lg font-semibold text-gray-900">${template.name}</h3>
-                                <span class="px-2 py-1 text-xs font-medium rounded-full ${template.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <h3 class="text-lg font-semibold text-gray-100">${template.name}</h3>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full ${template.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'}">
                                     ${template.status === 'active' ? 'Ativo' : 'Inativo'}
                                 </span>
-                                <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
                                     ${template.category}
                                 </span>
                             </div>
-                            <p class="text-gray-600 mt-2 line-clamp-2">${template.content.body}</p>
-                            <div class="flex items-center space-x-4 mt-3 text-sm text-gray-500">
+                            <p class="text-gray-400 mb-3 line-clamp-2">${template.content.body}</p>
+                            <div class="flex items-center space-x-4 text-sm text-gray-500">
                                 <span><i class="fas fa-language mr-1"></i>${template.language}</span>
                                 <span><i class="fas fa-calendar mr-1"></i>${new Date(template.createdAt).toLocaleDateString()}</span>
                                 <span><i class="fas fa-tags mr-1"></i>${template.variables?.length || 0} variáveis</span>
                             </div>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="editTemplate('${template._id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
+                            <button onclick="editTemplate('${template._id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button onclick="deleteTemplate('${template._id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                            <button onclick="deleteTemplate('${template._id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -345,7 +350,7 @@
             
             const variablesList = document.getElementById('variables-list');
             variablesList.innerHTML = uniqueVariables.map(variable => 
-                `<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${variable}</span>`
+                `<span class="px-2 py-1 bg-blue-900 text-blue-300 text-xs rounded-full">${variable}</span>`
             ).join('');
         }
 
@@ -445,6 +450,12 @@
         function showError(message) {
             // You can implement a toast notification here
             alert('Erro: ' + message);
+        }
+
+        // Logout function
+        function handleLogout() {
+            localStorage.removeItem('adminToken');
+            window.location.href = 'login.html';
         }
     </script>
 </body>
