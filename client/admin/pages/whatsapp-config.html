@@ -313,7 +313,6 @@
     <!-- Scripts -->
     <script src="../../js/config.js"></script>
     <script src="../../js/admin/auth.js"></script>
-    <script src="../../js/admin/whatsapp-config.js"></script>
     <script>
         // Função de logout
         function handleLogout() {
@@ -336,6 +335,97 @@
                 icon.classList.remove('fa-eye-slash');
                 icon.classList.add('fa-eye');
             }
+        }
+
+        // WhatsApp Configuration Management - INLINE VERSION
+        let currentProvider = null;
+
+        // Setup event listeners when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('WhatsApp Config page loaded');
+            
+            // Setup provider selection
+            document.querySelectorAll('input[name="provider"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    currentProvider = e.target.value;
+                    showProviderConfig();
+                    updateRadioStyling();
+                });
+            });
+
+            // Set default provider
+            currentProvider = 'twilio';
+            const twilioRadio = document.getElementById('provider-twilio');
+            if (twilioRadio) {
+                twilioRadio.checked = true;
+                showProviderConfig();
+                updateRadioStyling();
+            }
+        });
+
+        function showProviderConfig() {
+            console.log('Showing config for provider:', currentProvider);
+            
+            // Hide all provider configs
+            document.querySelectorAll('.provider-config').forEach(config => {
+                config.classList.add('hidden');
+            });
+
+            // Show selected provider config
+            if (currentProvider) {
+                const configElement = document.getElementById(`${currentProvider}-config`);
+                if (configElement) {
+                    configElement.classList.remove('hidden');
+                    console.log('Showed config for:', currentProvider);
+                } else {
+                    console.error('Config element not found for:', currentProvider);
+                }
+            }
+        }
+
+        function updateRadioStyling() {
+            document.querySelectorAll('input[name="provider"]').forEach(radio => {
+                const label = radio.closest('.relative').querySelector('label');
+                const radioCircle = label.querySelector('.w-4.h-4');
+                
+                if (radio.checked) {
+                    radioCircle.classList.remove('border-gray-400');
+                    radioCircle.classList.add('border-blue-500', 'bg-blue-500');
+                    label.classList.add('border-blue-500');
+                    label.classList.remove('border-gray-600');
+                } else {
+                    radioCircle.classList.remove('border-blue-500', 'bg-blue-500');
+                    radioCircle.classList.add('border-gray-400');
+                    label.classList.remove('border-blue-500');
+                    label.classList.add('border-gray-600');
+                }
+            });
+        }
+
+        function saveWhatsAppConfig() {
+            console.log('Saving WhatsApp config...');
+            // TODO: Implement save functionality
+            alert('Funcionalidade de salvar será implementada em breve!');
+        }
+
+        function testWhatsAppConnection() {
+            console.log('Testing WhatsApp connection...');
+            // TODO: Implement test functionality
+            alert('Funcionalidade de teste será implementada em breve!');
+        }
+
+        function resetWhatsAppConfig() {
+            console.log('Resetting WhatsApp config...');
+            if (confirm('Tem certeza que deseja resetar todas as configurações?')) {
+                // TODO: Implement reset functionality
+                alert('Funcionalidade de reset será implementada em breve!');
+            }
+        }
+
+        function saveGlobalSettings() {
+            console.log('Saving global settings...');
+            // TODO: Implement save functionality
+            alert('Funcionalidade de salvar será implementada em breve!');
         }
     </script>
 </body>
