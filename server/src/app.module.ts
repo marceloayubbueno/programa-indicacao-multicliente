@@ -22,6 +22,7 @@ import { FinanceModule } from './finance/finance.module';
 import { EmailTemplatesModule } from './email-templates/email-templates.module';
 import { EmailConfigModule } from './email-config/email-config.module';
 import { MailModule } from './common/mail.module';
+import { WhatsAppModule } from './whatsapp/whatsapp.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { MailModule } from './common/mail.module';
     EmailTemplatesModule,
     EmailConfigModule,
     MailModule,
+    WhatsAppModule,
   ],
   controllers: [AppController],
   providers: [AppService],
