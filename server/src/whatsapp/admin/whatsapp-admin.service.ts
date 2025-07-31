@@ -100,35 +100,42 @@ export class WhatsAppAdminService {
   }
 
   async testConnection(testData: any): Promise<any> {
-    const { testPhone, ...configData } = testData;
+    const { phoneNumber, provider, credentials } = testData;
     
-    if (!testPhone) {
+    if (!phoneNumber) {
       throw new Error('Número de telefone de teste é obrigatório');
     }
 
     // Valida formato do telefone
-    if (!this.isValidPhoneNumber(testPhone)) {
+    if (!this.isValidPhoneNumber(phoneNumber)) {
       throw new Error('Formato de telefone inválido');
     }
 
-    // Salva configuração temporariamente
-    const tempConfig = await this.saveConfig(configData);
-    
-    if (!tempConfig.status.connected) {
-      throw new Error('Configuração não está conectada');
+    // Valida credenciais
+    if (!provider || !credentials) {
+      throw new Error('Provedor e credenciais são obrigatórios');
     }
 
     try {
+      // Testa conexão com o provedor
+      const isConnected = await this.testProviderConnection(provider, credentials);
+      
+      if (!isConnected) {
+        throw new Error('Falha na conexão com o provedor WhatsApp');
+      }
+
       // Envia mensagem de teste
-      const testMessage = await this.sendTestMessage(testPhone, tempConfig);
+      const testMessage = await this.sendTestMessage(phoneNumber, { provider, credentials });
       
       return {
         success: true,
         message: 'Mensagem de teste enviada com sucesso',
-        messageId: testMessage.providerResponse?.messageId
+        messageId: testMessage.providerResponse?.messageId,
+        status: testMessage.status
       };
     } catch (error) {
-      throw new Error(`Erro ao enviar mensagem de teste: ${error.message}`);
+      console.error('Error in testConnection:', error);
+      throw new Error(`Erro ao testar conexão WhatsApp: ${error.message}`);
     }
   }
 
@@ -304,18 +311,33 @@ export class WhatsAppAdminService {
   }
 
   private async sendTwilioMessage(phoneNumber: string, credentials: any): Promise<any> {
-    const client = twilio(credentials.accountSid, credentials.authToken);
-    
-    const message = await client.messages.create({
-      body: 'Teste de conectividade WhatsApp - Sistema de Indicação',
-      from: `whatsapp:${credentials.whatsappNumber}`,
-      to: `whatsapp:${phoneNumber}`
-    });
+    try {
+      console.log('Enviando mensagem Twilio para:', phoneNumber);
+      console.log('Credenciais:', { accountSid: credentials.accountSid, whatsappNumber: credentials.whatsappNumber });
+      
+      const client = twilio(credentials.accountSid, credentials.authToken);
+      
+      const message = await client.messages.create({
+        body: 'Teste de conectividade WhatsApp - Sistema de Indicação',
+        from: `whatsapp:${credentials.whatsappNumber}`,
+        to: `whatsapp:${phoneNumber}`
+      });
 
-    return {
-      sid: message.sid,
-      status: message.status
-    };
+      console.log('Mensagem Twilio enviada:', message.sid);
+      
+      return {
+        sid: message.sid,
+        status: message.status
+      };
+    } catch (error) {
+      console.error('Erro ao enviar mensagem Twilio:', error);
+      console.error('Detalhes do erro:', {
+        code: error.code,
+        message: error.message,
+        moreInfo: error.moreInfo
+      });
+      throw new Error(`Erro Twilio: ${error.message} (${error.code})`);
+    }
   }
 
   private async sendMetaMessage(phoneNumber: string, credentials: any): Promise<any> {
