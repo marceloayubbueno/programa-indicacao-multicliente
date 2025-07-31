@@ -402,31 +402,192 @@
             });
         }
 
-        function saveWhatsAppConfig() {
-            console.log('Saving WhatsApp config...');
-            // TODO: Implement save functionality
-            alert('Funcionalidade de salvar será implementada em breve!');
-        }
+                 async function saveWhatsAppConfig() {
+             console.log('Saving WhatsApp config...');
+             
+             try {
+                 // Coletar dados do formulário
+                 const config = {
+                     provider: currentProvider,
+                     credentials: getProviderCredentials(),
+                     globalSettings: getGlobalSettings()
+                 };
 
-        function testWhatsAppConnection() {
-            console.log('Testing WhatsApp connection...');
-            // TODO: Implement test functionality
-            alert('Funcionalidade de teste será implementada em breve!');
-        }
+                 // Validar dados
+                 if (!config.provider) {
+                     alert('Selecione um provedor!');
+                     return;
+                 }
 
-        function resetWhatsAppConfig() {
-            console.log('Resetting WhatsApp config...');
-            if (confirm('Tem certeza que deseja resetar todas as configurações?')) {
-                // TODO: Implement reset functionality
-                alert('Funcionalidade de reset será implementada em breve!');
-            }
-        }
+                 if (!validateCredentials(config.credentials)) {
+                     alert('Preencha todas as credenciais obrigatórias!');
+                     return;
+                 }
 
-        function saveGlobalSettings() {
-            console.log('Saving global settings...');
-            // TODO: Implement save functionality
-            alert('Funcionalidade de salvar será implementada em breve!');
-        }
+                 // Enviar para API
+                 const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/config`, {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                     },
+                     body: JSON.stringify(config)
+                 });
+
+                 if (response.ok) {
+                     const result = await response.json();
+                     alert('Configuração salva com sucesso!');
+                     console.log('Config saved:', result);
+                     
+                     // Atualizar status
+                     updateStatusDisplay(result);
+                 } else {
+                     const error = await response.json();
+                     alert(`Erro ao salvar: ${error.message || 'Erro desconhecido'}`);
+                 }
+             } catch (error) {
+                 console.error('Error saving config:', error);
+                 alert('Erro ao conectar com o servidor');
+             }
+         }
+
+         async function testWhatsAppConnection() {
+             console.log('Testing WhatsApp connection...');
+             
+             const testPhone = document.getElementById('test-phone').value;
+             if (!testPhone) {
+                 alert('Digite um número de telefone para teste!');
+                 return;
+             }
+
+             try {
+                 const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/test`, {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                     },
+                     body: JSON.stringify({
+                         phoneNumber: testPhone,
+                         provider: currentProvider,
+                         credentials: getProviderCredentials()
+                     })
+                 });
+
+                 if (response.ok) {
+                     const result = await response.json();
+                     alert(`Teste realizado com sucesso!\nMensagem ID: ${result.messageId}\nStatus: ${result.status}`);
+                     console.log('Test result:', result);
+                 } else {
+                     const error = await response.json();
+                     alert(`Erro no teste: ${error.message || 'Erro desconhecido'}`);
+                 }
+             } catch (error) {
+                 console.error('Error testing connection:', error);
+                 alert('Erro ao conectar com o servidor');
+             }
+         }
+
+         function resetWhatsAppConfig() {
+             console.log('Resetting WhatsApp config...');
+             if (confirm('Tem certeza que deseja resetar todas as configurações?')) {
+                 // Limpar campos
+                 document.querySelectorAll('input[type="text"], input[type="password"]').forEach(input => {
+                     input.value = '';
+                 });
+                 
+                 // Resetar seleções
+                 document.getElementById('rate-limit-per-minute').value = '30';
+                 document.getElementById('send-time-start').value = '08:00';
+                 document.getElementById('send-time-end').value = '20:00';
+                 document.getElementById('timezone').value = 'America/Sao_Paulo';
+                 document.getElementById('enable-webhooks').checked = false;
+                 
+                 alert('Configurações resetadas!');
+             }
+         }
+
+         async function saveGlobalSettings() {
+             console.log('Saving global settings...');
+             
+             try {
+                 const settings = getGlobalSettings();
+                 
+                 const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/config`, {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                     },
+                     body: JSON.stringify({
+                         provider: currentProvider,
+                         credentials: getProviderCredentials(),
+                         globalSettings: settings
+                     })
+                 });
+
+                 if (response.ok) {
+                     alert('Configurações globais salvas com sucesso!');
+                 } else {
+                     const error = await response.json();
+                     alert(`Erro ao salvar: ${error.message || 'Erro desconhecido'}`);
+                 }
+             } catch (error) {
+                 console.error('Error saving global settings:', error);
+                 alert('Erro ao conectar com o servidor');
+             }
+         }
+
+         // Funções auxiliares
+         function getProviderCredentials() {
+             const credentials = {};
+             
+             if (currentProvider === 'twilio') {
+                 credentials.accountSid = document.getElementById('twilio-account-sid').value;
+                 credentials.authToken = document.getElementById('twilio-auth-token').value;
+                 credentials.whatsappNumber = document.getElementById('twilio-whatsapp-number').value;
+             } else if (currentProvider === 'meta') {
+                 credentials.accessToken = document.getElementById('meta-access-token').value;
+                 credentials.phoneNumberId = document.getElementById('meta-phone-number-id').value;
+                 credentials.businessAccountId = document.getElementById('meta-business-account-id').value;
+             } else if (currentProvider === '360dialog') {
+                 credentials.apiKey = document.getElementById('360dialog-api-key').value;
+                 credentials.instanceId = document.getElementById('360dialog-instance-id').value;
+             }
+             
+             return credentials;
+         }
+
+         function getGlobalSettings() {
+             return {
+                 rateLimitPerMinute: parseInt(document.getElementById('rate-limit-per-minute').value) || 30,
+                 sendTimeStart: document.getElementById('send-time-start').value || '08:00',
+                 sendTimeEnd: document.getElementById('send-time-end').value || '20:00',
+                 timezone: document.getElementById('timezone').value || 'America/Sao_Paulo',
+                 enableWebhooks: document.getElementById('enable-webhooks').checked
+             };
+         }
+
+         function validateCredentials(credentials) {
+             if (currentProvider === 'twilio') {
+                 return credentials.accountSid && credentials.authToken && credentials.whatsappNumber;
+             } else if (currentProvider === 'meta') {
+                 return credentials.accessToken && credentials.phoneNumberId && credentials.businessAccountId;
+             } else if (currentProvider === '360dialog') {
+                 return credentials.apiKey && credentials.instanceId;
+             }
+             return false;
+         }
+
+         function updateStatusDisplay(config) {
+             if (config) {
+                 document.getElementById('provider-name').textContent = config.provider || '-';
+                 document.getElementById('connection-status').textContent = config.status?.connected ? 'Conectado' : 'Desconectado';
+                 document.getElementById('whatsapp-status').innerHTML = config.status?.connected ? 
+                     '<i class="fas fa-circle mr-1 text-green-400"></i>Conectado' : 
+                     '<i class="fas fa-circle mr-1 text-red-400"></i>Desconectado';
+             }
+         }
     </script>
 </body>
 </html> 
