@@ -340,28 +340,104 @@
         // WhatsApp Configuration Management - INLINE VERSION
         let currentProvider = null;
 
-        // Setup event listeners when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('WhatsApp Config page loaded');
-            
-            // Setup provider selection
-            document.querySelectorAll('input[name="provider"]').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    currentProvider = e.target.value;
-                    showProviderConfig();
-                    updateRadioStyling();
-                });
-            });
+                 // Setup event listeners when page loads
+         document.addEventListener('DOMContentLoaded', function() {
+             console.log('WhatsApp Config page loaded');
+             
+             // Setup provider selection
+             document.querySelectorAll('input[name="provider"]').forEach(radio => {
+                 radio.addEventListener('change', (e) => {
+                     currentProvider = e.target.value;
+                     showProviderConfig();
+                     updateRadioStyling();
+                 });
+             });
 
-            // Set default provider
-            currentProvider = 'twilio';
-            const twilioRadio = document.getElementById('provider-twilio');
-            if (twilioRadio) {
-                twilioRadio.checked = true;
-                showProviderConfig();
-                updateRadioStyling();
-            }
-        });
+             // Carregar configurações salvas
+             loadSavedConfig();
+         });
+
+         async function loadSavedConfig() {
+             try {
+                 console.log('Carregando configurações salvas...');
+                 
+                 const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/config`, {
+                     method: 'GET',
+                     headers: {
+                         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                     }
+                 });
+
+                 if (response.ok) {
+                     const config = await response.json();
+                     console.log('Configurações carregadas:', config);
+                     
+                     // Preencher campos com dados salvos
+                     fillConfigFields(config);
+                     
+                     // Atualizar status
+                     updateStatusDisplay(config);
+                 } else {
+                     console.log('Nenhuma configuração salva encontrada, usando padrão');
+                     // Usar configuração padrão
+                     setDefaultConfig();
+                 }
+             } catch (error) {
+                 console.error('Erro ao carregar configurações:', error);
+                 // Usar configuração padrão em caso de erro
+                 setDefaultConfig();
+             }
+         }
+
+         function fillConfigFields(config) {
+             if (config.provider) {
+                 currentProvider = config.provider;
+                 
+                 // Selecionar provedor correto
+                 const providerRadio = document.getElementById(`provider-${config.provider}`);
+                 if (providerRadio) {
+                     providerRadio.checked = true;
+                     showProviderConfig();
+                     updateRadioStyling();
+                 }
+
+                 // Preencher credenciais
+                 if (config.credentials) {
+                     if (config.provider === 'twilio') {
+                         document.getElementById('twilio-account-sid').value = config.credentials.accountSid || '';
+                         document.getElementById('twilio-auth-token').value = config.credentials.authToken || '';
+                         document.getElementById('twilio-whatsapp-number').value = config.credentials.whatsappNumber || '';
+                     } else if (config.provider === 'meta') {
+                         document.getElementById('meta-access-token').value = config.credentials.accessToken || '';
+                         document.getElementById('meta-phone-number-id').value = config.credentials.phoneNumberId || '';
+                         document.getElementById('meta-business-account-id').value = config.credentials.businessAccountId || '';
+                     } else if (config.provider === '360dialog') {
+                         document.getElementById('360dialog-api-key').value = config.credentials.apiKey || '';
+                         document.getElementById('360dialog-instance-id').value = config.credentials.instanceId || '';
+                     }
+                 }
+
+                 // Preencher configurações globais
+                 if (config.globalSettings) {
+                     document.getElementById('rate-limit-per-minute').value = config.globalSettings.rateLimitPerMinute || 30;
+                     document.getElementById('send-time-start').value = config.globalSettings.sendTimeStart || '08:00';
+                     document.getElementById('send-time-end').value = config.globalSettings.sendTimeEnd || '20:00';
+                     document.getElementById('timezone').value = config.globalSettings.timezone || 'America/Sao_Paulo';
+                     document.getElementById('enable-webhooks').checked = config.globalSettings.enableWebhooks !== false;
+                 }
+             }
+         }
+
+         function setDefaultConfig() {
+             // Configurar Twilio como padrão
+             currentProvider = 'twilio';
+             const twilioRadio = document.getElementById('provider-twilio');
+             if (twilioRadio) {
+                 twilioRadio.checked = true;
+                 showProviderConfig();
+                 updateRadioStyling();
+             }
+         }
 
         function showProviderConfig() {
             console.log('Showing config for provider:', currentProvider);
