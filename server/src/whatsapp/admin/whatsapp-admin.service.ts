@@ -117,15 +117,24 @@ export class WhatsAppAdminService {
     }
 
     try {
-      // Testa conexão com o provedor
+      console.log('=== INÍCIO TESTE DE CONEXÃO ===');
+      console.log('Provedor:', provider);
+      console.log('Telefone:', phoneNumber);
+      
+      // Testa conexão com o provedor primeiro
+      console.log('Testando conectividade básica...');
       const isConnected = await this.testProviderConnection(provider, credentials);
       
       if (!isConnected) {
-        throw new Error('Falha na conexão com o provedor WhatsApp');
+        throw new Error('Falha na conexão básica com o provedor WhatsApp');
       }
+
+      console.log('Conectividade básica OK, tentando enviar mensagem...');
 
       // Envia mensagem de teste
       const testMessage = await this.sendTestMessage(phoneNumber, { provider, credentials });
+      
+      console.log('=== TESTE CONCLUÍDO COM SUCESSO ===');
       
       return {
         success: true,
@@ -134,7 +143,8 @@ export class WhatsAppAdminService {
         status: testMessage.status
       };
     } catch (error) {
-      console.error('Error in testConnection:', error);
+      console.error('=== ERRO NO TESTE DE CONEXÃO ===');
+      console.error('Erro completo:', error);
       throw new Error(`Erro ao testar conexão WhatsApp: ${error.message}`);
     }
   }
@@ -312,55 +322,85 @@ export class WhatsAppAdminService {
 
   private async sendTwilioMessage(phoneNumber: string, credentials: any): Promise<any> {
     try {
-      console.log('Enviando mensagem Twilio para:', phoneNumber);
-      console.log('Credenciais:', { accountSid: credentials.accountSid, whatsappNumber: credentials.whatsappNumber });
+      console.log('=== INÍCIO ENVIO TWILIO ===');
+      console.log('Telefone de destino:', phoneNumber);
+      console.log('Número WhatsApp configurado:', credentials.whatsappNumber);
+      console.log('Account SID:', credentials.accountSid);
       
       // Validações específicas para Twilio
       if (!credentials.whatsappNumber) {
         throw new Error('Número WhatsApp não configurado');
       }
 
+      if (!credentials.accountSid || !credentials.authToken) {
+        throw new Error('Credenciais Twilio incompletas');
+      }
+
       // Formatar número de telefone para Twilio
       const formattedPhone = this.formatPhoneForTwilio(phoneNumber);
-      console.log('Telefone formatado:', formattedPhone);
+      console.log('Telefone formatado para Twilio:', formattedPhone);
       
       const client = twilio(credentials.accountSid, credentials.authToken);
       
+      // Verificar se o sandbox está ativo primeiro
+      console.log('Verificando sandbox...');
+      try {
+        const sandboxInfo = await client.messaging.v1.services('MG' + credentials.accountSid.substring(2)).fetch();
+        console.log('Sandbox encontrado:', sandboxInfo.sid);
+      } catch (sandboxError) {
+        console.log('Sandbox não encontrado, tentando envio direto...');
+      }
+      
+      console.log('Enviando mensagem...');
       const message = await client.messages.create({
         body: 'Teste de conectividade WhatsApp - Sistema de Indicação',
         from: `whatsapp:${credentials.whatsappNumber}`,
         to: `whatsapp:${formattedPhone}`
       });
 
-      console.log('Mensagem Twilio enviada:', message.sid);
+      console.log('Mensagem Twilio enviada com sucesso!');
+      console.log('Message SID:', message.sid);
+      console.log('Status:', message.status);
+      console.log('=== FIM ENVIO TWILIO ===');
       
       return {
         sid: message.sid,
         status: message.status
       };
     } catch (error) {
-      console.error('Erro ao enviar mensagem Twilio:', error);
-      console.error('Detalhes do erro:', {
-        code: error.code,
-        message: error.message,
-        moreInfo: error.moreInfo,
-        status: error.status
-      });
+      console.error('=== ERRO TWILIO ===');
+      console.error('Código do erro:', error.code);
+      console.error('Mensagem do erro:', error.message);
+      console.error('Informações adicionais:', error.moreInfo);
+      console.error('Status HTTP:', error.status);
+      console.error('Stack trace:', error.stack);
+      console.error('=== FIM ERRO TWILIO ===');
 
       // Tratamento específico para erro 540
       if (error.code === 540) {
-        throw new Error(`Erro 540: Número não verificado no sandbox. Envie "join <palavra-chave>" para ${credentials.whatsappNumber} no WhatsApp`);
+        throw new Error(`Erro 540: Número não verificado no sandbox do WhatsApp. Para resolver:
+1. Abra o WhatsApp no seu telefone
+2. Envie a mensagem "join <palavra-chave>" para ${credentials.whatsappNumber}
+3. Aguarde a confirmação
+4. Tente novamente`);
       }
 
-      // Outros erros comuns
+      // Outros erros comuns do Twilio
       if (error.code === 21211) {
-        throw new Error('Número de telefone inválido');
+        throw new Error('Número de telefone inválido. Use formato: +5511999999999');
       }
       if (error.code === 21214) {
-        throw new Error('Número não está no sandbox do WhatsApp');
+        throw new Error('Número não está no sandbox do WhatsApp. Verifique se enviou "join <palavra-chave>"');
+      }
+      if (error.code === 21215) {
+        throw new Error('Credenciais Twilio inválidas. Verifique Account SID e Auth Token');
+      }
+      if (error.code === 21608) {
+        throw new Error('Número WhatsApp não configurado corretamente');
       }
 
-      throw new Error(`Erro Twilio: ${error.message} (${error.code})`);
+      // Erro genérico com mais detalhes
+      throw new Error(`Erro Twilio (${error.code}): ${error.message}. Verifique as credenciais e configuração do sandbox.`);
     }
   }
 
