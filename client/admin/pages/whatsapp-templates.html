@@ -240,10 +240,10 @@
         async function loadTemplates() {
             try {
                 console.log('Carregando templates...');
-                console.log('API URL:', `${window.API_BASE_URL}/admin/whatsapp/templates`);
+                console.log('API URL:', `${window.API_URL}/admin/whatsapp/templates`);
                 console.log('Token:', localStorage.getItem('adminToken') ? 'Presente' : 'Ausente');
                 
-                const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/templates`, {
+                const response = await fetch(`${window.API_URL}/admin/whatsapp/templates`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
@@ -390,8 +390,8 @@
 
             try {
                 const url = currentTemplateId 
-                    ? `${window.API_BASE_URL}/admin/whatsapp/templates/${currentTemplateId}`
-                    : `${window.API_BASE_URL}/admin/whatsapp/templates`;
+                    ? `${window.API_URL}/admin/whatsapp/templates/${currentTemplateId}`
+                    : `${window.API_URL}/admin/whatsapp/templates`;
                 
                 const method = currentTemplateId ? 'PUT' : 'POST';
                 
@@ -438,7 +438,7 @@
         // Confirm delete template
         async function confirmDeleteTemplate() {
             try {
-                const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/templates/${currentTemplateId}`, {
+                const response = await fetch(`${window.API_URL}/admin/whatsapp/templates/${currentTemplateId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
