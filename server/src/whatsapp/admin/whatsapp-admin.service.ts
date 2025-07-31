@@ -106,8 +106,13 @@ export class WhatsAppAdminService {
       throw new Error('Número de telefone de teste é obrigatório');
     }
 
+    // Limpa o número de telefone (remove espaços e caracteres especiais)
+    const cleanPhoneNumber = phoneNumber.trim().replace(/\s+/g, '');
+    console.log('Número original:', phoneNumber);
+    console.log('Número limpo:', cleanPhoneNumber);
+
     // Valida formato do telefone
-    if (!this.isValidPhoneNumber(phoneNumber)) {
+    if (!this.isValidPhoneNumber(cleanPhoneNumber)) {
       throw new Error('Formato de telefone inválido');
     }
 
@@ -117,22 +122,23 @@ export class WhatsAppAdminService {
     }
 
     try {
-      console.log('=== INÍCIO TESTE DE CONEXÃO ===');
-      console.log('Provedor:', provider);
-      console.log('Telefone:', phoneNumber);
-      
-      // Testa conexão com o provedor primeiro
-      console.log('Testando conectividade básica...');
-      const isConnected = await this.testProviderConnection(provider, credentials);
-      
-      if (!isConnected) {
-        throw new Error('Falha na conexão básica com o provedor WhatsApp');
-      }
+             console.log('=== INÍCIO TESTE DE CONEXÃO ===');
+       console.log('Provedor:', provider);
+       console.log('Telefone original:', phoneNumber);
+       console.log('Telefone limpo:', cleanPhoneNumber);
+       
+       // Testa conexão com o provedor primeiro
+       console.log('Testando conectividade básica...');
+       const isConnected = await this.testProviderConnection(provider, credentials);
+       
+       if (!isConnected) {
+         throw new Error('Falha na conexão básica com o provedor WhatsApp');
+       }
 
-      console.log('Conectividade básica OK, tentando enviar mensagem...');
+       console.log('Conectividade básica OK, tentando enviar mensagem...');
 
-      // Envia mensagem de teste
-      const testMessage = await this.sendTestMessage(phoneNumber, { provider, credentials });
+       // Envia mensagem de teste
+       const testMessage = await this.sendTestMessage(cleanPhoneNumber, { provider, credentials });
       
       console.log('=== TESTE CONCLUÍDO COM SUCESSO ===');
       
