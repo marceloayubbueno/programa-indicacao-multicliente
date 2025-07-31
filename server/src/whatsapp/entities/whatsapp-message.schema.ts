@@ -40,7 +40,7 @@ export class WhatsAppMessage {
   @Prop({ type: Object })
   variables?: Record<string, any>;
 
-  @Prop({ required: true, enum: ['pending', 'sent', 'delivered', 'read', 'failed'] })
+  @Prop({ required: true, enum: ['pending', 'queued', 'sent', 'delivered', 'read', 'failed'] })
   status: string;
 
   @Prop({ type: Object })
