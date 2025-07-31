@@ -315,12 +315,21 @@ export class WhatsAppAdminService {
       console.log('Enviando mensagem Twilio para:', phoneNumber);
       console.log('Credenciais:', { accountSid: credentials.accountSid, whatsappNumber: credentials.whatsappNumber });
       
+      // Validações específicas para Twilio
+      if (!credentials.whatsappNumber) {
+        throw new Error('Número WhatsApp não configurado');
+      }
+
+      // Formatar número de telefone para Twilio
+      const formattedPhone = this.formatPhoneForTwilio(phoneNumber);
+      console.log('Telefone formatado:', formattedPhone);
+      
       const client = twilio(credentials.accountSid, credentials.authToken);
       
       const message = await client.messages.create({
         body: 'Teste de conectividade WhatsApp - Sistema de Indicação',
         from: `whatsapp:${credentials.whatsappNumber}`,
-        to: `whatsapp:${phoneNumber}`
+        to: `whatsapp:${formattedPhone}`
       });
 
       console.log('Mensagem Twilio enviada:', message.sid);
@@ -334,10 +343,40 @@ export class WhatsAppAdminService {
       console.error('Detalhes do erro:', {
         code: error.code,
         message: error.message,
-        moreInfo: error.moreInfo
+        moreInfo: error.moreInfo,
+        status: error.status
       });
+
+      // Tratamento específico para erro 540
+      if (error.code === 540) {
+        throw new Error(`Erro 540: Número não verificado no sandbox. Envie "join <palavra-chave>" para ${credentials.whatsappNumber} no WhatsApp`);
+      }
+
+      // Outros erros comuns
+      if (error.code === 21211) {
+        throw new Error('Número de telefone inválido');
+      }
+      if (error.code === 21214) {
+        throw new Error('Número não está no sandbox do WhatsApp');
+      }
+
       throw new Error(`Erro Twilio: ${error.message} (${error.code})`);
     }
+  }
+
+  private formatPhoneForTwilio(phone: string): string {
+    // Remove todos os caracteres não numéricos exceto +
+    let formatted = phone.replace(/[^\d+]/g, '');
+    
+    // Garante que começa com +
+    if (!formatted.startsWith('+')) {
+      formatted = '+' + formatted;
+    }
+    
+    // Remove zeros extras após o código do país
+    formatted = formatted.replace(/^\+(\d{1,3})0+/, '+$1');
+    
+    return formatted;
   }
 
   private async sendMetaMessage(phoneNumber: string, credentials: any): Promise<any> {
@@ -390,9 +429,15 @@ export class WhatsAppAdminService {
   }
 
   private isValidPhoneNumber(phone: string): boolean {
-    // Validação básica de formato de telefone
-    const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    return phoneRegex.test(phone);
+    // Validação mais específica para Twilio
+    const phoneRegex = /^\+[1-9]\d{10,14}$/;
+    const isValid = phoneRegex.test(phone);
+    
+    if (!isValid) {
+      console.log('Telefone inválido:', phone);
+    }
+    
+    return isValid;
   }
 
   private async getMessagesToday(): Promise<number> {
