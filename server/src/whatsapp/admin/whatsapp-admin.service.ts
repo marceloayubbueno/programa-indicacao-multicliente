@@ -558,4 +558,93 @@ export class WhatsAppAdminService {
     // TODO: Implementar contagem de templates
     return 0;
   }
+
+  async getMessageStatus(messageId: string): Promise<any> {
+    try {
+      console.log('=== VERIFICANDO STATUS DA MENSAGEM ===');
+      console.log('Message ID:', messageId);
+      
+      // Busca a mensagem no banco
+      const message = await this.whatsappMessageModel.findOne({
+        'providerResponse.messageId': messageId
+      }).exec();
+      
+      if (!message) {
+        throw new Error('Mensagem não encontrada');
+      }
+      
+      console.log('Mensagem encontrada no banco:', {
+        id: message._id,
+        status: message.status,
+        to: message.to,
+        from: message.from
+      });
+      
+      // Se for Twilio, verifica o status atual
+      if (message.providerResponse && message.providerResponse.provider === 'twilio') {
+        const config = await this.getConfig();
+        const credentials = config.credentials;
+        
+        if (credentials.accountSid && credentials.authToken) {
+          try {
+            const client = twilio(credentials.accountSid, credentials.authToken);
+            const twilioMessage = await client.messages(messageId).fetch();
+            
+            console.log('Status atual no Twilio:', {
+              sid: twilioMessage.sid,
+              status: twilioMessage.status,
+              errorCode: twilioMessage.errorCode,
+              errorMessage: twilioMessage.errorMessage,
+              direction: twilioMessage.direction,
+              from: twilioMessage.from,
+              to: twilioMessage.to,
+              dateCreated: twilioMessage.dateCreated,
+              dateUpdated: twilioMessage.dateUpdated
+            });
+            
+            // Atualiza o status no banco
+            await this.whatsappMessageModel.updateOne(
+              { _id: message._id },
+              { 
+                $set: { 
+                  status: twilioMessage.status,
+                  'providerResponse.errorCode': twilioMessage.errorCode,
+                  'providerResponse.errorMessage': twilioMessage.errorMessage
+                }
+              }
+            );
+            
+            return {
+              messageId,
+              status: twilioMessage.status,
+              errorCode: twilioMessage.errorCode,
+              errorMessage: twilioMessage.errorMessage,
+              direction: twilioMessage.direction,
+              from: twilioMessage.from,
+              to: twilioMessage.to,
+              dateCreated: twilioMessage.dateCreated,
+              dateUpdated: twilioMessage.dateUpdated
+            };
+          } catch (twilioError) {
+            console.error('Erro ao verificar status no Twilio:', twilioError);
+            return {
+              messageId,
+              status: message.status,
+              error: 'Erro ao verificar status no Twilio'
+            };
+          }
+        }
+      }
+      
+      return {
+        messageId,
+        status: message.status,
+        to: message.to,
+        from: message.from
+      };
+    } catch (error) {
+      console.error('Erro ao verificar status da mensagem:', error);
+      throw error;
+    }
+  }
 } 

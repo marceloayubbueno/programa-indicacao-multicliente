@@ -47,6 +47,7 @@ export class WhatsAppMessage {
   providerResponse?: {
     messageId: string;
     status: string;
+    provider?: string;
     errorCode?: string;
     errorMessage?: string;
   };

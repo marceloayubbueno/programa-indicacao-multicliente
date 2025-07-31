@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WhatsAppAdminService } from './whatsapp-admin.service';
 
@@ -65,6 +65,18 @@ export class WhatsAppAdminController {
     } catch (error) {
       throw new HttpException(
         'Erro ao buscar status WhatsApp',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get('message/:messageId/status')
+  async getMessageStatus(@Param('messageId') messageId: string) {
+    try {
+      return await this.whatsappAdminService.getMessageStatus(messageId);
+    } catch (error) {
+      throw new HttpException(
+        'Erro ao buscar status da mensagem',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
