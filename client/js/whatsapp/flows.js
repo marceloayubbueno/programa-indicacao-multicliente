@@ -164,60 +164,88 @@ function renderFlows() {
     const grid = document.getElementById('flowsGrid');
     if (!grid) return;
 
-    grid.innerHTML = '';
-
-    flows.forEach(flow => {
-        const card = createFlowCard(flow);
-        grid.appendChild(card);
-    });
-}
-
-function createFlowCard(flow) {
-    const card = document.createElement('div');
-    card.className = 'bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-blue-500 transition-colors';
-    
-    const statusColor = flow.status === 'active' ? 'text-green-400' : 'text-yellow-400';
-    const statusText = flow.status === 'active' ? 'Ativo' : 'Rascunho';
-    
-    card.innerHTML = `
-        <div class="flex items-start justify-between mb-4">
-            <div class="flex-1">
-                <h3 class="text-lg font-semibold text-gray-100 mb-2">${flow.name}</h3>
-                <p class="text-gray-400 text-sm mb-3">${flow.description}</p>
-                <div class="flex items-center gap-4 text-sm">
-                    <span class="text-blue-400">
-                        <i class="fas fa-users mr-1"></i>${getTargetAudienceText(flow.targetAudience)}
-                    </span>
-                    <span class="${statusColor}">
-                        <i class="fas fa-circle mr-1"></i>${statusText}
-                    </span>
-                    <span class="text-gray-500">
-                        <i class="fas fa-comments mr-1"></i>${flow.messages.length} mensagens
-                    </span>
+    if (flows.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <div class="bg-gray-800 rounded-xl p-8 max-w-md mx-auto">
+                    <i class="fas fa-project-diagram text-6xl text-gray-500 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-300 mb-2">Nenhum fluxo criado</h3>
+                    <p class="text-gray-400 mb-6">Crie seu primeiro fluxo de mensagens WhatsApp</p>
+                    <button onclick="openCreateFlowModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Criar Primeiro Fluxo
+                    </button>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="editFlow('${flow.id}')" class="text-blue-400 hover:text-blue-300 p-2">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="deleteFlow('${flow.id}')" class="text-red-400 hover:text-red-300 p-2">
-                    <i class="fas fa-trash"></i>
-                </button>
+        `;
+        return;
+    }
+
+    grid.innerHTML = `
+        <div class="col-span-full">
+            <div class="bg-gray-800 rounded-xl border border-gray-700">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-750 border-b border-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fluxo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Público-Alvo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mensagens</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            ${flows.map(flow => `
+                                <tr class="hover:bg-gray-750 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-100">${flow.name}</div>
+                                            <div class="text-sm text-gray-400 mt-1 max-w-xs truncate">${flow.description}</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
+                                            ${getTargetAudienceText(flow.targetAudience)}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${flow.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'}">
+                                            ${flow.status === 'active' ? 'Ativo' : 'Rascunho'}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-sm text-gray-400">${flow.messages.length}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-sm text-gray-400">${new Date(flow.createdAt).toLocaleDateString('pt-BR')}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button onclick="toggleFlowStatus('${flow.id}')" 
+                                                    class="p-2 ${flow.status === 'active' ? 'text-red-400 hover:bg-red-900/20' : 'text-green-400 hover:bg-green-900/20'} rounded-lg transition-colors" 
+                                                    title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
+                                                <i class="fas ${flow.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <div class="flex justify-between items-center">
-            <span class="text-gray-500 text-sm">
-                Criado em ${new Date(flow.createdAt).toLocaleDateString('pt-BR')}
-            </span>
-            <button onclick="toggleFlowStatus('${flow.id}')" 
-                    class="px-3 py-1 rounded-lg text-sm transition-colors ${flow.status === 'active' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}">
-                ${flow.status === 'active' ? 'Desativar' : 'Ativar'}
-            </button>
-        </div>
     `;
-    
-    return card;
 }
+
+
 
 function getTargetAudienceText(audience) {
     switch(audience) {
@@ -252,12 +280,82 @@ function renderFilteredFlows(filteredFlows) {
     const grid = document.getElementById('flowsGrid');
     if (!grid) return;
 
-    grid.innerHTML = '';
+    if (filteredFlows.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <div class="bg-gray-800 rounded-xl p-8 max-w-md mx-auto">
+                    <i class="fas fa-search text-6xl text-gray-500 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-300 mb-2">Nenhum fluxo encontrado</h3>
+                    <p class="text-gray-400">Tente ajustar os filtros de busca</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
 
-    filteredFlows.forEach(flow => {
-        const card = createFlowCard(flow);
-        grid.appendChild(card);
-    });
+    grid.innerHTML = `
+        <div class="col-span-full">
+            <div class="bg-gray-800 rounded-xl border border-gray-700">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-750 border-b border-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fluxo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Público-Alvo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mensagens</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            ${filteredFlows.map(flow => `
+                                <tr class="hover:bg-gray-750 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-100">${flow.name}</div>
+                                            <div class="text-sm text-gray-400 mt-1 max-w-xs truncate">${flow.description}</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
+                                            ${getTargetAudienceText(flow.targetAudience)}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${flow.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'}">
+                                            ${flow.status === 'active' ? 'Ativo' : 'Rascunho'}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-sm text-gray-400">${flow.messages.length}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-sm text-gray-400">${new Date(flow.createdAt).toLocaleDateString('pt-BR')}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button onclick="toggleFlowStatus('${flow.id}')" 
+                                                    class="p-2 ${flow.status === 'active' ? 'text-red-400 hover:bg-red-900/20' : 'text-green-400 hover:bg-green-900/20'} rounded-lg transition-colors" 
+                                                    title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
+                                                <i class="fas ${flow.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function openCreateFlowModal() {
