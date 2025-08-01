@@ -26,11 +26,8 @@ async function initWhatsAppFlows() {
         // Configurar eventos
         setupEventListeners();
         
-        // Inicializar formulário
-        initializeForm();
-        
     } catch (error) {
-        console.error('Erro ao inicializar WhatsApp Flows:', error);
+        console.error('Erro ao inicializar Fluxos:', error);
         showError('Erro ao carregar fluxos');
     }
 }
@@ -93,7 +90,7 @@ async function loadFlows() {
                         order: 1
                     }
                 ],
-                status: 'draft',
+                status: 'active',
                 createdAt: '2024-01-16T14:30:00Z'
             }
         ];
@@ -136,108 +133,96 @@ async function loadTemplates() {
 
 function setupEventListeners() {
     // Busca
-    const searchInput = document.getElementById('searchFlows');
+    const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             filterFlows();
         });
     }
-}
 
-function initializeForm() {
-    // Reset do formulário
-    const form = document.getElementById('flowForm');
-    if (form) {
-        form.reset();
+    // Filtros
+    const audienceFilter = document.getElementById('filter-audience');
+    const statusFilter = document.getElementById('filter-status');
+    
+    if (audienceFilter) {
+        audienceFilter.addEventListener('change', filterFlows);
     }
     
-    // Limpar containers
-    const messagesContainer = document.getElementById('messagesContainer');
-    if (messagesContainer) {
-        messagesContainer.innerHTML = '';
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterFlows);
     }
-    
-    messageCounter = 1;
 }
 
 function renderFlows() {
-    const grid = document.getElementById('flowsGrid');
-    if (!grid) return;
+    const container = document.getElementById('flows-list');
+    if (!container) return;
 
     if (flows.length === 0) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-12">
-                <div class="bg-gray-800 rounded-xl p-8 max-w-md mx-auto">
-                    <i class="fas fa-project-diagram text-6xl text-gray-500 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-300 mb-2">Nenhum fluxo criado</h3>
-                    <p class="text-gray-400 mb-6">Crie seu primeiro fluxo de mensagens WhatsApp</p>
-                    <button onclick="openCreateFlowModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-                        <i class="fas fa-plus mr-2"></i>Criar Primeiro Fluxo
-                    </button>
-                </div>
+        container.innerHTML = `
+            <div class="p-6 text-center text-gray-400">
+                <i class="fas fa-project-diagram text-6xl text-gray-500 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-300 mb-2">Nenhum fluxo criado</h3>
+                <p class="text-gray-400 mb-6">Crie seu primeiro fluxo de mensagens WhatsApp</p>
+                <button onclick="openCreateFlowModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Criar Primeiro Fluxo
+                </button>
             </div>
         `;
         return;
     }
 
-    grid.innerHTML = `
-        <div class="col-span-full">
-            <div class="bg-gray-800 rounded-xl border border-gray-700">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-750 border-b border-gray-700">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fluxo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Público-Alvo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mensagens</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-700">
-                            ${flows.map(flow => `
-                                <tr class="hover:bg-gray-750 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-medium text-gray-100">${flow.name}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
-                                            ${getTargetAudienceText(flow.targetAudience)}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${flow.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'}">
-                                            ${flow.status === 'active' ? 'Ativo' : 'Inativo'}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="text-sm text-gray-400">${flow.messages.length}</span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="text-sm text-gray-400">${new Date(flow.createdAt).toLocaleDateString('pt-BR')}</span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center space-x-2">
-                                            <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    container.innerHTML = `
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-750 border-b border-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fluxo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Público-Alvo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mensagens</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    ${flows.map(flow => `
+                        <tr class="hover:bg-gray-750 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-medium text-gray-100">${flow.name}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
+                                    ${getTargetAudienceText(flow.targetAudience)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(flow.status)}">
+                                    ${getStatusText(flow.status)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm text-gray-400">${flow.messages.length}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm text-gray-400">${formatDate(flow.createdAt)}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-2">
+                                    <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
         </div>
     `;
 }
-
-
 
 function getTargetAudienceText(audience) {
     switch(audience) {
@@ -248,115 +233,135 @@ function getTargetAudienceText(audience) {
     }
 }
 
-function filterFlows() {
-    const searchTerm = document.getElementById('searchFlows').value.toLowerCase();
-    const filteredFlows = flows.filter(flow => 
-        flow.name.toLowerCase().includes(searchTerm) ||
-        flow.description.toLowerCase().includes(searchTerm)
-    );
-    
-    renderFilteredFlows(filteredFlows);
+function getStatusColor(status) {
+    switch(status) {
+        case 'active': return 'bg-green-900 text-green-300';
+        case 'inactive': return 'bg-gray-700 text-gray-300';
+        default: return 'bg-gray-700 text-gray-300';
+    }
 }
 
-function filterByType(type) {
-    let filteredFlows = flows;
-    
-    if (type !== 'all') {
-        filteredFlows = flows.filter(flow => flow.targetAudience === type);
+function getStatusText(status) {
+    switch(status) {
+        case 'active': return 'Ativo';
+        case 'inactive': return 'Inativo';
+        default: return status;
     }
+}
+
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString('pt-BR');
+}
+
+function filterFlows() {
+    const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
+    const audienceFilter = document.getElementById('filter-audience')?.value || '';
+    const statusFilter = document.getElementById('filter-status')?.value || '';
+    
+    const filteredFlows = flows.filter(flow => {
+        const matchesSearch = flow.name.toLowerCase().includes(searchTerm) ||
+                            flow.description.toLowerCase().includes(searchTerm);
+        const matchesAudience = !audienceFilter || flow.targetAudience === audienceFilter;
+        const matchesStatus = !statusFilter || flow.status === statusFilter;
+        
+        return matchesSearch && matchesAudience && matchesStatus;
+    });
     
     renderFilteredFlows(filteredFlows);
 }
 
 function renderFilteredFlows(filteredFlows) {
-    const grid = document.getElementById('flowsGrid');
-    if (!grid) return;
+    const container = document.getElementById('flows-list');
+    if (!container) return;
 
     if (filteredFlows.length === 0) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-12">
-                <div class="bg-gray-800 rounded-xl p-8 max-w-md mx-auto">
-                    <i class="fas fa-search text-6xl text-gray-500 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-300 mb-2">Nenhum fluxo encontrado</h3>
-                    <p class="text-gray-400">Tente ajustar os filtros de busca</p>
-                </div>
+        container.innerHTML = `
+            <div class="p-6 text-center text-gray-400">
+                <i class="fas fa-search text-6xl text-gray-500 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-300 mb-2">Nenhum fluxo encontrado</h3>
+                <p class="text-gray-400">Tente ajustar os filtros de busca</p>
             </div>
         `;
         return;
     }
 
-    grid.innerHTML = `
-        <div class="col-span-full">
-            <div class="bg-gray-800 rounded-xl border border-gray-700">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-750 border-b border-gray-700">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fluxo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Público-Alvo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mensagens</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-700">
-                            ${filteredFlows.map(flow => `
-                                <tr class="hover:bg-gray-750 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-medium text-gray-100">${flow.name}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
-                                            ${getTargetAudienceText(flow.targetAudience)}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${flow.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'}">
-                                            ${flow.status === 'active' ? 'Ativo' : 'Inativo'}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="text-sm text-gray-400">${flow.messages.length}</span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="text-sm text-gray-400">${new Date(flow.createdAt).toLocaleDateString('pt-BR')}</span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center space-x-2">
-                                            <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    container.innerHTML = `
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-750 border-b border-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fluxo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Público-Alvo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mensagens</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    ${filteredFlows.map(flow => `
+                        <tr class="hover:bg-gray-750 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-medium text-gray-100">${flow.name}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
+                                    ${getTargetAudienceText(flow.targetAudience)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(flow.status)}">
+                                    ${getStatusText(flow.status)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm text-gray-400">${flow.messages.length}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm text-gray-400">${formatDate(flow.createdAt)}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-2">
+                                    <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
         </div>
     `;
 }
 
 function openCreateFlowModal() {
     currentFlow = null;
-    document.getElementById('modalTitle').textContent = 'Novo Fluxo WhatsApp';
-    document.getElementById('flowModal').classList.remove('hidden');
-    initializeForm();
+    document.getElementById('modal-title').textContent = 'Novo Fluxo';
+    document.getElementById('flow-modal').classList.remove('hidden');
+    resetForm();
 }
 
 function closeFlowModal() {
-    document.getElementById('flowModal').classList.add('hidden');
+    document.getElementById('flow-modal').classList.add('hidden');
     currentFlow = null;
-    initializeForm();
+    resetForm();
+}
+
+function resetForm() {
+    document.getElementById('flow-form').reset();
+    const container = document.getElementById('messages-container');
+    if (container) {
+        container.innerHTML = '';
+    }
+    messageCounter = 1;
 }
 
 function addMessage() {
-    const container = document.getElementById('messagesContainer');
+    const container = document.getElementById('messages-container');
     if (!container) return;
     
     // Verificar limite de 10 mensagens
@@ -441,37 +446,56 @@ function toggleSendOptions(messageId) {
     }
 }
 
-function updateTriggerOptions() {
-    const targetAudience = document.getElementById('flowTargetAudience').value;
-    const messageDivs = document.querySelectorAll('[id^="message-"]');
+function editFlow(flowId) {
+    const flow = flows.find(f => f.id === flowId);
+    if (!flow) return;
     
-    messageDivs.forEach(div => {
-        const triggerSelect = div.querySelector('select[name="trigger"]');
-        if (triggerSelect) {
-            triggerSelect.innerHTML = '<option value="">Selecione um gatilho</option>';
-            
-            if (targetAudience === 'indicators' || targetAudience === 'mixed') {
-                triggerSelect.innerHTML += '<option value="indicator_joined">Indicador se juntou</option>';
-                triggerSelect.innerHTML += '<option value="reward_earned">Recompensa ganha</option>';
-            }
-            
-            if (targetAudience === 'leads' || targetAudience === 'mixed') {
-                triggerSelect.innerHTML += '<option value="lead_indicated">Lead foi indicado</option>';
-                triggerSelect.innerHTML += '<option value="lead_converted">Lead foi convertido</option>';
-            }
+    currentFlow = flowId;
+    document.getElementById('modal-title').textContent = 'Editar Fluxo';
+    
+    // Preencher formulário
+    document.getElementById('flow-name').value = flow.name;
+    document.getElementById('flow-audience').value = flow.targetAudience;
+    document.getElementById('flow-description').value = flow.description || '';
+    
+    // Limpar e recriar mensagens
+    const container = document.getElementById('messages-container');
+    container.innerHTML = '';
+    messageCounter = 1;
+    
+    flow.messages.forEach(message => {
+        addMessage();
+        const messageDiv = document.getElementById(`message-${messageCounter - 1}`);
+        
+        // Preencher dados da mensagem
+        messageDiv.querySelector('select[name="templateId"]').value = message.templateId;
+        messageDiv.querySelector('select[name="trigger"]').value = message.trigger;
+        
+        if (message.scheduledDate) {
+            messageDiv.querySelector('select[name="sendType"]').value = 'date';
+            toggleSendOptions(messageCounter - 1);
+            messageDiv.querySelector('input[name="scheduledDate"]').value = new Date(message.scheduledDate).toISOString().slice(0, 16);
+        } else {
+            messageDiv.querySelector('input[name="delay"]').value = message.delay || 0;
         }
     });
+    
+    document.getElementById('flow-modal').classList.remove('hidden');
 }
 
 async function saveFlow() {
     try {
-        const formData = new FormData(document.getElementById('flowForm'));
-        const flowData = {
-            name: formData.get('name'),
-            description: formData.get('description'),
-            targetAudience: formData.get('targetAudience'),
+        const formData = {
+            name: document.getElementById('flow-name').value,
+            targetAudience: document.getElementById('flow-audience').value,
+            description: document.getElementById('flow-description').value,
             messages: []
         };
+        
+        if (!formData.name || !formData.targetAudience) {
+            showError('Preencha todos os campos obrigatórios');
+            return;
+        }
         
         // Coletar mensagens
         const messageDivs = document.querySelectorAll('[id^="message-"]');
@@ -498,11 +522,11 @@ async function saveFlow() {
                     message.delay = parseInt(delay) || 0;
                 }
                 
-                flowData.messages.push(message);
+                formData.messages.push(message);
             }
         });
         
-        if (flowData.messages.length === 0) {
+        if (formData.messages.length === 0) {
             showError('Adicione pelo menos uma mensagem ao fluxo');
             return;
         }
@@ -512,14 +536,14 @@ async function saveFlow() {
             // Editar fluxo existente
             const index = flows.findIndex(f => f.id === currentFlow);
             if (index !== -1) {
-                flows[index] = { ...flows[index], ...flowData };
+                flows[index] = { ...flows[index], ...formData };
             }
         } else {
             // Criar novo fluxo
             const newFlow = {
                 id: Date.now().toString(),
-                ...flowData,
-                status: 'draft',
+                ...formData,
+                status: 'active',
                 createdAt: new Date().toISOString()
             };
             flows.push(newFlow);
@@ -535,57 +559,11 @@ async function saveFlow() {
     }
 }
 
-function editFlow(flowId) {
-    const flow = flows.find(f => f.id === flowId);
-    if (!flow) return;
-    
-    currentFlow = flowId;
-    document.getElementById('modalTitle').textContent = 'Editar Fluxo WhatsApp';
-    
-    // Preencher formulário
-    document.getElementById('flowName').value = flow.name;
-    document.getElementById('flowDescription').value = flow.description;
-    document.getElementById('flowTargetAudience').value = flow.targetAudience;
-    
-    // Limpar e recriar mensagens
-    const container = document.getElementById('messagesContainer');
-    container.innerHTML = '';
-    messageCounter = 1;
-    
-    flow.messages.forEach(message => {
-        addMessage();
-        const messageDiv = document.getElementById(`message-${messageCounter - 1}`);
-        
-        // Preencher dados da mensagem
-        messageDiv.querySelector('select[name="templateId"]').value = message.templateId;
-        messageDiv.querySelector('select[name="trigger"]').value = message.trigger;
-        
-        if (message.scheduledDate) {
-            messageDiv.querySelector('select[name="sendType"]').value = 'date';
-            toggleSendOptions(messageCounter - 1);
-            messageDiv.querySelector('input[name="scheduledDate"]').value = new Date(message.scheduledDate).toISOString().slice(0, 16);
-        } else {
-            messageDiv.querySelector('input[name="delay"]').value = message.delay || 0;
-        }
-    });
-    
-    document.getElementById('flowModal').classList.remove('hidden');
-}
-
 function deleteFlow(flowId) {
     if (confirm('Tem certeza que deseja excluir este fluxo?')) {
         flows = flows.filter(f => f.id !== flowId);
         renderFlows();
         showSuccess('Fluxo excluído com sucesso!');
-    }
-}
-
-function toggleFlowStatus(flowId) {
-    const flow = flows.find(f => f.id === flowId);
-    if (flow) {
-        flow.status = flow.status === 'active' ? 'draft' : 'active';
-        renderFlows();
-        showSuccess(`Fluxo ${flow.status === 'active' ? 'ativado' : 'desativado'} com sucesso!`);
     }
 }
 
