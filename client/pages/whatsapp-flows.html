@@ -93,13 +93,13 @@
                 <button onclick="filterByType('all')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
                   Todos
                 </button>
-                <button onclick="filterByType('indicator_flow')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
+                <button onclick="filterByType('indicators')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
                   Indicadores
                 </button>
-                <button onclick="filterByType('lead_flow')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
+                <button onclick="filterByType('leads')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
                   Leads
                 </button>
-                <button onclick="filterByType('mixed_flow')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
+                <button onclick="filterByType('mixed')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-colors">
                   Misto
                 </button>
               </div>
@@ -117,7 +117,7 @@
     <!-- Modal de Criação/Edição de Fluxo -->
     <div id="flowModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
       <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="bg-gray-800 rounded-xl shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
           <div class="p-6 border-b border-gray-700">
             <div class="flex items-center justify-between">
               <h2 id="modalTitle" class="text-xl font-semibold text-gray-100">Novo Fluxo WhatsApp</h2>
@@ -136,12 +136,12 @@
                          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                  <label class="block text-gray-300 text-sm font-medium mb-2">Tipo de Fluxo</label>
-                  <select id="flowType" name="type" required onchange="updateTriggerOptions()"
+                  <label class="block text-gray-300 text-sm font-medium mb-2">Público-Alvo</label>
+                  <select id="flowTargetAudience" name="targetAudience" required onchange="updateTriggerOptions()"
                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="indicator_flow">Fluxo para Indicadores</option>
-                    <option value="lead_flow">Fluxo para Leads</option>
-                    <option value="mixed_flow">Fluxo Misto</option>
+                    <option value="indicators">Indicadores</option>
+                    <option value="leads">Leads</option>
+                    <option value="mixed">Misto</option>
                   </select>
                 </div>
               </div>
@@ -152,66 +152,18 @@
                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
               </div>
 
-              <!-- Seção de Triggers -->
+              <!-- Seção de Mensagens do Fluxo -->
               <div class="border-t border-gray-700 pt-6">
                 <div class="flex items-center justify-between mb-4">
                   <h3 class="text-lg font-medium text-gray-100">
-                    <i class="fas fa-play text-blue-400 mr-2"></i>Triggers (Gatilhos)
-                  </h3>
-                  <button type="button" onclick="addTrigger()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm transition-colors">
-                    <i class="fas fa-plus mr-1"></i>Adicionar
-                  </button>
-                </div>
-                <div id="triggersContainer" class="space-y-4">
-                  <!-- Triggers serão adicionados aqui -->
-                </div>
-              </div>
-
-              <!-- Seção de Mensagens -->
-              <div class="border-t border-gray-700 pt-6">
-                <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-lg font-medium text-gray-100">
-                    <i class="fas fa-comments text-green-400 mr-2"></i>Mensagens do Fluxo
+                    <i class="fas fa-comments text-green-400 mr-2"></i>Mensagens do Fluxo (Máximo: 10)
                   </h3>
                   <button type="button" onclick="addMessage()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-sm transition-colors">
-                    <i class="fas fa-plus mr-1"></i>Adicionar
+                    <i class="fas fa-plus mr-1"></i>Adicionar Mensagem
                   </button>
                 </div>
                 <div id="messagesContainer" class="space-y-4">
                   <!-- Mensagens serão adicionadas aqui -->
-                </div>
-              </div>
-
-              <!-- Configurações -->
-              <div class="border-t border-gray-700 pt-6">
-                <h3 class="text-lg font-medium text-gray-100 mb-4">
-                  <i class="fas fa-cog text-purple-400 mr-2"></i>Configurações
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label class="block text-gray-300 text-sm font-medium mb-2">Máximo de mensagens/dia</label>
-                    <input type="number" id="flowMaxMessages" name="maxMessagesPerDay" value="100" min="1"
-                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-gray-300 text-sm font-medium mb-2">Horário de início</label>
-                    <input type="time" id="flowStartTime" name="startTime" value="09:00"
-                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-gray-300 text-sm font-medium mb-2">Horário de fim</label>
-                    <input type="time" id="flowEndTime" name="endTime" value="18:00"
-                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  </div>
-                </div>
-                <div class="mt-4">
-                  <label class="block text-gray-300 text-sm font-medium mb-2">Fuso Horário</label>
-                  <select id="flowTimezone" name="timezone" required
-                          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
-                    <option value="America/New_York">Nova York (GMT-5)</option>
-                    <option value="Europe/London">Londres (GMT+0)</option>
-                  </select>
                 </div>
               </div>
             </form>
@@ -222,35 +174,6 @@
             </button>
             <button onclick="saveFlow()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
               Salvar Fluxo
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal de Preview do Fluxo -->
-    <div id="flowPreviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-      <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-          <div class="p-6 border-b border-gray-700">
-            <div class="flex items-center justify-between">
-              <h2 class="text-xl font-semibold text-gray-100">Preview do Fluxo</h2>
-              <button onclick="closeFlowPreviewModal()" class="text-gray-400 hover:text-gray-300">
-                <i class="fas fa-times text-xl"></i>
-              </button>
-            </div>
-          </div>
-          <div class="p-6">
-            <div id="flowPreviewContent" class="flow-preview">
-              <!-- Preview do fluxo será carregado dinamicamente -->
-            </div>
-          </div>
-          <div class="p-6 border-t border-gray-700 flex justify-end gap-3">
-            <button onclick="closeFlowPreviewModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-gray-200 rounded-lg transition-colors">
-              Fechar
-            </button>
-            <button onclick="testFlow()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
-              Testar Fluxo
             </button>
           </div>
         </div>
