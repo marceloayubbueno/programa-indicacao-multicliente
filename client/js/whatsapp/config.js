@@ -18,7 +18,6 @@ async function initWhatsAppConfig() {
 
         // Carregar dados iniciais
         await loadConfig();
-        await loadStatistics();
         await loadActivityLogs();
         
         // Configurar eventos
@@ -69,27 +68,7 @@ async function loadConfig() {
     }
 }
 
-async function loadStatistics() {
-    try {
-        // Mock data para desenvolvimento frontend
-        const stats = {
-            totalMessagesSent: 1250,
-            successRate: 98.5,
-            messagesToday: 45,
-            remainingQuota: 955
-        };
-        
-        // Atualizar estatísticas
-        document.getElementById('totalMessagesSent').textContent = stats.totalMessagesSent.toLocaleString();
-        document.getElementById('successRate').textContent = stats.successRate + '%';
-        document.getElementById('messagesToday').textContent = stats.messagesToday;
-        document.getElementById('remainingQuota').textContent = stats.remainingQuota;
-        
-    } catch (error) {
-        console.error('Erro ao carregar estatísticas:', error);
-        showError('Erro ao carregar estatísticas');
-    }
-}
+
 
 async function loadActivityLogs() {
     try {
