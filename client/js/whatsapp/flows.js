@@ -199,10 +199,7 @@ function renderFlows() {
                             ${flows.map(flow => `
                                 <tr class="hover:bg-gray-750 transition-colors">
                                     <td class="px-6 py-4">
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-100">${flow.name}</div>
-                                            <div class="text-sm text-gray-400 mt-1 max-w-xs truncate">${flow.description}</div>
-                                        </div>
+                                        <div class="text-sm font-medium text-gray-100">${flow.name}</div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
@@ -210,8 +207,8 @@ function renderFlows() {
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${flow.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'}">
-                                            ${flow.status === 'active' ? 'Ativo' : 'Rascunho'}
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${flow.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'}">
+                                            ${flow.status === 'active' ? 'Ativo' : 'Inativo'}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
@@ -227,11 +224,6 @@ function renderFlows() {
                                             </button>
                                             <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
                                                 <i class="fas fa-trash"></i>
-                                            </button>
-                                            <button onclick="toggleFlowStatus('${flow.id}')" 
-                                                    class="p-2 ${flow.status === 'active' ? 'text-red-400 hover:bg-red-900/20' : 'text-green-400 hover:bg-green-900/20'} rounded-lg transition-colors" 
-                                                    title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
-                                                <i class="fas ${flow.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -312,10 +304,7 @@ function renderFilteredFlows(filteredFlows) {
                             ${filteredFlows.map(flow => `
                                 <tr class="hover:bg-gray-750 transition-colors">
                                     <td class="px-6 py-4">
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-100">${flow.name}</div>
-                                            <div class="text-sm text-gray-400 mt-1 max-w-xs truncate">${flow.description}</div>
-                                        </div>
+                                        <div class="text-sm font-medium text-gray-100">${flow.name}</div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
@@ -323,8 +312,8 @@ function renderFilteredFlows(filteredFlows) {
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${flow.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'}">
-                                            ${flow.status === 'active' ? 'Ativo' : 'Rascunho'}
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${flow.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'}">
+                                            ${flow.status === 'active' ? 'Ativo' : 'Inativo'}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
@@ -340,11 +329,6 @@ function renderFilteredFlows(filteredFlows) {
                                             </button>
                                             <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
                                                 <i class="fas fa-trash"></i>
-                                            </button>
-                                            <button onclick="toggleFlowStatus('${flow.id}')" 
-                                                    class="p-2 ${flow.status === 'active' ? 'text-red-400 hover:bg-red-900/20' : 'text-green-400 hover:bg-green-900/20'} rounded-lg transition-colors" 
-                                                    title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
-                                                <i class="fas ${flow.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
                                             </button>
                                         </div>
                                     </td>
