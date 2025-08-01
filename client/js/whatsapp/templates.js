@@ -107,39 +107,64 @@ function renderTemplates() {
         return;
     }
 
-    const templatesHTML = templates.map(template => `
-        <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-colors">
-            <div class="flex items-center justify-between">
-                <div class="flex-1">
-                    <div class="flex items-center space-x-3 mb-2">
-                        <h3 class="text-lg font-semibold text-gray-100">${template.name}</h3>
-                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(template.status)}">
-                            ${getStatusText(template.status)}
-                        </span>
-                        <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
-                            ${getCategoryText(template.category)}
-                        </span>
-                    </div>
-                    <p class="text-gray-400 mb-3 line-clamp-2">${template.content}</p>
-                    <div class="flex items-center space-x-4 text-sm text-gray-500">
-                        <span><i class="fas fa-language mr-1"></i>${template.language}</span>
-                        <span><i class="fas fa-calendar mr-1"></i>${formatDate(template.createdAt)}</span>
-                        <span><i class="fas fa-tags mr-1"></i>${template.variables?.length || 0} variáveis</span>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button onclick="editTemplate('${template.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteTemplate('${template.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors">
-                        <i class="fas fa-trash"></i>
-                    </button>
+    container.innerHTML = `
+        <div class="col-span-full">
+            <div class="bg-gray-800 rounded-xl border border-gray-700">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-750 border-b border-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Template</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Categoria</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Variáveis</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            ${templates.map(template => `
+                                <tr class="hover:bg-gray-750 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-100">${template.name}</div>
+                                            <div class="text-sm text-gray-400 mt-1 max-w-xs truncate">${template.content}</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
+                                            ${getCategoryText(template.category)}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(template.status)}">
+                                            ${getStatusText(template.status)}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-sm text-gray-400">${template.variables?.length || 0}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-sm text-gray-400">${formatDate(template.createdAt)}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="editTemplate('${template.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteTemplate('${template.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    `).join('');
-
-    container.innerHTML = templatesHTML;
+    `;
 }
 
 function setupEventListeners() {
