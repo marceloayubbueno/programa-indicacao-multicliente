@@ -1,650 +1,644 @@
 // Configuração WhatsApp - Gestão de configurações e conexões
-// Sistema multicliente - UX otimizada
+// Sistema multicliente - JWT Authentication
 
-class WhatsAppConfig {
-    constructor() {
-        this.clientId = null;
-        this.currentProvider = null;
-        this.config = null;
-        this.init();
-    }
+// Variáveis globais
+let currentProvider = null;
+let config = null;
 
-    async init() {
-        try {
-            // Verificar autenticação
-            if (!window.auth || !window.auth.isAuthenticated()) {
-                window.location.href = 'login.html';
-                return;
-            }
+// Inicialização
+document.addEventListener('DOMContentLoaded', async function() {
+    await initWhatsAppConfig();
+});
 
-            // Obter dados do cliente
-            this.clientId = window.auth.getClientId();
-            
-            // Carregar configurações
-            await this.loadConfig();
-            
-            // Configurar eventos
-            this.setupEventListeners();
-            
-            // Atualizar interface
-            this.updateInterface();
-            
-        } catch (error) {
-            console.error('Erro ao inicializar WhatsApp Config:', error);
-            this.showError('Erro ao carregar configurações');
-        }
-    }
-
-    async loadConfig() {
-        try {
-            // Mock data para desenvolvimento frontend
-            this.config = {
-                provider: 'twilio',
-                status: 'disconnected',
-                lastCheck: null,
-                approvedTemplates: 0,
-                credentials: {
-                    twilio: {
-                        accountSid: '',
-                        authToken: '',
-                        whatsappNumber: '',
-                        webhookUrl: ''
-                    },
-                    meta: {
-                        accessToken: '',
-                        phoneNumberId: '',
-                        businessAccountId: '',
-                        webhookVerifyToken: ''
-                    },
-                    '360dialog': {
-                        apiKey: '',
-                        whatsappNumber: '',
-                        webhookUrl: '',
-                        webhookSecret: ''
-                    }
-                },
-                rateLimiting: {
-                    maxMessagesPerDay: 1000,
-                    maxMessagesPerHour: 100,
-                    delayBetweenMessages: 2,
-                    maxBatchSize: 50,
-                    startTime: '09:00',
-                    endTime: '18:00'
-                },
-                stats: {
-                    totalMessagesSent: 0,
-                    successRate: 0,
-                    messagesToday: 0,
-                    remainingQuota: 1000
-                },
-                logs: []
-            };
-
-            this.updateInterface();
-
-        } catch (error) {
-            console.error('Erro ao carregar configurações:', error);
-        }
-    }
-
-    setupEventListeners() {
-        // Seleção de provedor
-        document.querySelectorAll('.provider-option').forEach(option => {
-            option.addEventListener('click', (e) => {
-                this.selectProvider(e.currentTarget.dataset.provider);
-            });
-        });
-
-        // Auto-save em mudanças
-        const inputs = document.querySelectorAll('input, select');
-        inputs.forEach(input => {
-            input.addEventListener('change', () => {
-                this.autoSave();
-            });
-        });
-    }
-
-    selectProvider(provider) {
-        // Remover seleção anterior
-        document.querySelectorAll('.provider-option').forEach(option => {
-            option.classList.remove('border-blue-500');
-            option.querySelector('.fa-check').classList.add('hidden');
-        });
-
-        // Selecionar novo provedor
-        const selectedOption = document.querySelector(`[data-provider="${provider}"]`);
-        if (selectedOption) {
-            selectedOption.classList.add('border-blue-500');
-            selectedOption.querySelector('.fa-check').classList.remove('hidden');
-        }
-
-        this.currentProvider = provider;
-        this.showProviderConfig(provider);
-        this.updateProviderName(provider);
-    }
-
-    showProviderConfig(provider) {
-        // Esconder todas as configurações
-        document.querySelectorAll('.provider-config').forEach(config => {
-            config.classList.add('hidden');
-        });
-
-        // Mostrar configuração do provedor selecionado
-        const configElement = document.getElementById(`${provider}Config`);
-        if (configElement) {
-            configElement.classList.remove('hidden');
-        }
-
-        // Mostrar container de configuração
-        document.getElementById('providerConfig').classList.remove('hidden');
-
-        // Preencher campos com dados salvos
-        this.populateProviderFields(provider);
-    }
-
-    populateProviderFields(provider) {
-        const credentials = this.config.credentials[provider];
-        if (!credentials) return;
-
-        Object.keys(credentials).forEach(key => {
-            const input = document.getElementById(`${provider}${key.charAt(0).toUpperCase() + key.slice(1)}`);
-            if (input) {
-                input.value = credentials[key] || '';
-            }
-        });
-    }
-
-    updateProviderName(provider) {
-        const providerNames = {
-            'twilio': 'Twilio',
-            'meta': 'Meta WhatsApp',
-            '360dialog': '360dialog'
-        };
-        
-        document.getElementById('providerName').textContent = providerNames[provider] || 'Não configurado';
-    }
-
-    updateInterface() {
-        // Atualizar status da conexão
-        this.updateConnectionStatus();
-        
-        // Atualizar estatísticas
-        this.updateStats();
-        
-        // Atualizar logs
-        this.updateLogs();
-        
-        // Selecionar provedor atual
-        if (this.config.provider) {
-            this.selectProvider(this.config.provider);
-        }
-        
-        // Preencher configurações de rate limiting
-        this.populateRateLimiting();
-    }
-
-    updateConnectionStatus() {
-        const statusElement = document.getElementById('connectionStatus');
-        const status = this.config.status;
-        
-        let statusHTML = '';
-        switch (status) {
-            case 'connected':
-                statusHTML = `
-                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span class="text-green-400 font-medium">Conectado</span>
-                `;
-                break;
-            case 'connecting':
-                statusHTML = `
-                    <div class="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"></div>
-                    <span class="text-yellow-400 font-medium">Conectando...</span>
-                `;
-                break;
-            case 'error':
-                statusHTML = `
-                    <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span class="text-red-400 font-medium">Erro</span>
-                `;
-                break;
-            default:
-                statusHTML = `
-                    <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    <span class="text-red-400 font-medium">Desconectado</span>
-                `;
-        }
-        
-        statusElement.innerHTML = statusHTML;
-        
-        // Atualizar última verificação
-        const lastCheck = this.config.lastCheck ? 
-            new Date(this.config.lastCheck).toLocaleString('pt-BR') : 'Nunca';
-        document.getElementById('lastCheck').textContent = lastCheck;
-        
-        // Atualizar templates aprovados
-        document.getElementById('approvedTemplates').textContent = this.config.approvedTemplates;
-    }
-
-    updateStats() {
-        document.getElementById('totalMessagesSent').textContent = this.config.stats.totalMessagesSent.toLocaleString();
-        document.getElementById('successRate').textContent = `${this.config.stats.successRate}%`;
-        document.getElementById('messagesToday').textContent = this.config.stats.messagesToday;
-        document.getElementById('remainingQuota').textContent = this.config.stats.remainingQuota;
-    }
-
-    updateLogs() {
-        const logsContainer = document.getElementById('activityLogs');
-        
-        if (this.config.logs.length === 0) {
-            logsContainer.innerHTML = `
-                <div class="text-center text-gray-400 py-4">
-                    <i class="fas fa-info-circle text-2xl mb-2"></i>
-                    <p>Nenhuma atividade registrada</p>
-                </div>
-            `;
+async function initWhatsAppConfig() {
+    try {
+        // Verificar autenticação
+        if (!checkAuth()) {
             return;
         }
 
-        const logsHTML = this.config.logs.slice(0, 10).map(log => `
-            <div class="flex items-start gap-3 p-3 bg-gray-600 rounded-lg">
-                <div class="flex-shrink-0 mt-1">
-                    <i class="fas ${this.getLogIcon(log.type)} text-${this.getLogColor(log.type)}"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-gray-200 text-sm">${log.message}</p>
-                    <p class="text-gray-400 text-xs">${new Date(log.timestamp).toLocaleString('pt-BR')}</p>
-                </div>
-            </div>
-        `).join('');
-
-        logsContainer.innerHTML = logsHTML;
-    }
-
-    getLogIcon(type) {
-        const icons = {
-            'success': 'fa-check-circle',
-            'error': 'fa-exclamation-circle',
-            'warning': 'fa-exclamation-triangle',
-            'info': 'fa-info-circle'
-        };
-        return icons[type] || 'fa-info-circle';
-    }
-
-    getLogColor(type) {
-        const colors = {
-            'success': 'green-400',
-            'error': 'red-400',
-            'warning': 'yellow-400',
-            'info': 'blue-400'
-        };
-        return colors[type] || 'blue-400';
-    }
-
-    populateRateLimiting() {
-        const rateLimiting = this.config.rateLimiting;
+        // Carregar configurações
+        await loadConfig();
         
-        document.getElementById('maxMessagesPerDay').value = rateLimiting.maxMessagesPerDay;
-        document.getElementById('maxMessagesPerHour').value = rateLimiting.maxMessagesPerHour;
-        document.getElementById('delayBetweenMessages').value = rateLimiting.delayBetweenMessages;
-        document.getElementById('maxBatchSize').value = rateLimiting.maxBatchSize;
-        document.getElementById('startTime').value = rateLimiting.startTime;
-        document.getElementById('endTime').value = rateLimiting.endTime;
-    }
-
-    async saveProviderConfig() {
-        try {
-            const provider = this.currentProvider;
-            if (!provider) {
-                this.showError('Selecione um provedor primeiro');
-                return;
-            }
-
-            // Coletar dados do formulário
-            const credentials = {};
-            const inputs = document.querySelectorAll(`#${provider}Config input`);
-            inputs.forEach(input => {
-                const key = input.id.replace(provider, '').replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
-                credentials[key] = input.value;
-            });
-
-            // Validação básica
-            if (!this.validateProviderCredentials(provider, credentials)) {
-                return;
-            }
-
-            // Salvar configuração
-            this.config.provider = provider;
-            this.config.credentials[provider] = credentials;
-            this.config.status = 'disconnected';
-
-            // Mock save - em produção seria uma chamada API
-            await this.saveConfig();
-            
-            this.showSuccess('Configuração do provedor salva com sucesso!');
-            this.addLog('info', `Configuração do provedor ${provider} salva`);
-
-        } catch (error) {
-            console.error('Erro ao salvar configuração do provedor:', error);
-            this.showError('Erro ao salvar configuração');
-        }
-    }
-
-    validateProviderCredentials(provider, credentials) {
-        const validations = {
-            'twilio': ['accountSid', 'authToken', 'whatsappNumber'],
-            'meta': ['accessToken', 'phoneNumberId', 'businessAccountId'],
-            '360dialog': ['apiKey', 'whatsappNumber']
-        };
-
-        const required = validations[provider] || [];
-        const missing = required.filter(field => !credentials[field]);
-
-        if (missing.length > 0) {
-            this.showError(`Campos obrigatórios: ${missing.join(', ')}`);
-            return false;
-        }
-
-        return true;
-    }
-
-    async saveRateLimiting() {
-        try {
-            const rateLimiting = {
-                maxMessagesPerDay: parseInt(document.getElementById('maxMessagesPerDay').value),
-                maxMessagesPerHour: parseInt(document.getElementById('maxMessagesPerHour').value),
-                delayBetweenMessages: parseInt(document.getElementById('delayBetweenMessages').value),
-                maxBatchSize: parseInt(document.getElementById('maxBatchSize').value),
-                startTime: document.getElementById('startTime').value,
-                endTime: document.getElementById('endTime').value
-            };
-
-            // Validação
-            if (rateLimiting.maxMessagesPerDay < 1 || rateLimiting.maxMessagesPerHour < 1) {
-                this.showError('Limites devem ser maiores que zero');
-                return;
-            }
-
-            if (rateLimiting.startTime >= rateLimiting.endTime) {
-                this.showError('Horário de início deve ser menor que o de fim');
-                return;
-            }
-
-            this.config.rateLimiting = rateLimiting;
-            await this.saveConfig();
-            
-            this.showSuccess('Configurações de rate limiting salvas!');
-            this.addLog('info', 'Configurações de rate limiting atualizadas');
-
-        } catch (error) {
-            console.error('Erro ao salvar rate limiting:', error);
-            this.showError('Erro ao salvar configurações');
-        }
-    }
-
-    async testConnection() {
-        try {
-            if (!this.config.provider) {
-                this.showError('Configure um provedor primeiro');
-                return;
-            }
-
-            this.openTestModal();
-            this.config.status = 'connecting';
-            this.updateConnectionStatus();
-
-            // Simular teste de conexão
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Mock resultado do teste
-            const success = Math.random() > 0.3; // 70% de chance de sucesso
-            
-            if (success) {
-                this.config.status = 'connected';
-                this.config.lastCheck = new Date().toISOString();
-                this.config.approvedTemplates = Math.floor(Math.random() * 10) + 1;
-                this.addLog('success', 'Conexão testada com sucesso');
-            } else {
-                this.config.status = 'error';
-                this.addLog('error', 'Falha na conexão com o provedor');
-            }
-
-            this.updateConnectionStatus();
-            this.showTestResult(success);
-
-        } catch (error) {
-            console.error('Erro no teste de conexão:', error);
-            this.config.status = 'error';
-            this.updateConnectionStatus();
-            this.showTestResult(false);
-        }
-    }
-
-    openTestModal() {
-        document.getElementById('testConnectionModal').classList.remove('hidden');
-    }
-
-    closeTestModal() {
-        document.getElementById('testConnectionModal').classList.add('hidden');
-    }
-
-    showTestResult(success) {
-        const statusElement = document.getElementById('testConnectionStatus');
+        // Configurar eventos
+        setupEventListeners();
         
-        if (success) {
-            statusElement.innerHTML = `
-                <div class="text-center">
-                    <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-green-400 mb-2">Conexão Bem-sucedida!</h3>
-                    <p class="text-gray-300">O provedor está funcionando corretamente</p>
-                </div>
-            `;
-        } else {
-            statusElement.innerHTML = `
-                <div class="text-center">
-                    <i class="fas fa-exclamation-circle text-6xl text-red-500 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-red-400 mb-2">Falha na Conexão</h3>
-                    <p class="text-gray-300">Verifique as credenciais e tente novamente</p>
-                </div>
-            `;
-        }
+        // Atualizar interface
+        updateInterface();
+        
+    } catch (error) {
+        console.error('Erro ao inicializar WhatsApp Config:', error);
+        showError('Erro ao carregar configurações');
     }
+}
 
-    resetProviderConfig() {
-        if (confirm('Tem certeza que deseja resetar a configuração do provedor?')) {
-            const provider = this.currentProvider;
-            if (provider) {
-                const inputs = document.querySelectorAll(`#${provider}Config input`);
-                inputs.forEach(input => {
-                    input.value = '';
-                });
-            }
-            this.showInfo('Configuração resetada');
+async function loadConfig() {
+    try {
+        const token = getToken();
+        if (!token) {
+            console.error('Token não encontrado');
+            return;
         }
-    }
 
-    resetRateLimiting() {
-        if (confirm('Tem certeza que deseja restaurar as configurações padrão?')) {
-            const defaults = {
+        // Mock data para desenvolvimento frontend
+        config = {
+            provider: 'twilio',
+            status: 'disconnected',
+            lastCheck: null,
+            approvedTemplates: 0,
+            credentials: {
+                twilio: {
+                    accountSid: '',
+                    authToken: '',
+                    whatsappNumber: '',
+                    webhookUrl: ''
+                },
+                meta: {
+                    accessToken: '',
+                    phoneNumberId: '',
+                    businessAccountId: '',
+                    webhookVerifyToken: ''
+                },
+                '360dialog': {
+                    apiKey: '',
+                    whatsappNumber: '',
+                    webhookUrl: '',
+                    webhookSecret: ''
+                }
+            },
+            rateLimiting: {
                 maxMessagesPerDay: 1000,
                 maxMessagesPerHour: 100,
                 delayBetweenMessages: 2,
                 maxBatchSize: 50,
                 startTime: '09:00',
                 endTime: '18:00'
-            };
-
-            Object.keys(defaults).forEach(key => {
-                const element = document.getElementById(key);
-                if (element) {
-                    element.value = defaults[key];
-                }
-            });
-
-            this.showInfo('Configurações restauradas para o padrão');
-        }
-    }
-
-    async refreshLogs() {
-        try {
-            // Simular carregamento de novos logs
-            const newLogs = [
-                {
-                    type: 'info',
-                    message: 'Sistema verificado automaticamente',
-                    timestamp: new Date().toISOString()
-                },
-                {
-                    type: 'success',
-                    message: '5 mensagens enviadas com sucesso',
-                    timestamp: new Date(Date.now() - 300000).toISOString()
-                }
-            ];
-
-            this.config.logs.unshift(...newLogs);
-            this.config.logs = this.config.logs.slice(0, 50); // Manter apenas os 50 mais recentes
-            
-            this.updateLogs();
-            this.showSuccess('Logs atualizados');
-
-        } catch (error) {
-            console.error('Erro ao atualizar logs:', error);
-            this.showError('Erro ao atualizar logs');
-        }
-    }
-
-    async saveConfig() {
-        try {
-            // Mock save - em produção seria uma chamada API
-            console.log('Salvando configuração:', this.config);
-            
-            // Simular delay de salvamento
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-        } catch (error) {
-            console.error('Erro ao salvar configuração:', error);
-            throw error;
-        }
-    }
-
-    addLog(type, message) {
-        const log = {
-            type,
-            message,
-            timestamp: new Date().toISOString()
+            },
+            stats: {
+                totalMessagesSent: 0,
+                successRate: 0,
+                messagesToday: 0,
+                remainingQuota: 1000
+            },
+            logs: []
         };
 
-        this.config.logs.unshift(log);
-        this.config.logs = this.config.logs.slice(0, 50); // Manter apenas os 50 mais recentes
-        
-        this.updateLogs();
-    }
+        updateInterface();
 
-    autoSave() {
-        // Debounce para evitar muitas chamadas
-        clearTimeout(this.autoSaveTimeout);
-        this.autoSaveTimeout = setTimeout(() => {
-            this.saveConfig();
-        }, 1000);
-    }
-
-    // Métodos de notificação
-    showSuccess(message) {
-        this.showNotification(message, 'success');
-    }
-
-    showError(message) {
-        this.showNotification(message, 'error');
-    }
-
-    showInfo(message) {
-        this.showNotification(message, 'info');
-    }
-
-    showWarning(message) {
-        this.showNotification(message, 'warning');
-    }
-
-    showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-            type === 'success' ? 'bg-green-600 text-white' :
-            type === 'error' ? 'bg-red-600 text-white' :
-            type === 'warning' ? 'bg-yellow-600 text-white' :
-            'bg-blue-600 text-white'
-        }`;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+    } catch (error) {
+        console.error('Erro ao carregar configurações:', error);
     }
 }
 
-// Funções globais para compatibilidade com onclick
-function testConnection() {
-    if (window.whatsappConfig) {
-        window.whatsappConfig.testConnection();
+function setupEventListeners() {
+    // Seleção de provedor
+    document.querySelectorAll('.provider-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            selectProvider(e.currentTarget.dataset.provider);
+        });
+    });
+
+    // Auto-save em mudanças
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('change', () => {
+            autoSave();
+        });
+    });
+}
+
+function selectProvider(provider) {
+    currentProvider = provider;
+    config.provider = provider;
+    
+    // Atualizar interface
+    document.querySelectorAll('.provider-option').forEach(option => {
+        option.classList.remove('bg-blue-600', 'text-white');
+        option.classList.add('bg-gray-700', 'text-gray-300');
+    });
+    
+    const selectedOption = document.querySelector(`[data-provider="${provider}"]`);
+    if (selectedOption) {
+        selectedOption.classList.remove('bg-gray-700', 'text-gray-300');
+        selectedOption.classList.add('bg-blue-600', 'text-white');
+    }
+    
+    showProviderConfig(provider);
+    updateProviderName(provider);
+}
+
+function showProviderConfig(provider) {
+    // Esconder todas as configurações
+    document.querySelectorAll('.provider-config').forEach(config => {
+        config.classList.add('hidden');
+    });
+    
+    // Mostrar configuração do provedor selecionado
+    const configElement = document.getElementById(`${provider}-config`);
+    if (configElement) {
+        configElement.classList.remove('hidden');
+    }
+    
+    // Preencher campos com dados salvos
+    populateProviderFields(provider);
+}
+
+function populateProviderFields(provider) {
+    const credentials = config.credentials[provider];
+    if (!credentials) return;
+    
+    Object.keys(credentials).forEach(key => {
+        const input = document.getElementById(`${provider}-${key}`);
+        if (input) {
+            input.value = credentials[key] || '';
+        }
+    });
+}
+
+function updateProviderName(provider) {
+    const providerNames = {
+        'twilio': 'Twilio WhatsApp API',
+        'meta': 'Meta WhatsApp Business API',
+        '360dialog': '360dialog WhatsApp API'
+    };
+    
+    const nameElement = document.getElementById('currentProviderName');
+    if (nameElement) {
+        nameElement.textContent = providerNames[provider] || provider;
     }
 }
 
-function saveProviderConfig() {
-    if (window.whatsappConfig) {
-        window.whatsappConfig.saveProviderConfig();
+function updateInterface() {
+    updateConnectionStatus();
+    updateStats();
+    updateLogs();
+    populateRateLimiting();
+}
+
+function updateConnectionStatus() {
+    const statusElement = document.getElementById('connectionStatus');
+    const statusTextElement = document.getElementById('connectionStatusText');
+    const lastCheckElement = document.getElementById('lastCheck');
+    
+    if (!statusElement || !statusTextElement) return;
+    
+    const status = config.status;
+    const statusConfig = {
+        'connected': {
+            color: 'bg-green-500',
+            text: 'Conectado',
+            icon: 'fas fa-check-circle'
+        },
+        'disconnected': {
+            color: 'bg-red-500',
+            text: 'Desconectado',
+            icon: 'fas fa-times-circle'
+        },
+        'connecting': {
+            color: 'bg-yellow-500',
+            text: 'Conectando...',
+            icon: 'fas fa-spinner fa-spin'
+        },
+        'error': {
+            color: 'bg-red-500',
+            text: 'Erro',
+            icon: 'fas fa-exclamation-triangle'
+        }
+    };
+    
+    const currentStatus = statusConfig[status] || statusConfig.disconnected;
+    
+    statusElement.className = `w-3 h-3 ${currentStatus.color} rounded-full animate-pulse`;
+    statusTextElement.innerHTML = `<i class="${currentStatus.icon} mr-2"></i>${currentStatus.text}`;
+    
+    if (lastCheckElement && config.lastCheck) {
+        lastCheckElement.textContent = new Date(config.lastCheck).toLocaleString('pt-BR');
     }
 }
 
-function saveRateLimiting() {
-    if (window.whatsappConfig) {
-        window.whatsappConfig.saveRateLimiting();
+function updateStats() {
+    const stats = config.stats;
+    
+    document.getElementById('totalMessagesSent').textContent = stats.totalMessagesSent.toLocaleString();
+    document.getElementById('successRate').textContent = `${stats.successRate}%`;
+    document.getElementById('messagesToday').textContent = stats.messagesToday.toLocaleString();
+    document.getElementById('remainingQuota').textContent = stats.remainingQuota.toLocaleString();
+}
+
+function updateLogs() {
+    const logsContainer = document.getElementById('logsContainer');
+    if (!logsContainer) return;
+    
+    const logs = config.logs.slice(-10); // Últimos 10 logs
+    
+    if (logs.length === 0) {
+        logsContainer.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-info-circle text-2xl mb-2"></i>
+                <p>Nenhum log disponível</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const logsHTML = logs.map(log => `
+        <div class="flex items-center gap-3 py-2 border-b border-gray-700 last:border-b-0">
+            <div class="flex-shrink-0">
+                <i class="${getLogIcon(log.type)} ${getLogColor(log.type)}"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm text-gray-200 truncate">${log.message}</p>
+                <p class="text-xs text-gray-500">${new Date(log.timestamp).toLocaleString('pt-BR')}</p>
+            </div>
+        </div>
+    `).join('');
+    
+    logsContainer.innerHTML = logsHTML;
+}
+
+function getLogIcon(type) {
+    const icons = {
+        'info': 'fas fa-info-circle',
+        'success': 'fas fa-check-circle',
+        'warning': 'fas fa-exclamation-triangle',
+        'error': 'fas fa-times-circle'
+    };
+    return icons[type] || icons.info;
+}
+
+function getLogColor(type) {
+    const colors = {
+        'info': 'text-blue-400',
+        'success': 'text-green-400',
+        'warning': 'text-yellow-400',
+        'error': 'text-red-400'
+    };
+    return colors[type] || colors.info;
+}
+
+function populateRateLimiting() {
+    const rateLimiting = config.rateLimiting;
+    
+    document.getElementById('maxMessagesPerDay').value = rateLimiting.maxMessagesPerDay;
+    document.getElementById('maxMessagesPerHour').value = rateLimiting.maxMessagesPerHour;
+    document.getElementById('delayBetweenMessages').value = rateLimiting.delayBetweenMessages;
+    document.getElementById('maxBatchSize').value = rateLimiting.maxBatchSize;
+    document.getElementById('startTime').value = rateLimiting.startTime;
+    document.getElementById('endTime').value = rateLimiting.endTime;
+}
+
+async function saveProviderConfig() {
+    try {
+        const token = getToken();
+        if (!token) {
+            showError('Token não encontrado');
+            return;
+        }
+
+        if (!currentProvider) {
+            showError('Selecione um provedor primeiro');
+            return;
+        }
+
+        // Coletar dados do formulário
+        const credentials = {};
+        const inputs = document.querySelectorAll(`#${currentProvider}-config input`);
+        inputs.forEach(input => {
+            const key = input.id.replace(`${currentProvider}-`, '');
+            credentials[key] = input.value;
+        });
+
+        // Validar credenciais
+        if (!validateProviderCredentials(currentProvider, credentials)) {
+            return;
+        }
+
+        // Salvar no config
+        config.credentials[currentProvider] = credentials;
+        
+        // Mock - em produção seria uma chamada para a API
+        showSuccess('Configurações salvas com sucesso!');
+        addLog('success', `Configurações do ${currentProvider} salvas`);
+
+    } catch (error) {
+        console.error('Erro ao salvar configurações:', error);
+        showError('Erro ao salvar configurações');
+    }
+}
+
+function validateProviderCredentials(provider, credentials) {
+    const validations = {
+        'twilio': () => {
+            if (!credentials.accountSid || !credentials.authToken) {
+                showError('Account SID e Auth Token são obrigatórios para Twilio');
+                return false;
+            }
+            return true;
+        },
+        'meta': () => {
+            if (!credentials.accessToken || !credentials.phoneNumberId) {
+                showError('Access Token e Phone Number ID são obrigatórios para Meta');
+                return false;
+            }
+            return true;
+        },
+        '360dialog': () => {
+            if (!credentials.apiKey) {
+                showError('API Key é obrigatória para 360dialog');
+                return false;
+            }
+            return true;
+        }
+    };
+
+    const validation = validations[provider];
+    return validation ? validation() : true;
+}
+
+async function saveRateLimiting() {
+    try {
+        const token = getToken();
+        if (!token) {
+            showError('Token não encontrado');
+            return;
+        }
+
+        // Coletar dados do formulário
+        const rateLimiting = {
+            maxMessagesPerDay: parseInt(document.getElementById('maxMessagesPerDay').value),
+            maxMessagesPerHour: parseInt(document.getElementById('maxMessagesPerHour').value),
+            delayBetweenMessages: parseInt(document.getElementById('delayBetweenMessages').value),
+            maxBatchSize: parseInt(document.getElementById('maxBatchSize').value),
+            startTime: document.getElementById('startTime').value,
+            endTime: document.getElementById('endTime').value
+        };
+
+        // Validações
+        if (rateLimiting.maxMessagesPerDay < 1 || rateLimiting.maxMessagesPerHour < 1) {
+            showError('Limites de mensagens devem ser maiores que 0');
+            return;
+        }
+
+        if (rateLimiting.delayBetweenMessages < 1) {
+            showError('Delay entre mensagens deve ser maior que 0');
+            return;
+        }
+
+        // Salvar no config
+        config.rateLimiting = rateLimiting;
+        
+        // Mock - em produção seria uma chamada para a API
+        showSuccess('Configurações de rate limiting salvas!');
+        addLog('success', 'Configurações de rate limiting atualizadas');
+
+    } catch (error) {
+        console.error('Erro ao salvar rate limiting:', error);
+        showError('Erro ao salvar configurações de rate limiting');
+    }
+}
+
+async function testConnection() {
+    try {
+        const token = getToken();
+        if (!token) {
+            showError('Token não encontrado');
+            return;
+        }
+
+        if (!currentProvider) {
+            showError('Selecione um provedor primeiro');
+            return;
+        }
+
+        // Atualizar status para conectando
+        config.status = 'connecting';
+        updateConnectionStatus();
+
+        // Simular teste de conexão
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Mock - em produção seria uma chamada para a API
+        const success = Math.random() > 0.3; // 70% de chance de sucesso
+        
+        if (success) {
+            config.status = 'connected';
+            config.lastCheck = new Date().toISOString();
+            addLog('success', `Conexão com ${currentProvider} estabelecida com sucesso`);
+            showSuccess('Conexão testada com sucesso!');
+        } else {
+            config.status = 'error';
+            addLog('error', `Falha na conexão com ${currentProvider}`);
+            showError('Falha na conexão. Verifique as credenciais.');
+        }
+
+        updateConnectionStatus();
+
+    } catch (error) {
+        console.error('Erro ao testar conexão:', error);
+        config.status = 'error';
+        updateConnectionStatus();
+        showError('Erro ao testar conexão');
+    }
+}
+
+function openTestModal() {
+    document.getElementById('testModal').classList.remove('hidden');
+}
+
+function closeTestModal() {
+    document.getElementById('testModal').classList.add('hidden');
+}
+
+function showTestResult(success) {
+    const resultElement = document.getElementById('testResult');
+    if (!resultElement) return;
+
+    if (success) {
+        resultElement.innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-check-circle text-6xl text-green-400 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-100 mb-2">Conexão Bem-sucedida!</h3>
+                <p class="text-gray-400">O provedor está configurado corretamente.</p>
+            </div>
+        `;
+    } else {
+        resultElement.innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-times-circle text-6xl text-red-400 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-100 mb-2">Falha na Conexão</h3>
+                <p class="text-gray-400">Verifique as credenciais e tente novamente.</p>
+            </div>
+        `;
     }
 }
 
 function resetProviderConfig() {
-    if (window.whatsappConfig) {
-        window.whatsappConfig.resetProviderConfig();
+    if (!currentProvider) {
+        showError('Selecione um provedor primeiro');
+        return;
     }
+
+    if (!confirm(`Tem certeza que deseja resetar as configurações do ${currentProvider}?`)) {
+        return;
+    }
+
+    // Limpar campos
+    const inputs = document.querySelectorAll(`#${currentProvider}-config input`);
+    inputs.forEach(input => {
+        input.value = '';
+    });
+
+    // Limpar do config
+    config.credentials[currentProvider] = {};
+    
+    showSuccess('Configurações resetadas!');
+    addLog('info', `Configurações do ${currentProvider} resetadas`);
 }
 
 function resetRateLimiting() {
-    if (window.whatsappConfig) {
-        window.whatsappConfig.resetRateLimiting();
+    if (!confirm('Tem certeza que deseja resetar as configurações de rate limiting?')) {
+        return;
+    }
+
+    // Resetar para valores padrão
+    config.rateLimiting = {
+        maxMessagesPerDay: 1000,
+        maxMessagesPerHour: 100,
+        delayBetweenMessages: 2,
+        maxBatchSize: 50,
+        startTime: '09:00',
+        endTime: '18:00'
+    };
+
+    populateRateLimiting();
+    showSuccess('Configurações de rate limiting resetadas!');
+    addLog('info', 'Configurações de rate limiting resetadas');
+}
+
+async function refreshLogs() {
+    try {
+        const token = getToken();
+        if (!token) {
+            showError('Token não encontrado');
+            return;
+        }
+
+        // Mock - em produção seria uma chamada para a API
+        // Simular novos logs
+        const newLogs = [
+            { type: 'info', message: 'Sistema verificado', timestamp: new Date().toISOString() },
+            { type: 'success', message: 'Configurações sincronizadas', timestamp: new Date().toISOString() }
+        ];
+
+        config.logs.push(...newLogs);
+        updateLogs();
+        showSuccess('Logs atualizados!');
+
+    } catch (error) {
+        console.error('Erro ao atualizar logs:', error);
+        showError('Erro ao atualizar logs');
     }
 }
 
-function refreshLogs() {
-    if (window.whatsappConfig) {
-        window.whatsappConfig.refreshLogs();
+async function saveConfig() {
+    try {
+        const token = getToken();
+        if (!token) {
+            showError('Token não encontrado');
+            return;
+        }
+
+        // Mock - em produção seria uma chamada para a API
+        showSuccess('Configurações salvas com sucesso!');
+        addLog('success', 'Configurações gerais salvas');
+
+    } catch (error) {
+        console.error('Erro ao salvar configurações:', error);
+        showError('Erro ao salvar configurações');
     }
 }
 
-function closeTestModal() {
-    if (window.whatsappConfig) {
-        window.whatsappConfig.closeTestModal();
+function addLog(type, message) {
+    const log = {
+        type,
+        message,
+        timestamp: new Date().toISOString()
+    };
+
+    config.logs.push(log);
+    
+    // Manter apenas os últimos 100 logs
+    if (config.logs.length > 100) {
+        config.logs = config.logs.slice(-100);
     }
+
+    updateLogs();
 }
 
-// Função de logout (reutilizada do sistema existente)
-function logout() {
-    if (window.auth) {
-        window.auth.logout();
-    }
+function autoSave() {
+    // Auto-save a cada 30 segundos
+    setTimeout(() => {
+        saveConfig();
+    }, 30000);
 }
 
-// Inicialização quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', function() {
-    // Aguardar carregamento dos módulos necessários
-    if (typeof window.auth !== 'undefined' && typeof window.apiClient !== 'undefined') {
-        window.whatsappConfig = new WhatsAppConfig();
-    } else {
-        // Tentar novamente após um delay
+function showSuccess(message) {
+    showNotification(message, 'success');
+}
+
+function showError(message) {
+    showNotification(message, 'error');
+}
+
+function showInfo(message) {
+    showNotification(message, 'info');
+}
+
+function showWarning(message) {
+    showNotification(message, 'warning');
+}
+
+function showNotification(message, type = 'info') {
+    // Criar notificação
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full`;
+    
+    const colors = {
+        success: 'bg-green-600 text-white',
+        error: 'bg-red-600 text-white',
+        info: 'bg-blue-600 text-white',
+        warning: 'bg-yellow-600 text-white'
+    };
+    
+    notification.className += ` ${colors[type]}`;
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animar entrada
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
         setTimeout(() => {
-            if (typeof window.auth !== 'undefined' && typeof window.apiClient !== 'undefined') {
-                window.whatsappConfig = new WhatsAppConfig();
-            } else {
-                console.error('Módulos necessários não carregados');
-            }
-        }, 1000);
-    }
-}); 
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Funções globais para compatibilidade com HTML
+window.testConnection = testConnection;
+window.saveProviderConfig = saveProviderConfig;
+window.saveRateLimiting = saveRateLimiting;
+window.resetProviderConfig = resetProviderConfig;
+window.resetRateLimiting = resetRateLimiting;
+window.refreshLogs = refreshLogs;
+window.closeTestModal = closeTestModal; 
