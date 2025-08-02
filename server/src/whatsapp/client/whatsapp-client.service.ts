@@ -184,6 +184,10 @@ export class WhatsAppClientService {
         { new: true }
       ).exec();
 
+      if (!updatedConfig) {
+        throw new NotFoundException('Configuração de WhatsApp não encontrada');
+      }
+
       return updatedConfig;
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof BadRequestException) {
