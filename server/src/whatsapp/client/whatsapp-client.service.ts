@@ -2,6 +2,12 @@ import { Injectable, NotFoundException, BadRequestException, ConflictException }
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { WhatsAppClientConfig, WhatsAppClientConfigDocument } from '../entities/whatsapp-client-config.schema';
+import { WhatsAppMessage, WhatsAppMessageDocument } from '../entities/whatsapp-message.schema';
+import { InjectModel as InjectAdminModel } from '@nestjs/mongoose';
+import { Model as AdminModel } from 'mongoose';
+import { WhatsAppConfig, WhatsAppConfigDocument } from '../entities/whatsapp-config.schema';
+import * as twilio from 'twilio';
+import axios from 'axios';
 
 export interface CreateWhatsAppClientConfigDto {
   clientId: string;
@@ -49,6 +55,10 @@ export class WhatsAppClientService {
   constructor(
     @InjectModel(WhatsAppClientConfig.name)
     private whatsAppClientConfigModel: Model<WhatsAppClientConfigDocument>,
+    @InjectAdminModel(WhatsAppConfig.name)
+    private whatsappConfigModel: AdminModel<WhatsAppConfigDocument>,
+    @InjectAdminModel(WhatsAppMessage.name)
+    private whatsappMessageModel: Model<WhatsAppMessageDocument>,
   ) {}
 
   /**
@@ -374,5 +384,248 @@ export class WhatsAppClientService {
         resolve(Math.random() > 0.1);
       }, 2000);
     });
+  }
+
+  async sendTestMessage(clientId: string, messageData: any) {
+    try {
+      console.log('=== CLIENT SERVICE: ENVIO DE MENSAGEM DE TESTE ===');
+      console.log('ClientId:', clientId);
+      console.log('Dados da mensagem:', JSON.stringify(messageData, null, 2));
+      
+      const { to, message } = messageData;
+      
+      // Validar dados
+      if (!to || !message) {
+        throw new Error('Número de destino e mensagem são obrigatórios');
+      }
+      
+      // Validar formato do número
+      const phoneRegex = /^\+[1-9]\d{1,14}$/;
+      if (!phoneRegex.test(to)) {
+        throw new Error('Formato de telefone inválido');
+      }
+      
+      // Buscar configuração do cliente
+      const clientConfig = await this.whatsAppClientConfigModel.findOne({ clientId }).exec();
+      if (!clientConfig) {
+        throw new Error('Configuração de WhatsApp não encontrada');
+      }
+      
+      if (!clientConfig.isActive) {
+        throw new Error('Configuração de WhatsApp não está ativa');
+      }
+      
+      console.log('Configuração do cliente encontrada:', clientConfig);
+      
+      // Buscar configuração global do admin
+      const adminConfig = await this.whatsappConfigModel.findOne().exec();
+      if (!adminConfig || !(adminConfig as any).isActive) {
+        throw new Error('Configuração global de WhatsApp não está ativa');
+      }
+      
+      console.log('Configuração admin encontrada:', adminConfig);
+      
+      // Enviar mensagem usando o provedor configurado
+      const result = await this.sendMessage({
+        to: to.trim().replace(/\s+/g, ''),
+        message: message,
+        from: clientConfig.whatsappNumber,
+        clientId: clientId
+      });
+      
+      console.log('=== CLIENT SERVICE: MENSAGEM ENVIADA COM SUCESSO ===');
+      console.log('Resultado:', result);
+      
+      return {
+        success: true,
+        message: 'Mensagem de teste enviada com sucesso',
+        data: {
+          messageId: result.messageId || 'unknown',
+          to: to,
+          status: result.status || 'sent',
+          timestamp: new Date().toISOString()
+        }
+      };
+      
+    } catch (error) {
+      console.error('=== CLIENT SERVICE: ERRO NO ENVIO ===');
+      console.error('Erro:', error);
+      throw error;
+    }
+  }
+
+  private async sendMessage(messageData: any) {
+    const { to, message, from, clientId } = messageData;
+    
+    try {
+      let messageId: string;
+      let status: string;
+
+      // Buscar configuração global do admin
+      const adminConfig = await this.whatsappConfigModel.findOne().exec();
+      if (!adminConfig || !adminConfig.isActive) {
+        throw new Error('Configuração global de WhatsApp não está ativa');
+      }
+
+      // Enviar mensagem usando o provedor configurado
+      switch (adminConfig.provider) {
+        case 'twilio':
+          const twilioResult = await this.sendTwilioMessage(to, adminConfig.credentials);
+          messageId = twilioResult.sid;
+          status = twilioResult.status;
+          break;
+        case 'meta':
+          const metaResult = await this.sendMetaMessage(to, adminConfig.credentials);
+          messageId = metaResult.id;
+          status = metaResult.status;
+          break;
+        case '360dialog':
+          const dialogResult = await this.send360DialogMessage(to, adminConfig.credentials);
+          messageId = dialogResult.message_id;
+          status = dialogResult.status;
+          break;
+        default:
+          throw new Error(`Provedor não suportado: ${adminConfig.provider}`);
+      }
+
+      // Salva mensagem no banco
+      const testMessage = new this.whatsappMessageModel({
+        clientId: clientId,
+        to: to,
+        from: from || 'client',
+        content: {
+          body: message
+        },
+        status: status || 'sent',
+        providerResponse: {
+          messageId,
+          status,
+          provider: adminConfig.provider
+        },
+        sentAt: new Date()
+      });
+
+      const savedMessage = await testMessage.save();
+      console.log('Mensagem salva no banco:', savedMessage._id);
+      
+      return {
+        messageId: messageId || savedMessage._id.toString(),
+        status: status || 'sent',
+        provider: adminConfig.provider
+      };
+      
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+      throw error;
+    }
+  }
+
+  // Implementações específicas por provedor (copiadas do admin service)
+  private async sendTwilioMessage(phoneNumber: string, credentials: any): Promise<any> {
+    try {
+      console.log('=== INÍCIO ENVIO TWILIO (CLIENT) ===');
+      console.log('Telefone de destino:', phoneNumber);
+      console.log('Número WhatsApp configurado:', credentials.whatsappNumber);
+      
+      // Validações específicas para Twilio
+      if (!credentials.whatsappNumber) {
+        throw new Error('Número WhatsApp não configurado');
+      }
+
+      if (!credentials.accountSid || !credentials.authToken) {
+        throw new Error('Credenciais Twilio incompletas');
+      }
+
+      // Formatar número de telefone para Twilio
+      const formattedPhone = this.formatPhoneForTwilio(phoneNumber);
+      console.log('Telefone formatado para Twilio:', formattedPhone);
+      
+      const client = twilio(credentials.accountSid, credentials.authToken);
+      
+      console.log('Enviando mensagem...');
+      const message = await client.messages.create({
+        body: 'Teste de conectividade WhatsApp - Sistema de Indicação',
+        from: `whatsapp:${credentials.whatsappNumber}`,
+        to: `whatsapp:${formattedPhone}`
+      });
+
+      console.log('Mensagem Twilio enviada com sucesso!');
+      console.log('Message SID:', message.sid);
+      console.log('Status:', message.status);
+      console.log('=== FIM ENVIO TWILIO (CLIENT) ===');
+      
+      return {
+        sid: message.sid,
+        status: message.status
+      };
+    } catch (error) {
+      console.error('=== ERRO TWILIO (CLIENT) ===');
+      console.error('Erro:', error);
+      throw error;
+    }
+  }
+
+  private formatPhoneForTwilio(phone: string): string {
+    // Remove todos os caracteres não numéricos exceto +
+    let formatted = phone.replace(/[^\d+]/g, '');
+    
+    // Garante que começa com +
+    if (!formatted.startsWith('+')) {
+      formatted = '+' + formatted;
+    }
+    
+    // Remove zeros extras após o código do país
+    formatted = formatted.replace(/^\+(\d{1,3})0+/, '+$1');
+    
+    return formatted;
+  }
+
+  private async sendMetaMessage(phoneNumber: string, credentials: any): Promise<any> {
+    const response = await axios.post(
+      `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}/messages`,
+      {
+        messaging_product: 'whatsapp',
+        to: phoneNumber,
+        type: 'text',
+        text: {
+          body: 'Teste de conectividade WhatsApp - Sistema de Indicação'
+        }
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${credentials.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return {
+      id: response.data.messages[0].id,
+      status: 'sent'
+    };
+  }
+
+  private async send360DialogMessage(phoneNumber: string, credentials: any): Promise<any> {
+    const response = await axios.post(
+      `https://waba.360dialog.io/v1/instances/${credentials.instanceId}/messages`,
+      {
+        to: phoneNumber,
+        type: 'text',
+        text: {
+          body: 'Teste de conectividade WhatsApp - Sistema de Indicação'
+        }
+      },
+      {
+        headers: {
+          'D360-API-KEY': credentials.apiKey,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return {
+      message_id: response.data.messages[0].id,
+      status: 'sent'
+    };
   }
 } 

@@ -146,23 +146,27 @@ export class WhatsAppClientController {
    */
   @Post('config/verify')
   @UseGuards(JwtClientAuthGuard)
-  async verifyNumber(@Request() req) {
+  async verifyConfig(@Request() req: any) {
     try {
       const clientId = req.user.clientId;
-      const result = await this.whatsAppClientService.verifyNumber(clientId);
-
-      return {
-        success: result.success,
-        message: result.message
-      };
+      return await this.whatsappClientService.verifyConfig(clientId);
     } catch (error) {
       throw new HttpException(
-        {
-          success: false,
-          message: error.message || 'Erro ao verificar número de WhatsApp',
-          error: error.response?.message || error.message
-        },
-        error.status || HttpStatus.BAD_REQUEST
+        'Erro ao verificar configuração WhatsApp',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post('test-message')
+  async sendTestMessage(@Request() req: any, @Body() messageData: any) {
+    try {
+      const clientId = req.user.clientId;
+      return await this.whatsappClientService.sendTestMessage(clientId, messageData);
+    } catch (error) {
+      throw new HttpException(
+        'Erro ao enviar mensagem de teste',
+        HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
