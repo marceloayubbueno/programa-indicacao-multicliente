@@ -2,7 +2,7 @@
 // Sistema multicliente - JWT Authentication
 
 // Variáveis globais
-let config = null;
+let whatsappConfig = null;
 let clientId = null;
 
 // Inicialização
@@ -103,20 +103,20 @@ async function loadConfig() {
         console.log('Response status:', response.status);
 
         if (response.ok) {
-            config = await response.json();
-            console.log('Configuração carregada:', config);
+            whatsappConfig = await response.json();
+            console.log('Configuração carregada:', whatsappConfig);
             
             // Preencher formulário
-            document.getElementById('whatsappNumber').value = config.whatsappNumber || '';
-            document.getElementById('displayName').value = config.displayName || '';
-            document.getElementById('businessDescription').value = config.businessDescription || '';
+            document.getElementById('whatsappNumber').value = whatsappConfig.whatsappNumber || '';
+            document.getElementById('displayName').value = whatsappConfig.displayName || '';
+            document.getElementById('businessDescription').value = whatsappConfig.businessDescription || '';
             
             // Atualizar status da conexão
             updateConnectionStatus();
         } else if (response.status === 404) {
             console.log('Configuração não encontrada, usando valores padrão');
             // Configuração não existe ainda - usar valores padrão
-            config = {
+            whatsappConfig = {
                 whatsappNumber: '',
                 displayName: '',
                 businessDescription: '',
@@ -141,7 +141,7 @@ async function loadConfig() {
         showError('Erro ao carregar configuração');
         
         // Usar dados padrão em caso de erro
-        config = {
+        whatsappConfig = {
             whatsappNumber: '',
             displayName: '',
             businessDescription: '',
@@ -214,12 +214,12 @@ function updateConnectionStatus() {
     const lastCheckElement = document.getElementById('lastCheck');
     const approvedTemplatesElement = document.getElementById('approvedTemplates');
     
-    if (config && config.isActive && config.isVerified) {
+    if (whatsappConfig && whatsappConfig.isActive && whatsappConfig.isVerified) {
         statusElement.innerHTML = `
             <div class="w-3 h-3 bg-green-500 rounded-full"></div>
             <span class="text-green-400 font-medium">Conectado</span>
         `;
-    } else if (config && config.isVerified) {
+    } else if (whatsappConfig && whatsappConfig.isVerified) {
         statusElement.innerHTML = `
             <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <span class="text-yellow-400 font-medium">Inativo</span>
@@ -232,8 +232,8 @@ function updateConnectionStatus() {
     }
     
     if (lastCheckElement) {
-        if (config && config.verifiedAt) {
-            lastCheckElement.textContent = new Date(config.verifiedAt).toLocaleString('pt-BR');
+        if (whatsappConfig && whatsappConfig.verifiedAt) {
+            lastCheckElement.textContent = new Date(whatsappConfig.verifiedAt).toLocaleString('pt-BR');
         } else {
             lastCheckElement.textContent = 'Nunca';
         }
@@ -314,7 +314,7 @@ async function saveWhatsAppConfig() {
         
         let response;
         
-        if (config && config._id) {
+        if (whatsappConfig && whatsappConfig._id) {
             // Atualizar configuração existente
             const url = `${window.API_BASE_URL}/whatsapp/client/config/${clientId}`;
             console.log('Atualizando configuração:', url);
@@ -346,8 +346,8 @@ async function saveWhatsAppConfig() {
         console.log('Response status:', response.status);
         
         if (response.ok) {
-            config = await response.json();
-            console.log('Configuração salva:', config);
+            whatsappConfig = await response.json();
+            console.log('Configuração salva:', whatsappConfig);
             showSuccess('Configuração salva com sucesso!');
             updateConnectionStatus();
             
@@ -386,12 +386,12 @@ async function testConnection() {
     console.log('Função testConnection chamada');
     try {
         // Verificar se há configuração salva
-        if (!config || !config.whatsappNumber) {
+        if (!whatsappConfig || !whatsappConfig.whatsappNumber) {
             showError('Configure um número de WhatsApp antes de testar a conexão');
             return;
         }
         
-        console.log('Testando conexão para número:', config.whatsappNumber);
+        console.log('Testando conexão para número:', whatsappConfig.whatsappNumber);
         
         // Mostrar modal de teste
         document.getElementById('testConnectionModal').classList.remove('hidden');
