@@ -479,7 +479,7 @@ export class WhatsAppClientService {
       // Enviar mensagem usando o provedor configurado
       switch (adminConfig.provider) {
         case 'twilio':
-          const twilioResult = await this.sendTwilioMessage(to, adminConfig.credentials, message);
+          const twilioResult = await this.sendTwilioMessage(to, adminConfig.credentials, message, from);
           messageId = twilioResult.sid;
           status = twilioResult.status;
           break;
@@ -530,11 +530,12 @@ export class WhatsAppClientService {
   }
 
   // Implementações específicas por provedor (copiadas do admin service)
-  private async sendTwilioMessage(phoneNumber: string, credentials: any, messageText?: string): Promise<any> {
+  private async sendTwilioMessage(phoneNumber: string, credentials: any, messageText?: string, fromNumber?: string): Promise<any> {
     try {
       console.log('=== INÍCIO ENVIO TWILIO (CLIENT) ===');
       console.log('Telefone de destino:', phoneNumber);
       console.log('Número WhatsApp configurado:', credentials.whatsappNumber);
+      console.log('Número do cliente (from):', fromNumber);
       console.log('Mensagem a ser enviada:', messageText);
       
       // Validações específicas para Twilio
@@ -555,10 +556,14 @@ export class WhatsAppClientService {
       // Usar mensagem personalizada ou padrão
       const messageBody = messageText || 'Teste de conectividade WhatsApp - Sistema de Indicação';
       
+      // Usar número do cliente se disponível, senão usar número sandbox
+      const fromWhatsAppNumber = fromNumber || credentials.whatsappNumber;
+      console.log('Número FROM a ser usado:', fromWhatsAppNumber);
+      
       console.log('Enviando mensagem...');
       const message = await client.messages.create({
         body: messageBody,
-        from: `whatsapp:${credentials.whatsappNumber}`,
+        from: `whatsapp:${fromWhatsAppNumber}`,
         to: `whatsapp:${formattedPhone}`
       });
 
