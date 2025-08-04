@@ -3,6 +3,7 @@
 
 // Variáveis globais
 let config = null;
+let clientId = null;
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', async function() {
@@ -13,6 +14,13 @@ async function initWhatsAppConfig() {
     try {
         // Verificar autenticação
         if (!checkAuth()) {
+            return;
+        }
+
+        // Obter clientId do token
+        clientId = getClientIdFromToken();
+        if (!clientId) {
+            showError('Token inválido - clientId não encontrado');
             return;
         }
 
@@ -42,65 +50,87 @@ function getToken() {
     return localStorage.getItem('clientToken');
 }
 
+function getClientIdFromToken() {
+    const token = getToken();
+    if (!token) return null;
+    
+    try {
+        // Decodificar JWT para extrair clientId
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.clientId || payload.sub;
+    } catch (error) {
+        console.error('Erro ao decodificar token:', error);
+        return null;
+    }
+}
+
 async function loadConfig() {
     try {
-        // Mock data para desenvolvimento frontend
-        config = {
-            whatsappNumber: '+5511999999999',
-            displayName: 'Minha Empresa',
-            businessDescription: 'Empresa especializada em soluções digitais',
-            status: 'connected',
-            lastCheck: '2024-01-15T10:30:00Z',
-            approvedTemplates: 5
-        };
-        
-        // Preencher formulário
-        document.getElementById('whatsappNumber').value = config.whatsappNumber;
-        document.getElementById('displayName').value = config.displayName;
-        document.getElementById('businessDescription').value = config.businessDescription;
-        
-        // Atualizar status da conexão
-        updateConnectionStatus();
+        const token = getToken();
+        const response = await fetch(`${window.API_BASE_URL}/whatsapp/client/config/${clientId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            config = await response.json();
+            
+            // Preencher formulário
+            document.getElementById('whatsappNumber').value = config.whatsappNumber || '';
+            document.getElementById('displayName').value = config.displayName || '';
+            document.getElementById('businessDescription').value = config.businessDescription || '';
+            
+            // Atualizar status da conexão
+            updateConnectionStatus();
+        } else if (response.status === 404) {
+            // Configuração não existe ainda - usar valores padrão
+            config = {
+                whatsappNumber: '',
+                displayName: '',
+                businessDescription: '',
+                isActive: false,
+                isVerified: false
+            };
+            
+            // Limpar formulário
+            document.getElementById('whatsappNumber').value = '';
+            document.getElementById('displayName').value = '';
+            document.getElementById('businessDescription').value = '';
+            
+            updateConnectionStatus();
+        } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
         
     } catch (error) {
         console.error('Erro ao carregar configuração:', error);
         showError('Erro ao carregar configuração');
+        
+        // Usar dados padrão em caso de erro
+        config = {
+            whatsappNumber: '',
+            displayName: '',
+            businessDescription: '',
+            isActive: false,
+            isVerified: false
+        };
     }
 }
 
-
-
 async function loadActivityLogs() {
     try {
-        // Mock data para desenvolvimento frontend
+        // Por enquanto, usar logs simulados
+        // TODO: Implementar endpoint de logs quando necessário
         const logs = [
             {
                 id: '1',
-                type: 'message_sent',
-                message: 'Mensagem enviada para +5511999999999',
-                timestamp: '2024-01-15T15:30:00Z',
+                type: 'config_saved',
+                message: 'Configuração de WhatsApp salva',
+                timestamp: new Date().toISOString(),
                 status: 'success'
-            },
-            {
-                id: '2',
-                type: 'template_approved',
-                message: 'Template "Boas-vindas" aprovado',
-                timestamp: '2024-01-15T14:20:00Z',
-                status: 'success'
-            },
-            {
-                id: '3',
-                type: 'connection_test',
-                message: 'Teste de conexão realizado com sucesso',
-                timestamp: '2024-01-15T10:30:00Z',
-                status: 'success'
-            },
-            {
-                id: '4',
-                type: 'message_failed',
-                message: 'Falha ao enviar mensagem para +5511888888888',
-                timestamp: '2024-01-15T09:15:00Z',
-                status: 'error'
             }
         ];
         
@@ -144,24 +174,34 @@ function updateConnectionStatus() {
     const lastCheckElement = document.getElementById('lastCheck');
     const approvedTemplatesElement = document.getElementById('approvedTemplates');
     
-    if (config.status === 'connected') {
+    if (config && config.isActive && config.isVerified) {
         statusElement.innerHTML = `
             <div class="w-3 h-3 bg-green-500 rounded-full"></div>
             <span class="text-green-400 font-medium">Conectado</span>
         `;
+    } else if (config && config.isVerified) {
+        statusElement.innerHTML = `
+            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <span class="text-yellow-400 font-medium">Inativo</span>
+        `;
     } else {
         statusElement.innerHTML = `
             <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-            <span class="text-red-400 font-medium">Desconectado</span>
+            <span class="text-red-400 font-medium">Não configurado</span>
         `;
     }
     
     if (lastCheckElement) {
-        lastCheckElement.textContent = new Date(config.lastCheck).toLocaleString('pt-BR');
+        if (config && config.verifiedAt) {
+            lastCheckElement.textContent = new Date(config.verifiedAt).toLocaleString('pt-BR');
+        } else {
+            lastCheckElement.textContent = 'Nunca';
+        }
     }
     
     if (approvedTemplatesElement) {
-        approvedTemplatesElement.textContent = config.approvedTemplates;
+        // TODO: Implementar contagem real de templates
+        approvedTemplatesElement.textContent = '0';
     }
 }
 
@@ -194,6 +234,7 @@ function renderActivityLogs(logs) {
 
 function getLogIcon(type) {
     switch(type) {
+        case 'config_saved': return 'fas fa-save';
         case 'message_sent': return 'fas fa-paper-plane';
         case 'template_approved': return 'fas fa-check-circle';
         case 'connection_test': return 'fas fa-plug';
@@ -204,9 +245,9 @@ function getLogIcon(type) {
 
 async function saveWhatsAppConfig() {
     try {
-        const whatsappNumber = document.getElementById('whatsappNumber').value;
-        const displayName = document.getElementById('displayName').value;
-        const businessDescription = document.getElementById('businessDescription').value;
+        const whatsappNumber = document.getElementById('whatsappNumber').value.trim();
+        const displayName = document.getElementById('displayName').value.trim();
+        const businessDescription = document.getElementById('businessDescription').value.trim();
         
         // Validação
         if (!whatsappNumber || !displayName) {
@@ -219,20 +260,55 @@ async function saveWhatsAppConfig() {
             return;
         }
         
-        // Mock save - em produção seria uma chamada API
-        config = {
-            ...config,
+        const token = getToken();
+        const configData = {
             whatsappNumber,
             displayName,
-            businessDescription,
-            lastCheck: new Date().toISOString()
+            businessDescription
         };
         
-        showSuccess('Configuração salva com sucesso!');
+        let response;
+        
+        if (config && config._id) {
+            // Atualizar configuração existente
+            response = await fetch(`${window.API_BASE_URL}/whatsapp/client/config/${clientId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(configData)
+            });
+        } else {
+            // Criar nova configuração
+            response = await fetch(`${window.API_BASE_URL}/whatsapp/client/config`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...configData,
+                    clientId
+                })
+            });
+        }
+        
+        if (response.ok) {
+            config = await response.json();
+            showSuccess('Configuração salva com sucesso!');
+            updateConnectionStatus();
+            
+            // Recarregar logs
+            await loadActivityLogs();
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP ${response.status}`);
+        }
         
     } catch (error) {
         console.error('Erro ao salvar configuração:', error);
-        showError('Erro ao salvar configuração');
+        showError(`Erro ao salvar configuração: ${error.message}`);
     }
 }
 
@@ -254,26 +330,51 @@ function resetWhatsAppConfig() {
 
 async function testConnection() {
     try {
+        // Verificar se há configuração salva
+        if (!config || !config.whatsappNumber) {
+            showError('Configure um número de WhatsApp antes de testar a conexão');
+            return;
+        }
+        
         // Mostrar modal de teste
         document.getElementById('testConnectionModal').classList.remove('hidden');
         
-        // Simular teste de conexão
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        const token = getToken();
+        
+        // Testar conexão via API
+        const response = await fetch(`${window.API_BASE_URL}/whatsapp/client/config/${clientId}/verify`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
         
         // Atualizar status do teste
         const statusElement = document.getElementById('testConnectionStatus');
-        statusElement.innerHTML = `
-            <div class="text-green-400 mb-4">
-                <i class="fas fa-check-circle text-4xl"></i>
-            </div>
-            <p class="text-gray-300">Conexão testada com sucesso!</p>
-            <p class="text-gray-400 text-sm mt-2">Todas as configurações estão funcionando corretamente.</p>
-        `;
         
-        // Atualizar status da conexão
-        config.status = 'connected';
-        config.lastCheck = new Date().toISOString();
-        updateConnectionStatus();
+        if (response.ok && result.success) {
+            statusElement.innerHTML = `
+                <div class="text-green-400 mb-4">
+                    <i class="fas fa-check-circle text-4xl"></i>
+                </div>
+                <p class="text-gray-300">Conexão testada com sucesso!</p>
+                <p class="text-gray-400 text-sm mt-2">${result.message}</p>
+            `;
+            
+            // Recarregar configuração para atualizar status
+            await loadConfig();
+        } else {
+            statusElement.innerHTML = `
+                <div class="text-red-400 mb-4">
+                    <i class="fas fa-exclamation-triangle text-4xl"></i>
+                </div>
+                <p class="text-gray-300">Erro ao testar conexão</p>
+                <p class="text-gray-400 text-sm mt-2">${result.message || 'Verifique suas configurações e tente novamente.'}</p>
+            `;
+        }
         
     } catch (error) {
         console.error('Erro ao testar conexão:', error);
@@ -284,7 +385,7 @@ async function testConnection() {
                 <i class="fas fa-exclamation-triangle text-4xl"></i>
             </div>
             <p class="text-gray-300">Erro ao testar conexão</p>
-            <p class="text-gray-400 text-sm mt-2">Verifique suas configurações e tente novamente.</p>
+            <p class="text-gray-400 text-sm mt-2">Erro de comunicação com o servidor.</p>
         `;
     }
 }
