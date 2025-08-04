@@ -122,23 +122,26 @@ export class WhatsAppAdminService {
     }
 
     try {
-             console.log('=== INÍCIO TESTE DE CONEXÃO ===');
-       console.log('Provedor:', provider);
-       console.log('Telefone original:', phoneNumber);
-       console.log('Telefone limpo:', cleanPhoneNumber);
-       
-       // Testa conexão com o provedor primeiro
-       console.log('Testando conectividade básica...');
-       const isConnected = await this.testProviderConnection(provider, credentials);
-       
-       if (!isConnected) {
-         throw new Error('Falha na conexão básica com o provedor WhatsApp');
-       }
+      console.log('=== INÍCIO TESTE DE CONEXÃO ===');
+      console.log('Provedor:', provider);
+      console.log('Telefone original:', phoneNumber);
+      console.log('Telefone limpo:', cleanPhoneNumber);
+      
+      // Testa conexão com o provedor primeiro
+      console.log('Testando conectividade básica...');
+      const isConnected = await this.testProviderConnection(provider, credentials);
+      
+      if (!isConnected) {
+        throw new Error('Falha na conexão básica com o provedor WhatsApp');
+      }
 
-       console.log('Conectividade básica OK, tentando enviar mensagem...');
+      console.log('Conectividade básica OK, tentando enviar mensagem...');
 
-       // Envia mensagem de teste
-       const testMessage = await this.sendTestMessage({ to: cleanPhoneNumber, message: 'Teste de conectividade WhatsApp - Sistema de Indicação' });
+      // Envia mensagem de teste usando o método correto
+      const testMessage = await this.sendTestMessage({ 
+        to: cleanPhoneNumber, 
+        message: 'Teste de conectividade WhatsApp - Sistema de Indicação' 
+      });
       
       console.log('=== TESTE CONCLUÍDO COM SUCESSO ===');
       
