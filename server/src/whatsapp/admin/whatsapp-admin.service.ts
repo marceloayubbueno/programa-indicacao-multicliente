@@ -138,15 +138,15 @@ export class WhatsAppAdminService {
        console.log('Conectividade básica OK, tentando enviar mensagem...');
 
        // Envia mensagem de teste
-       const testMessage = await this.sendTestMessage(cleanPhoneNumber, { provider, credentials });
+       const testMessage = await this.sendTestMessage({ to: cleanPhoneNumber, message: 'Teste de conectividade WhatsApp - Sistema de Indicação' });
       
       console.log('=== TESTE CONCLUÍDO COM SUCESSO ===');
       
       return {
         success: true,
         message: 'Mensagem de teste enviada com sucesso',
-        messageId: testMessage.providerResponse?.messageId,
-        status: testMessage.status
+        messageId: testMessage.data?.messageId,
+        status: testMessage.data?.status
       };
     } catch (error) {
       console.error('=== ERRO NO TESTE DE CONEXÃO ===');
@@ -162,7 +162,7 @@ export class WhatsAppAdminService {
     const updatedStatus = {
       connected: config.status?.connected || false,
       messagesToday: await this.getMessagesToday(),
-      dailyLimit: this.getDailyLimit(config.provider),
+      dailyLimit: this.getDailyLimit((config as any).provider || 'twilio'),
       activeClients: await this.getActiveClients(),
       totalTemplates: await this.getTotalTemplates()
     };
