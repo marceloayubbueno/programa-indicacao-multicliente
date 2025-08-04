@@ -222,22 +222,36 @@ function updateConnectionStatus() {
     const statusElement = document.getElementById('connectionStatus');
     const lastCheckElement = document.getElementById('lastCheck');
     const approvedTemplatesElement = document.getElementById('approvedTemplates');
+    const toggleActiveBtn = document.getElementById('toggleActiveBtn');
     
     if (whatsappConfig && whatsappConfig.isActive && whatsappConfig.isVerified) {
         statusElement.innerHTML = `
             <div class="w-3 h-3 bg-green-500 rounded-full"></div>
             <span class="text-green-400 font-medium">Conectado</span>
         `;
+        if (toggleActiveBtn) {
+            toggleActiveBtn.innerHTML = '<i class="fas fa-power-off mr-2"></i>Desativar';
+            toggleActiveBtn.className = 'bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors';
+            toggleActiveBtn.classList.remove('hidden');
+        }
     } else if (whatsappConfig && whatsappConfig.isVerified) {
         statusElement.innerHTML = `
             <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <span class="text-yellow-400 font-medium">Inativo</span>
         `;
+        if (toggleActiveBtn) {
+            toggleActiveBtn.innerHTML = '<i class="fas fa-power-off mr-2"></i>Ativar';
+            toggleActiveBtn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors';
+            toggleActiveBtn.classList.remove('hidden');
+        }
     } else {
         statusElement.innerHTML = `
             <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
             <span class="text-red-400 font-medium">Não configurado</span>
         `;
+        if (toggleActiveBtn) {
+            toggleActiveBtn.classList.add('hidden');
+        }
     }
     
     if (lastCheckElement) {
@@ -379,6 +393,58 @@ async function saveWhatsAppConfig() {
     } catch (error) {
         console.error('Erro ao salvar configuração:', error);
         showError(`Erro ao salvar configuração: ${error.message}`);
+    }
+}
+
+async function toggleActive() {
+    console.log('Função toggleActive chamada');
+    try {
+        if (!whatsappConfig) {
+            showError('Configure o WhatsApp antes de ativar');
+            return;
+        }
+        
+        const newStatus = !whatsappConfig.isActive;
+        const action = newStatus ? 'ativar' : 'desativar';
+        
+        if (!confirm(`Tem certeza que deseja ${action} a configuração de WhatsApp?`)) {
+            return;
+        }
+        
+        const token = getToken();
+        const url = `${window.API_BASE_URL}/whatsapp/client/config/toggle-active`;
+        console.log(`${action.charAt(0).toUpperCase() + action.slice(1)} configuração:`, url);
+        
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ isActive: newStatus })
+        });
+        
+        console.log('Response status toggle:', response.status);
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Resultado toggle:', result);
+            
+            // Atualizar configuração local
+            if (result.data) {
+                whatsappConfig = result.data;
+            }
+            
+            showSuccess(`Configuração ${action} com sucesso!`);
+            updateConnectionStatus();
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP ${response.status}`);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao alterar status:', error);
+        showError(`Erro ao alterar status: ${error.message}`);
     }
 }
 
