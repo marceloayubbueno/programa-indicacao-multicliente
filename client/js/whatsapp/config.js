@@ -346,8 +346,16 @@ async function saveWhatsAppConfig() {
         console.log('Response status:', response.status);
         
         if (response.ok) {
-            whatsappConfig = await response.json();
-            console.log('Configuração salva:', whatsappConfig);
+            const responseData = await response.json();
+            console.log('Configuração salva:', responseData);
+            
+            // Atualizar whatsappConfig com os dados retornados
+            if (responseData.data) {
+                whatsappConfig = responseData.data;
+            } else {
+                whatsappConfig = responseData;
+            }
+            
             showSuccess('Configuração salva com sucesso!');
             updateConnectionStatus();
             
