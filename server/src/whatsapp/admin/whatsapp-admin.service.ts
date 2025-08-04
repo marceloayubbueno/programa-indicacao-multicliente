@@ -248,8 +248,8 @@ export class WhatsAppAdminService {
       
       // Obter configuração do admin
       const config = await this.getConfig();
-      if (!config || !config.isActive) {
-        throw new Error('Configuração WhatsApp não está ativa');
+      if (!config) {
+        throw new Error('Configuração WhatsApp não encontrada');
       }
       
       console.log('Configuração encontrada:', config);
@@ -291,8 +291,8 @@ export class WhatsAppAdminService {
 
       // Obter configuração do admin
       const config = await this.getConfig();
-      if (!config || !config.isActive) {
-        throw new Error('Configuração WhatsApp não está ativa');
+      if (!config) {
+        throw new Error('Configuração WhatsApp não encontrada');
       }
 
       // Enviar mensagem usando o provedor configurado
