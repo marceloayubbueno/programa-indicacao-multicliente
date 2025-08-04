@@ -19,7 +19,7 @@ export class WhatsAppAdminService {
     if (!config) {
       // Retorna configuração padrão se não existir
       return {
-        provider: 'twilio',
+        provider: 'whatsapp-business',
         credentials: {},
         globalSettings: {
           rateLimitPerMinute: 30,
@@ -42,15 +42,15 @@ export class WhatsAppAdminService {
   }
 
   async saveConfig(configData: any): Promise<any> {
-    const { provider, credentials, globalSettings } = configData;
+    const { credentials, globalSettings } = configData;
 
     // Validações básicas
-    if (!provider || !['twilio', 'meta', '360dialog'].includes(provider)) {
-      throw new Error('Provedor inválido');
+    if (!credentials) {
+      throw new Error('Credenciais são obrigatórias');
     }
 
-    // Valida credenciais específicas do provedor
-    this.validateProviderCredentials(provider, credentials);
+    // Valida credenciais do WhatsApp Business API
+    this.validateWhatsAppBusinessCredentials(credentials);
 
     // Busca configuração existente ou cria nova
     let config = await this.whatsappConfigModel.findOne().exec();
@@ -60,7 +60,7 @@ export class WhatsAppAdminService {
     }
 
     // Atualiza configuração
-    config.provider = provider;
+    config.provider = 'whatsapp-business';
     config.credentials = credentials;
     config.globalSettings = {
       rateLimitPerMinute: globalSettings.rateLimitPerMinute || 30,
@@ -71,14 +71,14 @@ export class WhatsAppAdminService {
     };
 
     // Testa conexão se credenciais foram fornecidas
-    if (this.hasValidCredentials(provider, credentials)) {
+    if (this.hasValidWhatsAppBusinessCredentials(credentials)) {
       try {
-        const isConnected = await this.testProviderConnection(provider, credentials);
+        const isConnected = await this.testWhatsAppBusinessConnection(credentials);
         config.status = {
           ...config.status,
           connected: isConnected,
           messagesToday: await this.getMessagesToday(),
-          dailyLimit: this.getDailyLimit(provider),
+          dailyLimit: this.getDailyLimit(),
           activeClients: await this.getActiveClients(),
           totalTemplates: await this.getTotalTemplates()
         };
@@ -165,7 +165,7 @@ export class WhatsAppAdminService {
     const updatedStatus = {
       connected: config.status?.connected || false,
       messagesToday: await this.getMessagesToday(),
-      dailyLimit: this.getDailyLimit((config as any).provider || 'twilio'),
+      dailyLimit: this.getDailyLimit(),
       activeClients: await this.getActiveClients(),
       totalTemplates: await this.getTotalTemplates()
     };
@@ -295,26 +295,10 @@ export class WhatsAppAdminService {
         throw new Error('Configuração WhatsApp não encontrada');
       }
 
-      // Enviar mensagem usando o provedor configurado
-      switch (config.provider) {
-        case 'twilio':
-          const twilioResult = await this.sendTwilioMessage(to, config.credentials);
-          messageId = twilioResult.sid;
-          status = twilioResult.status;
-          break;
-        case 'meta':
-          const metaResult = await this.sendMetaMessage(to, config.credentials);
-          messageId = metaResult.id;
-          status = metaResult.status;
-          break;
-        case '360dialog':
-          const dialogResult = await this.send360DialogMessage(to, config.credentials);
-          messageId = dialogResult.message_id;
-          status = dialogResult.status;
-          break;
-        default:
-          throw new Error(`Provedor não suportado: ${config.provider}`);
-      }
+      // Enviar mensagem usando WhatsApp Business API
+      const result = await this.sendWhatsAppBusinessMessage(to, config.credentials, message);
+      messageId = result.id;
+      status = result.status;
 
       // Salva mensagem no banco
       const testMessage = new this.whatsappMessageModel({
@@ -328,7 +312,7 @@ export class WhatsAppAdminService {
         providerResponse: {
           messageId,
           status,
-          provider: config.provider
+          provider: 'whatsapp-business'
         },
         sentAt: new Date()
       });
@@ -336,30 +320,10 @@ export class WhatsAppAdminService {
       const savedMessage = await testMessage.save();
       console.log('Mensagem salva no banco:', savedMessage._id);
       
-      // Para Twilio, vamos verificar o status da mensagem
-      if (config.provider === 'twilio' && messageId) {
-        try {
-          const client = twilio(config.credentials.accountSid, config.credentials.authToken);
-          const messageStatus = await client.messages(messageId).fetch();
-          
-          // Atualiza o status no banco
-          await this.whatsappMessageModel.findByIdAndUpdate(savedMessage._id, {
-            status: messageStatus.status,
-            'providerResponse.status': messageStatus.status,
-            'providerResponse.errorCode': messageStatus.errorCode,
-            'providerResponse.errorMessage': messageStatus.errorMessage
-          });
-          
-          console.log('Status atualizado:', messageStatus.status);
-        } catch (statusError) {
-          console.error('Erro ao verificar status:', statusError);
-        }
-      }
-      
       return {
         messageId: messageId || savedMessage._id.toString(),
         status: status || 'sent',
-        provider: config.provider
+        provider: 'whatsapp-business'
       };
       
     } catch (error) {
@@ -589,13 +553,8 @@ export class WhatsAppAdminService {
     return count;
   }
 
-  private getDailyLimit(provider: string): number {
-    const limits = {
-      twilio: 1000,
-      meta: 250,
-      '360dialog': 1000
-    };
-    return limits[provider] || 1000;
+  private getDailyLimit(): number {
+    return 5000; // WhatsApp Business API tem limite mais alto
   }
 
   private async getActiveClients(): Promise<number> {
@@ -606,6 +565,108 @@ export class WhatsAppAdminService {
   private async getTotalTemplates(): Promise<number> {
     // TODO: Implementar contagem de templates
     return 0;
+  }
+
+  // Métodos para WhatsApp Business API
+  private validateWhatsAppBusinessCredentials(credentials: any): void {
+    if (!credentials.accessToken) {
+      throw new Error('Access Token é obrigatório');
+    }
+    if (!credentials.phoneNumberId) {
+      throw new Error('Phone Number ID é obrigatório');
+    }
+    if (!credentials.businessAccountId) {
+      throw new Error('Business Account ID é obrigatório');
+    }
+  }
+
+  private hasValidWhatsAppBusinessCredentials(credentials: any): boolean {
+    return !!(credentials.accessToken && credentials.phoneNumberId && credentials.businessAccountId);
+  }
+
+  private async testWhatsAppBusinessConnection(credentials: any): Promise<boolean> {
+    try {
+      console.log('=== TESTANDO CONEXÃO WHATSAPP BUSINESS API ===');
+      
+      // Testa a conexão fazendo uma requisição para a API
+      const response = await axios.get(
+        `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${credentials.accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Resposta da API:', response.status);
+      return response.status === 200;
+    } catch (error) {
+      console.error('Erro ao testar conexão WhatsApp Business API:', error);
+      return false;
+    }
+  }
+
+  private async sendWhatsAppBusinessMessage(phoneNumber: string, credentials: any, messageText: string): Promise<any> {
+    try {
+      console.log('=== ENVIANDO MENSAGEM VIA WHATSAPP BUSINESS API ===');
+      console.log('Telefone de destino:', phoneNumber);
+      console.log('Mensagem:', messageText);
+      
+      // Validações
+      if (!credentials.accessToken || !credentials.phoneNumberId) {
+        throw new Error('Credenciais incompletas para WhatsApp Business API');
+      }
+
+      // Formatar número de telefone
+      const formattedPhone = this.formatPhoneForWhatsApp(phoneNumber);
+      console.log('Telefone formatado:', formattedPhone);
+      
+      // Enviar mensagem via API
+      const response = await axios.post(
+        `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}/messages`,
+        {
+          messaging_product: 'whatsapp',
+          to: formattedPhone,
+          type: 'text',
+          text: {
+            body: messageText
+          }
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${credentials.accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Mensagem enviada com sucesso!');
+      console.log('Response:', response.data);
+      
+      return {
+        id: response.data.messages[0].id,
+        status: 'sent'
+      };
+    } catch (error) {
+      console.error('Erro ao enviar mensagem via WhatsApp Business API:', error);
+      throw error;
+    }
+  }
+
+  private formatPhoneForWhatsApp(phone: string): string {
+    // Remove todos os caracteres não numéricos exceto +
+    let formatted = phone.replace(/[^\d+]/g, '');
+    
+    // Garante que começa com +
+    if (!formatted.startsWith('+')) {
+      formatted = '+' + formatted;
+    }
+    
+    // Remove zeros extras após o código do país
+    formatted = formatted.replace(/^\+(\d{1,3})0+/, '+$1');
+    
+    return formatted;
   }
 
   async getMessageStatus(messageId: string): Promise<any> {
@@ -629,57 +690,50 @@ export class WhatsAppAdminService {
         from: message.from
       });
       
-      // Se for Twilio, verifica o status atual
-      if (message.providerResponse && message.providerResponse.provider === 'twilio') {
+      // Verifica o status atual na API do WhatsApp Business
+      if (message.providerResponse && message.providerResponse.provider === 'whatsapp-business') {
         const config = await this.getConfig();
         const credentials = config.credentials;
         
-        if (credentials.accountSid && credentials.authToken) {
+        if (credentials.accessToken && credentials.phoneNumberId) {
           try {
-            const client = twilio(credentials.accountSid, credentials.authToken);
-            const twilioMessage = await client.messages(messageId).fetch();
+            const response = await axios.get(
+              `https://graph.facebook.com/v18.0/${messageId}`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${credentials.accessToken}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
             
-            console.log('Status atual no Twilio:', {
-              sid: twilioMessage.sid,
-              status: twilioMessage.status,
-              errorCode: twilioMessage.errorCode,
-              errorMessage: twilioMessage.errorMessage,
-              direction: twilioMessage.direction,
-              from: twilioMessage.from,
-              to: twilioMessage.to,
-              dateCreated: twilioMessage.dateCreated,
-              dateUpdated: twilioMessage.dateUpdated
-            });
+            const messageStatus = response.data;
+            console.log('Status atual na API:', messageStatus);
             
             // Atualiza o status no banco
             await this.whatsappMessageModel.updateOne(
               { _id: message._id },
               { 
                 $set: { 
-                  status: twilioMessage.status,
-                  'providerResponse.errorCode': twilioMessage.errorCode,
-                  'providerResponse.errorMessage': twilioMessage.errorMessage
+                  status: messageStatus.status,
+                  'providerResponse.errorCode': messageStatus.error?.code,
+                  'providerResponse.errorMessage': messageStatus.error?.message
                 }
               }
             );
             
             return {
               messageId,
-              status: twilioMessage.status,
-              errorCode: twilioMessage.errorCode,
-              errorMessage: twilioMessage.errorMessage,
-              direction: twilioMessage.direction,
-              from: twilioMessage.from,
-              to: twilioMessage.to,
-              dateCreated: twilioMessage.dateCreated,
-              dateUpdated: twilioMessage.dateUpdated
+              status: messageStatus.status,
+              errorCode: messageStatus.error?.code,
+              errorMessage: messageStatus.error?.message
             };
-          } catch (twilioError) {
-            console.error('Erro ao verificar status no Twilio:', twilioError);
+          } catch (apiError) {
+            console.error('Erro ao verificar status na API:', apiError);
             return {
               messageId,
               status: message.status,
-              error: 'Erro ao verificar status no Twilio'
+              error: 'Erro ao verificar status na API'
             };
           }
         }

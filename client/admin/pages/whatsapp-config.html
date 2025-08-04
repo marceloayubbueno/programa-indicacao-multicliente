@@ -101,131 +101,57 @@
                         </div>
                     </div>
 
-                    <!-- Configuração do Provedor -->
+                    <!-- Configuração WhatsApp Business API -->
                     <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
                         <h2 class="text-xl font-semibold text-gray-100 mb-6">
                             <i class="fas fa-cog text-blue-400 mr-2"></i>
-                            Configuração do Provedor
+                            Configuração WhatsApp Business API
                         </h2>
 
-                        <!-- Seleção de Provedor -->
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-300 mb-3">Provedor WhatsApp Business</label>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="relative">
-                                    <input type="radio" id="provider-twilio" name="provider" value="twilio" class="sr-only">
-                                    <label for="provider-twilio" class="block p-4 border-2 border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-                                        <div class="flex items-center mb-2">
-                                            <div class="w-4 h-4 border-2 border-gray-400 rounded-full mr-3"></div>
-                                            <span class="font-medium text-gray-100">Twilio</span>
-                                        </div>
-                                        <p class="text-sm text-gray-400">API oficial do WhatsApp Business</p>
-                                        <p class="text-xs text-gray-500 mt-1">Recomendado para MVP</p>
-                                    </label>
-                                </div>
-                                
-                                <div class="relative">
-                                    <input type="radio" id="provider-meta" name="provider" value="meta" class="sr-only">
-                                    <label for="provider-meta" class="block p-4 border-2 border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-                                        <div class="flex items-center mb-2">
-                                            <div class="w-4 h-4 border-2 border-gray-400 rounded-full mr-3"></div>
-                                            <span class="font-medium text-gray-100">Meta (Facebook)</span>
-                                        </div>
-                                        <p class="text-sm text-gray-400">API nativa do WhatsApp</p>
-                                        <p class="text-xs text-gray-500 mt-1">Mais recursos</p>
-                                    </label>
-                                </div>
-                                
-                                <div class="relative">
-                                    <input type="radio" id="provider-360dialog" name="provider" value="360dialog" class="sr-only">
-                                    <label for="provider-360dialog" class="block p-4 border-2 border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-                                        <div class="flex items-center mb-2">
-                                            <div class="w-4 h-4 border-2 border-gray-400 rounded-full mr-3"></div>
-                                            <span class="font-medium text-gray-100">360dialog</span>
-                                        </div>
-                                        <p class="text-sm text-gray-400">Provedor especializado</p>
-                                        <p class="text-xs text-gray-500 mt-1">Suporte premium</p>
-                                    </label>
+                        <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mb-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-blue-400 mt-1 mr-3"></i>
+                                <div>
+                                    <h3 class="text-blue-400 font-medium mb-2">WhatsApp Business API</h3>
+                                    <p class="text-sm text-gray-300 mb-2">Configure sua API oficial do WhatsApp Business para enviar mensagens personalizadas e templates aprovados.</p>
+                                    <p class="text-xs text-gray-400">Para obter as credenciais, acesse o <a href="https://developers.facebook.com/apps/" target="_blank" class="text-blue-400 hover:underline">Facebook Developers</a> e crie um app WhatsApp Business.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Configuração Twilio -->
-                        <div id="twilio-config" class="provider-config hidden">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">Account SID</label>
-                                    <input type="text" id="twilio-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
-                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <!-- Configuração WhatsApp Business API -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Access Token</label>
+                                <div class="flex gap-2">
+                                    <input type="password" id="whatsapp-access-token" placeholder="EAAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
+                                           class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <button onclick="togglePasswordVisibility('whatsapp-access-token')" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">Auth Token</label>
-                                    <div class="flex gap-2">
-                                        <input type="password" id="twilio-auth-token" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
-                                               class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <button onclick="togglePasswordVisibility('twilio-auth-token')" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">WhatsApp Number (Sandbox)</label>
-                                    <input type="text" id="twilio-whatsapp-number" placeholder="+14155238886" 
-                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <p class="text-xs text-gray-400 mt-1">Use o número sandbox para testes</p>
-                                </div>
+                                <p class="text-xs text-gray-400 mt-1">Token de acesso da sua aplicação WhatsApp Business</p>
                             </div>
-                        </div>
-
-                        <!-- Configuração Meta -->
-                        <div id="meta-config" class="provider-config hidden">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">Access Token</label>
-                                    <div class="flex gap-2">
-                                        <input type="password" id="meta-access-token" placeholder="EAAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
-                                               class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <button onclick="togglePasswordVisibility('meta-access-token')" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">Phone Number ID</label>
-                                    <input type="text" id="meta-phone-number-id" placeholder="123456789012345" 
-                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">Business Account ID</label>
-                                    <input type="text" id="meta-business-account-id" placeholder="123456789012345" 
-                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Phone Number ID</label>
+                                <input type="text" id="whatsapp-phone-number-id" placeholder="123456789012345" 
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <p class="text-xs text-gray-400 mt-1">ID do número de telefone WhatsApp Business</p>
                             </div>
-                        </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Business Account ID</label>
+                                <input type="text" id="whatsapp-business-account-id" placeholder="123456789012345" 
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <p class="text-xs text-gray-400 mt-1">ID da conta comercial do WhatsApp Business</p>
+                            </div>
 
-                        <!-- Configuração 360dialog -->
-                        <div id="360dialog-config" class="provider-config hidden">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">API Key</label>
-                                    <div class="flex gap-2">
-                                        <input type="password" id="360dialog-api-key" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
-                                               class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <button onclick="togglePasswordVisibility('360dialog-api-key')" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">Instance ID</label>
-                                    <input type="text" id="360dialog-instance-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" 
-                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Webhook URL (Opcional)</label>
+                                <input type="url" id="whatsapp-webhook-url" placeholder="https://seudominio.com/webhook/whatsapp" 
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <p class="text-xs text-gray-400 mt-1">URL para receber atualizações de status das mensagens</p>
                             </div>
                         </div>
 
@@ -337,25 +263,14 @@
             }
         }
 
-        // WhatsApp Configuration Management - INLINE VERSION
-        let currentProvider = null;
-
-                 // Setup event listeners when page loads
-         document.addEventListener('DOMContentLoaded', function() {
-             console.log('WhatsApp Config page loaded');
-             
-             // Setup provider selection
-             document.querySelectorAll('input[name="provider"]').forEach(radio => {
-                 radio.addEventListener('change', (e) => {
-                     currentProvider = e.target.value;
-                     showProviderConfig();
-                     updateRadioStyling();
-                 });
-             });
-
-             // Carregar configurações salvas
-             loadSavedConfig();
-         });
+        // WhatsApp Business API Configuration Management
+        // Setup event listeners when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('WhatsApp Business API Config page loaded');
+            
+            // Carregar configurações salvas
+            loadSavedConfig();
+        });
 
          async function loadSavedConfig() {
              try {
@@ -390,112 +305,41 @@
          }
 
          function fillConfigFields(config) {
-             if (config.provider) {
-                 currentProvider = config.provider;
-                 
-                 // Selecionar provedor correto
-                 const providerRadio = document.getElementById(`provider-${config.provider}`);
-                 if (providerRadio) {
-                     providerRadio.checked = true;
-                     showProviderConfig();
-                     updateRadioStyling();
-                 }
+             // Preencher credenciais WhatsApp Business API
+             if (config.credentials) {
+                 document.getElementById('whatsapp-access-token').value = config.credentials.accessToken || '';
+                 document.getElementById('whatsapp-phone-number-id').value = config.credentials.phoneNumberId || '';
+                 document.getElementById('whatsapp-business-account-id').value = config.credentials.businessAccountId || '';
+                 document.getElementById('whatsapp-webhook-url').value = config.credentials.webhookUrl || '';
+             }
 
-                 // Preencher credenciais
-                 if (config.credentials) {
-                     if (config.provider === 'twilio') {
-                         document.getElementById('twilio-account-sid').value = config.credentials.accountSid || '';
-                         document.getElementById('twilio-auth-token').value = config.credentials.authToken || '';
-                         document.getElementById('twilio-whatsapp-number').value = config.credentials.whatsappNumber || '';
-                     } else if (config.provider === 'meta') {
-                         document.getElementById('meta-access-token').value = config.credentials.accessToken || '';
-                         document.getElementById('meta-phone-number-id').value = config.credentials.phoneNumberId || '';
-                         document.getElementById('meta-business-account-id').value = config.credentials.businessAccountId || '';
-                     } else if (config.provider === '360dialog') {
-                         document.getElementById('360dialog-api-key').value = config.credentials.apiKey || '';
-                         document.getElementById('360dialog-instance-id').value = config.credentials.instanceId || '';
-                     }
-                 }
-
-                 // Preencher configurações globais
-                 if (config.globalSettings) {
-                     document.getElementById('rate-limit-per-minute').value = config.globalSettings.rateLimitPerMinute || 30;
-                     document.getElementById('send-time-start').value = config.globalSettings.sendTimeStart || '08:00';
-                     document.getElementById('send-time-end').value = config.globalSettings.sendTimeEnd || '20:00';
-                     document.getElementById('timezone').value = config.globalSettings.timezone || 'America/Sao_Paulo';
-                     document.getElementById('enable-webhooks').checked = config.globalSettings.enableWebhooks !== false;
-                 }
+             // Preencher configurações globais
+             if (config.globalSettings) {
+                 document.getElementById('rate-limit-per-minute').value = config.globalSettings.rateLimitPerMinute || 30;
+                 document.getElementById('send-time-start').value = config.globalSettings.sendTimeStart || '08:00';
+                 document.getElementById('send-time-end').value = config.globalSettings.sendTimeEnd || '20:00';
+                 document.getElementById('timezone').value = config.globalSettings.timezone || 'America/Sao_Paulo';
+                 document.getElementById('enable-webhooks').checked = config.globalSettings.enableWebhooks !== false;
              }
          }
 
          function setDefaultConfig() {
-             // Configurar Twilio como padrão
-             currentProvider = 'twilio';
-             const twilioRadio = document.getElementById('provider-twilio');
-             if (twilioRadio) {
-                 twilioRadio.checked = true;
-                 showProviderConfig();
-                 updateRadioStyling();
-             }
+             // Configuração padrão para WhatsApp Business API
+             console.log('Using default WhatsApp Business API configuration');
          }
 
-        function showProviderConfig() {
-            console.log('Showing config for provider:', currentProvider);
-            
-            // Hide all provider configs
-            document.querySelectorAll('.provider-config').forEach(config => {
-                config.classList.add('hidden');
-            });
-
-            // Show selected provider config
-            if (currentProvider) {
-                const configElement = document.getElementById(`${currentProvider}-config`);
-                if (configElement) {
-                    configElement.classList.remove('hidden');
-                    console.log('Showed config for:', currentProvider);
-                } else {
-                    console.error('Config element not found for:', currentProvider);
-                }
-            }
-        }
-
-        function updateRadioStyling() {
-            document.querySelectorAll('input[name="provider"]').forEach(radio => {
-                const label = radio.closest('.relative').querySelector('label');
-                const radioCircle = label.querySelector('.w-4.h-4');
-                
-                if (radio.checked) {
-                    radioCircle.classList.remove('border-gray-400');
-                    radioCircle.classList.add('border-blue-500', 'bg-blue-500');
-                    label.classList.add('border-blue-500');
-                    label.classList.remove('border-gray-600');
-                } else {
-                    radioCircle.classList.remove('border-blue-500', 'bg-blue-500');
-                    radioCircle.classList.add('border-gray-400');
-                    label.classList.remove('border-blue-500');
-                    label.classList.add('border-gray-600');
-                }
-            });
-        }
-
                  async function saveWhatsAppConfig() {
-             console.log('Saving WhatsApp config...');
+             console.log('Saving WhatsApp Business API config...');
              
              try {
                  // Coletar dados do formulário
                  const config = {
-                     provider: currentProvider,
-                     credentials: getProviderCredentials(),
+                     credentials: getWhatsAppBusinessCredentials(),
                      globalSettings: getGlobalSettings()
                  };
 
                  // Validar dados
-                 if (!config.provider) {
-                     alert('Selecione um provedor!');
-                     return;
-                 }
-
-                 if (!validateCredentials(config.credentials)) {
+                 if (!validateWhatsAppBusinessCredentials(config.credentials)) {
                      alert('Preencha todas as credenciais obrigatórias!');
                      return;
                  }
@@ -512,7 +356,7 @@
 
                  if (response.ok) {
                      const result = await response.json();
-                     alert('Configuração salva com sucesso!');
+                     alert('Configuração WhatsApp Business API salva com sucesso!');
                      console.log('Config saved:', result);
                      
                      // Atualizar status
@@ -528,7 +372,7 @@
          }
 
          async function testWhatsAppConnection() {
-             console.log('Testing WhatsApp connection...');
+             console.log('Testing WhatsApp Business API connection...');
              
              const testPhone = document.getElementById('test-phone').value;
              if (!testPhone) {
@@ -545,14 +389,13 @@
                      },
                      body: JSON.stringify({
                          phoneNumber: testPhone,
-                         provider: currentProvider,
-                         credentials: getProviderCredentials()
+                         message: 'Teste de conectividade WhatsApp Business API - Sistema de Indicação'
                      })
                  });
 
                  if (response.ok) {
                      const result = await response.json();
-                     alert(`Teste realizado com sucesso!\nMensagem ID: ${result.messageId}\nStatus: ${result.status}`);
+                     alert(`Teste realizado com sucesso!\nMensagem ID: ${result.data?.messageId}\nStatus: ${result.data?.status}`);
                      console.log('Test result:', result);
                  } else {
                      const error = await response.json();
@@ -565,12 +408,13 @@
          }
 
          function resetWhatsAppConfig() {
-             console.log('Resetting WhatsApp config...');
+             console.log('Resetting WhatsApp Business API config...');
              if (confirm('Tem certeza que deseja resetar todas as configurações?')) {
                  // Limpar campos
-                 document.querySelectorAll('input[type="text"], input[type="password"]').forEach(input => {
-                     input.value = '';
-                 });
+                 document.getElementById('whatsapp-access-token').value = '';
+                 document.getElementById('whatsapp-phone-number-id').value = '';
+                 document.getElementById('whatsapp-business-account-id').value = '';
+                 document.getElementById('whatsapp-webhook-url').value = '';
                  
                  // Resetar seleções
                  document.getElementById('rate-limit-per-minute').value = '30';
@@ -596,8 +440,7 @@
                          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
                      },
                      body: JSON.stringify({
-                         provider: currentProvider,
-                         credentials: getProviderCredentials(),
+                         credentials: getWhatsAppBusinessCredentials(),
                          globalSettings: settings
                      })
                  });
@@ -615,23 +458,13 @@
          }
 
          // Funções auxiliares
-         function getProviderCredentials() {
-             const credentials = {};
-             
-             if (currentProvider === 'twilio') {
-                 credentials.accountSid = document.getElementById('twilio-account-sid').value;
-                 credentials.authToken = document.getElementById('twilio-auth-token').value;
-                 credentials.whatsappNumber = document.getElementById('twilio-whatsapp-number').value;
-             } else if (currentProvider === 'meta') {
-                 credentials.accessToken = document.getElementById('meta-access-token').value;
-                 credentials.phoneNumberId = document.getElementById('meta-phone-number-id').value;
-                 credentials.businessAccountId = document.getElementById('meta-business-account-id').value;
-             } else if (currentProvider === '360dialog') {
-                 credentials.apiKey = document.getElementById('360dialog-api-key').value;
-                 credentials.instanceId = document.getElementById('360dialog-instance-id').value;
-             }
-             
-             return credentials;
+         function getWhatsAppBusinessCredentials() {
+             return {
+                 accessToken: document.getElementById('whatsapp-access-token').value,
+                 phoneNumberId: document.getElementById('whatsapp-phone-number-id').value,
+                 businessAccountId: document.getElementById('whatsapp-business-account-id').value,
+                 webhookUrl: document.getElementById('whatsapp-webhook-url').value || undefined
+             };
          }
 
          function getGlobalSettings() {
@@ -644,20 +477,13 @@
              };
          }
 
-         function validateCredentials(credentials) {
-             if (currentProvider === 'twilio') {
-                 return credentials.accountSid && credentials.authToken && credentials.whatsappNumber;
-             } else if (currentProvider === 'meta') {
-                 return credentials.accessToken && credentials.phoneNumberId && credentials.businessAccountId;
-             } else if (currentProvider === '360dialog') {
-                 return credentials.apiKey && credentials.instanceId;
-             }
-             return false;
+         function validateWhatsAppBusinessCredentials(credentials) {
+             return credentials.accessToken && credentials.phoneNumberId && credentials.businessAccountId;
          }
 
          function updateStatusDisplay(config) {
              if (config) {
-                 document.getElementById('provider-name').textContent = config.provider || '-';
+                 document.getElementById('provider-name').textContent = 'WhatsApp Business API';
                  document.getElementById('connection-status').textContent = config.status?.connected ? 'Conectado' : 'Desconectado';
                  document.getElementById('whatsapp-status').innerHTML = config.status?.connected ? 
                      '<i class="fas fa-circle mr-1 text-green-400"></i>Conectado' : 

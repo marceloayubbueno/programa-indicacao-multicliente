@@ -5,24 +5,16 @@ export type WhatsAppConfigDocument = WhatsAppConfig & Document;
 
 @Schema({ timestamps: true })
 export class WhatsAppConfig {
-  @Prop({ required: true, enum: ['twilio', 'meta', '360dialog'] })
+  @Prop({ default: 'whatsapp-business' })
   provider: string;
 
   @Prop({ type: Object })
   credentials: {
-    // Twilio
-    accountSid?: string;
-    authToken?: string;
-    whatsappNumber?: string;
-    
-    // Meta
-    accessToken?: string;
-    phoneNumberId?: string;
-    businessAccountId?: string;
-    
-    // 360dialog
-    apiKey?: string;
-    instanceId?: string;
+    // WhatsApp Business API
+    accessToken: string;
+    phoneNumberId: string;
+    businessAccountId: string;
+    webhookUrl?: string; // opcional
   };
 
   @Prop({ type: Object, default: {} })
