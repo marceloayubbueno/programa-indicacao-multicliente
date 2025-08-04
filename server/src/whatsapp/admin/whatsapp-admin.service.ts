@@ -225,96 +225,142 @@ export class WhatsAppAdminService {
     }
   }
 
-  private async sendTestMessage(phoneNumber: string, config: any): Promise<any> {
-    const { provider, credentials } = config;
+  async sendTestMessage(messageData: any) {
+    try {
+      console.log('=== SERVICE: ENVIO DE MENSAGEM DE TESTE ===');
+      console.log('Dados da mensagem:', JSON.stringify(messageData, null, 2));
+      
+      const { to, message, from } = messageData;
+      
+      // Validar dados
+      if (!to || !message) {
+        throw new Error('Número de destino e mensagem são obrigatórios');
+      }
+      
+      // Validar formato do número
+      const phoneRegex = /^\+[1-9]\d{1,14}$/;
+      if (!phoneRegex.test(to)) {
+        throw new Error('Formato de telefone inválido');
+      }
+      
+      // Obter configuração do admin
+      const config = await this.getConfig();
+      if (!config || !config.isActive) {
+        throw new Error('Configuração WhatsApp não está ativa');
+      }
+      
+      console.log('Configuração encontrada:', config);
+      
+      // Enviar mensagem usando o provedor configurado
+      const result = await this.sendMessage({
+        to: to.trim().replace(/\s+/g, ''),
+        message: message,
+        from: from || config.whatsappNumber
+      });
+      
+      console.log('=== SERVICE: MENSAGEM ENVIADA COM SUCESSO ===');
+      console.log('Resultado:', result);
+      
+      return {
+        success: true,
+        message: 'Mensagem de teste enviada com sucesso',
+        data: {
+          messageId: result.messageId || 'unknown',
+          to: to,
+          status: result.status || 'sent',
+          timestamp: new Date().toISOString()
+        }
+      };
+      
+    } catch (error) {
+      console.error('=== SERVICE: ERRO NO ENVIO ===');
+      console.error('Erro:', error);
+      throw error;
+    }
+  }
+
+  private async sendMessage(messageData: any) {
+    const { to, message, from } = messageData;
     
     try {
       let messageId: string;
       let status: string;
 
-      switch (provider) {
+      // Obter configuração do admin
+      const config = await this.getConfig();
+      if (!config || !config.isActive) {
+        throw new Error('Configuração WhatsApp não está ativa');
+      }
+
+      // Enviar mensagem usando o provedor configurado
+      switch (config.provider) {
         case 'twilio':
-          const twilioResult = await this.sendTwilioMessage(phoneNumber, credentials);
+          const twilioResult = await this.sendTwilioMessage(to, config.credentials);
           messageId = twilioResult.sid;
           status = twilioResult.status;
           break;
         case 'meta':
-          const metaResult = await this.sendMetaMessage(phoneNumber, credentials);
+          const metaResult = await this.sendMetaMessage(to, config.credentials);
           messageId = metaResult.id;
           status = metaResult.status;
           break;
         case '360dialog':
-          const dialogResult = await this.send360DialogMessage(phoneNumber, credentials);
+          const dialogResult = await this.send360DialogMessage(to, config.credentials);
           messageId = dialogResult.message_id;
           status = dialogResult.status;
           break;
         default:
-          throw new Error(`Provedor não suportado: ${provider}`);
+          throw new Error(`Provedor não suportado: ${config.provider}`);
       }
 
-             // Salva mensagem no banco
-       const testMessage = new this.whatsappMessageModel({
-         clientId: null, // Mensagem administrativa
-         to: phoneNumber,
-         from: credentials.whatsappNumber || 'admin',
-         content: {
-           body: 'Teste de conectividade WhatsApp - Sistema de Indicação'
-         },
-         status: status || 'sent',
-         providerResponse: {
-           messageId,
-           status,
-           provider
-         },
-         sentAt: new Date()
-       });
+      // Salva mensagem no banco
+      const testMessage = new this.whatsappMessageModel({
+        clientId: null, // Mensagem administrativa
+        to: to,
+        from: from || 'admin',
+        content: {
+          body: message
+        },
+        status: status || 'sent',
+        providerResponse: {
+          messageId,
+          status,
+          provider: config.provider
+        },
+        sentAt: new Date()
+      });
 
-       await testMessage.save();
-       
-       // Para Twilio, vamos verificar o status da mensagem
-       if (provider === 'twilio' && messageId) {
-         try {
-           const client = twilio(credentials.accountSid, credentials.authToken);
-           const messageStatus = await client.messages(messageId).fetch();
-           
-           console.log('Status detalhado da mensagem Twilio:', {
-             sid: messageStatus.sid,
-             status: messageStatus.status,
-             errorCode: messageStatus.errorCode,
-             errorMessage: messageStatus.errorMessage,
-             direction: messageStatus.direction,
-             from: messageStatus.from,
-             to: messageStatus.to
-           });
-           
-           // Atualiza o status no banco
-           await this.whatsappMessageModel.updateOne(
-             { _id: testMessage._id },
-             { 
-               $set: { 
-                 status: messageStatus.status,
-                 'providerResponse.errorCode': messageStatus.errorCode,
-                 'providerResponse.errorMessage': messageStatus.errorMessage
-               }
-             }
-           );
-           
-           return {
-             ...testMessage.toObject(),
-             detailedStatus: {
-               status: messageStatus.status,
-               errorCode: messageStatus.errorCode,
-               errorMessage: messageStatus.errorMessage
-             }
-           };
-         } catch (statusError) {
-           console.error('Erro ao verificar status da mensagem:', statusError);
-         }
-       }
-       
-       return testMessage.toObject();
+      const savedMessage = await testMessage.save();
+      console.log('Mensagem salva no banco:', savedMessage._id);
+      
+      // Para Twilio, vamos verificar o status da mensagem
+      if (config.provider === 'twilio' && messageId) {
+        try {
+          const client = twilio(config.credentials.accountSid, config.credentials.authToken);
+          const messageStatus = await client.messages(messageId).fetch();
+          
+          // Atualiza o status no banco
+          await this.whatsappMessageModel.findByIdAndUpdate(savedMessage._id, {
+            status: messageStatus.status,
+            'providerResponse.status': messageStatus.status,
+            'providerResponse.errorCode': messageStatus.errorCode,
+            'providerResponse.errorMessage': messageStatus.errorMessage
+          });
+          
+          console.log('Status atualizado:', messageStatus.status);
+        } catch (statusError) {
+          console.error('Erro ao verificar status:', statusError);
+        }
+      }
+      
+      return {
+        messageId: messageId || savedMessage._id.toString(),
+        status: status || 'sent',
+        provider: config.provider
+      };
+      
     } catch (error) {
-      console.error('Erro ao enviar mensagem de teste:', error.message);
+      console.error('Erro ao enviar mensagem:', error);
       throw error;
     }
   }

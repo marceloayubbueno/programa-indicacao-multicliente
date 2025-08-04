@@ -574,7 +574,7 @@ async function sendTestMessage() {
         console.log('Enviando mensagem de teste:', { testNumber, testMessage });
         
         const token = getToken();
-        const url = `${window.API_BASE_URL}/whatsapp/admin/test-message`;
+        const url = `${window.API_BASE_URL}/admin/whatsapp/test-message`; // Corrigido para usar endpoint admin
         console.log('URL do teste de envio:', url);
         
         const response = await fetch(url, {

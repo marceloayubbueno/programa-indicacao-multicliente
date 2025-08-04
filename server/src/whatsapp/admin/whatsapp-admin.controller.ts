@@ -58,6 +58,33 @@ export class WhatsAppAdminController {
     }
   }
 
+  @Post('test-message')
+  async sendTestMessage(@Body() messageData: any) {
+    try {
+      console.log('=== CONTROLLER: ENVIO DE MENSAGEM DE TESTE ===');
+      console.log('Dados recebidos:', JSON.stringify(messageData, null, 2));
+      
+      const result = await this.whatsappAdminService.sendTestMessage(messageData);
+      
+      console.log('=== CONTROLLER: MENSAGEM ENVIADA ===');
+      return result;
+    } catch (error) {
+      console.error('=== CONTROLLER: ERRO NO ENVIO ===');
+      console.error('Erro completo:', error);
+      console.error('Stack trace:', error.stack);
+      console.error('Mensagem:', error.message);
+      
+      throw new HttpException(
+        {
+          message: 'Erro ao enviar mensagem de teste',
+          details: error.message,
+          code: error.code || 'UNKNOWN'
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   @Get('status')
   async getStatus() {
     try {
