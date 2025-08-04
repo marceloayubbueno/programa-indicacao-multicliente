@@ -295,17 +295,6 @@ function renderActivityLogs(logs) {
     });
 }
 
-function getLogIcon(type) {
-    switch(type) {
-        case 'config_saved': return 'fas fa-save';
-        case 'message_sent': return 'fas fa-paper-plane';
-        case 'template_approved': return 'fas fa-check-circle';
-        case 'connection_test': return 'fas fa-plug';
-        case 'message_failed': return 'fas fa-exclamation-triangle';
-        default: return 'fas fa-info-circle';
-    }
-}
-
 async function saveWhatsAppConfig() {
     console.log('Função saveWhatsAppConfig chamada');
     try {
@@ -553,6 +542,120 @@ async function refreshLogs() {
     } catch (error) {
         console.error('Erro ao atualizar logs:', error);
         showError('Erro ao atualizar logs');
+    }
+}
+
+async function sendTestMessage() {
+    console.log('Função sendTestMessage chamada');
+    try {
+        const testNumber = document.getElementById('testNumber').value.trim();
+        const testMessage = document.getElementById('testMessage').value.trim();
+        
+        // Validação
+        if (!testNumber || !testMessage) {
+            showError('Preencha o número e a mensagem de teste');
+            return;
+        }
+        
+        if (!validatePhoneNumber(testNumber)) {
+            showError('Número de teste inválido');
+            return;
+        }
+        
+        if (!whatsappConfig || !whatsappConfig.whatsappNumber) {
+            showError('Configure o WhatsApp antes de enviar mensagens de teste');
+            return;
+        }
+        
+        if (!confirm(`Enviar mensagem de teste para ${testNumber}?\n\nMensagem: "${testMessage}"`)) {
+            return;
+        }
+        
+        console.log('Enviando mensagem de teste:', { testNumber, testMessage });
+        
+        const token = getToken();
+        const url = `${window.API_BASE_URL}/whatsapp/admin/test-message`;
+        console.log('URL do teste de envio:', url);
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                to: testNumber,
+                message: testMessage,
+                from: whatsappConfig.whatsappNumber
+            })
+        });
+        
+        console.log('Response status do teste de envio:', response.status);
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Resultado do teste de envio:', result);
+            
+            showSuccess('Mensagem de teste enviada com sucesso! Verifique o WhatsApp do número de destino.');
+            
+            // Adicionar log de atividade
+            await addActivityLog('test_message_sent', `Mensagem de teste enviada para ${testNumber}`);
+            
+        } else {
+            const errorData = await response.json();
+            console.error('Erro no teste de envio:', errorData);
+            throw new Error(errorData.message || `HTTP ${response.status}`);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao enviar mensagem de teste:', error);
+        showError(`Erro ao enviar mensagem de teste: ${error.message}`);
+    }
+}
+
+function fillTestDefaults() {
+    console.log('Função fillTestDefaults chamada');
+    
+    // Preencher número de teste com o número configurado (se existir)
+    if (whatsappConfig && whatsappConfig.whatsappNumber) {
+        document.getElementById('testNumber').value = whatsappConfig.whatsappNumber;
+    }
+    
+    // Preencher mensagem padrão
+    document.getElementById('testMessage').value = 'Olá! Este é um teste do sistema Viral Lead. Se você recebeu esta mensagem, a configuração está funcionando perfeitamente! 🎉';
+    
+    showSuccess('Campos preenchidos com valores padrão');
+}
+
+async function addActivityLog(type, message) {
+    try {
+        // Adicionar log localmente
+        const logs = [
+            {
+                id: Date.now().toString(),
+                type: type,
+                message: message,
+                timestamp: new Date().toISOString(),
+                status: 'success'
+            }
+        ];
+        
+        renderActivityLogs(logs);
+        
+    } catch (error) {
+        console.error('Erro ao adicionar log:', error);
+    }
+}
+
+function getLogIcon(type) {
+    switch(type) {
+        case 'config_saved': return 'fas fa-save';
+        case 'test_message_sent': return 'fas fa-paper-plane';
+        case 'message_sent': return 'fas fa-paper-plane';
+        case 'template_approved': return 'fas fa-check-circle';
+        case 'connection_test': return 'fas fa-plug';
+        case 'message_failed': return 'fas fa-exclamation-triangle';
+        default: return 'fas fa-info-circle';
     }
 }
 
