@@ -7,22 +7,38 @@ let clientId = null;
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', async function() {
+    console.log('DOM carregado - iniciando WhatsApp Config');
     await initWhatsAppConfig();
 });
 
 async function initWhatsAppConfig() {
     try {
+        console.log('Iniciando WhatsApp Config...');
+        
+        // Verificar se API_BASE_URL está definido
+        if (!window.API_BASE_URL) {
+            console.error('API_BASE_URL não está definido!');
+            showError('Erro de configuração: API_BASE_URL não encontrado');
+            return;
+        }
+        
+        console.log('API_BASE_URL:', window.API_BASE_URL);
+
         // Verificar autenticação
         if (!checkAuth()) {
+            console.log('Falha na autenticação');
             return;
         }
 
         // Obter clientId do token
         clientId = getClientIdFromToken();
         if (!clientId) {
+            console.error('ClientId não encontrado no token');
             showError('Token inválido - clientId não encontrado');
             return;
         }
+        
+        console.log('ClientId extraído:', clientId);
 
         // Carregar dados iniciais
         await loadConfig();
@@ -30,6 +46,8 @@ async function initWhatsAppConfig() {
         
         // Configurar eventos
         setupEventListeners();
+        
+        console.log('WhatsApp Config inicializado com sucesso');
         
     } catch (error) {
         console.error('Erro ao inicializar WhatsApp Config:', error);
@@ -40,9 +58,11 @@ async function initWhatsAppConfig() {
 function checkAuth() {
     const token = getToken();
     if (!token) {
+        console.log('Token não encontrado, redirecionando para login');
         window.location.href = 'login.html';
         return false;
     }
+    console.log('Token encontrado');
     return true;
 }
 
@@ -57,6 +77,7 @@ function getClientIdFromToken() {
     try {
         // Decodificar JWT para extrair clientId
         const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('Payload do token:', payload);
         return payload.clientId || payload.sub;
     } catch (error) {
         console.error('Erro ao decodificar token:', error);
@@ -66,8 +87,12 @@ function getClientIdFromToken() {
 
 async function loadConfig() {
     try {
+        console.log('Carregando configuração para clientId:', clientId);
         const token = getToken();
-        const response = await fetch(`${window.API_BASE_URL}/whatsapp/client/config/${clientId}`, {
+        const url = `${window.API_BASE_URL}/whatsapp/client/config/${clientId}`;
+        console.log('URL da requisição:', url);
+        
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -75,8 +100,11 @@ async function loadConfig() {
             }
         });
 
+        console.log('Response status:', response.status);
+
         if (response.ok) {
             config = await response.json();
+            console.log('Configuração carregada:', config);
             
             // Preencher formulário
             document.getElementById('whatsappNumber').value = config.whatsappNumber || '';
@@ -86,6 +114,7 @@ async function loadConfig() {
             // Atualizar status da conexão
             updateConnectionStatus();
         } else if (response.status === 404) {
+            console.log('Configuração não encontrada, usando valores padrão');
             // Configuração não existe ainda - usar valores padrão
             config = {
                 whatsappNumber: '',
@@ -102,6 +131,8 @@ async function loadConfig() {
             
             updateConnectionStatus();
         } else {
+            const errorText = await response.text();
+            console.error('Erro na resposta:', response.status, errorText);
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
@@ -122,6 +153,7 @@ async function loadConfig() {
 
 async function loadActivityLogs() {
     try {
+        console.log('Carregando logs de atividade...');
         // Por enquanto, usar logs simulados
         // TODO: Implementar endpoint de logs quando necessário
         const logs = [
@@ -143,6 +175,7 @@ async function loadActivityLogs() {
 }
 
 function setupEventListeners() {
+    console.log('Configurando event listeners...');
     // Event listeners para validação em tempo real
     const whatsappNumber = document.getElementById('whatsappNumber');
     if (whatsappNumber) {
@@ -150,6 +183,13 @@ function setupEventListeners() {
             validatePhoneNumber(this.value);
         });
     }
+    
+    // Verificar se os botões existem e adicionar event listeners
+    const saveButton = document.querySelector('button[onclick="saveWhatsAppConfig()"]');
+    const testButton = document.querySelector('button[onclick="testConnection()"]');
+    
+    console.log('Botão salvar encontrado:', !!saveButton);
+    console.log('Botão testar encontrado:', !!testButton);
 }
 
 function validatePhoneNumber(phoneNumber) {
@@ -244,10 +284,13 @@ function getLogIcon(type) {
 }
 
 async function saveWhatsAppConfig() {
+    console.log('Função saveWhatsAppConfig chamada');
     try {
         const whatsappNumber = document.getElementById('whatsappNumber').value.trim();
         const displayName = document.getElementById('displayName').value.trim();
         const businessDescription = document.getElementById('businessDescription').value.trim();
+        
+        console.log('Dados do formulário:', { whatsappNumber, displayName, businessDescription });
         
         // Validação
         if (!whatsappNumber || !displayName) {
@@ -267,11 +310,15 @@ async function saveWhatsAppConfig() {
             businessDescription
         };
         
+        console.log('Enviando dados:', configData);
+        
         let response;
         
         if (config && config._id) {
             // Atualizar configuração existente
-            response = await fetch(`${window.API_BASE_URL}/whatsapp/client/config/${clientId}`, {
+            const url = `${window.API_BASE_URL}/whatsapp/client/config/${clientId}`;
+            console.log('Atualizando configuração:', url);
+            response = await fetch(url, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -281,7 +328,9 @@ async function saveWhatsAppConfig() {
             });
         } else {
             // Criar nova configuração
-            response = await fetch(`${window.API_BASE_URL}/whatsapp/client/config`, {
+            const url = `${window.API_BASE_URL}/whatsapp/client/config`;
+            console.log('Criando nova configuração:', url);
+            response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -294,8 +343,11 @@ async function saveWhatsAppConfig() {
             });
         }
         
+        console.log('Response status:', response.status);
+        
         if (response.ok) {
             config = await response.json();
+            console.log('Configuração salva:', config);
             showSuccess('Configuração salva com sucesso!');
             updateConnectionStatus();
             
@@ -303,6 +355,7 @@ async function saveWhatsAppConfig() {
             await loadActivityLogs();
         } else {
             const errorData = await response.json();
+            console.error('Erro na resposta:', errorData);
             throw new Error(errorData.message || `HTTP ${response.status}`);
         }
         
@@ -313,6 +366,7 @@ async function saveWhatsAppConfig() {
 }
 
 function resetWhatsAppConfig() {
+    console.log('Função resetWhatsAppConfig chamada');
     if (confirm('Tem certeza que deseja resetar as configurações?')) {
         document.getElementById('whatsappNumber').value = '';
         document.getElementById('displayName').value = '';
@@ -329,6 +383,7 @@ function resetWhatsAppConfig() {
 }
 
 async function testConnection() {
+    console.log('Função testConnection chamada');
     try {
         // Verificar se há configuração salva
         if (!config || !config.whatsappNumber) {
@@ -336,13 +391,17 @@ async function testConnection() {
             return;
         }
         
+        console.log('Testando conexão para número:', config.whatsappNumber);
+        
         // Mostrar modal de teste
         document.getElementById('testConnectionModal').classList.remove('hidden');
         
         const token = getToken();
+        const url = `${window.API_BASE_URL}/whatsapp/client/config/${clientId}/verify`;
+        console.log('URL do teste:', url);
         
         // Testar conexão via API
-        const response = await fetch(`${window.API_BASE_URL}/whatsapp/client/config/${clientId}/verify`, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -350,7 +409,9 @@ async function testConnection() {
             }
         });
         
+        console.log('Response status do teste:', response.status);
         const result = await response.json();
+        console.log('Resultado do teste:', result);
         
         // Atualizar status do teste
         const statusElement = document.getElementById('testConnectionStatus');
@@ -402,6 +463,7 @@ function closeTestModal() {
 }
 
 async function refreshLogs() {
+    console.log('Função refreshLogs chamada');
     try {
         await loadActivityLogs();
         showSuccess('Logs atualizados');
@@ -412,11 +474,13 @@ async function refreshLogs() {
 }
 
 function showSuccess(message) {
+    console.log('Sucesso:', message);
     // Implementar notificação de sucesso
     alert(message);
 }
 
 function showError(message) {
+    console.error('Erro:', message);
     // Implementar notificação de erro
     alert('Erro: ' + message);
 } 
