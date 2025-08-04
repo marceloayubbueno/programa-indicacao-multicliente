@@ -159,13 +159,32 @@ export class WhatsAppClientController {
   }
 
   @Post('test-message')
+  @UseGuards(JwtClientAuthGuard)
   async sendTestMessage(@Request() req: any, @Body() messageData: any) {
     try {
+      console.log('=== CONTROLLER: INÍCIO ENVIO MENSAGEM DE TESTE ===');
+      console.log('ClientId:', req.user.clientId);
+      console.log('Dados da mensagem:', JSON.stringify(messageData, null, 2));
+      
       const clientId = req.user.clientId;
-      return await this.whatsAppClientService.sendTestMessage(clientId, messageData);
+      const result = await this.whatsAppClientService.sendTestMessage(clientId, messageData);
+      
+      console.log('=== CONTROLLER: MENSAGEM ENVIADA COM SUCESSO ===');
+      console.log('Resultado:', result);
+      
+      return result;
     } catch (error) {
+      console.error('=== CONTROLLER: ERRO NO ENVIO ===');
+      console.error('Erro completo:', error);
+      console.error('Stack trace:', error.stack);
+      console.error('Mensagem:', error.message);
+      
       throw new HttpException(
-        'Erro ao enviar mensagem de teste',
+        {
+          message: 'Erro ao enviar mensagem de teste',
+          details: error.message,
+          code: error.code || 'UNKNOWN'
+        },
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
