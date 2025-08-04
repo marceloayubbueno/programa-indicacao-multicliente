@@ -413,7 +413,9 @@ export class WhatsAppClientService {
       }
       
       // Buscar configuração do cliente
-      const clientConfig = await this.whatsAppClientConfigModel.findOne({ clientId }).exec();
+      const clientConfig = await this.whatsAppClientConfigModel.findOne({ 
+        clientId: new Types.ObjectId(clientId) 
+      }).exec();
       if (!clientConfig) {
         throw new Error('Configuração de WhatsApp não encontrada');
       }
