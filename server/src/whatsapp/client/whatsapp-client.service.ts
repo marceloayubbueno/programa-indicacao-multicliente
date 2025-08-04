@@ -428,8 +428,8 @@ export class WhatsAppClientService {
       
       // Buscar configuração global do admin
       const adminConfig = await this.whatsappConfigModel.findOne().exec();
-      if (!adminConfig || !(adminConfig as any).isActive) {
-        throw new Error('Configuração global de WhatsApp não está ativa');
+      if (!adminConfig) {
+        throw new Error('Configuração global de WhatsApp não encontrada');
       }
       
       console.log('Configuração admin encontrada:', adminConfig);
@@ -472,8 +472,8 @@ export class WhatsAppClientService {
 
       // Buscar configuração global do admin
       const adminConfig = await this.whatsappConfigModel.findOne().exec();
-      if (!adminConfig || !(adminConfig as any).isActive) {
-        throw new Error('Configuração global de WhatsApp não está ativa');
+      if (!adminConfig) {
+        throw new Error('Configuração global de WhatsApp não encontrada');
       }
 
       // Enviar mensagem usando o provedor configurado

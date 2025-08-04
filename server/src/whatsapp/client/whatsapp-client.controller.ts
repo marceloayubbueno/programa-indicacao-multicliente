@@ -149,10 +149,18 @@ export class WhatsAppClientController {
   async verifyConfig(@Request() req: any) {
     try {
       const clientId = req.user.clientId;
-      return await this.whatsAppClientService.verifyConfig(clientId);
+      const result = await this.whatsAppClientService.verifyConfig(clientId);
+      
+      return {
+        success: result.success,
+        message: result.message
+      };
     } catch (error) {
       throw new HttpException(
-        'Erro ao verificar configuração WhatsApp',
+        {
+          success: false,
+          message: error.message || 'Erro ao verificar configuração WhatsApp'
+        },
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
