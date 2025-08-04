@@ -120,6 +120,14 @@ async function loadConfig() {
             document.getElementById('displayName').value = whatsappConfig.displayName || '';
             document.getElementById('businessDescription').value = whatsappConfig.businessDescription || '';
             
+            // Preencher credenciais se existirem
+            if (whatsappConfig.whatsappCredentials) {
+                document.getElementById('accessToken').value = whatsappConfig.whatsappCredentials.accessToken || '';
+                document.getElementById('phoneNumberId').value = whatsappConfig.whatsappCredentials.phoneNumberId || '';
+                document.getElementById('businessAccountId').value = whatsappConfig.whatsappCredentials.businessAccountId || '';
+                document.getElementById('webhookUrl').value = whatsappConfig.whatsappCredentials.webhookUrl || '';
+            }
+            
             // Atualizar status da conexão
             updateConnectionStatus();
         } else if (response.status === 404) {
@@ -137,6 +145,10 @@ async function loadConfig() {
             document.getElementById('whatsappNumber').value = '';
             document.getElementById('displayName').value = '';
             document.getElementById('businessDescription').value = '';
+            document.getElementById('accessToken').value = '';
+            document.getElementById('phoneNumberId').value = '';
+            document.getElementById('businessAccountId').value = '';
+            document.getElementById('webhookUrl').value = '';
             
             updateConnectionStatus();
         } else {
@@ -302,9 +314,23 @@ async function saveWhatsAppConfig() {
         const displayName = document.getElementById('displayName').value.trim();
         const businessDescription = document.getElementById('businessDescription').value.trim();
         
-        console.log('Dados do formulário:', { whatsappNumber, displayName, businessDescription });
+        // Novos campos de credenciais
+        const accessToken = document.getElementById('accessToken').value.trim();
+        const phoneNumberId = document.getElementById('phoneNumberId').value.trim();
+        const businessAccountId = document.getElementById('businessAccountId').value.trim();
+        const webhookUrl = document.getElementById('webhookUrl').value.trim();
         
-        // Validação
+        console.log('Dados do formulário:', { 
+            whatsappNumber, 
+            displayName, 
+            businessDescription,
+            accessToken: accessToken ? '***' : '',
+            phoneNumberId,
+            businessAccountId,
+            webhookUrl
+        });
+        
+        // Validação básica
         if (!whatsappNumber || !displayName) {
             showError('Preencha todos os campos obrigatórios');
             return;
@@ -319,7 +345,13 @@ async function saveWhatsAppConfig() {
         const configData = {
             whatsappNumber,
             displayName,
-            businessDescription
+            businessDescription,
+            whatsappCredentials: {
+                accessToken,
+                phoneNumberId,
+                businessAccountId,
+                webhookUrl: webhookUrl || undefined
+            }
         };
         
         console.log('Enviando dados:', configData);
@@ -669,4 +701,60 @@ function showError(message) {
     console.error('Erro:', message);
     // Implementar notificação de erro
     alert('Erro: ' + message);
+}
+
+async function testWhatsAppCredentials() {
+    console.log('Função testWhatsAppCredentials chamada');
+    try {
+        const accessToken = document.getElementById('accessToken').value.trim();
+        const phoneNumberId = document.getElementById('phoneNumberId').value.trim();
+        const businessAccountId = document.getElementById('businessAccountId').value.trim();
+        
+        if (!accessToken || !phoneNumberId || !businessAccountId) {
+            showError('Preencha todas as credenciais antes de testar');
+            return;
+        }
+        
+        const token = getToken();
+        const testData = {
+            accessToken,
+            phoneNumberId,
+            businessAccountId
+        };
+        
+        console.log('Testando credenciais...');
+        
+        const response = await fetch(`${window.API_BASE_URL}/whatsapp/client/test-credentials`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(testData)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Teste de credenciais bem-sucedido:', result);
+            showSuccess('Credenciais válidas! Conexão com WhatsApp Business API estabelecida.');
+            
+            // Atualizar status de conexão
+            updateConnectionStatus();
+            
+            // Adicionar log de atividade
+            await addActivityLog('success', 'Credenciais testadas com sucesso');
+            
+        } else {
+            const errorData = await response.json();
+            console.error('Erro no teste de credenciais:', errorData);
+            showError(`Erro ao testar credenciais: ${errorData.message || 'Credenciais inválidas'}`);
+            
+            // Adicionar log de atividade
+            await addActivityLog('error', `Falha no teste de credenciais: ${errorData.message}`);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao testar credenciais:', error);
+        showError(`Erro ao testar credenciais: ${error.message}`);
+    }
 } 

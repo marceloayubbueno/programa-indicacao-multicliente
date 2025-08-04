@@ -22,6 +22,21 @@ export class WhatsAppAdminService {
         provider: 'whatsapp-business',
         credentials: {},
         globalSettings: {
+          // Configurações de Rate Limiting
+          globalRateLimitPerMinute: 30,
+          defaultDailyLimitPerClient: 100,
+          
+          // Configurações de Horário
+          globalSendTimeStart: '08:00',
+          globalSendTimeEnd: '20:00',
+          defaultTimezone: 'America/Sao_Paulo',
+          
+          // Configurações de Funcionalidades
+          enableGlobalWebhooks: true,
+          requireVerification: false,
+          enableAutoReply: false,
+          
+          // Configurações legadas (mantidas para compatibilidade)
           rateLimitPerMinute: 30,
           sendTimeStart: '08:00',
           sendTimeEnd: '20:00',
@@ -31,7 +46,7 @@ export class WhatsAppAdminService {
         status: {
           connected: false,
           messagesToday: 0,
-          dailyLimit: 1000,
+          dailyLimit: 5000,
           activeClients: 0,
           totalTemplates: 0
         }
@@ -62,13 +77,32 @@ export class WhatsAppAdminService {
     // Atualiza configuração
     config.provider = 'whatsapp-business';
     config.credentials = credentials;
-    config.globalSettings = {
-      rateLimitPerMinute: globalSettings.rateLimitPerMinute || 30,
-      sendTimeStart: globalSettings.sendTimeStart || '08:00',
-      sendTimeEnd: globalSettings.sendTimeEnd || '20:00',
-      timezone: globalSettings.timezone || 'America/Sao_Paulo',
-      enableWebhooks: globalSettings.enableWebhooks !== false
-    };
+    
+    // Atualiza configurações globais se fornecidas
+    if (globalSettings) {
+      config.globalSettings = {
+        // Configurações de Rate Limiting
+        globalRateLimitPerMinute: globalSettings.globalRateLimitPerMinute || 30,
+        defaultDailyLimitPerClient: globalSettings.defaultDailyLimitPerClient || 100,
+        
+        // Configurações de Horário
+        globalSendTimeStart: globalSettings.globalSendTimeStart || '08:00',
+        globalSendTimeEnd: globalSettings.globalSendTimeEnd || '20:00',
+        defaultTimezone: globalSettings.defaultTimezone || 'America/Sao_Paulo',
+        
+        // Configurações de Funcionalidades
+        enableGlobalWebhooks: globalSettings.enableGlobalWebhooks !== false,
+        requireVerification: globalSettings.requireVerification !== false,
+        enableAutoReply: globalSettings.enableAutoReply !== false,
+        
+        // Configurações legadas (mantidas para compatibilidade)
+        rateLimitPerMinute: globalSettings.globalRateLimitPerMinute || 30,
+        sendTimeStart: globalSettings.globalSendTimeStart || '08:00',
+        sendTimeEnd: globalSettings.globalSendTimeEnd || '20:00',
+        timezone: globalSettings.defaultTimezone || 'America/Sao_Paulo',
+        enableWebhooks: globalSettings.enableGlobalWebhooks !== false
+      };
+    }
 
     // Testa conexão se credenciais foram fornecidas
     if (this.hasValidWhatsAppBusinessCredentials(credentials)) {
@@ -97,6 +131,58 @@ export class WhatsAppAdminService {
 
     await config.save();
     return config.toObject();
+  }
+
+  async saveGlobalSettings(globalSettings: any): Promise<any> {
+    console.log('=== SALVANDO CONFIGURAÇÕES GLOBAIS ===');
+    console.log('Configurações recebidas:', JSON.stringify(globalSettings, null, 2));
+
+    // Validações básicas
+    if (!globalSettings) {
+      throw new Error('Configurações globais são obrigatórias');
+    }
+
+    // Busca configuração existente ou cria nova
+    let config = await this.whatsappConfigModel.findOne().exec();
+    
+    if (!config) {
+      config = new this.whatsappConfigModel();
+      config.provider = 'whatsapp-business';
+      config.credentials = {};
+    }
+
+    // Atualiza apenas as configurações globais
+    config.globalSettings = {
+      // Configurações de Rate Limiting
+      globalRateLimitPerMinute: globalSettings.globalRateLimitPerMinute || 30,
+      defaultDailyLimitPerClient: globalSettings.defaultDailyLimitPerClient || 100,
+      
+      // Configurações de Horário
+      globalSendTimeStart: globalSettings.globalSendTimeStart || '08:00',
+      globalSendTimeEnd: globalSettings.globalSendTimeEnd || '20:00',
+      defaultTimezone: globalSettings.defaultTimezone || 'America/Sao_Paulo',
+      
+      // Configurações de Funcionalidades
+      enableGlobalWebhooks: globalSettings.enableGlobalWebhooks !== false,
+      requireVerification: globalSettings.requireVerification !== false,
+      enableAutoReply: globalSettings.enableAutoReply !== false,
+      
+      // Configurações legadas (mantidas para compatibilidade)
+      rateLimitPerMinute: globalSettings.globalRateLimitPerMinute || 30,
+      sendTimeStart: globalSettings.globalSendTimeStart || '08:00',
+      sendTimeEnd: globalSettings.globalSendTimeEnd || '20:00',
+      timezone: globalSettings.defaultTimezone || 'America/Sao_Paulo',
+      enableWebhooks: globalSettings.enableGlobalWebhooks !== false
+    };
+
+    await config.save();
+    console.log('Configurações globais salvas com sucesso');
+    
+    return {
+      success: true,
+      message: 'Configurações globais salvas com sucesso',
+      globalSettings: config.globalSettings
+    };
   }
 
   async testConnection(testData: any): Promise<any> {

@@ -17,6 +17,15 @@ export class WhatsAppClientConfig {
   @Prop({ trim: true })
   businessDescription?: string;
 
+  // WhatsApp Business API Credentials
+  @Prop({ type: Object })
+  whatsappCredentials?: {
+    accessToken: string;
+    phoneNumberId: string;
+    businessAccountId: string;
+    webhookUrl?: string;
+  };
+
   @Prop({ default: false })
   isActive: boolean;
 

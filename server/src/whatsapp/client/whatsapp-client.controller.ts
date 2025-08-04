@@ -199,6 +199,45 @@ export class WhatsAppClientController {
   }
 
   /**
+   * Testar credenciais do WhatsApp Business API
+   */
+  @Post('test-credentials')
+  @UseGuards(JwtClientAuthGuard)
+  async testCredentials(@Request() req: any, @Body() credentials: any) {
+    try {
+      console.log('=== CONTROLLER: INÍCIO TESTE DE CREDENCIAIS ===');
+      console.log('ClientId:', req.user.clientId);
+      console.log('Credenciais:', JSON.stringify(credentials, null, 2));
+      
+      const clientId = req.user.clientId;
+      const result = await this.whatsAppClientService.testCredentials(clientId, credentials);
+      
+      console.log('=== CONTROLLER: CREDENCIAIS TESTADAS COM SUCESSO ===');
+      console.log('Resultado:', result);
+      
+      return {
+        success: true,
+        message: 'Credenciais testadas com sucesso',
+        data: result
+      };
+    } catch (error) {
+      console.error('=== CONTROLLER: ERRO NO TESTE DE CREDENCIAIS ===');
+      console.error('Erro completo:', error);
+      console.error('Stack trace:', error.stack);
+      console.error('Mensagem:', error.message);
+      
+      throw new HttpException(
+        {
+          success: false,
+          message: error.message || 'Erro ao testar credenciais',
+          error: error.response?.message || error.message
+        },
+        error.status || HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  /**
    * Buscar estatísticas de uso
    */
   @Get('statistics')

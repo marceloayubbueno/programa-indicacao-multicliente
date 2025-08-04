@@ -31,6 +31,18 @@ export class WhatsAppAdminController {
     }
   }
 
+  @Post('global-settings')
+  async saveGlobalSettings(@Body() globalSettings: any) {
+    try {
+      return await this.whatsappAdminService.saveGlobalSettings(globalSettings);
+    } catch (error) {
+      throw new HttpException(
+        'Erro ao salvar configurações globais',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   @Post('test')
   async testConnection(@Body() testData: any) {
     try {

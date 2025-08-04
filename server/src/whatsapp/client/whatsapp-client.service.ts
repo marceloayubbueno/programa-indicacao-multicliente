@@ -393,6 +393,38 @@ export class WhatsAppClientService {
     });
   }
 
+  /**
+   * Testar credenciais do WhatsApp Business API
+   */
+  async testCredentials(clientId: string, credentials: any) {
+    try {
+      console.log('=== CLIENT SERVICE: TESTE DE CREDENCIAIS ===');
+      console.log('ClientId:', clientId);
+      console.log('Credenciais:', JSON.stringify(credentials, null, 2));
+
+      // Validar credenciais obrigatórias
+      if (!credentials.accessToken || !credentials.phoneNumberId || !credentials.businessAccountId) {
+        throw new BadRequestException('Credenciais incompletas. Necessário: accessToken, phoneNumberId, businessAccountId');
+      }
+
+      // Testar conexão com WhatsApp Business API
+      const testResult = await this.testWhatsAppBusinessAPI(credentials);
+
+      console.log('=== CLIENT SERVICE: CREDENCIAIS TESTADAS COM SUCESSO ===');
+      console.log('Resultado:', testResult);
+
+      return {
+        success: true,
+        message: 'Credenciais válidas',
+        data: testResult
+      };
+    } catch (error) {
+      console.error('=== CLIENT SERVICE: ERRO NO TESTE DE CREDENCIAIS ===');
+      console.error('Erro:', error);
+      throw error;
+    }
+  }
+
   async sendTestMessage(clientId: string, messageData: any) {
     try {
       console.log('=== CLIENT SERVICE: ENVIO DE MENSAGEM DE TESTE ===');
@@ -649,5 +681,60 @@ export class WhatsAppClientService {
       message_id: response.data.messages[0].id,
       status: 'sent'
     };
+  }
+
+  /**
+   * Testar conexão com WhatsApp Business API
+   */
+  private async testWhatsAppBusinessAPI(credentials: any): Promise<any> {
+    try {
+      console.log('=== TESTE WHATSAPP BUSINESS API ===');
+      console.log('Testando credenciais:', {
+        accessToken: credentials.accessToken ? '***' : 'NÃO FORNECIDO',
+        phoneNumberId: credentials.phoneNumberId,
+        businessAccountId: credentials.businessAccountId
+      });
+
+      // Fazer uma requisição para verificar se as credenciais são válidas
+      // Vamos buscar informações do número de telefone
+      const response = await axios.get(
+        `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${credentials.accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Resposta da API:', response.data);
+
+      if (response.data && response.data.id) {
+        return {
+          phoneNumberId: response.data.id,
+          phoneNumber: response.data.phone_number,
+          name: response.data.name,
+          codeVerificationStatus: response.data.code_verification_status,
+          qualityRating: response.data.quality_rating,
+          isVerified: response.data.is_verified
+        };
+      } else {
+        throw new Error('Resposta inválida da API do WhatsApp Business');
+      }
+
+    } catch (error) {
+      console.error('=== ERRO NO TESTE WHATSAPP BUSINESS API ===');
+      console.error('Erro:', error.response?.data || error.message);
+      
+      if (error.response?.status === 401) {
+        throw new BadRequestException('Token de acesso inválido ou expirado');
+      } else if (error.response?.status === 404) {
+        throw new BadRequestException('Phone Number ID não encontrado');
+      } else if (error.response?.status === 403) {
+        throw new BadRequestException('Sem permissão para acessar este número de telefone');
+      } else {
+        throw new BadRequestException(`Erro ao testar credenciais: ${error.response?.data?.error?.message || error.message}`);
+      }
+    }
   }
 } 

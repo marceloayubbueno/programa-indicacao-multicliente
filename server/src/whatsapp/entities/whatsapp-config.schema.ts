@@ -19,11 +19,26 @@ export class WhatsAppConfig {
 
   @Prop({ type: Object, default: {} })
   globalSettings: {
-    rateLimitPerMinute: number;
-    sendTimeStart: string;
-    sendTimeEnd: string;
-    timezone: string;
-    enableWebhooks: boolean;
+    // Configurações de Rate Limiting
+    globalRateLimitPerMinute: number;
+    defaultDailyLimitPerClient: number;
+    
+    // Configurações de Horário
+    globalSendTimeStart: string;
+    globalSendTimeEnd: string;
+    defaultTimezone: string;
+    
+    // Configurações de Funcionalidades
+    enableGlobalWebhooks: boolean;
+    requireVerification: boolean;
+    enableAutoReply: boolean;
+    
+    // Configurações legadas (mantidas para compatibilidade)
+    rateLimitPerMinute?: number;
+    sendTimeStart?: string;
+    sendTimeEnd?: string;
+    timezone?: string;
+    enableWebhooks?: boolean;
   };
 
   @Prop({ type: Object, default: {} })
