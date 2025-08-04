@@ -479,17 +479,17 @@ export class WhatsAppClientService {
       // Enviar mensagem usando o provedor configurado
       switch (adminConfig.provider) {
         case 'twilio':
-          const twilioResult = await this.sendTwilioMessage(to, adminConfig.credentials);
+          const twilioResult = await this.sendTwilioMessage(to, adminConfig.credentials, message);
           messageId = twilioResult.sid;
           status = twilioResult.status;
           break;
         case 'meta':
-          const metaResult = await this.sendMetaMessage(to, adminConfig.credentials);
+          const metaResult = await this.sendMetaMessage(to, adminConfig.credentials, message);
           messageId = metaResult.id;
           status = metaResult.status;
           break;
         case '360dialog':
-          const dialogResult = await this.send360DialogMessage(to, adminConfig.credentials);
+          const dialogResult = await this.send360DialogMessage(to, adminConfig.credentials, message);
           messageId = dialogResult.message_id;
           status = dialogResult.status;
           break;
@@ -530,11 +530,12 @@ export class WhatsAppClientService {
   }
 
   // Implementações específicas por provedor (copiadas do admin service)
-  private async sendTwilioMessage(phoneNumber: string, credentials: any): Promise<any> {
+  private async sendTwilioMessage(phoneNumber: string, credentials: any, messageText?: string): Promise<any> {
     try {
       console.log('=== INÍCIO ENVIO TWILIO (CLIENT) ===');
       console.log('Telefone de destino:', phoneNumber);
       console.log('Número WhatsApp configurado:', credentials.whatsappNumber);
+      console.log('Mensagem a ser enviada:', messageText);
       
       // Validações específicas para Twilio
       if (!credentials.whatsappNumber) {
@@ -551,9 +552,12 @@ export class WhatsAppClientService {
       
       const client = twilio(credentials.accountSid, credentials.authToken);
       
+      // Usar mensagem personalizada ou padrão
+      const messageBody = messageText || 'Teste de conectividade WhatsApp - Sistema de Indicação';
+      
       console.log('Enviando mensagem...');
       const message = await client.messages.create({
-        body: 'Teste de conectividade WhatsApp - Sistema de Indicação',
+        body: messageBody,
         from: `whatsapp:${credentials.whatsappNumber}`,
         to: `whatsapp:${formattedPhone}`
       });
@@ -589,7 +593,9 @@ export class WhatsAppClientService {
     return formatted;
   }
 
-  private async sendMetaMessage(phoneNumber: string, credentials: any): Promise<any> {
+  private async sendMetaMessage(phoneNumber: string, credentials: any, messageText?: string): Promise<any> {
+    const messageBody = messageText || 'Teste de conectividade WhatsApp - Sistema de Indicação';
+    
     const response = await axios.post(
       `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}/messages`,
       {
@@ -597,7 +603,7 @@ export class WhatsAppClientService {
         to: phoneNumber,
         type: 'text',
         text: {
-          body: 'Teste de conectividade WhatsApp - Sistema de Indicação'
+          body: messageBody
         }
       },
       {
@@ -614,14 +620,16 @@ export class WhatsAppClientService {
     };
   }
 
-  private async send360DialogMessage(phoneNumber: string, credentials: any): Promise<any> {
+  private async send360DialogMessage(phoneNumber: string, credentials: any, messageText?: string): Promise<any> {
+    const messageBody = messageText || 'Teste de conectividade WhatsApp - Sistema de Indicação';
+    
     const response = await axios.post(
       `https://waba.360dialog.io/v1/instances/${credentials.instanceId}/messages`,
       {
         to: phoneNumber,
         type: 'text',
         text: {
-          body: 'Teste de conectividade WhatsApp - Sistema de Indicação'
+          body: messageBody
         }
       },
       {
