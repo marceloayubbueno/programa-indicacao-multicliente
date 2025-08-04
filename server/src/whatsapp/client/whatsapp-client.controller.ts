@@ -149,7 +149,7 @@ export class WhatsAppClientController {
   async verifyConfig(@Request() req: any) {
     try {
       const clientId = req.user.clientId;
-      return await this.whatsappClientService.verifyConfig(clientId);
+      return await this.whatsAppClientService.verifyConfig(clientId);
     } catch (error) {
       throw new HttpException(
         'Erro ao verificar configuração WhatsApp',
@@ -162,7 +162,7 @@ export class WhatsAppClientController {
   async sendTestMessage(@Request() req: any, @Body() messageData: any) {
     try {
       const clientId = req.user.clientId;
-      return await this.whatsappClientService.sendTestMessage(clientId, messageData);
+      return await this.whatsAppClientService.sendTestMessage(clientId, messageData);
     } catch (error) {
       throw new HttpException(
         'Erro ao enviar mensagem de teste',
