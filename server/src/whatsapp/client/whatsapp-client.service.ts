@@ -261,6 +261,13 @@ export class WhatsAppClientService {
   }
 
   /**
+   * Verificar configuração de WhatsApp (alias para verifyNumber)
+   */
+  async verifyConfig(clientId: string): Promise<{ success: boolean; message: string }> {
+    return this.verifyNumber(clientId);
+  }
+
+  /**
    * Buscar estatísticas de uso
    */
   async getStatistics(clientId: string): Promise<any> {
@@ -463,7 +470,7 @@ export class WhatsAppClientService {
 
       // Buscar configuração global do admin
       const adminConfig = await this.whatsappConfigModel.findOne().exec();
-      if (!adminConfig || !adminConfig.isActive) {
+      if (!adminConfig || !(adminConfig as any).isActive) {
         throw new Error('Configuração global de WhatsApp não está ativa');
       }
 
