@@ -919,8 +919,6 @@
         height: '100%',
         width: 'auto',
         storageManager: false,
-        showOffsets: true,
-        noticeOnUnload: false,
         panels: { 
           defaults: [
             // Removemos o painel de devices do GrapesJS pois agora está no header
@@ -928,9 +926,6 @@
         },
         blockManager: {
           appendTo: '#tab-blocks .blocks-container'
-        },
-        selectorManager: {
-          appendTo: '#tab-styles .styles-container'
         },
         styleManager: {
           appendTo: '#tab-styles .styles-container',
@@ -998,7 +993,7 @@
           ]
         },
         traitManager: {
-          appendTo: '#tab-traits .traits-container'
+          appendTo: '#tab-traits'
         },
         canvas: {
           styles: [
