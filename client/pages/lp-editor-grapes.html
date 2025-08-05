@@ -853,6 +853,28 @@
     #gjs [style*="transform"] {
       transform: inherit !important;
     }
+    
+    /* Solução pragmática para preservar estilos em todos os dispositivos */
+    #gjs {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+    
+    /* Forçar preservação de estilos inline importantes */
+    #gjs [style*="background: linear-gradient"] {
+      background: inherit !important;
+    }
+    
+    #gjs [style*="backdrop-filter"] {
+      backdrop-filter: inherit !important;
+    }
+    
+    #gjs [style*="box-shadow"] {
+      box-shadow: inherit !important;
+    }
+    
+    #gjs [style*="border-radius"] {
+      border-radius: inherit !important;
+    }
   </style>
 </head>
 <body>
@@ -1035,7 +1057,17 @@
           // Forçar aplicação de estilos em todos os dispositivos
           customBadgeLabel: false,
           // Garantir que os estilos inline sejam preservados
-          preserveStyle: true
+          preserveStyle: true,
+          // Configuração para preservar estilos entre dispositivos
+          script: function() {
+            // Preservar estilos inline quando dispositivo muda
+            document.addEventListener('DOMContentLoaded', function() {
+              const elements = document.querySelectorAll('[style*="linear-gradient"]');
+              elements.forEach(function(el) {
+                el.setAttribute('data-preserve-style', el.style.cssText);
+              });
+            });
+          }
         },
         deviceManager: {
           devices: [
@@ -2720,7 +2752,21 @@
             // Forçar re-renderização do canvas para aplicar estilos corretamente
             setTimeout(() => {
               editor.refresh();
-              console.log('[GrapesJS Debug] Canvas re-renderizado após mudança de dispositivo');
+              
+              // Preservar estilos importantes após mudança de dispositivo
+              const canvas = editor.Canvas.getFrameEl();
+              if (canvas) {
+                const canvasDoc = canvas.contentDocument || canvas.contentWindow.document;
+                const elements = canvasDoc.querySelectorAll('[data-preserve-style]');
+                elements.forEach(function(el) {
+                  const preservedStyle = el.getAttribute('data-preserve-style');
+                  if (preservedStyle) {
+                    el.style.cssText = preservedStyle + ';' + el.style.cssText;
+                  }
+                });
+              }
+              
+              console.log('[GrapesJS Debug] Canvas re-renderizado e estilos preservados');
             }, 100);
           });
         });
