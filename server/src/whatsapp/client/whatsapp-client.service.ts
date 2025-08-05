@@ -458,13 +458,12 @@ export class WhatsAppClientService {
       
       console.log('Configuração do cliente encontrada:', clientConfig);
       
-      // Buscar configuração global do admin
-      const adminConfig = await this.whatsappConfigModel.findOne().exec();
-      if (!adminConfig) {
-        throw new Error('Configuração global de WhatsApp não encontrada');
+      // Verificar se o cliente tem credenciais configuradas
+      if (!clientConfig.whatsappCredentials) {
+        throw new Error('Credenciais WhatsApp não configuradas para este cliente');
       }
       
-      console.log('Configuração admin encontrada:', adminConfig);
+      console.log('Credenciais do cliente encontradas:', clientConfig.whatsappCredentials);
       
       // Enviar mensagem usando o provedor configurado
       const result = await this.sendMessage({
@@ -502,32 +501,19 @@ export class WhatsAppClientService {
       let messageId: string;
       let status: string;
 
-      // Buscar configuração global do admin
-      const adminConfig = await this.whatsappConfigModel.findOne().exec();
-      if (!adminConfig) {
-        throw new Error('Configuração global de WhatsApp não encontrada');
+      // Buscar configuração do cliente
+      const clientConfig = await this.whatsAppClientConfigModel.findOne({ 
+        clientId: new Types.ObjectId(clientId) 
+      }).exec();
+      
+      if (!clientConfig || !clientConfig.whatsappCredentials) {
+        throw new Error('Credenciais WhatsApp não configuradas para este cliente');
       }
 
-      // Enviar mensagem usando o provedor configurado
-      switch (adminConfig.provider) {
-        case 'twilio':
-          const twilioResult = await this.sendTwilioMessage(to, adminConfig.credentials, message, from);
-          messageId = twilioResult.sid;
-          status = twilioResult.status;
-          break;
-        case 'meta':
-          const metaResult = await this.sendMetaMessage(to, adminConfig.credentials, message);
-          messageId = metaResult.id;
-          status = metaResult.status;
-          break;
-        case '360dialog':
-          const dialogResult = await this.send360DialogMessage(to, adminConfig.credentials, message);
-          messageId = dialogResult.message_id;
-          status = dialogResult.status;
-          break;
-        default:
-          throw new Error(`Provedor não suportado: ${adminConfig.provider}`);
-      }
+            // Enviar mensagem usando WhatsApp Business API (modelo HubSpot)
+      const whatsappResult = await this.sendWhatsAppBusinessMessage(to, clientConfig.whatsappCredentials, message);
+      messageId = whatsappResult.id;
+      status = whatsappResult.status;
 
       // Salva mensagem no banco
       const testMessage = new this.whatsappMessageModel({
@@ -541,7 +527,7 @@ export class WhatsAppClientService {
         providerResponse: {
           messageId,
           status,
-          provider: adminConfig.provider
+          provider: 'whatsapp-business'
         },
         sentAt: new Date()
       });
@@ -552,7 +538,7 @@ export class WhatsAppClientService {
       return {
         messageId: messageId || savedMessage._id.toString(),
         status: status || 'sent',
-        provider: adminConfig.provider
+        provider: 'whatsapp-business'
       };
       
     } catch (error) {
@@ -734,6 +720,57 @@ export class WhatsAppClientService {
         throw new BadRequestException('Sem permissão para acessar este número de telefone');
       } else {
         throw new BadRequestException(`Erro ao testar credenciais: ${error.response?.data?.error?.message || error.message}`);
+      }
+    }
+  }
+
+  /**
+   * Enviar mensagem via WhatsApp Business API (modelo HubSpot)
+   */
+  private async sendWhatsAppBusinessMessage(to: string, credentials: any, message: string): Promise<any> {
+    try {
+      console.log('=== ENVIO WHATSAPP BUSINESS API ===');
+      console.log('Para:', to);
+      console.log('Phone Number ID:', credentials.phoneNumberId);
+      console.log('Mensagem:', message);
+
+      const response = await axios.post(
+        `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}/messages`,
+        {
+          messaging_product: 'whatsapp',
+          to: to,
+          type: 'text',
+          text: {
+            body: message
+          }
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${credentials.accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Resposta da API:', response.data);
+
+      return {
+        id: response.data.messages[0].id,
+        status: 'sent'
+      };
+
+    } catch (error) {
+      console.error('=== ERRO NO ENVIO WHATSAPP BUSINESS API ===');
+      console.error('Erro:', error.response?.data || error.message);
+      
+      if (error.response?.status === 401) {
+        throw new Error('Token de acesso inválido ou expirado');
+      } else if (error.response?.status === 400) {
+        throw new Error(`Erro na requisição: ${error.response?.data?.error?.message || 'Dados inválidos'}`);
+      } else if (error.response?.status === 403) {
+        throw new Error('Sem permissão para enviar mensagens');
+      } else {
+        throw new Error(`Erro ao enviar mensagem: ${error.response?.data?.error?.message || error.message}`);
       }
     }
   }
