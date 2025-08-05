@@ -2416,6 +2416,286 @@
         ]
       });
       
+      // Template 2: "Lead Magnet" - Captura de Emails para Programa de Indicação
+      editor.BlockManager.add('template-lead-magnet', {
+        label: 'Template: Lead Magnet',
+        content: `
+          <section style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 100px 20px; text-align: center;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <h1 style="font-size: 3.5rem; margin-bottom: 25px; font-weight: 800; font-family: 'Inter', sans-serif;">Guia: Como Ser um Indicador de Sucesso</h1>
+              <p style="font-size: 1.3rem; margin-bottom: 40px; opacity: 0.95; max-width: 700px; margin-left: auto; margin-right: auto;">
+                Descubra as estratégias que já fizeram milhares de pessoas se tornarem indicadores profissionais. 
+                Baixe nosso guia completo e cadastre-se no programa!
+              </p>
+              
+              <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; max-width: 500px; margin: 0 auto; border: 1px solid rgba(255,255,255,0.2);">
+                <h3 style="font-size: 1.5rem; margin-bottom: 20px; font-weight: 600;">O que você vai aprender:</h3>
+                <ul style="text-align: left; list-style: none; padding: 0; margin: 0;">
+                  <li style="margin-bottom: 15px; display: flex; align-items: center;">
+                    <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                    <span>Como escolher os melhores nichos para indicar</span>
+                  </li>
+                  <li style="margin-bottom: 15px; display: flex; align-items: center;">
+                    <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                    <span>Estratégias para aumentar suas conversões</span>
+                  </li>
+                  <li style="margin-bottom: 15px; display: flex; align-items: center;">
+                    <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                    <span>Ferramentas essenciais para indicadores</span>
+                  </li>
+                  <li style="display: flex; align-items: center;">
+                    <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                    <span>Como escalar seu negócio de indicações</span>
+                  </li>
+                </ul>
+                
+                <form style="margin-top: 30px;">
+                  <input type="text" placeholder="Seu nome completo" style="width: 100%; padding: 15px; border: none; border-radius: 10px; margin-bottom: 15px; font-size: 1rem;">
+                  <input type="email" placeholder="Seu melhor e-mail" style="width: 100%; padding: 15px; border: none; border-radius: 10px; margin-bottom: 15px; font-size: 1rem;">
+                  <button type="submit" style="background: #ffffff; color: #4facfe; padding: 15px 30px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 700; cursor: pointer; width: 100%;">
+                    📥 Baixar Guia + Cadastrar-se
+                  </button>
+                </form>
+                
+                <p style="font-size: 0.9rem; margin-top: 15px; opacity: 0.8;">
+                  🔒 100% gratuito • Cadastro automático no programa • Sem spam
+                </p>
+              </div>
+            </div>
+          </section>
+          
+          <section style="background: #f8f9fa; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Indicadores que Já Estão Ganhando</h2>
+                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto;">
+                  Veja como nosso programa transformou a vida de milhares de indicadores
+                </p>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                  <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <div style="width: 50px; height: 50px; background: #4facfe; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">M</div>
+                    <div>
+                      <h4 style="margin: 0; color: #2c3e50; font-weight: 600;">Maria Silva</h4>
+                      <p style="margin: 0; color: #7f8c8d; font-size: 0.9rem;">Indicadora - Nicho Saúde</p>
+                    </div>
+                  </div>
+                  <p style="color: #7f8c8d; line-height: 1.6; margin: 0;">
+                    "Este programa me ensinou estratégias que nunca tinha pensado. Em 2 meses já ganhei R$ 1.200 indicando produtos de saúde!"
+                  </p>
+                  <div style="margin-top: 15px;">
+                    <span style="color: #f39c12;">⭐⭐⭐⭐⭐</span>
+                  </div>
+                </div>
+                
+                <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                  <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <div style="width: 50px; height: 50px; background: #f093fb; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">J</div>
+                    <div>
+                      <h4 style="margin: 0; color: #2c3e50; font-weight: 600;">João Santos</h4>
+                      <p style="margin: 0; color: #7f8c8d; font-size: 0.9rem;">Indicador - Nicho Tecnologia</p>
+                    </div>
+                  </div>
+                  <p style="color: #7f8c8d; line-height: 1.6; margin: 0;">
+                    "Conteúdo de qualidade! As dicas práticas me ajudaram a estruturar meu negócio de indicações em tecnologia."
+                  </p>
+                  <div style="margin-top: 15px;">
+                    <span style="color: #f39c12;">⭐⭐⭐⭐⭐</span>
+                  </div>
+                </div>
+                
+                <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                  <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <div style="width: 50px; height: 50px; background: #10b981; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">A</div>
+                    <div>
+                      <h4 style="margin: 0; color: #2c3e50; font-weight: 600;">Ana Costa</h4>
+                      <p style="margin: 0; color: #7f8c8d; font-size: 0.9rem;">Indicadora - Nicho Educação</p>
+                    </div>
+                  </div>
+                  <p style="color: #7f8c8d; line-height: 1.6; margin: 0;">
+                    "Perfeito para iniciantes! Linguagem clara e exemplos práticos. Já estou ganhando com cursos online!"
+                  </p>
+                  <div style="margin-top: 15px;">
+                    <span style="color: #f39c12;">⭐⭐⭐⭐⭐</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          <section style="background: white; padding: 80px 20px; text-align: center;">
+            <div style="max-width: 800px; margin: 0 auto;">
+              <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Não Perca Esta Oportunidade</h2>
+              <p style="font-size: 1.2rem; color: #7f8c8d; margin-bottom: 40px;">
+                Junte-se a mais de 10.000 indicadores que já baixaram nosso guia e estão ganhando dinheiro
+              </p>
+              <button style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px 40px; border: none; border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer; box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);">
+                📥 Baixar Guia + Cadastrar-se - É Grátis!
+              </button>
+            </div>
+          </section>
+        `,
+        category: 'Templates Completos',
+        attributes: { class: 'fas fa-download' },
+        traits: [
+          {
+            type: 'color',
+            name: 'hero-bg-color',
+            label: 'Cor Hero Principal',
+            default: '#4facfe'
+          },
+          {
+            type: 'color',
+            name: 'hero-bg-color-2',
+            label: 'Cor Hero Secundária',
+            default: '#00f2fe'
+          },
+          {
+            type: 'text',
+            name: 'hero-title',
+            label: 'Título Principal',
+            default: 'Guia: Como Ser um Indicador de Sucesso'
+          },
+          {
+            type: 'text',
+            name: 'hero-subtitle',
+            label: 'Subtítulo Hero',
+            default: 'Descubra as estratégias que já fizeram milhares de pessoas se tornarem indicadores profissionais. Baixe nosso guia completo e cadastre-se no programa!'
+          }
+                 ]
+       });
+       
+       // Template 3: "Educacional" - Treinamento + Cadastro no Programa
+       editor.BlockManager.add('template-educational', {
+         label: 'Template: Educacional',
+         content: `
+           <section style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 100px 20px; text-align: center;">
+             <div style="max-width: 1200px; margin: 0 auto;">
+               <h1 style="font-size: 3.5rem; margin-bottom: 25px; font-weight: 800; font-family: 'Inter', sans-serif;">Descubra Como Ser um Indicador Profissional</h1>
+               <p style="font-size: 1.3rem; margin-bottom: 40px; opacity: 0.95; max-width: 700px; margin-left: auto; margin-right: auto;">
+                 Aprenda as técnicas avançadas que transformaram milhares de pessoas em indicadores de sucesso. 
+                 Treinamento completo + cadastro no programa!
+               </p>
+               
+               <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; max-width: 600px; margin: 0 auto; border: 1px solid rgba(255,255,255,0.2);">
+                 <h3 style="font-size: 1.5rem; margin-bottom: 20px; font-weight: 600;">Treinamento Completo Inclui:</h3>
+                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left;">
+                   <div>
+                     <h4 style="font-size: 1.1rem; margin-bottom: 15px; font-weight: 600;">📚 Módulos de Aprendizado</h4>
+                     <ul style="list-style: none; padding: 0; margin: 0;">
+                       <li style="margin-bottom: 8px;">• Fundamentos do Marketing de Indicação</li>
+                       <li style="margin-bottom: 8px;">• Escolha de Nichos Lucrativos</li>
+                       <li style="margin-bottom: 8px;">• Estratégias de Conversão</li>
+                       <li>• Ferramentas e Automação</li>
+                     </ul>
+                   </div>
+                   <div>
+                     <h4 style="font-size: 1.1rem; margin-bottom: 15px; font-weight: 600;">🎯 Bônus Exclusivos</h4>
+                     <ul style="list-style: none; padding: 0; margin: 0;">
+                       <li style="margin-bottom: 8px;">• Templates de Campanhas</li>
+                       <li style="margin-bottom: 8px;">• Scripts de Vendas</li>
+                       <li style="margin-bottom: 8px;">• Comunidade VIP</li>
+                       <li>• Suporte Personalizado</li>
+                     </ul>
+                   </div>
+                 </div>
+                 
+                 <form style="margin-top: 30px;">
+                   <input type="text" placeholder="Seu nome completo" style="width: 100%; padding: 15px; border: none; border-radius: 10px; margin-bottom: 15px; font-size: 1rem;">
+                   <input type="email" placeholder="Seu melhor e-mail" style="width: 100%; padding: 15px; border: none; border-radius: 10px; margin-bottom: 15px; font-size: 1rem;">
+                   <button type="submit" style="background: #ffffff; color: #10b981; padding: 15px 30px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 700; cursor: pointer; width: 100%;">
+                     🎓 Acessar Treinamento + Cadastrar-se
+                   </button>
+                 </form>
+                 
+                 <p style="font-size: 0.9rem; margin-top: 15px; opacity: 0.8;">
+                   🔒 100% gratuito • Acesso vitalício • Cadastro automático no programa
+                 </p>
+               </div>
+             </div>
+           </section>
+           
+           <section style="background: #f8f9fa; padding: 80px 20px;">
+             <div style="max-width: 1200px; margin: 0 auto;">
+               <div style="text-align: center; margin-bottom: 60px;">
+                 <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Resultados dos Nossos Alunos</h2>
+                 <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto;">
+                   Veja como o treinamento transformou a vida de milhares de indicadores
+                 </p>
+               </div>
+               
+               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                 <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                   <div style="text-align: center; margin-bottom: 20px;">
+                     <div style="font-size: 3rem; margin-bottom: 10px;">📈</div>
+                     <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 10px; font-weight: 600;">+150%</h3>
+                     <p style="color: #7f8c8d; margin: 0;">Aumento médio na conversão</p>
+                   </div>
+                 </div>
+                 
+                 <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                   <div style="text-align: center; margin-bottom: 20px;">
+                     <div style="font-size: 3rem; margin-bottom: 10px;">💰</div>
+                     <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 10px; font-weight: 600;">R$ 2.500</h3>
+                     <p style="color: #7f8c8d; margin: 0;">Ganho médio mensal</p>
+                   </div>
+                 </div>
+                 
+                 <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                   <div style="text-align: center; margin-bottom: 20px;">
+                     <div style="font-size: 3rem; margin-bottom: 10px;">🎯</div>
+                     <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 10px; font-weight: 600;">95%</h3>
+                     <p style="color: #7f8c8d; margin: 0;">Taxa de satisfação</p>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </section>
+           
+           <section style="background: white; padding: 80px 20px; text-align: center;">
+             <div style="max-width: 800px; margin: 0 auto;">
+               <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Comece Sua Jornada Hoje</h2>
+               <p style="font-size: 1.2rem; color: #7f8c8d; margin-bottom: 40px;">
+                 Junte-se a mais de 15.000 indicadores que já fizeram nosso treinamento
+               </p>
+               <button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px 40px; border: none; border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);">
+                 🎓 Acessar Treinamento + Cadastrar-se - É Grátis!
+               </button>
+             </div>
+           </section>
+         `,
+         category: 'Templates Completos',
+         attributes: { class: 'fas fa-graduation-cap' },
+         traits: [
+           {
+             type: 'color',
+             name: 'hero-bg-color',
+             label: 'Cor Hero Principal',
+             default: '#10b981'
+           },
+           {
+             type: 'color',
+             name: 'hero-bg-color-2',
+             label: 'Cor Hero Secundária',
+             default: '#059669'
+           },
+           {
+             type: 'text',
+             name: 'hero-title',
+             label: 'Título Principal',
+             default: 'Descubra Como Ser um Indicador Profissional'
+           },
+           {
+             type: 'text',
+             name: 'hero-subtitle',
+             label: 'Subtítulo Hero',
+             default: 'Aprenda as técnicas avançadas que transformaram milhares de pessoas em indicadores de sucesso. Treinamento completo + cadastro no programa!'
+           }
+         ]
+       });
+       
       // Listener para aplicar traits quando componentes são adicionados
       editor.on('component:add', function(component) {
         const traits = component.get('traits');
