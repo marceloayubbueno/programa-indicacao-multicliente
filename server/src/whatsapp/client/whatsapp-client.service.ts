@@ -444,28 +444,34 @@ export class WhatsAppClientService {
         throw new Error('Formato de telefone inválido');
       }
       
+      console.log('=== BUSCANDO CONFIGURAÇÃO DO CLIENTE ===');
       // Buscar configuração do cliente
       const clientConfig = await this.whatsAppClientConfigModel.findOne({ 
         clientId: new Types.ObjectId(clientId) 
       }).exec();
+      
+      console.log('Configuração encontrada:', clientConfig ? 'SIM' : 'NÃO');
+      
       if (!clientConfig) {
         throw new Error('Configuração de WhatsApp não encontrada');
       }
       
-      if (!clientConfig.isActive) {
-        throw new Error('Configuração de WhatsApp não está ativa');
-      }
-      
-      console.log('Configuração do cliente encontrada:', clientConfig);
+      console.log('Configuração ativa:', clientConfig.isActive);
+      console.log('Credenciais configuradas:', !!clientConfig.whatsappCredentials);
       
       // Verificar se o cliente tem credenciais configuradas
       if (!clientConfig.whatsappCredentials) {
         throw new Error('Credenciais WhatsApp não configuradas para este cliente');
       }
       
-      console.log('Credenciais do cliente encontradas:', clientConfig.whatsappCredentials);
+      console.log('Credenciais do cliente encontradas:', {
+        accessToken: clientConfig.whatsappCredentials.accessToken ? '***' : 'NÃO FORNECIDO',
+        phoneNumberId: clientConfig.whatsappCredentials.phoneNumberId,
+        businessAccountId: clientConfig.whatsappCredentials.businessAccountId
+      });
       
       // Enviar mensagem usando o provedor configurado
+      console.log('=== INICIANDO ENVIO DA MENSAGEM ===');
       const result = await this.sendMessage({
         to: to.trim().replace(/\s+/g, ''),
         message: message,
@@ -489,7 +495,9 @@ export class WhatsAppClientService {
       
     } catch (error) {
       console.error('=== CLIENT SERVICE: ERRO NO ENVIO ===');
-      console.error('Erro:', error);
+      console.error('Erro completo:', error);
+      console.error('Stack trace:', error.stack);
+      console.error('Mensagem:', error.message);
       throw error;
     }
   }
