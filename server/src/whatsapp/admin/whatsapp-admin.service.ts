@@ -148,7 +148,12 @@ export class WhatsAppAdminService {
     if (!config) {
       config = new this.whatsappConfigModel();
       config.provider = 'whatsapp-business';
-      config.credentials = {};
+      config.credentials = {
+        accessToken: '',
+        phoneNumberId: '',
+        businessAccountId: '',
+        webhookUrl: ''
+      };
     }
 
     // Atualiza apenas as configurações globais
