@@ -1368,11 +1368,11 @@
 
       // ===== NOVOS BLOCOS PERSONALIZADOS =====
       
-      // Bloco "Como Funciona" - Design Premium
+      // Bloco "Como Funciona" - Design Premium (Sem Fundo Fixo)
       editor.BlockManager.add('how-it-works', {
         label: 'Como Funciona',
         content: `
-          <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 100px 20px; position: relative; overflow: hidden;">
+          <section style="padding: 100px 20px; position: relative; overflow: hidden;">
             <!-- Elementos decorativos de fundo -->
             <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
             <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
@@ -1461,14 +1461,40 @@
           </section>
         `,
         category: 'Programa de Indicação',
-        attributes: { class: 'fas fa-cogs' }
+        attributes: { class: 'fas fa-cogs' },
+        traits: [
+          {
+            type: 'color',
+            name: 'background-color',
+            label: 'Cor de Fundo',
+            default: '#667eea'
+          },
+          {
+            type: 'color',
+            name: 'background-color-2',
+            label: 'Cor de Fundo 2 (Gradiente)',
+            default: '#764ba2'
+          },
+          {
+            type: 'text',
+            name: 'title',
+            label: 'Título',
+            default: 'Como Funciona'
+          },
+          {
+            type: 'text',
+            name: 'subtitle',
+            label: 'Subtítulo',
+            default: 'Processo simples em 3 passos para começar a ganhar recompensas incríveis'
+          }
+        ]
       });
 
-      // Bloco "Benefícios do Programa" - Design Premium
+      // Bloco "Benefícios do Programa" - Design Premium (Sem Fundo Fixo)
       editor.BlockManager.add('program-benefits', {
         label: 'Benefícios do Programa',
         content: `
-          <section style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 100px 20px; position: relative; overflow: hidden;">
+          <section style="padding: 100px 20px; position: relative; overflow: hidden;">
             <!-- Elementos decorativos de fundo -->
             <div style="position: absolute; top: -30px; left: -30px; width: 180px; height: 180px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
             <div style="position: absolute; bottom: -50px; right: -50px; width: 220px; height: 220px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
@@ -1557,14 +1583,40 @@
           </section>
         `,
         category: 'Programa de Indicação',
-        attributes: { class: 'fas fa-star' }
+        attributes: { class: 'fas fa-star' },
+        traits: [
+          {
+            type: 'color',
+            name: 'background-color',
+            label: 'Cor de Fundo',
+            default: '#f093fb'
+          },
+          {
+            type: 'color',
+            name: 'background-color-2',
+            label: 'Cor de Fundo 2 (Gradiente)',
+            default: '#f5576c'
+          },
+          {
+            type: 'text',
+            name: 'title',
+            label: 'Título',
+            default: 'Benefícios Exclusivos'
+          },
+          {
+            type: 'text',
+            name: 'subtitle',
+            label: 'Subtítulo',
+            default: 'Descubra todas as vantagens de ser um indicador oficial do nosso programa'
+          }
+        ]
       });
 
-      // Bloco "O Seu Indicador Também Ganha"
+      // Bloco "O Seu Indicador Também Ganha" (Sem Fundo Fixo)
       editor.BlockManager.add('indicator-benefits', {
         label: 'O Seu Indicador Também Ganha',
         content: `
-          <section style="background: #f8f9fa; padding: 80px 20px;">
+          <section style="padding: 80px 20px;">
             <div style="max-width: 1200px; margin: 0 auto;">
               <div style="text-align: center; margin-bottom: 60px;">
                 <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Ganhos Duplos</h2>
@@ -1696,14 +1748,34 @@
           </section>
         `,
         category: 'Programa de Indicação',
-        attributes: { class: 'fas fa-handshake' }
+        attributes: { class: 'fas fa-handshake' },
+        traits: [
+          {
+            type: 'color',
+            name: 'background-color',
+            label: 'Cor de Fundo',
+            default: '#f8f9fa'
+          },
+          {
+            type: 'text',
+            name: 'title',
+            label: 'Título',
+            default: 'Ganhos Duplos'
+          },
+          {
+            type: 'text',
+            name: 'subtitle',
+            label: 'Subtítulo',
+            default: 'Quando você indica alguém, ambos ganham! Descubra como funciona o sistema de ganhos duplos'
+          }
+        ]
       });
 
-      // Bloco "Como Acompanhar Minhas Indicações"
+      // Bloco "Como Acompanhar Minhas Indicações" (Sem Fundo Fixo)
       editor.BlockManager.add('track-indications', {
         label: 'Como Acompanhar Minhas Indicações',
         content: `
-          <section style="background: white; padding: 80px 20px;">
+          <section style="padding: 80px 20px;">
             <div style="max-width: 1200px; margin: 0 auto;">
               <div style="text-align: center; margin-bottom: 60px;">
                 <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Acompanhe Seus Resultados</h2>
@@ -1828,14 +1900,34 @@
           </section>
         `,
         category: 'Programa de Indicação',
-        attributes: { class: 'fas fa-chart-line' }
+        attributes: { class: 'fas fa-chart-line' },
+        traits: [
+          {
+            type: 'color',
+            name: 'background-color',
+            label: 'Cor de Fundo',
+            default: '#ffffff'
+          },
+          {
+            type: 'text',
+            name: 'title',
+            label: 'Título',
+            default: 'Acompanhe Seus Resultados'
+          },
+          {
+            type: 'text',
+            name: 'subtitle',
+            label: 'Subtítulo',
+            default: 'Dashboard completo para monitorar suas indicações, ganhos e performance em tempo real'
+          }
+        ]
       });
 
-      // Bloco "Dúvidas Frequentes"
+      // Bloco "Dúvidas Frequentes" (Sem Fundo Fixo)
       editor.BlockManager.add('faq', {
         label: 'Dúvidas Frequentes',
         content: `
-          <section style="background: #f8f9fa; padding: 80px 20px;">
+          <section style="padding: 80px 20px;">
             <div style="max-width: 1200px; margin: 0 auto;">
               <div style="text-align: center; margin-bottom: 60px;">
                 <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Dúvidas Frequentes</h2>
@@ -1954,14 +2046,34 @@
           </section>
         `,
         category: 'Programa de Indicação',
-        attributes: { class: 'fas fa-question-circle' }
+        attributes: { class: 'fas fa-question-circle' },
+        traits: [
+          {
+            type: 'color',
+            name: 'background-color',
+            label: 'Cor de Fundo',
+            default: '#f8f9fa'
+          },
+          {
+            type: 'text',
+            name: 'title',
+            label: 'Título',
+            default: 'Dúvidas Frequentes'
+          },
+          {
+            type: 'text',
+            name: 'subtitle',
+            label: 'Subtítulo',
+            default: 'Tire suas principais dúvidas sobre nosso programa de indicação'
+          }
+        ]
       });
 
-      // Bloco "Endereço e Contatos da Empresa"
+      // Bloco "Endereço e Contatos da Empresa" (Sem Fundo Fixo)
       editor.BlockManager.add('company-contact', {
         label: 'Endereço e Contatos da Empresa',
         content: `
-          <section style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 80px 20px;">
+          <section style="color: white; padding: 80px 20px;">
             <div style="max-width: 1200px; margin: 0 auto;">
               <div style="text-align: center; margin-bottom: 60px;">
                 <h2 style="font-size: 2.5rem; margin-bottom: 20px; font-weight: 600;">Entre em Contato</h2>
@@ -2114,10 +2226,121 @@
           </section>
         `,
         category: 'Programa de Indicação',
-        attributes: { class: 'fas fa-map-marker-alt' }
+        attributes: { class: 'fas fa-map-marker-alt' },
+        traits: [
+          {
+            type: 'color',
+            name: 'background-color',
+            label: 'Cor de Fundo',
+            default: '#2c3e50'
+          },
+          {
+            type: 'color',
+            name: 'background-color-2',
+            label: 'Cor de Fundo 2 (Gradiente)',
+            default: '#34495e'
+          },
+          {
+            type: 'text',
+            name: 'title',
+            label: 'Título',
+            default: 'Entre em Contato'
+          },
+          {
+            type: 'text',
+            name: 'subtitle',
+            label: 'Subtítulo',
+            default: 'Estamos aqui para ajudar! Entre em contato conosco através dos canais abaixo'
+          },
+          {
+            type: 'text',
+            name: 'company-name',
+            label: 'Nome da Empresa',
+            default: 'Sua Empresa Ltda.'
+          },
+          {
+            type: 'text',
+            name: 'cnpj',
+            label: 'CNPJ',
+            default: '00.000.000/0001-00'
+          },
+          {
+            type: 'text',
+            name: 'address',
+            label: 'Endereço',
+            default: 'Rua das Empresas, 123, Bairro Centro, São Paulo - SP, CEP: 01234-567'
+          },
+          {
+            type: 'text',
+            name: 'whatsapp',
+            label: 'WhatsApp',
+            default: '(11) 99999-9999'
+          },
+          {
+            type: 'text',
+            name: 'email',
+            label: 'E-mail',
+            default: 'contato@suaempresa.com.br'
+          },
+          {
+            type: 'text',
+            name: 'phone',
+            label: 'Telefone',
+            default: '(11) 3333-3333'
+          }
+        ]
       });
 
       console.log('[GrapesJS Debug] Blocos adicionados. Total de blocos:', editor.BlockManager.getAll().length);
+      
+      // Listener para aplicar traits quando componentes são adicionados
+      editor.on('component:add', function(component) {
+        const traits = component.get('traits');
+        if (traits && traits.length > 0) {
+          // Aplicar cores de fundo baseadas nos traits
+          const bgColor = component.getTrait('background-color')?.get('value');
+          const bgColor2 = component.getTrait('background-color-2')?.get('value');
+          
+          if (bgColor) {
+            if (bgColor2) {
+              // Gradiente
+              component.setStyle({
+                'background': `linear-gradient(135deg, ${bgColor} 0%, ${bgColor2} 100%)`
+              });
+            } else {
+              // Cor sólida
+              component.setStyle({
+                'background-color': bgColor
+              });
+            }
+          }
+        }
+      });
+      
+      // Listener para atualizar estilos quando traits são modificados
+      editor.on('trait:update', function(component, trait) {
+        const traitName = trait.get('name');
+        const traitValue = trait.get('value');
+        
+        if (traitName === 'background-color' || traitName === 'background-color-2') {
+          const bgColor = component.getTrait('background-color')?.get('value');
+          const bgColor2 = component.getTrait('background-color-2')?.get('value');
+          
+          if (bgColor) {
+            if (bgColor2) {
+              // Gradiente
+              component.setStyle({
+                'background': `linear-gradient(135deg, ${bgColor} 0%, ${bgColor2} 100%)`
+              });
+            } else {
+              // Cor sólida
+              component.setStyle({
+                'background-color': bgColor
+              });
+            }
+          }
+        }
+      });
       
       // Log de confirmação dos novos blocos personalizados
       console.log('[GrapesJS Debug] ✅ NOVOS BLOCOS PERSONALIZADOS IMPLEMENTADOS:');
