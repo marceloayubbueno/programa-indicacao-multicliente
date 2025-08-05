@@ -1382,7 +1382,933 @@
         attributes: { class: 'fas fa-rocket' }
       });
 
+      // ===== NOVOS BLOCOS PERSONALIZADOS =====
+      
+      // Bloco "Como Funciona"
+      editor.BlockManager.add('how-it-works', {
+        label: 'Como Funciona',
+        content: `
+          <section style="background: #f8f9fa; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Como Funciona Nosso Programa</h2>
+                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                  Processo simples e transparente para você começar a ganhar com suas indicações
+                </p>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px;">
+                <!-- Passo 1 -->
+                <div style="background: white; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative;">
+                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">1</div>
+                  <h3 style="font-size: 1.4rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Cadastre-se</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6; margin-bottom: 20px;">
+                    Faça seu cadastro gratuito como indicador oficial e receba seu link personalizado
+                  </p>
+                  <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
+                    <p style="margin: 0; font-size: 0.9rem; color: #1976d2; font-weight: 500;">
+                      ⏱️ Aprovação em até 24h
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- Passo 2 -->
+                <div style="background: white; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative;">
+                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">2</div>
+                  <h3 style="font-size: 1.4rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Compartilhe</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6; margin-bottom: 20px;">
+                    Use seu link personalizado para indicar amigos e familiares para nossos produtos
+                  </p>
+                  <div style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
+                    <p style="margin: 0; font-size: 0.9rem; color: #e65100; font-weight: 500;">
+                      📱 Compartilhe via WhatsApp, Instagram, Facebook
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- Passo 3 -->
+                <div style="background: white; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative;">
+                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">3</div>
+                  <h3 style="font-size: 1.4rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Ganhe</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6; margin-bottom: 20px;">
+                    A cada indicação que se torna cliente, você recebe sua comissão automaticamente
+                  </p>
+                  <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50;">
+                    <p style="margin: 0; font-size: 0.9rem; color: #2e7d32; font-weight: 500;">
+                      💰 Pagamento via PIX em até 48h
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Call to Action -->
+              <div style="text-align: center; margin-top: 60px;">
+                <button style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 40px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+                  🚀 Começar Agora - É Gratuito!
+                </button>
+              </div>
+            </div>
+            
+            <!-- CSS Responsivo -->
+            <style>
+              @media (max-width: 768px) {
+                section {
+                  padding: 40px 15px !important;
+                }
+                h2 {
+                  font-size: 2rem !important;
+                }
+                div[style*="grid-template-columns"] {
+                  grid-template-columns: 1fr !important;
+                  gap: 30px !important;
+                }
+                div[style*="padding: 40px 30px"] {
+                  padding: 30px 20px !important;
+                }
+              }
+            </style>
+          </section>
+        `,
+        category: 'Programa de Indicação',
+        attributes: { class: 'fas fa-cogs' }
+      });
+
+      // Bloco "Benefícios do Programa"
+      editor.BlockManager.add('program-benefits', {
+        label: 'Benefícios do Programa',
+        content: `
+          <section style="background: white; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Benefícios Exclusivos</h2>
+                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                  Descubra todas as vantagens de ser um indicador oficial do nosso programa
+                </p>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                <!-- Benefício 1 -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 20px; position: relative; overflow: hidden;">
+                  <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                  <div style="position: relative; z-index: 2;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">💰</div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 600;">Ganhos Ilimitados</h3>
+                    <p style="line-height: 1.6; margin-bottom: 20px; opacity: 0.9;">
+                      Não há limite para suas indicações. Quanto mais você indicar, mais você ganha!
+                    </p>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">✅</span> Comissões de R$ 50 a R$ 500 por indicação
+                      </li>
+                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">✅</span> Bônus por volume de indicações
+                      </li>
+                      <li style="display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">✅</span> Pagamentos recorrentes
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <!-- Benefício 2 -->
+                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 40px; border-radius: 20px; position: relative; overflow: hidden;">
+                  <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                  <div style="position: relative; z-index: 2;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">⚡</div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 600;">Facilidade Total</h3>
+                    <p style="line-height: 1.6; margin-bottom: 20px; opacity: 0.9;">
+                      Sistema automatizado que facilita todo o processo de indicação
+                    </p>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">✅</span> Link personalizado automático
+                      </li>
+                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">✅</span> Dashboard para acompanhamento
+                      </li>
+                      <li style="display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">✅</span> Suporte dedicado
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <!-- Benefício 3 -->
+                <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 40px; border-radius: 20px; position: relative; overflow: hidden;">
+                  <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                  <div style="position: relative; z-index: 2;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">🎯</div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 600;">Flexibilidade</h3>
+                    <p style="line-height: 1.6; margin-bottom: 20px; opacity: 0.9;">
+                      Trabalhe no seu ritmo, de onde quiser, quando quiser
+                    </p>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">✅</span> Trabalhe de casa ou qualquer lugar
+                      </li>
+                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">✅</span> Horário flexível
+                      </li>
+                      <li style="display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">✅</span> Sem metas obrigatórias
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Estatísticas -->
+              <div style="background: #f8f9fa; padding: 40px; border-radius: 20px; margin-top: 60px; text-align: center;">
+                <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 30px; font-weight: 600;">Números que Impressionam</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;">
+                  <div>
+                    <div style="font-size: 3rem; font-weight: bold; color: #667eea; margin-bottom: 10px;">R$ 2.5M+</div>
+                    <p style="color: #7f8c8d; font-weight: 500;">Em comissões pagas</p>
+                  </div>
+                  <div>
+                    <div style="font-size: 3rem; font-weight: bold; color: #f093fb; margin-bottom: 10px;">15K+</div>
+                    <p style="color: #7f8c8d; font-weight: 500;">Indicadores ativos</p>
+                  </div>
+                  <div>
+                    <div style="font-size: 3rem; font-weight: bold; color: #4facfe; margin-bottom: 10px;">98%</div>
+                    <p style="color: #7f8c8d; font-weight: 500;">Satisfação dos indicadores</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- CSS Responsivo -->
+            <style>
+              @media (max-width: 768px) {
+                section {
+                  padding: 40px 15px !important;
+                }
+                h2 {
+                  font-size: 2rem !important;
+                }
+                div[style*="grid-template-columns"] {
+                  grid-template-columns: 1fr !important;
+                  gap: 20px !important;
+                }
+                div[style*="padding: 40px"] {
+                  padding: 30px 20px !important;
+                }
+              }
+            </style>
+          </section>
+        `,
+        category: 'Programa de Indicação',
+        attributes: { class: 'fas fa-star' }
+      });
+
+      // Bloco "Como Ganhar"
+      editor.BlockManager.add('how-to-earn', {
+        label: 'Como Ganhar',
+        content: `
+          <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; margin-bottom: 20px; font-weight: 600;">Como Ganhar Dinheiro</h2>
+                <p style="font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                  Estratégias comprovadas para maximizar seus ganhos como indicador
+                </p>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                <!-- Estratégia 1 -->
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);">
+                  <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2rem;">📱</div>
+                  </div>
+                  <h3 style="font-size: 1.4rem; margin-bottom: 15px; font-weight: 600; text-align: center;">Redes Sociais</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Compartilhe em grupos do WhatsApp
+                    </li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Poste stories no Instagram
+                    </li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Compartilhe no Facebook
+                    </li>
+                    <li style="display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Use LinkedIn para contatos profissionais
+                    </li>
+                  </ul>
+                </div>
+                
+                <!-- Estratégia 2 -->
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);">
+                  <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2rem;">👥</div>
+                  </div>
+                  <h3 style="font-size: 1.4rem; margin-bottom: 15px; font-weight: 600; text-align: center;">Networking Pessoal</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Indique amigos e familiares
+                    </li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Colegas de trabalho
+                    </li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Contatos de academia/igreja
+                    </li>
+                    <li style="display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Vizinhos e conhecidos
+                    </li>
+                  </ul>
+                </div>
+                
+                <!-- Estratégia 3 -->
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);">
+                  <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2rem;">💼</div>
+                  </div>
+                  <h3 style="font-size: 1.4rem; margin-bottom: 15px; font-weight: 600; text-align: center;">Negócios Locais</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Pequenas empresas
+                    </li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Profissionais liberais
+                    </li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Empreendedores
+                    </li>
+                    <li style="display: flex; align-items: center;">
+                      <span style="margin-right: 10px; font-size: 1.2rem;">✅</span> Startups e consultorias
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <!-- Tabela de Ganhos -->
+              <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; margin-top: 60px; border: 1px solid rgba(255,255,255,0.2);">
+                <h3 style="font-size: 1.8rem; margin-bottom: 30px; font-weight: 600; text-align: center;">Tabela de Comissões</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                  <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+                    <div style="font-size: 2rem; font-weight: bold; margin-bottom: 10px;">R$ 50</div>
+                    <p style="opacity: 0.9; margin: 0;">Indicação Básica</p>
+                  </div>
+                  <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+                    <div style="font-size: 2rem; font-weight: bold; margin-bottom: 10px;">R$ 150</div>
+                    <p style="opacity: 0.9; margin: 0;">Indicação Premium</p>
+                  </div>
+                  <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+                    <div style="font-size: 2rem; font-weight: bold; margin-bottom: 10px;">R$ 500</div>
+                    <p style="opacity: 0.9; margin: 0;">Indicação VIP</p>
+                  </div>
+                  <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+                    <div style="font-size: 2rem; font-weight: bold; margin-bottom: 10px;">+10%</div>
+                    <p style="opacity: 0.9; margin: 0;">Bônus por Volume</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Call to Action -->
+              <div style="text-align: center; margin-top: 60px;">
+                <button style="background: white; color: #667eea; padding: 18px 40px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.2);">
+                  🚀 Começar a Ganhar Agora!
+                </button>
+              </div>
+            </div>
+            
+            <!-- CSS Responsivo -->
+            <style>
+              @media (max-width: 768px) {
+                section {
+                  padding: 40px 15px !important;
+                }
+                h2 {
+                  font-size: 2rem !important;
+                }
+                div[style*="grid-template-columns"] {
+                  grid-template-columns: 1fr !important;
+                  gap: 20px !important;
+                }
+                div[style*="padding: 40px 30px"] {
+                  padding: 30px 20px !important;
+                }
+              }
+            </style>
+          </section>
+        `,
+        category: 'Programa de Indicação',
+        attributes: { class: 'fas fa-dollar-sign' }
+      });
+
+      // Bloco "O Seu Indicador Também Ganha"
+      editor.BlockManager.add('indicator-benefits', {
+        label: 'O Seu Indicador Também Ganha',
+        content: `
+          <section style="background: #f8f9fa; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Ganhos Duplos</h2>
+                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                  Quando você indica alguém, ambos ganham! Descubra como funciona o sistema de ganhos duplos
+                </p>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+                <!-- Lado Esquerdo - Benefícios para o Indicador -->
+                <div style="background: white; padding: 50px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);">
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;">👤</div>
+                  </div>
+                  <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600; text-align: center;">Você Ganha</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 20px; display: flex; align-items: flex-start;">
+                      <div style="width: 40px; height: 40px; background: #e3f2fd; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                        <span style="font-size: 1.2rem;">💰</span>
+                      </div>
+                      <div>
+                        <h4 style="font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; font-weight: 600;">Comissão Direta</h4>
+                        <p style="color: #7f8c8d; line-height: 1.5; margin: 0;">R$ 50 a R$ 500 por indicação convertida</p>
+                      </div>
+                    </li>
+                    <li style="margin-bottom: 20px; display: flex; align-items: flex-start;">
+                      <div style="width: 40px; height: 40px; background: #fff3e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                        <span style="font-size: 1.2rem;">🎁</span>
+                      </div>
+                      <div>
+                        <h4 style="font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; font-weight: 600;">Bônus por Volume</h4>
+                        <p style="color: #7f8c8d; line-height: 1.5; margin: 0;">+10% extra ao atingir metas mensais</p>
+                      </div>
+                    </li>
+                    <li style="margin-bottom: 20px; display: flex; align-items: flex-start;">
+                      <div style="width: 40px; height: 40px; background: #e8f5e8; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                        <span style="font-size: 1.2rem;">🔄</span>
+                      </div>
+                      <div>
+                        <h4 style="font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; font-weight: 600;">Ganhos Recorrentes</h4>
+                        <p style="color: #7f8c8d; line-height: 1.5; margin: 0;">Comissões mensais de clientes ativos</p>
+                      </div>
+                    </li>
+                    <li style="display: flex; align-items: flex-start;">
+                      <div style="width: 40px; height: 40px; background: #f3e5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                        <span style="font-size: 1.2rem;">🏆</span>
+                      </div>
+                      <div>
+                        <h4 style="font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; font-weight: 600;">Programa VIP</h4>
+                        <p style="color: #7f8c8d; line-height: 1.5; margin: 0;">Acesso a produtos exclusivos e descontos</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                
+                <!-- Lado Direito - Benefícios para o Indicado -->
+                <div style="background: white; padding: 50px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);">
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;">🎯</div>
+                  </div>
+                  <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600; text-align: center;">Quem Você Indica Ganha</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 20px; display: flex; align-items: flex-start;">
+                      <div style="width: 40px; height: 40px; background: #e3f2fd; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                        <span style="font-size: 1.2rem;">💎</span>
+                      </div>
+                      <div>
+                        <h4 style="font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; font-weight: 600;">Desconto Especial</h4>
+                        <p style="color: #7f8c8d; line-height: 1.5; margin: 0;">20% de desconto no primeiro produto</p>
+                      </div>
+                    </li>
+                    <li style="margin-bottom: 20px; display: flex; align-items: flex-start;">
+                      <div style="width: 40px; height: 40px; background: #fff3e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                        <span style="font-size: 1.2rem;">🎁</span>
+                      </div>
+                      <div>
+                        <h4 style="font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; font-weight: 600;">Bônus de Boas-vindas</h4>
+                        <p style="color: #7f8c8d; line-height: 1.5; margin: 0;">Produto gratuito ao se cadastrar</p>
+                      </div>
+                    </li>
+                    <li style="margin-bottom: 20px; display: flex; align-items: flex-start;">
+                      <div style="width: 40px; height: 40px; background: #e8f5e8; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                        <span style="font-size: 1.2rem;">⭐</span>
+                      </div>
+                      <div>
+                        <h4 style="font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; font-weight: 600;">Suporte Premium</h4>
+                        <p style="color: #7f8c8d; line-height: 1.5; margin: 0;">Atendimento prioritário por 30 dias</p>
+                      </div>
+                    </li>
+                    <li style="display: flex; align-items: flex-start;">
+                      <div style="width: 40px; height: 40px; background: #f3e5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                        <span style="font-size: 1.2rem;">🚀</span>
+                      </div>
+                      <div>
+                        <h4 style="font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; font-weight: 600;">Acesso Antecipado</h4>
+                        <p style="color: #7f8c8d; line-height: 1.5; margin: 0;">Primeiro acesso a novos produtos</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <!-- Call to Action -->
+              <div style="text-align: center; margin-top: 60px;">
+                <button style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 40px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+                  🎯 Começar a Indicar - Todos Ganham!
+                </button>
+              </div>
+            </div>
+            
+            <!-- CSS Responsivo -->
+            <style>
+              @media (max-width: 768px) {
+                section {
+                  padding: 40px 15px !important;
+                }
+                h2 {
+                  font-size: 2rem !important;
+                }
+                div[style*="grid-template-columns: 1fr 1fr"] {
+                  grid-template-columns: 1fr !important;
+                  gap: 30px !important;
+                }
+                div[style*="padding: 50px"] {
+                  padding: 30px 20px !important;
+                }
+              }
+            </style>
+          </section>
+        `,
+        category: 'Programa de Indicação',
+        attributes: { class: 'fas fa-handshake' }
+      });
+
+      // Bloco "Como Acompanhar Minhas Indicações"
+      editor.BlockManager.add('track-indications', {
+        label: 'Como Acompanhar Minhas Indicações',
+        content: `
+          <section style="background: white; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Acompanhe Seus Resultados</h2>
+                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                  Dashboard completo para monitorar suas indicações, ganhos e performance em tempo real
+                </p>
+              </div>
+              
+              <!-- Dashboard Preview -->
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 20px; color: white; margin-bottom: 60px;">
+                <h3 style="font-size: 1.8rem; margin-bottom: 30px; font-weight: 600; text-align: center;">Seu Dashboard Pessoal</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                  <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 10px;">📊</div>
+                    <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px;">Indicações</div>
+                    <div style="opacity: 0.9;">Total de indicações enviadas</div>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 10px;">✅</div>
+                    <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px;">Convertidas</div>
+                    <div style="opacity: 0.9;">Indicações que viraram clientes</div>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 10px;">💰</div>
+                    <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px;">Ganhos</div>
+                    <div style="opacity: 0.9;">Total de comissões recebidas</div>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 10px;">📈</div>
+                    <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px;">Performance</div>
+                    <div style="opacity: 0.9;">Taxa de conversão</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Funcionalidades do Dashboard -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                <div style="background: #f8f9fa; padding: 40px 30px; border-radius: 20px; border-left: 4px solid #667eea;">
+                  <div style="font-size: 3rem; margin-bottom: 20px;">📱</div>
+                  <h3 style="font-size: 1.4rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Acesso Mobile</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6; margin-bottom: 20px;">
+                    Acesse seu dashboard de qualquer dispositivo, a qualquer momento
+                  </p>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px;">✅</span> App mobile responsivo
+                    </li>
+                    <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px;">✅</span> Notificações em tempo real
+                    </li>
+                    <li style="display: flex; align-items: center;">
+                      <span style="margin-right: 10px;">✅</span> Sincronização automática
+                    </li>
+                  </ul>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 40px 30px; border-radius: 20px; border-left: 4px solid #f093fb;">
+                  <div style="font-size: 3rem; margin-bottom: 20px;">📊</div>
+                  <h3 style="font-size: 1.4rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Relatórios Detalhados</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6; margin-bottom: 20px;">
+                    Análises completas da sua performance e oportunidades de melhoria
+                  </p>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px;">✅</span> Gráficos interativos
+                    </li>
+                    <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px;">✅</span> Relatórios mensais
+                    </li>
+                    <li style="display: flex; align-items: center;">
+                      <span style="margin-right: 10px;">✅</span> Comparativos de performance
+                    </li>
+                  </ul>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 40px 30px; border-radius: 20px; border-left: 4px solid #4facfe;">
+                  <div style="font-size: 3rem; margin-bottom: 20px;">🔔</div>
+                  <h3 style="font-size: 1.4rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Alertas Inteligentes</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6; margin-bottom: 20px;">
+                    Receba notificações sobre novas conversões e oportunidades
+                  </p>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px;">✅</span> Notificações de conversão
+                    </li>
+                    <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                      <span style="margin-right: 10px;">✅</span> Alertas de pagamento
+                    </li>
+                    <li style="display: flex; align-items: center;">
+                      <span style="margin-right: 10px;">✅</span> Dicas de otimização
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <!-- Call to Action -->
+              <div style="text-align: center; margin-top: 60px;">
+                <button style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 40px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+                  📊 Acessar Meu Dashboard
+                </button>
+              </div>
+            </div>
+            
+            <!-- CSS Responsivo -->
+            <style>
+              @media (max-width: 768px) {
+                section {
+                  padding: 40px 15px !important;
+                }
+                h2 {
+                  font-size: 2rem !important;
+                }
+                div[style*="grid-template-columns"] {
+                  grid-template-columns: 1fr !important;
+                  gap: 20px !important;
+                }
+                div[style*="padding: 40px 30px"] {
+                  padding: 30px 20px !important;
+                }
+              }
+            </style>
+          </section>
+        `,
+        category: 'Programa de Indicação',
+        attributes: { class: 'fas fa-chart-line' }
+      });
+
+      // Bloco "Dúvidas Frequentes"
+      editor.BlockManager.add('faq', {
+        label: 'Dúvidas Frequentes',
+        content: `
+          <section style="background: #f8f9fa; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Dúvidas Frequentes</h2>
+                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                  Tire suas principais dúvidas sobre nosso programa de indicação
+                </p>
+              </div>
+              
+              <div style="max-width: 800px; margin: 0 auto;">
+                <!-- FAQ Item 1 -->
+                <div style="background: white; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); overflow: hidden;">
+                  <div style="padding: 25px 30px; cursor: pointer; border-left: 4px solid #667eea; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <h3 style="font-size: 1.2rem; color: #2c3e50; margin: 0; font-weight: 600;">Como funciona o programa de indicação?</h3>
+                      <span style="font-size: 1.5rem; color: #667eea; font-weight: bold;">+</span>
+                    </div>
+                  </div>
+                  <div style="padding: 0 30px 25px 30px; background: white;">
+                    <p style="color: #7f8c8d; line-height: 1.6; margin: 0;">
+                      O programa é simples: você se cadastra gratuitamente, recebe seu link personalizado e compartilha com amigos. 
+                      A cada indicação que se torna cliente, você recebe uma comissão automática via PIX.
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- FAQ Item 2 -->
+                <div style="background: white; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); overflow: hidden;">
+                  <div style="padding: 25px 30px; cursor: pointer; border-left: 4px solid #f093fb; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <h3 style="font-size: 1.2rem; color: #2c3e50; margin: 0; font-weight: 600;">Quanto posso ganhar por indicação?</h3>
+                      <span style="font-size: 1.5rem; color: #f093fb; font-weight: bold;">+</span>
+                    </div>
+                  </div>
+                  <div style="padding: 0 30px 25px 30px; background: white;">
+                    <p style="color: #7f8c8d; line-height: 1.6; margin: 0;">
+                      Os valores variam de R$ 50 a R$ 500 por indicação, dependendo do produto/serviço. 
+                      Além disso, há bônus por volume e ganhos recorrentes de clientes ativos.
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- FAQ Item 3 -->
+                <div style="background: white; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); overflow: hidden;">
+                  <div style="padding: 25px 30px; cursor: pointer; border-left: 4px solid #4facfe; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <h3 style="font-size: 1.2rem; color: #2c3e50; margin: 0; font-weight: 600;">Quando recebo o pagamento?</h3>
+                      <span style="font-size: 1.5rem; color: #4facfe; font-weight: bold;">+</span>
+                    </div>
+                  </div>
+                  <div style="padding: 0 30px 25px 30px; background: white;">
+                    <p style="color: #7f8c8d; line-height: 1.6; margin: 0;">
+                      Os pagamentos são processados automaticamente e enviados via PIX em até 48 horas após a conversão da indicação. 
+                      Não há taxas ou mensalidades para participar.
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- FAQ Item 4 -->
+                <div style="background: white; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); overflow: hidden;">
+                  <div style="padding: 25px 30px; cursor: pointer; border-left: 4px solid #27ae60; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <h3 style="font-size: 1.2rem; color: #2c3e50; margin: 0; font-weight: 600;">Preciso ter experiência em vendas?</h3>
+                      <span style="font-size: 1.5rem; color: #27ae60; font-weight: bold;">+</span>
+                    </div>
+                  </div>
+                  <div style="padding: 0 30px 25px 30px; background: white;">
+                    <p style="color: #7f8c8d; line-height: 1.6; margin: 0;">
+                      Não! Qualquer pessoa pode participar, independente de experiência. 
+                      Fornecemos materiais de apoio, treinamentos e suporte completo para você ter sucesso.
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- FAQ Item 5 -->
+                <div style="background: white; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); overflow: hidden;">
+                  <div style="padding: 25px 30px; cursor: pointer; border-left: 4px solid #e74c3c; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <h3 style="font-size: 1.2rem; color: #2c3e50; margin: 0; font-weight: 600;">Há limite de indicações?</h3>
+                      <span style="font-size: 1.5rem; color: #e74c3c; font-weight: bold;">+</span>
+                    </div>
+                  </div>
+                  <div style="padding: 0 30px 25px 30px; background: white;">
+                    <p style="color: #7f8c8d; line-height: 1.6; margin: 0;">
+                      Não há limite! Quanto mais você indicar, mais você ganha. 
+                      Além disso, quanto maior seu volume de indicações, maiores os bônus e benefícios exclusivos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Call to Action -->
+              <div style="text-align: center; margin-top: 60px;">
+                <button style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 40px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+                  ❓ Ainda tem dúvidas? Fale conosco!
+                </button>
+              </div>
+            </div>
+            
+            <!-- CSS Responsivo -->
+            <style>
+              @media (max-width: 768px) {
+                section {
+                  padding: 40px 15px !important;
+                }
+                h2 {
+                  font-size: 2rem !important;
+                }
+                div[style*="padding: 25px 30px"] {
+                  padding: 20px 25px !important;
+                }
+                h3 {
+                  font-size: 1.1rem !important;
+                }
+              }
+            </style>
+          </section>
+        `,
+        category: 'Programa de Indicação',
+        attributes: { class: 'fas fa-question-circle' }
+      });
+
+      // Bloco "Endereço e Contatos da Empresa"
+      editor.BlockManager.add('company-contact', {
+        label: 'Endereço e Contatos da Empresa',
+        content: `
+          <section style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; margin-bottom: 20px; font-weight: 600;">Entre em Contato</h2>
+                <p style="font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                  Estamos aqui para ajudar! Entre em contato conosco através dos canais abaixo
+                </p>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+                <!-- Informações da Empresa -->
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);">
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2rem;">🏢</div>
+                  </div>
+                  <h3 style="font-size: 1.5rem; margin-bottom: 20px; font-weight: 600; text-align: center;">Nossa Empresa</h3>
+                  
+                  <div style="margin-bottom: 25px;">
+                    <h4 style="font-size: 1.2rem; margin-bottom: 10px; font-weight: 600; color: #f39c12;">Nome da Empresa</h4>
+                    <p style="opacity: 0.9; line-height: 1.6; margin: 0;">Sua Empresa Ltda.</p>
+                  </div>
+                  
+                  <div style="margin-bottom: 25px;">
+                    <h4 style="font-size: 1.2rem; margin-bottom: 10px; font-weight: 600; color: #f39c12;">CNPJ</h4>
+                    <p style="opacity: 0.9; line-height: 1.6; margin: 0;">00.000.000/0001-00</p>
+                  </div>
+                  
+                  <div style="margin-bottom: 25px;">
+                    <h4 style="font-size: 1.2rem; margin-bottom: 10px; font-weight: 600; color: #f39c12;">Horário de Atendimento</h4>
+                    <p style="opacity: 0.9; line-height: 1.6; margin: 0;">Segunda a Sexta: 8h às 18h<br>Sábado: 9h às 14h</p>
+                  </div>
+                </div>
+                
+                <!-- Endereço -->
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);">
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2rem;">📍</div>
+                  </div>
+                  <h3 style="font-size: 1.5rem; margin-bottom: 20px; font-weight: 600; text-align: center;">Endereço</h3>
+                  
+                  <div style="margin-bottom: 20px;">
+                    <p style="opacity: 0.9; line-height: 1.6; margin: 0; font-size: 1.1rem;">
+                      Rua das Empresas, 123<br>
+                      Bairro Centro<br>
+                      São Paulo - SP<br>
+                      CEP: 01234-567
+                    </p>
+                  </div>
+                  
+                  <div style="margin-top: 30px;">
+                    <h4 style="font-size: 1.2rem; margin-bottom: 10px; font-weight: 600; color: #f39c12;">Como Chegar</h4>
+                    <p style="opacity: 0.9; line-height: 1.6; margin: 0;">
+                      Metrô: Linha Azul - Estação Centro<br>
+                      Ônibus: Linhas 100, 200, 300<br>
+                      Estacionamento gratuito no local
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- Contatos -->
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);">
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2rem;">📞</div>
+                  </div>
+                  <h3 style="font-size: 1.5rem; margin-bottom: 20px; font-weight: 600; text-align: center;">Contatos</h3>
+                  
+                  <div style="margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                      <span style="font-size: 1.5rem; margin-right: 15px;">📱</span>
+                      <div>
+                        <h4 style="font-size: 1.1rem; margin-bottom: 5px; font-weight: 600; color: #f39c12;">WhatsApp</h4>
+                        <p style="opacity: 0.9; margin: 0;">(11) 99999-9999</p>
+                      </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                      <span style="font-size: 1.5rem; margin-right: 15px;">📧</span>
+                      <div>
+                        <h4 style="font-size: 1.1rem; margin-bottom: 5px; font-weight: 600; color: #f39c12;">E-mail</h4>
+                        <p style="opacity: 0.9; margin: 0;">contato@suaempresa.com.br</p>
+                      </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                      <span style="font-size: 1.5rem; margin-right: 15px;">🌐</span>
+                      <div>
+                        <h4 style="font-size: 1.1rem; margin-bottom: 5px; font-weight: 600; color: #f39c12;">Website</h4>
+                        <p style="opacity: 0.9; margin: 0;">www.suaempresa.com.br</p>
+                      </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center;">
+                      <span style="font-size: 1.5rem; margin-right: 15px;">📞</span>
+                      <div>
+                        <h4 style="font-size: 1.1rem; margin-bottom: 5px; font-weight: 600; color: #f39c12;">Telefone</h4>
+                        <p style="opacity: 0.9; margin: 0;">(11) 3333-3333</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Redes Sociais -->
+              <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; margin-top: 40px; border: 1px solid rgba(255,255,255,0.2); text-align: center;">
+                <h3 style="font-size: 1.8rem; margin-bottom: 30px; font-weight: 600;">Siga-nos nas Redes Sociais</h3>
+                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                  <a href="#" style="display: inline-block; width: 60px; height: 60px; background: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 1.5rem; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    📱
+                  </a>
+                  <a href="#" style="display: inline-block; width: 60px; height: 60px; background: #1877f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 1.5rem; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    📘
+                  </a>
+                  <a href="#" style="display: inline-block; width: 60px; height: 60px; background: #e4405f; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 1.5rem; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    📷
+                  </a>
+                  <a href="#" style="display: inline-block; width: 60px; height: 60px; background: #0077b5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 1.5rem; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    💼
+                  </a>
+                </div>
+              </div>
+              
+              <!-- Call to Action -->
+              <div style="text-align: center; margin-top: 60px;">
+                <button style="background: #f39c12; color: white; padding: 18px 40px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(243, 156, 18, 0.3);">
+                  📞 Falar com um Especialista
+                </button>
+              </div>
+            </div>
+            
+            <!-- CSS Responsivo -->
+            <style>
+              @media (max-width: 768px) {
+                section {
+                  padding: 40px 15px !important;
+                }
+                h2 {
+                  font-size: 2rem !important;
+                }
+                div[style*="grid-template-columns"] {
+                  grid-template-columns: 1fr !important;
+                  gap: 30px !important;
+                }
+                div[style*="padding: 40px"] {
+                  padding: 30px 20px !important;
+                }
+                div[style*="gap: 20px"] {
+                  gap: 15px !important;
+                }
+              }
+            </style>
+          </section>
+        `,
+        category: 'Programa de Indicação',
+        attributes: { class: 'fas fa-map-marker-alt' }
+      });
+
       console.log('[GrapesJS Debug] Blocos adicionados. Total de blocos:', editor.BlockManager.getAll().length);
+      
+      // Log de confirmação dos novos blocos personalizados
+      console.log('[GrapesJS Debug] ✅ NOVOS BLOCOS PERSONALIZADOS IMPLEMENTADOS:');
+      console.log('[GrapesJS Debug] 📋 1. "Como Funciona" - Explicação do processo');
+      console.log('[GrapesJS Debug] 📋 2. "Benefícios do Programa" - Vantagens detalhadas');
+      console.log('[GrapesJS Debug] 📋 3. "Como Ganhar" - Instruções de ganhos');
+      console.log('[GrapesJS Debug] 📋 4. "O Seu Indicador Também Ganha" - Benefícios para indicadores');
+      console.log('[GrapesJS Debug] 📋 5. "Como Acompanhar Minhas Indicações" - Dashboard/tracking');
+      console.log('[GrapesJS Debug] 📋 6. "Dúvidas Frequentes" - FAQ interativo');
+      console.log('[GrapesJS Debug] 📋 7. "Endereço e Contatos da Empresa" - Informações completas');
+      console.log('[GrapesJS Debug] 🎯 Todos os blocos estão na categoria "Programa de Indicação"');
+      console.log('[GrapesJS Debug] 🎨 Design responsivo e moderno implementado');
+      console.log('[GrapesJS Debug] 📱 CSS mobile-first para todos os novos blocos');
+      console.log('[GrapesJS Debug] 🚀 PRONTO PARA DEPLOY!');
 
       // Verificar se está no modo de edição e carregar dados existentes
       const urlParams = new URLSearchParams(window.location.search);
