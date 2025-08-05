@@ -2293,6 +2293,129 @@
 
       console.log('[GrapesJS Debug] Blocos adicionados. Total de blocos:', editor.BlockManager.getAll().length);
       
+      // ===== TEMPLATES COMPLETOS DE LP =====
+      
+      // Template 1: "Conversão Pro" - Vendas Diretas
+      editor.BlockManager.add('template-conversion-pro', {
+        label: 'Template: Conversão Pro',
+        content: `
+          <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 100px 20px; text-align: center;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <h1 style="font-size: 3.5rem; margin-bottom: 25px; font-weight: 800; font-family: 'Inter', sans-serif;">Ganhe R$ 500 por Indicação</h1>
+              <p style="font-size: 1.3rem; margin-bottom: 40px; opacity: 0.95; max-width: 700px; margin-left: auto; margin-right: auto;">
+                Programa de indicação que paga comissões de até R$ 500 por cliente convertido. 
+                Comece a ganhar dinheiro hoje mesmo!
+              </p>
+              <button style="background: #ffffff; color: #667eea; padding: 20px 40px; border: none; border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                🚀 Começar Agora - É Grátis!
+              </button>
+            </div>
+          </section>
+          
+          <section style="background: #f8f9fa; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Por que Escolher Nosso Programa?</h2>
+                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto;">
+                  Descubra as vantagens exclusivas de ser um indicador oficial
+                </p>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;">💰</div>
+                  <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Ganhos Imediatos</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6;">R$ 50 a R$ 500 por indicação convertida, pagos via PIX em até 48h</p>
+                </div>
+                
+                <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;">🎁</div>
+                  <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Bônus por Volume</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6;">+10% extra ao atingir metas mensais de indicações</p>
+                </div>
+                
+                <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;">🔄</div>
+                  <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Ganhos Recorrentes</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6;">Comissões mensais de clientes ativos que você indicou</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          <section style="background: white; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+              <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Como Funciona</h2>
+                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto;">
+                  Processo simples em 3 passos para começar a ganhar
+                </p>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+                <div style="background: #f8f9fa; padding: 40px; border-radius: 20px; text-align: center; position: relative;">
+                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">1</div>
+                  <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Cadastre-se Gratuitamente</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6;">Crie sua conta em menos de 2 minutos. Não há taxas ou mensalidades.</p>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 40px; border-radius: 20px; text-align: center; position: relative;">
+                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">2</div>
+                  <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Receba Seu Link</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6;">Você receberá um link único para compartilhar com amigos.</p>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 40px; border-radius: 20px; text-align: center; position: relative;">
+                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">3</div>
+                  <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Compartilhe e Ganhe</h3>
+                  <p style="color: #7f8c8d; line-height: 1.6;">A cada indicação que se torna cliente, você recebe comissão.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          <section style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 80px 20px; text-align: center;">
+            <div style="max-width: 800px; margin: 0 auto;">
+              <h2 style="font-size: 2.5rem; margin-bottom: 20px; font-weight: 600;">Pronto para Começar?</h2>
+              <p style="font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9;">
+                Junte-se a milhares de indicadores que já estão ganhando dinheiro
+              </p>
+              <button style="background: white; color: #f093fb; padding: 20px 40px; border: none; border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                🚀 Começar Agora - É Grátis!
+              </button>
+            </div>
+          </section>
+        `,
+        category: 'Templates Completos',
+        attributes: { class: 'fas fa-rocket' },
+        traits: [
+          {
+            type: 'color',
+            name: 'hero-bg-color',
+            label: 'Cor Hero Principal',
+            default: '#667eea'
+          },
+          {
+            type: 'color',
+            name: 'hero-bg-color-2',
+            label: 'Cor Hero Secundária',
+            default: '#764ba2'
+          },
+          {
+            type: 'text',
+            name: 'hero-title',
+            label: 'Título Principal',
+            default: 'Ganhe R$ 500 por Indicação'
+          },
+          {
+            type: 'text',
+            name: 'hero-subtitle',
+            label: 'Subtítulo Hero',
+            default: 'Programa de indicação que paga comissões de até R$ 500 por cliente convertido. Comece a ganhar dinheiro hoje mesmo!'
+          }
+        ]
+      });
+      
       // Listener para aplicar traits quando componentes são adicionados
       editor.on('component:add', function(component) {
         const traits = component.get('traits');
