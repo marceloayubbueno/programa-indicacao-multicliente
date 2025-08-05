@@ -741,17 +741,22 @@ export class WhatsAppClientService {
       console.log('Para:', to);
       console.log('Phone Number ID:', credentials.phoneNumberId);
       console.log('Mensagem:', message);
+      console.log('Access Token (primeiros 10 chars):', credentials.accessToken ? credentials.accessToken.substring(0, 10) + '...' : 'NÃO FORNECIDO');
+
+      const payload = {
+        messaging_product: 'whatsapp',
+        to: to,
+        type: 'text',
+        text: {
+          body: message
+        }
+      };
+
+      console.log('Payload enviado:', JSON.stringify(payload, null, 2));
 
       const response = await axios.post(
         `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}/messages`,
-        {
-          messaging_product: 'whatsapp',
-          to: to,
-          type: 'text',
-          text: {
-            body: message
-          }
-        },
+        payload,
         {
           headers: {
             'Authorization': `Bearer ${credentials.accessToken}`,
@@ -760,16 +765,29 @@ export class WhatsAppClientService {
         }
       );
 
-      console.log('Resposta da API:', response.data);
+      console.log('=== RESPOSTA COMPLETA DA API META ===');
+      console.log('Status:', response.status);
+      console.log('Headers:', response.headers);
+      console.log('Data:', JSON.stringify(response.data, null, 2));
 
-      return {
-        id: response.data.messages[0].id,
-        status: 'sent'
-      };
+      if (response.data && response.data.messages && response.data.messages[0]) {
+        console.log('Message ID retornado:', response.data.messages[0].id);
+        return {
+          id: response.data.messages[0].id,
+          status: 'sent'
+        };
+      } else {
+        console.error('Resposta da API não contém message ID:', response.data);
+        throw new Error('Resposta inválida da API do WhatsApp Business');
+      }
 
     } catch (error) {
-      console.error('=== ERRO NO ENVIO WHATSAPP BUSINESS API ===');
-      console.error('Erro:', error.response?.data || error.message);
+      console.error('=== ERRO DETALHADO NO ENVIO WHATSAPP BUSINESS API ===');
+      console.error('Status do erro:', error.response?.status);
+      console.error('Headers do erro:', error.response?.headers);
+      console.error('Data do erro:', JSON.stringify(error.response?.data, null, 2));
+      console.error('Mensagem do erro:', error.message);
+      console.error('Stack trace:', error.stack);
       
       if (error.response?.status === 401) {
         throw new Error('Token de acesso inválido ou expirado');
