@@ -881,7 +881,7 @@
       
       <div class="panel__content">
         <div class="panel__tab-content active" id="tab-blocks">
-          <div class="blocks-container">
+          <div class="blocks-container" id="blocks">
             <div style="padding: 15px; background: #f8f9fa; border-bottom: 1px solid #e9ecef; margin: -15px -15px 15px -15px;">
               <h4 style="margin: 0 0 5px 0; color: #2c3e50; font-size: 13px; font-weight: 600;">📦 Componentes Disponíveis</h4>
               <p style="margin: 0; color: #7f8c8d; font-size: 11px;">Arraste os blocos abaixo para o canvas para construir sua landing page</p>
@@ -908,7 +908,7 @@
       </div>
     </div>
   </div>
-  <script src="https://unpkg.com/grapesjs"></script>
+  <script src="https://unpkg.com/grapesjs@0.20.4/dist/grapes.min.js"></script>
   <script>
     console.log('[GrapesJS Debug] Iniciando configuração do editor...');
     
@@ -925,10 +925,10 @@
           ]
         },
         blockManager: {
-          appendTo: '#tab-blocks .blocks-container'
+          appendTo: '#blocks'
         },
         styleManager: {
-          appendTo: '#tab-styles .styles-container',
+          appendTo: '#tab-styles',
           sectors: [
             { 
               name: '📦 Container & Espaçamento', 
