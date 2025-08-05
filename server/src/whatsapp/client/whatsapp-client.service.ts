@@ -692,7 +692,7 @@ export class WhatsAppClientService {
       // Fazer uma requisição para verificar se as credenciais são válidas
       // Vamos buscar informações do número de telefone
       const response = await axios.get(
-        `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}`,
+        `https://graph.facebook.com/v23.0/${credentials.phoneNumberId}`,
         {
           headers: {
             'Authorization': `Bearer ${credentials.accessToken}`,
@@ -755,7 +755,7 @@ export class WhatsAppClientService {
       console.log('Payload enviado:', JSON.stringify(payload, null, 2));
 
       const response = await axios.post(
-        `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}/messages`,
+        `https://graph.facebook.com/v23.0/${credentials.phoneNumberId}/messages`,
         payload,
         {
           headers: {
