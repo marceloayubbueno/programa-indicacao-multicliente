@@ -1384,86 +1384,105 @@
 
       // ===== NOVOS BLOCOS PERSONALIZADOS =====
       
-      // Bloco "Como Funciona"
+      // Bloco "Como Funciona" - Design Moderno Premium
       editor.BlockManager.add('how-it-works', {
         label: 'Como Funciona',
         content: `
-          <section style="background: #f8f9fa; padding: 80px 20px;">
-            <div style="max-width: 1200px; margin: 0 auto;">
-              <div style="text-align: center; margin-bottom: 60px;">
-                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Como Funciona Nosso Programa</h2>
-                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto; line-height: 1.6;">
-                  Processo simples e transparente para você começar a ganhar com suas indicações
+          <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 100px 20px; position: relative; overflow: hidden;">
+            <!-- Elementos decorativos -->
+            <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+            
+            <div style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 2;">
+              <div style="text-align: center; margin-bottom: 80px;">
+                <div style="display: inline-block; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 20px 40px; border-radius: 50px; margin-bottom: 30px;">
+                  <span style="font-size: 1.2rem; color: white; font-weight: 600;">✨ PROCESSO SIMPLES</span>
+                </div>
+                <h2 style="font-size: 3.5rem; color: white; margin-bottom: 25px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.1); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">Como Funciona</h2>
+                <p style="font-size: 1.3rem; color: rgba(255,255,255,0.9); max-width: 700px; margin: 0 auto; line-height: 1.7; font-weight: 400;">
+                  Descubra como é incrivelmente fácil participar e ganhar com nosso programa de indicação
                 </p>
               </div>
-              
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px;">
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px;">
                 <!-- Passo 1 -->
-                <div style="background: white; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative;">
-                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">1</div>
-                  <h3 style="font-size: 1.4rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Cadastre-se</h3>
-                  <p style="color: #7f8c8d; line-height: 1.6; margin-bottom: 20px;">
-                    Faça seu cadastro gratuito como indicador oficial e receba seu link personalizado
+                <div style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 50px 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.3); transform: translateY(0); transition: all 0.4s ease;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                  <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 2px;"></div>
+                  <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 800; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); position: relative;">
+                    <span style="font-family: 'Inter', sans-serif;">1</span>
+                    <div style="position: absolute; top: -5px; right: -5px; width: 30px; height: 30px; background: #27ae60; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: white; font-weight: bold;">✓</div>
+                  </div>
+                  <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif;">Cadastre-se Gratuitamente</h3>
+                  <p style="color: #5a6c7d; line-height: 1.7; margin: 0; font-size: 1.1rem; font-weight: 400;">
+                    Crie sua conta em menos de 2 minutos. Não há taxas ou mensalidades para participar.
                   </p>
-                  <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
-                    <p style="margin: 0; font-size: 0.9rem; color: #1976d2; font-weight: 500;">
-                      ⏱️ Aprovação em até 24h
-                    </p>
+                  <div style="margin-top: 25px;">
+                    <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">2 MINUTOS</span>
                   </div>
                 </div>
-                
+
                 <!-- Passo 2 -->
-                <div style="background: white; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative;">
-                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">2</div>
-                  <h3 style="font-size: 1.4rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Compartilhe</h3>
-                  <p style="color: #7f8c8d; line-height: 1.6; margin-bottom: 20px;">
-                    Use seu link personalizado para indicar amigos e familiares para nossos produtos
+                <div style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 50px 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.3); transform: translateY(0); transition: all 0.4s ease;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                  <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 2px;"></div>
+                  <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 800; box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4); position: relative;">
+                    <span style="font-family: 'Inter', sans-serif;">2</span>
+                    <div style="position: absolute; top: -5px; right: -5px; width: 30px; height: 30px; background: #27ae60; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: white; font-weight: bold;">✓</div>
+                  </div>
+                  <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif;">Receba Seu Link Personalizado</h3>
+                  <p style="color: #5a6c7d; line-height: 1.7; margin: 0; font-size: 1.1rem; font-weight: 400;">
+                    Você receberá um link único para compartilhar com amigos e familiares.
                   </p>
-                  <div style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
-                    <p style="margin: 0; font-size: 0.9rem; color: #e65100; font-weight: 500;">
-                      📱 Compartilhe via WhatsApp, Instagram, Facebook
-                    </p>
+                  <div style="margin-top: 25px;">
+                    <span style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">LINK ÚNICO</span>
                   </div>
                 </div>
-                
+
                 <!-- Passo 3 -->
-                <div style="background: white; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative;">
-                  <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">3</div>
-                  <h3 style="font-size: 1.4rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600;">Ganhe</h3>
-                  <p style="color: #7f8c8d; line-height: 1.6; margin-bottom: 20px;">
-                    A cada indicação que se torna cliente, você recebe sua comissão automaticamente
+                <div style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 50px 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.3); transform: translateY(0); transition: all 0.4s ease;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                  <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 2px;"></div>
+                  <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 800; box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4); position: relative;">
+                    <span style="font-family: 'Inter', sans-serif;">3</span>
+                    <div style="position: absolute; top: -5px; right: -5px; width: 30px; height: 30px; background: #27ae60; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: white; font-weight: bold;">✓</div>
+                  </div>
+                  <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif;">Compartilhe e Ganhe</h3>
+                  <p style="color: #5a6c7d; line-height: 1.7; margin: 0; font-size: 1.1rem; font-weight: 400;">
+                    A cada indicação que se torna cliente, você recebe comissão automática via PIX.
                   </p>
-                  <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50;">
-                    <p style="margin: 0; font-size: 0.9rem; color: #2e7d32; font-weight: 500;">
-                      💰 Pagamento via PIX em até 48h
-                    </p>
+                  <div style="margin-top: 25px;">
+                    <span style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">PIX AUTOMÁTICO</span>
                   </div>
                 </div>
               </div>
-              
+
               <!-- Call to Action -->
-              <div style="text-align: center; margin-top: 60px;">
-                <button style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 40px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
-                  🚀 Começar Agora - É Gratuito!
+              <div style="text-align: center; margin-top: 80px;">
+                <button style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); color: #667eea; padding: 25px 50px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50px; font-size: 1.3rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 15px 40px rgba(0,0,0,0.2); font-family: 'Inter', sans-serif;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 20px 50px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.2)'">
+                  🚀 Começar Agora - É Grátis!
                 </button>
               </div>
             </div>
-            
+
             <!-- CSS Responsivo -->
             <style>
+              @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+              
               @media (max-width: 768px) {
                 section {
-                  padding: 40px 15px !important;
+                  padding: 60px 15px !important;
                 }
                 h2 {
-                  font-size: 2rem !important;
+                  font-size: 2.5rem !important;
                 }
                 div[style*="grid-template-columns"] {
                   grid-template-columns: 1fr !important;
                   gap: 30px !important;
                 }
-                div[style*="padding: 40px 30px"] {
-                  padding: 30px 20px !important;
+                div[style*="padding: 50px 40px"] {
+                  padding: 40px 25px !important;
+                }
+                button {
+                  padding: 20px 40px !important;
+                  font-size: 1.1rem !important;
                 }
               }
             </style>
@@ -1473,92 +1492,114 @@
         attributes: { class: 'fas fa-cogs' }
       });
 
-      // Bloco "Benefícios do Programa"
+      // Bloco "Benefícios do Programa" - Design Moderno Premium
       editor.BlockManager.add('program-benefits', {
         label: 'Benefícios do Programa',
         content: `
-          <section style="background: white; padding: 80px 20px;">
-            <div style="max-width: 1200px; margin: 0 auto;">
-              <div style="text-align: center; margin-bottom: 60px;">
-                <h2 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 20px; font-weight: 600;">Benefícios Exclusivos</h2>
-                <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+          <section style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 100px 20px; position: relative; overflow: hidden;">
+            <!-- Elementos decorativos -->
+            <div style="position: absolute; top: -100px; left: -100px; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+            
+            <div style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 2;">
+              <div style="text-align: center; margin-bottom: 80px;">
+                <div style="display: inline-block; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 20px 40px; border-radius: 50px; margin-bottom: 30px;">
+                  <span style="font-size: 1.2rem; color: white; font-weight: 600;">💎 BENEFÍCIOS EXCLUSIVOS</span>
+                </div>
+                <h2 style="font-size: 3.5rem; color: white; margin-bottom: 25px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.1); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">Benefícios Exclusivos</h2>
+                <p style="font-size: 1.3rem; color: rgba(255,255,255,0.9); max-width: 700px; margin: 0 auto; line-height: 1.7; font-weight: 400;">
                   Descubra todas as vantagens de ser um indicador oficial do nosso programa
                 </p>
               </div>
               
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px;">
                 <!-- Benefício 1 -->
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 20px; position: relative; overflow: hidden;">
-                  <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                  <div style="position: relative; z-index: 2;">
-                    <div style="font-size: 3rem; margin-bottom: 20px;">💰</div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 600;">Ganhos Ilimitados</h3>
-                    <p style="line-height: 1.6; margin-bottom: 20px; opacity: 0.9;">
-                      Não há limite para suas indicações. Quanto mais você indicar, mais você ganha!
-                    </p>
-                    <ul style="list-style: none; padding: 0; margin: 0;">
-                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
-                        <span style="margin-right: 10px;">✅</span> Comissões de R$ 50 a R$ 500 por indicação
-                      </li>
-                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
-                        <span style="margin-right: 10px;">✅</span> Bônus por volume de indicações
-                      </li>
-                      <li style="display: flex; align-items: center;">
-                        <span style="margin-right: 10px;">✅</span> Pagamentos recorrentes
-                      </li>
-                    </ul>
+                <div style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 50px 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); position: relative; border: 1px solid rgba(255,255,255,0.3); transform: translateY(0); transition: all 0.4s ease;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                  <div style="position: absolute; top: -2px; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 2px;"></div>
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);">
+                      💰
+                    </div>
                   </div>
+                  <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif; text-align: center;">Ganhos Ilimitados</h3>
+                  <p style="color: #5a6c7d; line-height: 1.7; margin-bottom: 25px; font-size: 1.1rem; font-weight: 400; text-align: center;">
+                    Não há limite para suas indicações. Quanto mais você indicar, mais você ganha!
+                  </p>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 15px; display: flex; align-items: center; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 12px; border-left: 4px solid #667eea;">
+                      <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                      <span style="color: #2c3e50; font-weight: 500;">Comissões de R$ 50 a R$ 500 por indicação</span>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: center; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 12px; border-left: 4px solid #667eea;">
+                      <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                      <span style="color: #2c3e50; font-weight: 500;">Bônus por volume de indicações</span>
+                    </li>
+                    <li style="display: flex; align-items: center; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 12px; border-left: 4px solid #667eea;">
+                      <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                      <span style="color: #2c3e50; font-weight: 500;">Pagamentos recorrentes</span>
+                    </li>
+                  </ul>
                 </div>
                 
                 <!-- Benefício 2 -->
-                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 40px; border-radius: 20px; position: relative; overflow: hidden;">
-                  <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                  <div style="position: relative; z-index: 2;">
-                    <div style="font-size: 3rem; margin-bottom: 20px;">⚡</div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 600;">Facilidade Total</h3>
-                    <p style="line-height: 1.6; margin-bottom: 20px; opacity: 0.9;">
-                      Sistema automatizado que facilita todo o processo de indicação
-                    </p>
-                    <ul style="list-style: none; padding: 0; margin: 0;">
-                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
-                        <span style="margin-right: 10px;">✅</span> Link personalizado automático
-                      </li>
-                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
-                        <span style="margin-right: 10px;">✅</span> Dashboard para acompanhamento
-                      </li>
-                      <li style="display: flex; align-items: center;">
-                        <span style="margin-right: 10px;">✅</span> Suporte dedicado
-                      </li>
-                    </ul>
+                <div style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 50px 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); position: relative; border: 1px solid rgba(255,255,255,0.3); transform: translateY(0); transition: all 0.4s ease;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                  <div style="position: absolute; top: -2px; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 2px;"></div>
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);">
+                      ⚡
+                    </div>
                   </div>
+                  <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif; text-align: center;">Facilidade Total</h3>
+                  <p style="color: #5a6c7d; line-height: 1.7; margin-bottom: 25px; font-size: 1.1rem; font-weight: 400; text-align: center;">
+                    Sistema automatizado que facilita todo o processo de indicação
+                  </p>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 15px; display: flex; align-items: center; padding: 15px; background: rgba(240, 147, 251, 0.1); border-radius: 12px; border-left: 4px solid #f093fb;">
+                      <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                      <span style="color: #2c3e50; font-weight: 500;">Link personalizado automático</span>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: center; padding: 15px; background: rgba(240, 147, 251, 0.1); border-radius: 12px; border-left: 4px solid #f093fb;">
+                      <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                      <span style="color: #2c3e50; font-weight: 500;">Dashboard para acompanhamento</span>
+                    </li>
+                    <li style="display: flex; align-items: center; padding: 15px; background: rgba(240, 147, 251, 0.1); border-radius: 12px; border-left: 4px solid #f093fb;">
+                      <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                      <span style="color: #2c3e50; font-weight: 500;">Suporte dedicado</span>
+                    </li>
+                  </ul>
                 </div>
                 
                 <!-- Benefício 3 -->
-                <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 40px; border-radius: 20px; position: relative; overflow: hidden;">
-                  <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                  <div style="position: relative; z-index: 2;">
-                    <div style="font-size: 3rem; margin-bottom: 20px;">🎯</div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 600;">Flexibilidade</h3>
-                    <p style="line-height: 1.6; margin-bottom: 20px; opacity: 0.9;">
-                      Trabalhe no seu ritmo, de onde quiser, quando quiser
-                    </p>
-                    <ul style="list-style: none; padding: 0; margin: 0;">
-                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
-                        <span style="margin-right: 10px;">✅</span> Trabalhe de casa ou qualquer lugar
-                      </li>
-                      <li style="margin-bottom: 8px; display: flex; align-items: center;">
-                        <span style="margin-right: 10px;">✅</span> Horário flexível
-                      </li>
-                      <li style="display: flex; align-items: center;">
-                        <span style="margin-right: 10px;">✅</span> Sem metas obrigatórias
-                      </li>
-                    </ul>
+                <div style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 50px 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); position: relative; border: 1px solid rgba(255,255,255,0.3); transform: translateY(0); transition: all 0.4s ease;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                  <div style="position: absolute; top: -2px; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 2px;"></div>
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);">
+                      🎯
+                    </div>
                   </div>
+                  <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif; text-align: center;">Flexibilidade</h3>
+                  <p style="color: #5a6c7d; line-height: 1.7; margin-bottom: 25px; font-size: 1.1rem; font-weight: 400; text-align: center;">
+                    Trabalhe no seu ritmo, de onde quiser, quando quiser
+                  </p>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 15px; display: flex; align-items: center; padding: 15px; background: rgba(79, 172, 254, 0.1); border-radius: 12px; border-left: 4px solid #4facfe;">
+                      <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                      <span style="color: #2c3e50; font-weight: 500;">Trabalhe de casa ou qualquer lugar</span>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: center; padding: 15px; background: rgba(79, 172, 254, 0.1); border-radius: 12px; border-left: 4px solid #4facfe;">
+                      <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                      <span style="color: #2c3e50; font-weight: 500;">Horário flexível</span>
+                    </li>
+                    <li style="display: flex; align-items: center; padding: 15px; background: rgba(79, 172, 254, 0.1); border-radius: 12px; border-left: 4px solid #4facfe;">
+                      <span style="margin-right: 15px; font-size: 1.2rem;">✅</span>
+                      <span style="color: #2c3e50; font-weight: 500;">Sem metas obrigatórias</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
               
               <!-- Estatísticas -->
-              <div style="background: #f8f9fa; padding: 40px; border-radius: 20px; margin-top: 60px; text-align: center;">
+              <div style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 60px 40px; border-radius: 25px; margin-top: 80px; text-align: center; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
                 <h3 style="font-size: 1.8rem; color: #2c3e50; margin-bottom: 30px; font-weight: 600;">Números que Impressionam</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;">
                   <div>
