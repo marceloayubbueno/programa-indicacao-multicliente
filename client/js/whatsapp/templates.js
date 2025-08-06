@@ -1,13 +1,16 @@
 // Templates WhatsApp - Gestão de templates de mensagens
 // Sistema multicliente - JWT Authentication
 
-// Variáveis globais
+// Configuração da API
+const API_BASE_URL = window.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+
+// Estado global
 let templates = [];
-let currentTemplate = null;
+let currentTemplateId = null;
 
 // Inicialização
-document.addEventListener('DOMContentLoaded', async function() {
-    await initTemplates();
+document.addEventListener('DOMContentLoaded', function() {
+    initTemplates();
 });
 
 async function initTemplates() {
@@ -32,9 +35,27 @@ async function initTemplates() {
 function checkAuth() {
     const token = getToken();
     if (!token) {
+        console.log('Token não encontrado, redirecionando para login');
         window.location.href = 'login.html';
         return false;
     }
+    
+    // Verificar se o token é válido (estrutura básica)
+    try {
+        const tokenParts = token.split('.');
+        if (tokenParts.length !== 3) {
+            console.log('Token malformado, redirecionando para login');
+            localStorage.removeItem('clientToken');
+            window.location.href = 'login.html';
+            return false;
+        }
+    } catch (error) {
+        console.log('Erro ao verificar token, redirecionando para login');
+        localStorage.removeItem('clientToken');
+        window.location.href = 'login.html';
+        return false;
+    }
+    
     return true;
 }
 
@@ -44,25 +65,51 @@ function getToken() {
 
 async function loadTemplates() {
     try {
+        const token = getToken();
+        if (!token) {
+            showError('Token de autenticação não encontrado');
+            return;
+        }
+
+        console.log('Carregando templates...');
         const response = await fetch(`${API_BASE_URL}/client/whatsapp/templates`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${getToken()}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
 
+        console.log('Response status:', response.status);
+        
+        if (response.status === 401) {
+            console.log('Token inválido ou expirado');
+            localStorage.removeItem('clientToken');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
         const result = await response.json();
+        console.log('Templates carregados:', result);
         
         if (result.success) {
-            templates = result.data;
+            templates = result.data || [];
             renderTemplates();
         } else {
             showError(result.message || 'Erro ao carregar templates');
         }
     } catch (error) {
         console.error('Erro ao carregar templates:', error);
-        showError('Erro ao carregar templates');
+        if (error.message.includes('401')) {
+            localStorage.removeItem('clientToken');
+            window.location.href = 'login.html';
+        } else {
+            showError('Erro ao carregar templates: ' + error.message);
+        }
     }
 }
 
@@ -245,7 +292,7 @@ function renderFilteredTemplates(filteredTemplates) {
 }
 
 function openCreateTemplateModal() {
-    currentTemplate = null;
+    currentTemplateId = null;
     document.getElementById('modal-title').textContent = 'Novo Template';
     resetForm();
     document.getElementById('template-modal').classList.remove('hidden');
@@ -258,13 +305,11 @@ function closeTemplateModal() {
 
 function resetForm() {
     document.getElementById('template-form').reset();
-    currentTemplate = null;
+    currentTemplateId = null;
 }
 
 function editTemplate(templateId) {
-    currentTemplate = templates.find(t => t._id === templateId);
-    if (!currentTemplate) return;
-
+    currentTemplateId = templateId;
     document.getElementById('modal-title').textContent = 'Editar Template';
     document.getElementById('template-name').value = currentTemplate.name;
     document.getElementById('template-category').value = currentTemplate.category;
@@ -289,11 +334,11 @@ async function saveTemplate() {
                 document.getElementById('template-variables').value.split(',').map(v => v.trim()) : []
         };
 
-        const url = currentTemplate ? 
-            `${API_BASE_URL}/client/whatsapp/templates/${currentTemplate._id}` :
+        const url = currentTemplateId ? 
+            `${API_BASE_URL}/client/whatsapp/templates/${currentTemplateId}` :
             `${API_BASE_URL}/client/whatsapp/templates`;
 
-        const method = currentTemplate ? 'PUT' : 'POST';
+        const method = currentTemplateId ? 'PUT' : 'POST';
 
         const response = await fetch(url, {
             method: method,

@@ -9,40 +9,13 @@
     <script src="../js/config.js"></script>
     <style>
         .template-block {
-            @apply bg-gray-800 border border-gray-700 rounded-lg p-4 cursor-move transition-all duration-200 hover:bg-gray-750 hover:border-gray-600;
-        }
-        .template-block.dragging {
-            @apply opacity-50 transform scale-95;
-        }
-        .block-header {
-            @apply flex items-center gap-3 mb-3 p-2 rounded-lg text-white;
+            @apply bg-gray-700 border border-gray-600 rounded-lg p-3 cursor-pointer transition-all duration-200 hover:bg-gray-600 hover:border-gray-500;
         }
         .block-icon {
-            @apply text-2xl;
+            @apply text-lg;
         }
         .block-name {
-            @apply font-semibold text-lg;
-        }
-        .block-description {
-            @apply text-gray-400 text-sm mb-3;
-        }
-        .block-preview {
-            @apply bg-gray-900 p-3 rounded-lg mb-3;
-        }
-        .preview-text {
-            @apply text-gray-300 text-sm;
-        }
-        .block-variables {
-            @apply flex items-center gap-2 text-xs text-gray-500 mb-3;
-        }
-        .variables-label {
-            @apply font-medium;
-        }
-        .variables-list {
-            @apply text-blue-400;
-        }
-        .btn-use-block {
-            @apply w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium;
+            @apply font-medium text-sm;
         }
     </style>
 </head>
@@ -131,23 +104,6 @@
                 
                 <!-- Main Content -->
                 <main class="flex-1 p-8">
-                    <!-- Blocos Pré-definidos -->
-                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
-                        <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <h2 class="text-2xl font-bold text-gray-100">
-                                    <i class="fas fa-puzzle-piece text-blue-400 mr-2"></i>
-                                    Blocos Pré-definidos
-                                </h2>
-                                <p class="text-gray-400 mt-1">Clique em um bloco para criar um template rapidamente</p>
-                            </div>
-                        </div>
-                        
-                        <div id="template-blocks-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Blocos serão carregados aqui -->
-                        </div>
-                    </div>
-
                     <!-- Header com Botão Novo Template -->
                     <div class="flex justify-between items-center mb-8">
                         <div>
@@ -224,7 +180,7 @@
     <!-- Create/Edit Template Modal -->
     <div id="template-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto border border-gray-700">
+            <div class="bg-gray-800 rounded-xl shadow-xl w-full max-w-6xl max-h-screen overflow-y-auto border border-gray-700">
                 <div class="flex items-center justify-between p-6 border-b border-gray-700">
                     <h3 id="modal-title" class="text-xl font-semibold text-gray-100">Novo Template</h3>
                     <button onclick="closeTemplateModal()" class="text-gray-400 hover:text-gray-200">
@@ -232,41 +188,59 @@
                     </button>
                 </div>
                 
-                <form id="template-form" class="p-6 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-2">Nome do Template *</label>
-                            <input type="text" id="template-name" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Boas-vindas Indicador">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-2">Categoria *</label>
-                            <select id="template-category" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">Selecione uma categoria</option>
-                                <option value="marketing">Marketing</option>
-                                <option value="utility">Utility</option>
-                                <option value="authentication">Authentication</option>
-                            </select>
+                <div class="flex">
+                    <!-- Blocos Pré-definidos (Lateral) -->
+                    <div class="w-80 bg-gray-750 p-4 border-r border-gray-700">
+                        <h4 class="text-lg font-semibold text-gray-100 mb-4">
+                            <i class="fas fa-puzzle-piece text-blue-400 mr-2"></i>
+                            Blocos Pré-definidos
+                        </h4>
+                        <p class="text-gray-400 text-sm mb-4">Clique em um bloco para usar como base</p>
+                        
+                        <div id="template-blocks-sidebar" class="space-y-2">
+                            <!-- Blocos serão carregados aqui -->
                         </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-2">Corpo da Mensagem *</label>
-                        <textarea id="template-body" rows="6" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Digite o conteúdo da mensagem. Use {{variavel}} para variáveis dinâmicas."></textarea>
-                        <p class="text-gray-400 text-xs mt-1">Variáveis disponíveis: {{nome}}, {{empresa}}, {{link}}, {{recompensa}}, etc.</p>
+                    <!-- Formulário (Principal) -->
+                    <div class="flex-1 p-6">
+                        <form id="template-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Nome do Template *</label>
+                                    <input type="text" id="template-name" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Boas-vindas Indicador">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Categoria *</label>
+                                    <select id="template-category" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Selecione uma categoria</option>
+                                        <option value="marketing">Marketing</option>
+                                        <option value="utility">Utility</option>
+                                        <option value="authentication">Authentication</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Corpo da Mensagem *</label>
+                                <textarea id="template-body" rows="6" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Digite o conteúdo da mensagem. Use {{variavel}} para variáveis dinâmicas."></textarea>
+                                <p class="text-gray-400 text-xs mt-1">Variáveis disponíveis: {{nome}}, {{empresa}}, {{link}}, {{recompensa}}, etc.</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Footer (Opcional)</label>
+                                    <input type="text" id="template-footer" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Texto do footer">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Variáveis (Opcional)</label>
+                                    <input type="text" id="template-variables" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="nome,empresa,link,recompensa">
+                                    <p class="text-gray-400 text-xs mt-1">Separe as variáveis por vírgula</p>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-2">Footer (Opcional)</label>
-                            <input type="text" id="template-footer" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Texto do footer">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-2">Variáveis (Opcional)</label>
-                            <input type="text" id="template-variables" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="nome,empresa,link,recompensa">
-                            <p class="text-gray-400 text-xs mt-1">Separe as variáveis por vírgula</p>
-                        </div>
-                    </div>
-                </form>
+                </div>
                 
                 <div class="p-6 border-t border-gray-700 flex justify-end gap-3">
                     <button onclick="closeTemplateModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-gray-200 rounded-lg transition-colors">
@@ -342,11 +316,31 @@
             window.location.href = 'login.html';
         }
 
-        // Inicializar blocos pré-definidos
+        // Inicializar blocos pré-definidos na sidebar
         document.addEventListener('DOMContentLoaded', function() {
-            // Renderizar blocos pré-definidos
-            TemplateBlocks.render('template-blocks-container');
+            // Renderizar blocos pré-definidos na sidebar
+            renderTemplateBlocksSidebar();
         });
+
+        // Função para renderizar blocos na sidebar (versão simplificada)
+        function renderTemplateBlocksSidebar() {
+            const container = document.getElementById('template-blocks-sidebar');
+            if (!container) return;
+            
+            const blocksHTML = TemplateBlocks.getAll().map(block => `
+                <div class="template-block" onclick="useTemplateBlock('${block.id}')">
+                    <div class="flex items-center gap-3">
+                        <span class="block-icon">${block.icon}</span>
+                        <div>
+                            <div class="block-name text-gray-100">${block.name}</div>
+                            <div class="text-xs text-gray-400">${block.description}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = blocksHTML;
+        }
     </script>
 </body>
 </html> 
