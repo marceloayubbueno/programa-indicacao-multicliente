@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import * as twilio from 'twilio';
 import axios from 'axios';
 import { WhatsAppConfig, WhatsAppConfigDocument } from '../entities/whatsapp-config.schema';
 import { WhatsAppMessage, WhatsAppMessageDocument } from '../entities/whatsapp-message.schema';
@@ -274,21 +273,13 @@ export class WhatsAppAdminService {
 
   private validateProviderCredentials(provider: string, credentials: any): void {
     switch (provider) {
-      case 'twilio':
-        if (!credentials.accountSid || !credentials.authToken) {
-          throw new Error('Account SID e Auth Token são obrigatórios para Twilio');
-        }
-        break;
-      case 'meta':
+      case 'whatsapp-business':
         if (!credentials.accessToken || !credentials.phoneNumberId) {
-          throw new Error('Access Token e Phone Number ID são obrigatórios para Meta');
+          throw new Error('Access Token e Phone Number ID são obrigatórios para WhatsApp Business API');
         }
         break;
-      case '360dialog':
-        if (!credentials.apiKey || !credentials.instanceId) {
-          throw new Error('API Key e Instance ID são obrigatórios para 360dialog');
-        }
-        break;
+      default:
+        throw new Error(`Provedor não suportado: ${provider}`);
     }
   }
 
@@ -304,12 +295,8 @@ export class WhatsAppAdminService {
   private async testProviderConnection(provider: string, credentials: any): Promise<boolean> {
     try {
       switch (provider) {
-        case 'twilio':
-          return await this.testTwilioConnection(credentials);
-        case 'meta':
-          return await this.testMetaConnection(credentials);
-        case '360dialog':
-          return await this.test360DialogConnection(credentials);
+        case 'whatsapp-business':
+          return await this.testWhatsAppBusinessConnection(credentials);
         default:
           throw new Error(`Provedor não suportado: ${provider}`);
       }
@@ -425,16 +412,9 @@ export class WhatsAppAdminService {
 
   // Implementações específicas por provedor
   private async testTwilioConnection(credentials: any): Promise<boolean> {
-    try {
-      const client = twilio(credentials.accountSid, credentials.authToken);
-      
-      // Testa conectividade buscando informações da conta
-      const account = await client.api.accounts(credentials.accountSid).fetch();
-      return !!account.sid;
-    } catch (error) {
-      console.error('Erro ao testar conexão Twilio:', error.message);
-      return false;
-    }
+    // Twilio removido - retorna false
+    console.log('Twilio não suportado mais');
+    return false;
   }
 
   private async testMetaConnection(credentials: any): Promise<boolean> {
@@ -474,103 +454,11 @@ export class WhatsAppAdminService {
   }
 
   private async sendTwilioMessage(phoneNumber: string, credentials: any): Promise<any> {
-    try {
-      console.log('=== INÍCIO ENVIO TWILIO ===');
-      console.log('Telefone de destino:', phoneNumber);
-      console.log('Número WhatsApp configurado:', credentials.whatsappNumber);
-      console.log('Account SID:', credentials.accountSid);
-      
-      // Validações específicas para Twilio
-      if (!credentials.whatsappNumber) {
-        throw new Error('Número WhatsApp não configurado');
-      }
-
-      if (!credentials.accountSid || !credentials.authToken) {
-        throw new Error('Credenciais Twilio incompletas');
-      }
-
-      // Formatar número de telefone para Twilio
-      const formattedPhone = this.formatPhoneForTwilio(phoneNumber);
-      console.log('Telefone formatado para Twilio:', formattedPhone);
-      
-      const client = twilio(credentials.accountSid, credentials.authToken);
-      
-      // Verificar se o sandbox está ativo primeiro
-      console.log('Verificando sandbox...');
-      try {
-        const sandboxInfo = await client.messaging.v1.services('MG' + credentials.accountSid.substring(2)).fetch();
-        console.log('Sandbox encontrado:', sandboxInfo.sid);
-      } catch (sandboxError) {
-        console.log('Sandbox não encontrado, tentando envio direto...');
-      }
-      
-      console.log('Enviando mensagem...');
-      const message = await client.messages.create({
-        body: 'Teste de conectividade WhatsApp - Sistema de Indicação',
-        from: `whatsapp:${credentials.whatsappNumber}`,
-        to: `whatsapp:${formattedPhone}`
-      });
-
-      console.log('Mensagem Twilio enviada com sucesso!');
-      console.log('Message SID:', message.sid);
-      console.log('Status:', message.status);
-      console.log('=== FIM ENVIO TWILIO ===');
-      
-      return {
-        sid: message.sid,
-        status: message.status
-      };
-    } catch (error) {
-      console.error('=== ERRO TWILIO ===');
-      console.error('Código do erro:', error.code);
-      console.error('Mensagem do erro:', error.message);
-      console.error('Informações adicionais:', error.moreInfo);
-      console.error('Status HTTP:', error.status);
-      console.error('Stack trace:', error.stack);
-      console.error('=== FIM ERRO TWILIO ===');
-
-      // Tratamento específico para erro 540
-      if (error.code === 540) {
-        throw new Error(`Erro 540: Número não verificado no sandbox do WhatsApp. Para resolver:
-1. Abra o WhatsApp no seu telefone
-2. Envie a mensagem "join <palavra-chave>" para ${credentials.whatsappNumber}
-3. Aguarde a confirmação
-4. Tente novamente`);
-      }
-
-      // Outros erros comuns do Twilio
-      if (error.code === 21211) {
-        throw new Error('Número de telefone inválido. Use formato: +5511999999999');
-      }
-      if (error.code === 21214) {
-        throw new Error('Número não está no sandbox do WhatsApp. Verifique se enviou "join <palavra-chave>"');
-      }
-      if (error.code === 21215) {
-        throw new Error('Credenciais Twilio inválidas. Verifique Account SID e Auth Token');
-      }
-      if (error.code === 21608) {
-        throw new Error('Número WhatsApp não configurado corretamente');
-      }
-
-      // Erro genérico com mais detalhes
-      throw new Error(`Erro Twilio (${error.code}): ${error.message}. Verifique as credenciais e configuração do sandbox.`);
-    }
+    // Twilio removido - retorna erro
+    throw new Error('Twilio não é mais suportado. Use WhatsApp Business API.');
   }
 
-  private formatPhoneForTwilio(phone: string): string {
-    // Remove todos os caracteres não numéricos exceto +
-    let formatted = phone.replace(/[^\d+]/g, '');
-    
-    // Garante que começa com +
-    if (!formatted.startsWith('+')) {
-      formatted = '+' + formatted;
-    }
-    
-    // Remove zeros extras após o código do país
-    formatted = formatted.replace(/^\+(\d{1,3})0+/, '+$1');
-    
-    return formatted;
-  }
+  // Método formatPhoneForTwilio removido - não é mais necessário
 
   private async sendMetaMessage(phoneNumber: string, credentials: any): Promise<any> {
     const response = await axios.post(
