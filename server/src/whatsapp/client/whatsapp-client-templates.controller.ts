@@ -16,12 +16,13 @@ export class WhatsAppClientTemplatesController {
       return {
         success: true,
         message: 'Template criado com sucesso',
-        data: template,
+        data: template
       };
     } catch (error) {
       return {
         success: false,
         message: error.message || 'Erro ao criar template',
+        error: error.message
       };
     }
   }
@@ -34,34 +35,103 @@ export class WhatsAppClientTemplatesController {
       
       return {
         success: true,
-        data: templates,
+        data: templates
       };
     } catch (error) {
       return {
         success: false,
         message: error.message || 'Erro ao buscar templates',
+        error: error.message
       };
     }
   }
 
-  @Get('global')
-  async getGlobalTemplates() {
+  @Get(':id')
+  async getTemplateById(@Request() req, @Param('id') templateId: string) {
     try {
-      const templates = await this.whatsappClientTemplatesService.getGlobalTemplates();
+      const clientId = req.user.clientId;
+      const template = await this.whatsappClientTemplatesService.getTemplateById(clientId, templateId);
       
       return {
         success: true,
-        data: templates,
+        data: template
       };
     } catch (error) {
       return {
         success: false,
-        message: error.message || 'Erro ao buscar templates globais',
+        message: error.message || 'Erro ao buscar template',
+        error: error.message
       };
     }
   }
 
-  @Get('stats')
+  @Put(':id')
+  async updateTemplate(@Request() req, @Param('id') templateId: string, @Body() templateData: UpdateTemplateDto) {
+    try {
+      const clientId = req.user.clientId;
+      const template = await this.whatsappClientTemplatesService.updateTemplate(clientId, templateId, templateData);
+      
+      return {
+        success: true,
+        message: 'Template atualizado com sucesso',
+        data: template
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Erro ao atualizar template',
+        error: error.message
+      };
+    }
+  }
+
+  @Delete(':id')
+  async deleteTemplate(@Request() req, @Param('id') templateId: string) {
+    try {
+      const clientId = req.user.clientId;
+      const deleted = await this.whatsappClientTemplatesService.deleteTemplate(clientId, templateId);
+      
+      if (deleted) {
+        return {
+          success: true,
+          message: 'Template deletado com sucesso'
+        };
+      } else {
+        return {
+          success: false,
+          message: 'Template não encontrado'
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Erro ao deletar template',
+        error: error.message
+      };
+    }
+  }
+
+  @Post(':id/duplicate')
+  async duplicateTemplate(@Request() req, @Param('id') templateId: string) {
+    try {
+      const clientId = req.user.clientId;
+      const template = await this.whatsappClientTemplatesService.duplicateTemplate(clientId, templateId);
+      
+      return {
+        success: true,
+        message: 'Template duplicado com sucesso',
+        data: template
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Erro ao duplicar template',
+        error: error.message
+      };
+    }
+  }
+
+  @Get('stats/overview')
   async getTemplateStats(@Request() req) {
     try {
       const clientId = req.user.clientId;
@@ -69,112 +139,13 @@ export class WhatsAppClientTemplatesController {
       
       return {
         success: true,
-        data: stats,
+        data: stats
       };
     } catch (error) {
       return {
         success: false,
         message: error.message || 'Erro ao buscar estatísticas',
-      };
-    }
-  }
-
-  @Get(':id')
-  async getTemplateById(@Request() req, @Param('id') id: string) {
-    try {
-      const clientId = req.user.clientId;
-      const template = await this.whatsappClientTemplatesService.getTemplateById(clientId, id);
-      
-      return {
-        success: true,
-        data: template,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || 'Erro ao buscar template',
-      };
-    }
-  }
-
-  @Put(':id')
-  async updateTemplate(@Request() req, @Param('id') id: string, @Body() templateData: UpdateTemplateDto) {
-    try {
-      const clientId = req.user.clientId;
-      const template = await this.whatsappClientTemplatesService.updateTemplate(clientId, id, templateData);
-      
-      return {
-        success: true,
-        message: 'Template atualizado com sucesso',
-        data: template,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || 'Erro ao atualizar template',
-      };
-    }
-  }
-
-  @Delete(':id')
-  async deleteTemplate(@Request() req, @Param('id') id: string) {
-    try {
-      const clientId = req.user.clientId;
-      const result = await this.whatsappClientTemplatesService.deleteTemplate(clientId, id);
-      
-      if (result) {
-        return {
-          success: true,
-          message: 'Template deletado com sucesso',
-        };
-      } else {
-        return {
-          success: false,
-          message: 'Template não encontrado',
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || 'Erro ao deletar template',
-      };
-    }
-  }
-
-  @Post(':id/duplicate')
-  async duplicateTemplate(@Request() req, @Param('id') id: string) {
-    try {
-      const clientId = req.user.clientId;
-      const template = await this.whatsappClientTemplatesService.duplicateTemplate(clientId, id);
-      
-      return {
-        success: true,
-        message: 'Template duplicado com sucesso',
-        data: template,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || 'Erro ao duplicar template',
-      };
-    }
-  }
-
-  @Post('global/:id/create')
-  async createFromGlobalTemplate(@Request() req, @Param('id') globalTemplateId: string) {
-    try {
-      const clientId = req.user.clientId;
-      const template = await this.whatsappClientTemplatesService.createFromGlobalTemplate(clientId, globalTemplateId);
-      
-      return {
-        success: true,
-        message: 'Template criado a partir do template global com sucesso',
-        data: template,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || 'Erro ao criar template a partir do global',
+        error: error.message
       };
     }
   }

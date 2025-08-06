@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { WhatsAppTemplate, WhatsAppTemplateDocument } from '../entities/whatsapp-template.schema';
-import { WhatsAppGlobalTemplate, WhatsAppGlobalTemplateDocument } from '../entities/whatsapp-global-template.schema';
 
 export interface CreateTemplateDto {
   name: string;
@@ -40,8 +39,6 @@ export class WhatsAppClientTemplatesService {
   constructor(
     @InjectModel(WhatsAppTemplate.name)
     private whatsappTemplateModel: Model<WhatsAppTemplateDocument>,
-    @InjectModel(WhatsAppGlobalTemplate.name)
-    private whatsappGlobalTemplateModel: Model<WhatsAppGlobalTemplateDocument>,
   ) {}
 
   async createTemplate(clientId: string, templateData: CreateTemplateDto): Promise<WhatsAppTemplate> {
@@ -171,47 +168,6 @@ export class WhatsAppClientTemplatesService {
     } catch (error) {
       console.error('Erro ao duplicar template:', error);
       throw new Error('Erro ao duplicar template');
-    }
-  }
-
-  async getGlobalTemplates(): Promise<WhatsAppGlobalTemplate[]> {
-    try {
-      return await this.whatsappGlobalTemplateModel
-        .find({ status: 'active', isGlobal: true })
-        .sort({ createdAt: -1 })
-        .exec();
-    } catch (error) {
-      console.error('Erro ao buscar templates globais:', error);
-      throw new Error('Erro ao buscar templates globais');
-    }
-  }
-
-  async createFromGlobalTemplate(clientId: string, globalTemplateId: string): Promise<WhatsAppTemplate> {
-    try {
-      const globalTemplate = await this.whatsappGlobalTemplateModel
-        .findById(globalTemplateId)
-        .exec();
-
-      if (!globalTemplate) {
-        throw new Error('Template global não encontrado');
-      }
-
-      const templateData = {
-        clientId: new Types.ObjectId(clientId),
-        name: globalTemplate.name,
-        category: globalTemplate.category,
-        language: globalTemplate.language,
-        content: globalTemplate.content,
-        variables: globalTemplate.variables,
-        status: 'draft',
-        isGlobal: false,
-      };
-
-      const template = new this.whatsappTemplateModel(templateData);
-      return await template.save();
-    } catch (error) {
-      console.error('Erro ao criar template a partir do global:', error);
-      throw new Error('Erro ao criar template a partir do global');
     }
   }
 
