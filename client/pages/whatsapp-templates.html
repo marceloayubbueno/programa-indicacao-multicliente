@@ -255,67 +255,11 @@
     </div>
 
     <!-- Scripts -->
+    <script src="../js/config.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/whatsapp/template-blocks.js"></script>
     <script src="../js/whatsapp/templates.js"></script>
     <script>
-        // Script para expandir/colapsar o menu Financeiro
-        function toggleFinanceMenu() {
-            const menu = document.getElementById('financeMenu');
-            const arrow = document.getElementById('financeArrow');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                arrow.style.transform = 'rotate(90deg)';
-            } else {
-                menu.classList.add('hidden');
-                arrow.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        // Script para expandir/colapsar o menu de Engajamento Email
-        function toggleEngagementEmailMenu() {
-            const menu = document.getElementById('engagementEmailMenu');
-            const arrow = document.getElementById('engagementEmailArrow');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                arrow.style.transform = 'rotate(90deg)';
-            } else {
-                menu.classList.add('hidden');
-                arrow.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        // Script para expandir/colapsar o menu WhatsApp
-        function toggleWhatsAppMenu() {
-            const menu = document.getElementById('whatsappMenu');
-            const arrow = document.getElementById('whatsappArrow');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                arrow.style.transform = 'rotate(90deg)';
-            } else {
-                menu.classList.add('hidden');
-                arrow.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        // Script para expandir/colapsar o menu Configurações
-        function toggleSettingsMenu() {
-            const menu = document.getElementById('settingsMenu');
-            const arrow = document.getElementById('settingsArrow');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                arrow.style.transform = 'rotate(90deg)';
-            } else {
-                menu.classList.add('hidden');
-                arrow.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('clientToken');
-            window.location.href = 'login.html';
-        }
-
         // Inicializar blocos pré-definidos na sidebar
         document.addEventListener('DOMContentLoaded', function() {
             // Renderizar blocos pré-definidos na sidebar

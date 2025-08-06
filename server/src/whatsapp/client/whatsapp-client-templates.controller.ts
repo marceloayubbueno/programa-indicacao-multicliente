@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { WhatsAppClientTemplatesService, CreateTemplateDto, UpdateTemplateDto, TemplateFilters } from './whatsapp-client-templates.service';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtClientAuthGuard } from '../../auth/guards/jwt-client-auth.guard';
 
 @Controller('client/whatsapp/templates')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtClientAuthGuard)
 export class WhatsAppClientTemplatesController {
   constructor(private readonly whatsappClientTemplatesService: WhatsAppClientTemplatesService) {}
 

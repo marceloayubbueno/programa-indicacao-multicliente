@@ -3,3 +3,88 @@
 [33m69733bb[m fix: adjust template focus to program registration - Update 'Conversão Pro' template to focus on program registration - Change CTAs from 'Começar Agora' to 'Cadastrar-se no Programa' - Emphasize multi-niche compatibility - Update hero titles and subtitles for registration focus
 [33ma77bfe4[m feat: add first template 'Conversão Pro' for hybrid approach - Add complete LP template for direct sales - Include hero, benefits, how-it-works, and CTA sections - Add editable traits for colors and text - Maintain all existing individual blocks - Zero impact on existing functionality
 [33m38b4c9c[m feat: remove fixed background colors and add editable traits for custom blocks - Remove hardcoded background colors from all custom blocks - Add color picker traits for background customization - Add text traits for title and subtitle editing - Add comprehensive traits for company contact block - Implement listeners to apply traits dynamically - Maintain premium design while allowing full customization
+[1mdiff --git a/client/js/whatsapp/templates.js b/client/js/whatsapp/templates.js[m
+[1mindex cb60c0c..ba2bf5a 100644[m
+[1m--- a/client/js/whatsapp/templates.js[m
+[1m+++ b/client/js/whatsapp/templates.js[m
+[36m@@ -15,7 +15,7 @@[m [mdocument.addEventListener('DOMContentLoaded', function() {[m
+ [m
+ async function initTemplates() {[m
+     try {[m
+[31m-        // Verificar autenticação[m
+[32m+[m[32m        // Verificar autenticação simples[m
+         if (!checkAuth()) {[m
+             return;[m
+         }[m
+[36m@@ -35,27 +35,9 @@[m [masync function initTemplates() {[m
+ function checkAuth() {[m
+     const token = getToken();[m
+     if (!token) {[m
+[31m-        console.log('Token não encontrado, redirecionando para login');[m
+         window.location.href = 'login.html';[m
+         return false;[m
+     }[m
+[31m-    [m
+[31m-    // Verificar se o token é válido (estrutura básica)[m
+[31m-    try {[m
+[31m-        const tokenParts = token.split('.');[m
+[31m-        if (tokenParts.length !== 3) {[m
+[31m-            console.log('Token malformado, redirecionando para login');[m
+[31m-            localStorage.removeItem('clientToken');[m
+[31m-            window.location.href = 'login.html';[m
+[31m-            return false;[m
+[31m-        }[m
+[31m-    } catch (error) {[m
+[31m-        console.log('Erro ao verificar token, redirecionando para login');[m
+[31m-        localStorage.removeItem('clientToken');[m
+[31m-        window.location.href = 'login.html';[m
+[31m-        return false;[m
+[31m-    }[m
+[31m-    [m
+     return true;[m
+ }[m
+ [m
+[36m@@ -71,7 +53,6 @@[m [masync function loadTemplates() {[m
+             return;[m
+         }[m
+ [m
+[31m-        console.log('Carregando templates...');[m
+         const response = await fetch(`${API_BASE_URL}/client/whatsapp/templates`, {[m
+             method: 'GET',[m
+             headers: {[m
+[36m@@ -80,21 +61,13 @@[m [masync function loadTemplates() {[m
+             }[m
+         });[m
+ [m
+[31m-        console.log('Response status:', response.status);[m
+[31m-        [m
+         if (response.status === 401) {[m
+[31m-            console.log('Token inválido ou expirado');[m
+             localStorage.removeItem('clientToken');[m
+             window.location.href = 'login.html';[m
+             return;[m
+         }[m
+ [m
+[31m-        if (!response.ok) {[m
+[31m-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);[m
+[31m-        }[m
+[31m-[m
+         const result = await response.json();[m
+[31m-        console.log('Templates carregados:', result);[m
+         [m
+         if (result.success) {[m
+             templates = result.data || [];[m
+[36m@@ -104,12 +77,7 @@[m [masync function loadTemplates() {[m
+         }[m
+     } catch (error) {[m
+         console.error('Erro ao carregar templates:', error);[m
+[31m-        if (error.message.includes('401')) {[m
+[31m-            localStorage.removeItem('clientToken');[m
+[31m-            window.location.href = 'login.html';[m
+[31m-        } else {[m
+[31m-            showError('Erro ao carregar templates: ' + error.message);[m
+[31m-        }[m
+[32m+[m[32m        showError('Erro ao carregar templates');[m
+     }[m
+ }[m
+ [m

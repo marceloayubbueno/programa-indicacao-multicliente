@@ -15,14 +15,14 @@ async function initWhatsAppConfig() {
     try {
         console.log('Iniciando WhatsApp Config...');
         
-        // Verificar se API_BASE_URL está definido
-        if (!window.API_BASE_URL) {
-            console.error('API_BASE_URL não está definido!');
-            showError('Erro de configuração: API_BASE_URL não encontrado');
+        // Verificar se APP_CONFIG está definido
+        if (!window.APP_CONFIG || !window.APP_CONFIG.API_URL) {
+            console.error('APP_CONFIG não está definido!');
+            showError('Erro de configuração: APP_CONFIG não encontrado');
             return;
         }
         
-        console.log('API_BASE_URL:', window.API_BASE_URL);
+        console.log('API_URL:', window.APP_CONFIG.API_URL);
 
         // Verificar autenticação
         if (!checkAuth()) {
@@ -89,7 +89,7 @@ async function loadConfig() {
     try {
         console.log('Carregando configuração para clientId:', clientId);
         const token = getToken();
-        const url = `${window.API_BASE_URL}/whatsapp/client/config`;
+        const url = `${window.APP_CONFIG.API_URL}/whatsapp/client/config`;
         console.log('URL da requisição:', url);
         
         const response = await fetch(url, {
@@ -360,7 +360,7 @@ async function saveWhatsAppConfig() {
         
         if (whatsappConfig && whatsappConfig._id) {
             // Atualizar configuração existente
-            const url = `${window.API_BASE_URL}/whatsapp/client/config`;
+            const url = `${window.APP_CONFIG.API_URL}/whatsapp/client/config`;
             console.log('Atualizando configuração:', url);
             response = await fetch(url, {
                 method: 'PUT',
@@ -372,7 +372,7 @@ async function saveWhatsAppConfig() {
             });
         } else {
             // Criar nova configuração
-            const url = `${window.API_BASE_URL}/whatsapp/client/config`;
+            const url = `${window.APP_CONFIG.API_URL}/whatsapp/client/config`;
             console.log('Criando nova configuração:', url);
             response = await fetch(url, {
                 method: 'POST',
@@ -433,7 +433,7 @@ async function toggleActive() {
         }
         
         const token = getToken();
-        const url = `${window.API_BASE_URL}/whatsapp/client/config/toggle-active`;
+        const url = `${window.APP_CONFIG.API_URL}/whatsapp/client/config/toggle-active`;
         console.log(`${action.charAt(0).toUpperCase() + action.slice(1)} configuração:`, url);
         
         const response = await fetch(url, {
@@ -501,7 +501,7 @@ async function testConnection() {
         document.getElementById('testConnectionModal').classList.remove('hidden');
         
         const token = getToken();
-        const url = `${window.API_BASE_URL}/whatsapp/client/config/verify`;
+        const url = `${window.APP_CONFIG.API_URL}/whatsapp/client/config/verify`;
         console.log('URL do teste:', url);
         
         // Testar conexão via API
@@ -606,7 +606,7 @@ async function sendTestMessage() {
         console.log('Enviando mensagem de teste:', { testNumber, testMessage });
         
         const token = getToken();
-        const url = `${window.API_BASE_URL}/whatsapp/client/test-message`; // Corrigido para usar endpoint de cliente
+        const url = `${window.APP_CONFIG.API_URL}/whatsapp/client/test-message`; // Corrigido para usar endpoint de cliente
         console.log('URL do teste de envio:', url);
         
         const response = await fetch(url, {
@@ -724,7 +724,7 @@ async function testWhatsAppCredentials() {
         
         console.log('Testando credenciais...');
         
-        const response = await fetch(`${window.API_BASE_URL}/whatsapp/client/test-credentials`, {
+        const response = await fetch(`${window.APP_CONFIG.API_URL}/whatsapp/client/test-credentials`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

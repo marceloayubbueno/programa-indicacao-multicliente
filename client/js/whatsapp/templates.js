@@ -2,7 +2,7 @@
 // Sistema multicliente - JWT Authentication
 
 // Configuração da API
-const API_BASE_URL = window.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+const API_BASE_URL = window.APP_CONFIG?.API_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api';
 
 // Estado global
 let templates = [];
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function initTemplates() {
     try {
-        // Verificar autenticação
+        // Verificar autenticação simples
         if (!checkAuth()) {
             return;
         }
@@ -35,27 +35,9 @@ async function initTemplates() {
 function checkAuth() {
     const token = getToken();
     if (!token) {
-        console.log('Token não encontrado, redirecionando para login');
         window.location.href = 'login.html';
         return false;
     }
-    
-    // Verificar se o token é válido (estrutura básica)
-    try {
-        const tokenParts = token.split('.');
-        if (tokenParts.length !== 3) {
-            console.log('Token malformado, redirecionando para login');
-            localStorage.removeItem('clientToken');
-            window.location.href = 'login.html';
-            return false;
-        }
-    } catch (error) {
-        console.log('Erro ao verificar token, redirecionando para login');
-        localStorage.removeItem('clientToken');
-        window.location.href = 'login.html';
-        return false;
-    }
-    
     return true;
 }
 
@@ -71,7 +53,6 @@ async function loadTemplates() {
             return;
         }
 
-        console.log('Carregando templates...');
         const response = await fetch(`${API_BASE_URL}/client/whatsapp/templates`, {
             method: 'GET',
             headers: {
@@ -80,21 +61,13 @@ async function loadTemplates() {
             }
         });
 
-        console.log('Response status:', response.status);
-        
         if (response.status === 401) {
-            console.log('Token inválido ou expirado');
             localStorage.removeItem('clientToken');
             window.location.href = 'login.html';
             return;
         }
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
         const result = await response.json();
-        console.log('Templates carregados:', result);
         
         if (result.success) {
             templates = result.data || [];
@@ -104,12 +77,7 @@ async function loadTemplates() {
         }
     } catch (error) {
         console.error('Erro ao carregar templates:', error);
-        if (error.message.includes('401')) {
-            localStorage.removeItem('clientToken');
-            window.location.href = 'login.html';
-        } else {
-            showError('Erro ao carregar templates: ' + error.message);
-        }
+        showError('Erro ao carregar templates');
     }
 }
 
