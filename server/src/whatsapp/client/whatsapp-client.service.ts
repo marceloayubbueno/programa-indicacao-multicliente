@@ -6,7 +6,6 @@ import { WhatsAppMessage, WhatsAppMessageDocument } from '../entities/whatsapp-m
 import { InjectModel as InjectAdminModel } from '@nestjs/mongoose';
 import { Model as AdminModel } from 'mongoose';
 import { WhatsAppConfig, WhatsAppConfigDocument } from '../entities/whatsapp-config.schema';
-import * as twilio from 'twilio';
 import axios from 'axios';
 
 export interface CreateWhatsAppClientConfigDto {
@@ -14,6 +13,12 @@ export interface CreateWhatsAppClientConfigDto {
   whatsappNumber: string;
   displayName: string;
   businessDescription?: string;
+  whatsappCredentials?: {
+    accessToken: string;
+    phoneNumberId: string;
+    businessAccountId: string;
+    webhookUrl?: string;
+  };
   settings?: {
     enableNotifications?: boolean;
     defaultLanguage?: string;
@@ -34,6 +39,12 @@ export interface UpdateWhatsAppClientConfigDto {
   displayName?: string;
   businessDescription?: string;
   isActive?: boolean;
+  whatsappCredentials?: {
+    accessToken?: string;
+    phoneNumberId?: string;
+    businessAccountId?: string;
+    webhookUrl?: string;
+  };
   settings?: {
     enableNotifications?: boolean;
     defaultLanguage?: string;
@@ -105,45 +116,49 @@ export class WhatsAppClientService {
 
       return await config.save();
     } catch (error) {
-      if (error instanceof ConflictException || error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new BadRequestException('Erro ao criar configuração de WhatsApp');
+      console.error('Erro ao criar configuração:', error);
+      throw error;
     }
   }
 
   /**
-   * Buscar configuração de WhatsApp por cliente
+   * Buscar configuração de WhatsApp por clientId
    */
-  async getConfigByClientId(clientId: string): Promise<WhatsAppClientConfig> {
+  async getConfigByClientId(clientId: string): Promise<WhatsAppClientConfigDocument> {
     try {
       const config = await this.whatsAppClientConfigModel.findOne({
         clientId: new Types.ObjectId(clientId)
       }).exec();
 
       if (!config) {
-        throw new NotFoundException('Configuração de WhatsApp não encontrada para este cliente');
+        throw new NotFoundException('Configuração de WhatsApp não encontrada');
       }
 
       return config;
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new BadRequestException('Erro ao buscar configuração de WhatsApp');
+      console.error('Erro ao buscar configuração:', error);
+      throw error;
     }
   }
 
   /**
    * Atualizar configuração de WhatsApp
    */
-  async updateConfig(clientId: string, updateDto: UpdateWhatsAppClientConfigDto): Promise<WhatsAppClientConfig> {
+  async updateConfig(clientId: string, updateDto: UpdateWhatsAppClientConfigDto): Promise<WhatsAppClientConfigDocument> {
     try {
-      // Validar se a configuração existe
-      const existingConfig = await this.getConfigByClientId(clientId);
+      const config = await this.whatsAppClientConfigModel.findOne({
+        clientId: new Types.ObjectId(clientId)
+      }).exec();
 
-      // Se estiver atualizando o número, validar se não está sendo usado por outro cliente
-      if (updateDto.whatsappNumber && updateDto.whatsappNumber !== existingConfig.whatsappNumber) {
+      if (!config) {
+        throw new NotFoundException('Configuração de WhatsApp não encontrada');
+      }
+
+      // Validar número se foi alterado
+      if (updateDto.whatsappNumber && updateDto.whatsappNumber !== config.whatsappNumber) {
+        this.validatePhoneNumber(updateDto.whatsappNumber);
+        
+        // Verificar se o novo número já está sendo usado
         const existingNumber = await this.whatsAppClientConfigModel.findOne({
           whatsappNumber: updateDto.whatsappNumber,
           clientId: { $ne: new Types.ObjectId(clientId) }
@@ -152,119 +167,106 @@ export class WhatsAppClientService {
         if (existingNumber) {
           throw new ConflictException('Número de WhatsApp já está sendo usado por outro cliente');
         }
-
-        // Validar formato do novo número
-        this.validatePhoneNumber(updateDto.whatsappNumber);
       }
 
-      const updatedConfig = await this.whatsAppClientConfigModel.findOneAndUpdate(
-        { clientId: new Types.ObjectId(clientId) },
-        { $set: updateDto },
-        { new: true, runValidators: true }
-      ).exec();
-
-      if (!updatedConfig) {
-        throw new NotFoundException('Configuração de WhatsApp não encontrada');
+      // Atualizar configuração
+      Object.assign(config, updateDto);
+      
+      // Se credenciais foram atualizadas, marcar como não verificado
+      if (updateDto.whatsappCredentials) {
+        config.isVerified = false;
+        config.verifiedAt = undefined; // Usar undefined em vez de null
       }
 
-      return updatedConfig;
+      return await config.save();
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ConflictException || error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new BadRequestException('Erro ao atualizar configuração de WhatsApp');
+      console.error('Erro ao atualizar configuração:', error);
+      throw error;
     }
   }
 
   /**
    * Ativar/Desativar configuração de WhatsApp
    */
-  async toggleActive(clientId: string, isActive: boolean): Promise<WhatsAppClientConfig> {
+  async toggleActive(clientId: string, isActive: boolean): Promise<WhatsAppClientConfigDocument> {
     try {
-      const config = await this.getConfigByClientId(clientId);
+      const config = await this.whatsAppClientConfigModel.findOne({
+        clientId: new Types.ObjectId(clientId)
+      }).exec();
 
-      // Só pode ativar se estiver verificado
-      if (isActive && !config.isVerified) {
-        throw new BadRequestException('Não é possível ativar configuração não verificada');
-      }
-
-      const updatedConfig = await this.whatsAppClientConfigModel.findOneAndUpdate(
-        { clientId: new Types.ObjectId(clientId) },
-        { $set: { isActive } },
-        { new: true }
-      ).exec();
-
-      if (!updatedConfig) {
+      if (!config) {
         throw new NotFoundException('Configuração de WhatsApp não encontrada');
       }
 
-      return updatedConfig;
-    } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
-        throw error;
+      // Verificar se está verificado antes de ativar
+      if (isActive && !config.isVerified) {
+        throw new BadRequestException('Configuração deve ser verificada antes de ser ativada');
       }
-      throw new BadRequestException('Erro ao alterar status da configuração');
+
+      config.isActive = isActive;
+      return await config.save();
+    } catch (error) {
+      console.error('Erro ao alterar status da configuração:', error);
+      throw error;
     }
   }
 
   /**
-   * Verificar número de WhatsApp
+   * Verificar número de WhatsApp (método legado - manter para compatibilidade)
    */
   async verifyNumber(clientId: string): Promise<{ success: boolean; message: string }> {
     try {
       const config = await this.getConfigByClientId(clientId);
+      
+      if (!config.whatsappNumber) {
+        return { success: false, message: 'Número de WhatsApp não configurado' };
+      }
 
-      // Aqui seria feita a verificação real com a API do WhatsApp
-      // Por enquanto, simulamos uma verificação bem-sucedida
-      const isVerified = await this.performWhatsAppVerification(config.whatsappNumber);
-
-      if (isVerified) {
-        await this.whatsAppClientConfigModel.findOneAndUpdate(
-          { clientId: new Types.ObjectId(clientId) },
-          { 
-            $set: { 
-              isVerified: true,
-              verifiedAt: new Date(),
-              'verification.status': 'approved',
-              'verification.approvedAt': new Date()
-            }
-          }
-        ).exec();
-
-        return {
-          success: true,
-          message: 'Número de WhatsApp verificado com sucesso'
-        };
+      // Verificação básica de formato
+      const isValid = this.validatePhoneNumber(config.whatsappNumber);
+      
+      if (isValid) {
+        config.isVerified = true;
+        config.verifiedAt = new Date();
+        await config.save();
+        
+        return { success: true, message: 'Número de WhatsApp verificado com sucesso' };
       } else {
-        await this.whatsAppClientConfigModel.findOneAndUpdate(
-          { clientId: new Types.ObjectId(clientId) },
-          { 
-            $set: { 
-              'verification.status': 'rejected',
-              'verification.rejectedAt': new Date(),
-              'verification.rejectionReason': 'Falha na verificação do número'
-            }
-          }
-        ).exec();
-
-        return {
-          success: false,
-          message: 'Falha na verificação do número de WhatsApp'
-        };
+        return { success: false, message: 'Formato de número inválido' };
       }
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new BadRequestException('Erro ao verificar número de WhatsApp');
+      console.error('Erro ao verificar número:', error);
+      return { success: false, message: 'Erro ao verificar número' };
     }
   }
 
   /**
-   * Verificar configuração de WhatsApp (alias para verifyNumber)
+   * Verificar configuração de WhatsApp (usar credenciais do WhatsApp Business API)
    */
   async verifyConfig(clientId: string): Promise<{ success: boolean; message: string }> {
-    return this.verifyNumber(clientId);
+    try {
+      const config = await this.getConfigByClientId(clientId);
+      
+      if (!config.whatsappCredentials) {
+        return { success: false, message: 'Credenciais do WhatsApp Business API não configuradas' };
+      }
+
+      // Testar credenciais do WhatsApp Business API
+      const testResult = await this.testWhatsAppBusinessAPI(config.whatsappCredentials);
+      
+      if (testResult.success) {
+        config.isVerified = true;
+        config.verifiedAt = new Date();
+        await config.save();
+        
+        return { success: true, message: 'Configuração verificada com sucesso' };
+      } else {
+        return { success: false, message: testResult.message };
+      }
+    } catch (error) {
+      console.error('Erro ao verificar configuração:', error);
+      return { success: false, message: 'Erro ao verificar configuração' };
+    }
   }
 
   /**
@@ -275,47 +277,59 @@ export class WhatsAppClientService {
       const config = await this.getConfigByClientId(clientId);
       
       return {
-        clientId: config.clientId,
-        whatsappNumber: config.whatsappNumber,
+        totalMessagesSent: config.statistics?.totalMessagesSent || 0,
+        totalMessagesDelivered: config.statistics?.totalMessagesDelivered || 0,
+        totalMessagesFailed: config.statistics?.totalMessagesFailed || 0,
+        monthlyUsage: config.statistics?.monthlyUsage || { current: 0, limit: 1000 },
         isActive: config.isActive,
         isVerified: config.isVerified,
-        statistics: config.statistics,
-        monthlyUsage: config.statistics?.monthlyUsage,
-        lastMessageSentAt: config.statistics?.lastMessageSentAt
+        verifiedAt: config.verifiedAt
       };
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new BadRequestException('Erro ao buscar estatísticas');
+      console.error('Erro ao buscar estatísticas:', error);
+      throw error;
     }
   }
 
   /**
-   * Atualizar estatísticas de mensagem
+   * Atualizar estatísticas de mensagens
    */
   async updateMessageStatistics(clientId: string, messageStatus: 'sent' | 'delivered' | 'failed'): Promise<void> {
     try {
-      const updateData: any = {
-        [`statistics.totalMessages${messageStatus.charAt(0).toUpperCase() + messageStatus.slice(1)}`]: 1,
-        'statistics.lastMessageSentAt': new Date()
-      };
-
-      if (messageStatus === 'sent') {
-        updateData['statistics.monthlyUsage.current'] = 1;
+      const config = await this.getConfigByClientId(clientId);
+      
+      // Atualizar estatísticas gerais
+      if (!config.statistics) {
+        config.statistics = {
+          totalMessagesSent: 0,
+          totalMessagesDelivered: 0,
+          totalMessagesFailed: 0,
+          monthlyUsage: { current: 0, limit: 1000 }
+        };
       }
 
-      await this.whatsAppClientConfigModel.findOneAndUpdate(
-        { clientId: new Types.ObjectId(clientId) },
-        { $inc: updateData }
-      ).exec();
+      if (messageStatus === 'sent') {
+        config.statistics.totalMessagesSent++;
+        config.statistics.monthlyUsage.current++;
+      } else if (messageStatus === 'delivered') {
+        config.statistics.totalMessagesDelivered++;
+      } else if (messageStatus === 'failed') {
+        config.statistics.totalMessagesFailed++;
+      }
+
+      // Atualizar lastMessageSentAt
+      if (messageStatus === 'sent') {
+        config.statistics.lastMessageSentAt = new Date();
+      }
+
+      await config.save();
     } catch (error) {
-      console.error('Erro ao atualizar estatísticas de mensagem:', error);
+      console.error('Erro ao atualizar estatísticas:', error);
     }
   }
 
   /**
-   * Listar todas as configurações (para admin)
+   * Buscar todas as configurações (para admin)
    */
   async getAllConfigs(filters?: {
     isActive?: boolean;
@@ -336,16 +350,14 @@ export class WhatsAppClientService {
       if (filters?.search) {
         query.$or = [
           { whatsappNumber: { $regex: filters.search, $options: 'i' } },
-          { displayName: { $regex: filters.search, $options: 'i' } },
-          { businessDescription: { $regex: filters.search, $options: 'i' } }
+          { displayName: { $regex: filters.search, $options: 'i' } }
         ];
       }
 
-      return await this.whatsAppClientConfigModel.find(query)
-        .sort({ createdAt: -1 })
-        .exec();
+      return await this.whatsAppClientConfigModel.find(query).exec();
     } catch (error) {
-      throw new BadRequestException('Erro ao buscar configurações');
+      console.error('Erro ao buscar configurações:', error);
+      throw error;
     }
   }
 
@@ -362,35 +374,18 @@ export class WhatsAppClientService {
         throw new NotFoundException('Configuração de WhatsApp não encontrada');
       }
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new BadRequestException('Erro ao deletar configuração');
+      console.error('Erro ao deletar configuração:', error);
+      throw error;
     }
   }
 
   /**
-   * Validar formato do número de telefone
+   * Validar formato de número de telefone
    */
-  private validatePhoneNumber(phoneNumber: string): void {
+  private validatePhoneNumber(phoneNumber: string): boolean {
+    // Validação básica de formato internacional
     const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-      throw new BadRequestException('Número de WhatsApp deve estar no formato internacional (+5511999999999)');
-    }
-  }
-
-  /**
-   * Simular verificação com API do WhatsApp
-   */
-  private async performWhatsAppVerification(phoneNumber: string): Promise<boolean> {
-    // Aqui seria feita a verificação real com a API do WhatsApp
-    // Por enquanto, simulamos uma verificação bem-sucedida
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Simula 90% de sucesso na verificação
-        resolve(Math.random() > 0.1);
-      }, 2000);
-    });
+    return phoneRegex.test(phoneNumber);
   }
 
   /**
@@ -398,110 +393,87 @@ export class WhatsAppClientService {
    */
   async testCredentials(clientId: string, credentials: any) {
     try {
-      console.log('=== CLIENT SERVICE: TESTE DE CREDENCIAIS ===');
+      console.log('=== INÍCIO TESTE DE CREDENCIAIS ===');
       console.log('ClientId:', clientId);
       console.log('Credenciais:', JSON.stringify(credentials, null, 2));
 
       // Validar credenciais obrigatórias
       if (!credentials.accessToken || !credentials.phoneNumberId || !credentials.businessAccountId) {
-        throw new BadRequestException('Credenciais incompletas. Necessário: accessToken, phoneNumberId, businessAccountId');
+        throw new Error('Credenciais incompletas. Necessário: accessToken, phoneNumberId, businessAccountId');
       }
 
       // Testar conexão com WhatsApp Business API
       const testResult = await this.testWhatsAppBusinessAPI(credentials);
-
-      console.log('=== CLIENT SERVICE: CREDENCIAIS TESTADAS COM SUCESSO ===');
+      
+      console.log('=== FIM TESTE DE CREDENCIAIS ===');
       console.log('Resultado:', testResult);
-
-      return {
-        success: true,
-        message: 'Credenciais válidas',
-        data: testResult
-      };
+      
+      return testResult;
     } catch (error) {
-      console.error('=== CLIENT SERVICE: ERRO NO TESTE DE CREDENCIAIS ===');
+      console.error('=== ERRO NO TESTE DE CREDENCIAIS ===');
       console.error('Erro:', error);
       throw error;
     }
   }
 
+  /**
+   * Enviar mensagem de teste
+   */
   async sendTestMessage(clientId: string, messageData: any) {
     try {
-      console.log('=== CLIENT SERVICE: ENVIO DE MENSAGEM DE TESTE ===');
+      console.log('=== INÍCIO ENVIO MENSAGEM DE TESTE ===');
       console.log('ClientId:', clientId);
       console.log('Dados da mensagem:', JSON.stringify(messageData, null, 2));
-      
-      const { to, message } = messageData;
-      
-      // Validar dados
+
+      const { to, message, from } = messageData;
+
+      // Validar dados da mensagem
       if (!to || !message) {
-        throw new Error('Número de destino e mensagem são obrigatórios');
+        throw new Error('Dados da mensagem incompletos. Necessário: to, message');
       }
-      
+
       // Validar formato do número
-      const phoneRegex = /^\+[1-9]\d{1,14}$/;
-      if (!phoneRegex.test(to)) {
-        throw new Error('Formato de telefone inválido');
+      if (!this.validatePhoneNumber(to)) {
+        throw new Error('Formato de número inválido');
       }
-      
-      console.log('=== BUSCANDO CONFIGURAÇÃO DO CLIENTE ===');
+
       // Buscar configuração do cliente
-      const clientConfig = await this.whatsAppClientConfigModel.findOne({ 
-        clientId: new Types.ObjectId(clientId) 
-      }).exec();
+      const clientConfig = await this.getConfigByClientId(clientId);
       
-      console.log('Configuração encontrada:', clientConfig ? 'SIM' : 'NÃO');
-      
-      if (!clientConfig) {
-        throw new Error('Configuração de WhatsApp não encontrada');
-      }
-      
-      console.log('Configuração ativa:', clientConfig.isActive);
-      console.log('Credenciais configuradas:', !!clientConfig.whatsappCredentials);
-      
-      // Verificar se o cliente tem credenciais configuradas
       if (!clientConfig.whatsappCredentials) {
-        throw new Error('Credenciais WhatsApp não configuradas para este cliente');
+        throw new Error('Credenciais do WhatsApp Business API não configuradas');
       }
-      
-      console.log('Credenciais do cliente encontradas:', {
-        accessToken: clientConfig.whatsappCredentials.accessToken ? '***' : 'NÃO FORNECIDO',
-        phoneNumberId: clientConfig.whatsappCredentials.phoneNumberId,
-        businessAccountId: clientConfig.whatsappCredentials.businessAccountId
-      });
-      
-      // Enviar mensagem usando o provedor configurado
-      console.log('=== INICIANDO ENVIO DA MENSAGEM ===');
+
+      if (!clientConfig.isVerified) {
+        throw new Error('Configuração não verificada. Teste as credenciais primeiro.');
+      }
+
+      // Enviar mensagem usando WhatsApp Business API
       const result = await this.sendMessage({
-        to: to.trim().replace(/\s+/g, ''),
-        message: message,
-        from: clientConfig.whatsappNumber,
-        clientId: clientId
+        to,
+        message,
+        from: from || clientConfig.whatsappNumber,
+        clientId
       });
-      
-      console.log('=== CLIENT SERVICE: MENSAGEM ENVIADA COM SUCESSO ===');
+
+      console.log('=== FIM ENVIO MENSAGEM DE TESTE ===');
       console.log('Resultado:', result);
-      
+
       return {
         success: true,
         message: 'Mensagem de teste enviada com sucesso',
-        data: {
-          messageId: result.messageId || 'unknown',
-          to: to,
-          status: result.status || 'sent',
-          timestamp: new Date().toISOString()
-        }
+        data: result
       };
-      
     } catch (error) {
-      console.error('=== CLIENT SERVICE: ERRO NO ENVIO ===');
-      console.error('Erro completo:', error);
-      console.error('Stack trace:', error.stack);
-      console.error('Mensagem:', error.message);
+      console.error('=== ERRO NO ENVIO DE MENSAGEM DE TESTE ===');
+      console.error('Erro:', error);
       throw error;
     }
   }
 
+  /**
+   * Enviar mensagem (método interno)
+   */
   private async sendMessage(messageData: any) {
     const { to, message, from, clientId } = messageData;
     
@@ -518,7 +490,7 @@ export class WhatsAppClientService {
         throw new Error('Credenciais WhatsApp não configuradas para este cliente');
       }
 
-            // Enviar mensagem usando WhatsApp Business API (modelo HubSpot)
+      // Enviar mensagem usando WhatsApp Business API (modelo HubSpot)
       const whatsappResult = await this.sendWhatsAppBusinessMessage(to, clientConfig.whatsappCredentials, message);
       messageId = whatsappResult.id;
       status = whatsappResult.status;
@@ -543,6 +515,9 @@ export class WhatsAppClientService {
       const savedMessage = await testMessage.save();
       console.log('Mensagem salva no banco:', savedMessage._id);
       
+      // Atualizar estatísticas
+      await this.updateMessageStatistics(clientId, 'sent');
+      
       return {
         messageId: messageId || savedMessage._id.toString(),
         status: status || 'sent',
@@ -555,144 +530,16 @@ export class WhatsAppClientService {
     }
   }
 
-  // Implementações específicas por provedor (copiadas do admin service)
-  private async sendTwilioMessage(phoneNumber: string, credentials: any, messageText?: string, fromNumber?: string): Promise<any> {
-    try {
-      console.log('=== INÍCIO ENVIO TWILIO (CLIENT) ===');
-      console.log('Telefone de destino:', phoneNumber);
-      console.log('Número WhatsApp configurado:', credentials.whatsappNumber);
-      console.log('Número do cliente (from):', fromNumber);
-      console.log('Mensagem a ser enviada:', messageText);
-      
-      // Validações específicas para Twilio
-      if (!credentials.whatsappNumber) {
-        throw new Error('Número WhatsApp não configurado');
-      }
-
-      if (!credentials.accountSid || !credentials.authToken) {
-        throw new Error('Credenciais Twilio incompletas');
-      }
-
-      // Formatar número de telefone para Twilio
-      const formattedPhone = this.formatPhoneForTwilio(phoneNumber);
-      console.log('Telefone formatado para Twilio:', formattedPhone);
-      
-      const client = twilio(credentials.accountSid, credentials.authToken);
-      
-      // Usar mensagem personalizada ou padrão
-      const messageBody = messageText || 'Teste de conectividade WhatsApp - Sistema de Indicação';
-      
-      // Usar número do cliente se disponível, senão usar número sandbox
-      const fromWhatsAppNumber = fromNumber || credentials.whatsappNumber;
-      console.log('Número FROM a ser usado:', fromWhatsAppNumber);
-      
-      console.log('Enviando mensagem...');
-      const message = await client.messages.create({
-        body: messageBody,
-        from: `whatsapp:${fromWhatsAppNumber}`,
-        to: `whatsapp:${formattedPhone}`
-      });
-
-      console.log('Mensagem Twilio enviada com sucesso!');
-      console.log('Message SID:', message.sid);
-      console.log('Status:', message.status);
-      console.log('=== FIM ENVIO TWILIO (CLIENT) ===');
-      
-      return {
-        sid: message.sid,
-        status: message.status
-      };
-    } catch (error) {
-      console.error('=== ERRO TWILIO (CLIENT) ===');
-      console.error('Erro:', error);
-      throw error;
-    }
-  }
-
-  private formatPhoneForTwilio(phone: string): string {
-    // Remove todos os caracteres não numéricos exceto +
-    let formatted = phone.replace(/[^\d+]/g, '');
-    
-    // Garante que começa com +
-    if (!formatted.startsWith('+')) {
-      formatted = '+' + formatted;
-    }
-    
-    // Remove zeros extras após o código do país
-    formatted = formatted.replace(/^\+(\d{1,3})0+/, '+$1');
-    
-    return formatted;
-  }
-
-  private async sendMetaMessage(phoneNumber: string, credentials: any, messageText?: string): Promise<any> {
-    const messageBody = messageText || 'Teste de conectividade WhatsApp - Sistema de Indicação';
-    
-    const response = await axios.post(
-      `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}/messages`,
-      {
-        messaging_product: 'whatsapp',
-        to: phoneNumber,
-        type: 'text',
-        text: {
-          body: messageBody
-        }
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${credentials.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    return {
-      id: response.data.messages[0].id,
-      status: 'sent'
-    };
-  }
-
-  private async send360DialogMessage(phoneNumber: string, credentials: any, messageText?: string): Promise<any> {
-    const messageBody = messageText || 'Teste de conectividade WhatsApp - Sistema de Indicação';
-    
-    const response = await axios.post(
-      `https://waba.360dialog.io/v1/instances/${credentials.instanceId}/messages`,
-      {
-        to: phoneNumber,
-        type: 'text',
-        text: {
-          body: messageBody
-        }
-      },
-      {
-        headers: {
-          'D360-API-KEY': credentials.apiKey,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    return {
-      message_id: response.data.messages[0].id,
-      status: 'sent'
-    };
-  }
-
   /**
    * Testar conexão com WhatsApp Business API
    */
   private async testWhatsAppBusinessAPI(credentials: any): Promise<any> {
     try {
-      console.log('=== TESTE WHATSAPP BUSINESS API ===');
-      console.log('Testando credenciais:', {
-        accessToken: credentials.accessToken ? '***' : 'NÃO FORNECIDO',
-        phoneNumberId: credentials.phoneNumberId,
-        businessAccountId: credentials.businessAccountId
-      });
-
-      // Fazer uma requisição para verificar se as credenciais são válidas
-      // Vamos buscar informações do número de telefone
+      console.log('=== INÍCIO TESTE WHATSAPP BUSINESS API ===');
+      
+      // Testar acesso à API fazendo uma requisição para obter informações do número
       const response = await axios.get(
-        `https://graph.facebook.com/v23.0/${credentials.phoneNumberId}`,
+        `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}`,
         {
           headers: {
             'Authorization': `Bearer ${credentials.accessToken}`,
@@ -702,61 +549,56 @@ export class WhatsAppClientService {
       );
 
       console.log('Resposta da API:', response.data);
-
+      
       if (response.data && response.data.id) {
+        console.log('=== TESTE WHATSAPP BUSINESS API SUCESSO ===');
         return {
-          phoneNumberId: response.data.id,
-          phoneNumber: response.data.phone_number,
-          name: response.data.name,
-          codeVerificationStatus: response.data.code_verification_status,
-          qualityRating: response.data.quality_rating,
-          isVerified: response.data.is_verified
+          success: true,
+          message: 'Conexão com WhatsApp Business API estabelecida com sucesso',
+          data: {
+            phoneNumberId: response.data.id,
+            verifiedName: response.data.verified_name,
+            codeVerificationStatus: response.data.code_verification_status
+          }
         };
       } else {
-        throw new Error('Resposta inválida da API do WhatsApp Business');
+        throw new Error('Resposta inválida da API');
       }
-
     } catch (error) {
-      console.error('=== ERRO NO TESTE WHATSAPP BUSINESS API ===');
+      console.error('=== ERRO TESTE WHATSAPP BUSINESS API ===');
       console.error('Erro:', error.response?.data || error.message);
       
       if (error.response?.status === 401) {
-        throw new BadRequestException('Token de acesso inválido ou expirado');
+        throw new Error('Token de acesso inválido ou expirado');
       } else if (error.response?.status === 404) {
-        throw new BadRequestException('Phone Number ID não encontrado');
+        throw new Error('Phone Number ID não encontrado');
       } else if (error.response?.status === 403) {
-        throw new BadRequestException('Sem permissão para acessar este número de telefone');
+        throw new Error('Sem permissão para acessar este número');
       } else {
-        throw new BadRequestException(`Erro ao testar credenciais: ${error.response?.data?.error?.message || error.message}`);
+        throw new Error(`Erro na API: ${error.response?.data?.error?.message || error.message}`);
       }
     }
   }
 
   /**
-   * Enviar mensagem via WhatsApp Business API (modelo HubSpot)
+   * Enviar mensagem via WhatsApp Business API
    */
   private async sendWhatsAppBusinessMessage(to: string, credentials: any, message: string): Promise<any> {
     try {
-      console.log('=== ENVIO WHATSAPP BUSINESS API ===');
+      console.log('=== INÍCIO ENVIO WHATSAPP BUSINESS API ===');
       console.log('Para:', to);
-      console.log('Phone Number ID:', credentials.phoneNumberId);
       console.log('Mensagem:', message);
-      console.log('Access Token (primeiros 10 chars):', credentials.accessToken ? credentials.accessToken.substring(0, 10) + '...' : 'NÃO FORNECIDO');
-
-      const payload = {
-        messaging_product: 'whatsapp',
-        to: to,
-        type: 'text',
-        text: {
-          body: message
-        }
-      };
-
-      console.log('Payload enviado:', JSON.stringify(payload, null, 2));
-
+      
       const response = await axios.post(
-        `https://graph.facebook.com/v23.0/${credentials.phoneNumberId}/messages`,
-        payload,
+        `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}/messages`,
+        {
+          messaging_product: 'whatsapp',
+          to: to,
+          type: 'text',
+          text: {
+            body: message
+          }
+        },
         {
           headers: {
             'Authorization': `Bearer ${credentials.accessToken}`,
@@ -765,38 +607,28 @@ export class WhatsAppClientService {
         }
       );
 
-      console.log('=== RESPOSTA COMPLETA DA API META ===');
-      console.log('Status:', response.status);
-      console.log('Headers:', response.headers);
-      console.log('Data:', JSON.stringify(response.data, null, 2));
-
+      console.log('Resposta da API:', response.data);
+      
       if (response.data && response.data.messages && response.data.messages[0]) {
-        console.log('Message ID retornado:', response.data.messages[0].id);
+        console.log('=== ENVIO WHATSAPP BUSINESS API SUCESSO ===');
         return {
           id: response.data.messages[0].id,
           status: 'sent'
         };
       } else {
-        console.error('Resposta da API não contém message ID:', response.data);
-        throw new Error('Resposta inválida da API do WhatsApp Business');
+        throw new Error('Resposta inválida da API');
       }
-
     } catch (error) {
-      console.error('=== ERRO DETALHADO NO ENVIO WHATSAPP BUSINESS API ===');
-      console.error('Status do erro:', error.response?.status);
-      console.error('Headers do erro:', error.response?.headers);
-      console.error('Data do erro:', JSON.stringify(error.response?.data, null, 2));
-      console.error('Mensagem do erro:', error.message);
-      console.error('Stack trace:', error.stack);
+      console.error('=== ERRO ENVIO WHATSAPP BUSINESS API ===');
+      console.error('Erro:', error.response?.data || error.message);
       
       if (error.response?.status === 401) {
         throw new Error('Token de acesso inválido ou expirado');
       } else if (error.response?.status === 400) {
-        throw new Error(`Erro na requisição: ${error.response?.data?.error?.message || 'Dados inválidos'}`);
-      } else if (error.response?.status === 403) {
-        throw new Error('Sem permissão para enviar mensagens');
+        const errorMessage = error.response?.data?.error?.message || 'Erro na requisição';
+        throw new Error(`Erro na API: ${errorMessage}`);
       } else {
-        throw new Error(`Erro ao enviar mensagem: ${error.response?.data?.error?.message || error.message}`);
+        throw new Error(`Erro na API: ${error.response?.data?.error?.message || error.message}`);
       }
     }
   }
