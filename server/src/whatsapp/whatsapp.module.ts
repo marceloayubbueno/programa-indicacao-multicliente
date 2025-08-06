@@ -8,6 +8,8 @@ import { WhatsAppTemplatesController } from './admin/whatsapp-templates.controll
 import { WhatsAppTemplatesService } from './admin/whatsapp-templates.service';
 import { WhatsAppClientController } from './client/whatsapp-client.controller';
 import { WhatsAppClientService } from './client/whatsapp-client.service';
+import { WhatsAppClientTemplatesController } from './client/whatsapp-client-templates.controller';
+import { WhatsAppClientTemplatesService } from './client/whatsapp-client-templates.service';
 import { WhatsAppConfig, WhatsAppConfigSchema } from './entities/whatsapp-config.schema';
 import { WhatsAppTemplate, WhatsAppTemplateSchema } from './entities/whatsapp-template.schema';
 import { WhatsAppGlobalTemplate, WhatsAppGlobalTemplateSchema } from './entities/whatsapp-global-template.schema';
@@ -30,19 +32,22 @@ import { WhatsAppClientConfig, WhatsAppClientConfigSchema } from './entities/wha
     WhatsAppController, 
     WhatsAppAdminController, 
     WhatsAppTemplatesController,
-    WhatsAppClientController
+    WhatsAppClientController,
+    WhatsAppClientTemplatesController
   ],
   providers: [
     WhatsAppService, 
     WhatsAppAdminService, 
     WhatsAppTemplatesService,
-    WhatsAppClientService
+    WhatsAppClientService,
+    WhatsAppClientTemplatesService
   ],
   exports: [
     WhatsAppService, 
     WhatsAppAdminService, 
     WhatsAppTemplatesService,
-    WhatsAppClientService
+    WhatsAppClientService,
+    WhatsAppClientTemplatesService
   ],
 })
 export class WhatsAppModule {} 
