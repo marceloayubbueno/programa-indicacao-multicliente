@@ -154,10 +154,14 @@ export class WhatsAppClientTemplatesService {
       const originalTemplate = await this.getTemplateById(clientId, templateId);
       
       const templateData = {
-        ...originalTemplate.toObject(),
-        _id: undefined,
+        clientId: originalTemplate.clientId,
         name: `${originalTemplate.name} (Cópia)`,
+        category: originalTemplate.category,
+        language: originalTemplate.language,
+        content: originalTemplate.content,
+        variables: originalTemplate.variables,
         status: 'draft',
+        isGlobal: originalTemplate.isGlobal,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
