@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Templates WhatsApp - Programa de Indicação</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Templates WhatsApp - Área do Cliente</title>
+    <link rel="stylesheet" href="../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="../js/config.js"></script>
     <style>
         .template-block {
@@ -44,113 +44,102 @@
         .btn-use-block {
             @apply w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium;
         }
-        .drag-over {
-            @apply border-2 border-dashed border-blue-500 bg-blue-900/20;
-        }
-        .template-editor-area {
-            @apply min-h-32 border-2 border-dashed border-gray-600 rounded-lg p-4 text-center text-gray-400 transition-all duration-200;
-        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
-    <!-- Sidebar -->
-    <div class="flex">
-        <div class="w-64 bg-gray-800 min-h-screen p-4">
-            <div class="mb-8">
-                <h1 class="text-xl font-bold text-white">Programa de Indicação</h1>
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+            <div class="flex items-center mb-8">
+                <span class="text-2xl font-bold text-blue-400">Programa de Indicação</span>
             </div>
-            
-            <nav class="space-y-2">
-                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg transition-colors">
-                    <i class="fas fa-tachometer-alt"></i>
-                    Dashboard
-                </a>
-                
-                <a href="campanhas.html" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg transition-colors">
-                    <i class="fas fa-bullhorn"></i>
-                    Campanhas
-                </a>
-                
-                <a href="participantes.html" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg transition-colors">
-                    <i class="fas fa-users"></i>
-                    Participantes
-                </a>
-                
-                <a href="recompensas.html" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg transition-colors">
-                    <i class="fas fa-gift"></i>
-                    Recompensas
-                </a>
-                
-                <a href="relatorios.html" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg transition-colors">
-                    <i class="fas fa-chart-bar"></i>
-                    Relatórios
-                </a>
-                
-                <div class="border-t border-gray-700 my-4"></div>
-                
-                <div class="text-xs text-gray-500 uppercase tracking-wider mb-2 px-3">Engajamentos</div>
-                
-                <div class="space-y-1">
-                    <button onclick="toggleWhatsAppMenu()" class="w-full flex items-center justify-between px-3 py-2 text-blue-400 hover:bg-gray-700 rounded-lg transition-colors">
-                        <div class="flex items-center gap-3">
-                            <i class="fab fa-whatsapp"></i>
-                            <span>WhatsApp</span>
-                        </div>
-                        <i id="whatsappArrow" class="fas fa-chevron-right text-xs transition-transform"></i>
-                    </button>
-                    
-                    <div id="whatsappMenu" class="hidden ml-6 space-y-1">
-                        <a href="whatsapp-config.html" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg transition-colors text-sm">
-                            <i class="fas fa-cog"></i>
-                            Configuração
-                        </a>
-                        <a href="whatsapp-templates.html" class="flex items-center gap-3 px-3 py-2 bg-blue-900/20 text-blue-400 rounded-lg transition-colors text-sm">
-                            <i class="fas fa-file-alt"></i>
-                            Templates
-                        </a>
-                        <a href="whatsapp-flows.html" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg transition-colors text-sm">
-                            <i class="fas fa-project-diagram"></i>
-                            Fluxos
-                        </a>
-                        <a href="whatsapp-stats.html" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg transition-colors text-sm">
-                            <i class="fas fa-chart-line"></i>
-                            Estatísticas
-                        </a>
+            <ul class="space-y-2 flex-1">
+                <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+                <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
+                <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-clipboard-list mr-2"></i> Lp de indicadores</a></li>
+                <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+                <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-bullhorn mr-2"></i> Lp de divulgação</a></li>
+                <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
+                <li>
+                    <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementEmailMenu()">
+                        <i class="fas fa-envelope mr-2"></i> Engajamento e-mail
+                        <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="engagementEmailArrow" style="transform: rotate(0deg);"></i>
                     </div>
-                </div>
-            </nav>
-        </div>
-
+                    <ul id="engagementEmailMenu" class="ml-8 mt-1 space-y-1 hidden">
+                        <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail marketing</a></li>
+                        <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold cursor-pointer group" onclick="toggleWhatsAppMenu()">
+                        <i class="fas fa-whatsapp mr-2"></i> Engajamentos Whatsapp
+                        <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="whatsappArrow" style="transform: rotate(90deg);"></i>
+                    </div>
+                    <ul id="whatsappMenu" class="ml-8 mt-1 space-y-1">
+                        <li><a href="whatsapp-templates.html" class="flex items-center pl-10 py-2 rounded-lg bg-blue-900 text-blue-300"><i class="fas fa-envelope mr-2"></i> Templates</a></li>
+                        <li><a href="whatsapp-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos</a></li>
+                        <li><a href="whatsapp-config.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-cog mr-2"></i> Configuração</a></li>
+                        <li><a href="whatsapp-stats.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-bar mr-2"></i> Estatísticas</a></li>
+                    </ul>
+                </li>
+                <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-user-plus mr-2"></i> Gestão de leads</a></li>
+                <li>
+                    <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleFinanceMenu()">
+                        <i class="fas fa-wallet mr-2"></i> Financeiro
+                        <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="financeArrow" style="transform: rotate(0deg);"></i>
+                    </div>
+                    <ul id="financeMenu" class="ml-8 mt-1 space-y-1 hidden">
+                        <li><a href="carteira.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-piggy-bank mr-2"></i> Carteira</a></li>
+                        <li><a href="payments.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-money-bill-wave mr-2"></i> Pagamentos</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleSettingsMenu()">
+                        <i class="fas fa-cog mr-2"></i> Configurações
+                        <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="settingsArrow" style="transform: rotate(0deg);"></i>
+                    </div>
+                    <ul id="settingsMenu" class="ml-8 mt-1 space-y-1 hidden">
+                        <li><a href="my-data.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
+                        <li><a href="email-config.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope-open mr-2"></i> Configuração de e-mail</a></li>
+                        <li><a href="configuracao-whatsapp.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-whatsapp mr-2"></i> Configuração de whatsapp</a></li>
+                        <li><a href="configuracao-integracoes.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-plug mr-2"></i> Configuração Integrações</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" onclick="logout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
+            </ul>
+        </nav>
+        
         <!-- Main Content -->
-        <div class="flex-1">
-            <div class="bg-gray-900 min-h-screen">
+        <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+            <div class="flex-1 flex flex-col">
                 <!-- Header -->
-                <div class="bg-gray-800 border-b border-gray-700 px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h1 class="text-2xl font-bold text-white">Templates WhatsApp</h1>
-                            <p class="text-gray-400 mt-1">Gerencie seus templates de mensagens WhatsApp</p>
+                <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm border-b border-gray-700">
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-3xl font-bold text-blue-400">Templates WhatsApp</h1>
+                        <p class="text-gray-400">Gerencie seus templates de mensagens WhatsApp</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-sm text-gray-400">Bem-vindo,</p>
+                            <p class="font-semibold text-gray-100" id="clientName">Cliente</p>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <span class="text-gray-400">Bem-vindo, Cliente</span>
-                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-white"></i>
-                            </div>
+                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
                         </div>
                     </div>
-                </div>
-
-                <!-- Content -->
-                <div class="p-6">
+                </header>
+                
+                <!-- Main Content -->
+                <main class="flex-1 p-8">
                     <!-- Blocos Pré-definidos -->
                     <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
                         <div class="flex items-center justify-between mb-6">
                             <div>
-                                <h2 class="text-xl font-semibold text-gray-100">
+                                <h2 class="text-2xl font-bold text-gray-100">
                                     <i class="fas fa-puzzle-piece text-blue-400 mr-2"></i>
                                     Blocos Pré-definidos
                                 </h2>
-                                <p class="text-gray-400 mt-1">Arraste um bloco para criar um template rapidamente</p>
+                                <p class="text-gray-400 mt-1">Clique em um bloco para criar um template rapidamente</p>
                             </div>
                         </div>
                         
@@ -159,77 +148,75 @@
                         </div>
                     </div>
 
-                    <!-- Templates Disponíveis -->
+                    <!-- Header com Botão Novo Template -->
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-100">
+                                <i class="fas fa-file-alt text-blue-400 mr-2"></i>
+                                Templates Disponíveis
+                            </h2>
+                            <p class="text-gray-400 mt-1">Crie e gerencie templates reutilizáveis para mensagens WhatsApp</p>
+                        </div>
+                        <button onclick="openCreateTemplateModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            Novo Template
+                        </button>
+                    </div>
+
+                    <!-- Filtros -->
                     <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
-                        <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-100 mb-4">
+                            <i class="fas fa-filter text-blue-400 mr-2"></i>
+                            Filtros
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                                <h2 class="text-xl font-semibold text-gray-100">
-                                    <i class="fas fa-file-alt text-blue-400 mr-2"></i>
-                                    Templates Disponíveis
-                                </h2>
-                                <p class="text-gray-400 mt-1">Crie e gerencie templates reutilizáveis para mensagens WhatsApp</p>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Categoria</label>
+                                <select id="filter-category" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todas</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="utility">Utility</option>
+                                    <option value="authentication">Authentication</option>
+                                </select>
                             </div>
-                            <button onclick="openCreateTemplateModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
-                                <i class="fas fa-plus mr-2"></i>
-                                Novo Template
-                            </button>
-                        </div>
-
-                        <!-- Filtros -->
-                        <div class="bg-gray-750 rounded-xl p-4 border border-gray-700 mb-6">
-                            <h3 class="text-lg font-semibold text-gray-100 mb-4">
-                                <i class="fas fa-filter text-blue-400 mr-2"></i>
-                                Filtros
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-400 mb-2">Categoria</label>
-                                    <select id="filter-category" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Todas</option>
-                                        <option value="marketing">Marketing</option>
-                                        <option value="utility">Utility</option>
-                                        <option value="authentication">Authentication</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-400 mb-2">Status</label>
-                                    <select id="filter-status" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Todos</option>
-                                        <option value="active">Ativo</option>
-                                        <option value="inactive">Inativo</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-400 mb-2">Buscar</label>
-                                    <input type="text" id="search-input" placeholder="Nome do template..." class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                <div class="flex items-end">
-                                    <button onclick="loadTemplates()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                                        <i class="fas fa-search mr-2"></i>
-                                        Filtrar
-                                    </button>
-                                </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Status</label>
+                                <select id="filter-status" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todos</option>
+                                    <option value="active">Ativo</option>
+                                    <option value="inactive">Inativo</option>
+                                </select>
                             </div>
-                        </div>
-
-                        <!-- Lista de Templates -->
-                        <div class="bg-gray-750 rounded-xl border border-gray-700">
-                            <div class="p-6 border-b border-gray-700">
-                                <h3 class="text-lg font-semibold text-gray-100">
-                                    <i class="fas fa-list text-blue-400 mr-2"></i>
-                                    Templates
-                                </h3>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Buscar</label>
+                                <input type="text" id="search-input" placeholder="Nome do template..." class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
-                            <div id="templates-list" class="divide-y divide-gray-700">
-                                <!-- Templates will be loaded here -->
-                                <div class="p-6 text-center text-gray-400">
-                                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                                    <p>Carregando templates...</p>
-                                </div>
+                            <div class="flex items-end">
+                                <button onclick="loadTemplates()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                    <i class="fas fa-search mr-2"></i>
+                                    Filtrar
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Lista de Templates -->
+                    <div class="bg-gray-800 rounded-xl border border-gray-700">
+                        <div class="p-6 border-b border-gray-700">
+                            <h3 class="text-lg font-semibold text-gray-100">
+                                <i class="fas fa-list text-blue-400 mr-2"></i>
+                                Templates
+                            </h3>
+                        </div>
+                        <div id="templates-list" class="divide-y divide-gray-700">
+                            <!-- Templates will be loaded here -->
+                            <div class="p-6 text-center text-gray-400">
+                                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                                <p>Carregando templates...</p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
         </div>
     </div>
@@ -298,10 +285,49 @@
     <script src="../js/whatsapp/template-blocks.js"></script>
     <script src="../js/whatsapp/templates.js"></script>
     <script>
+        // Script para expandir/colapsar o menu Financeiro
+        function toggleFinanceMenu() {
+            const menu = document.getElementById('financeMenu');
+            const arrow = document.getElementById('financeArrow');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                arrow.style.transform = 'rotate(90deg)';
+            } else {
+                menu.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Script para expandir/colapsar o menu de Engajamento Email
+        function toggleEngagementEmailMenu() {
+            const menu = document.getElementById('engagementEmailMenu');
+            const arrow = document.getElementById('engagementEmailArrow');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                arrow.style.transform = 'rotate(90deg)';
+            } else {
+                menu.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
         // Script para expandir/colapsar o menu WhatsApp
         function toggleWhatsAppMenu() {
             const menu = document.getElementById('whatsappMenu');
             const arrow = document.getElementById('whatsappArrow');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                arrow.style.transform = 'rotate(90deg)';
+            } else {
+                menu.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Script para expandir/colapsar o menu Configurações
+        function toggleSettingsMenu() {
+            const menu = document.getElementById('settingsMenu');
+            const arrow = document.getElementById('settingsArrow');
             if (menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
                 arrow.style.transform = 'rotate(90deg)';
@@ -320,9 +346,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Renderizar blocos pré-definidos
             TemplateBlocks.render('template-blocks-container');
-            
-            // Configurar drag & drop
-            TemplateBlocks.setupDragAndDrop();
         });
     </script>
 </body>
