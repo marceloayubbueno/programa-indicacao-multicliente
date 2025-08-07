@@ -706,7 +706,7 @@ export class WhatsAppClientService {
         metaValidationData: validationResult.metaData
       };
 
-      await this.whatsappClientConfigModel.findOneAndUpdate(
+      await this.whatsAppClientConfigModel.findOneAndUpdate(
         { clientId },
         { 
           $set: updateData,
