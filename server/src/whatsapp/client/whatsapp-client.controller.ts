@@ -320,6 +320,36 @@ export class WhatsAppClientController {
     }
   }
 
+  @Post('check-account-status')
+  @UseGuards(JwtClientAuthGuard)
+  async checkAccountRegistrationStatus(@ClientId() clientId: string) {
+    try {
+      console.log('=== CONTROLLER: VERIFICAR STATUS DA CONTA ===');
+      console.log('ClientId:', clientId);
+
+      const result = await this.whatsAppClientService.checkAccountRegistrationStatus(clientId);
+      
+      console.log('=== CONTROLLER: STATUS DA CONTA VERIFICADO ===');
+      console.log('Resultado:', result);
+
+      return {
+        success: true,
+        message: 'Status da conta verificado com sucesso',
+        data: result.data
+      };
+
+    } catch (error) {
+      console.error('=== CONTROLLER: ERRO AO VERIFICAR STATUS ===');
+      console.error('Erro completo:', error);
+
+      return {
+        success: false,
+        message: error.message || 'Erro ao verificar status da conta',
+        error: error.message
+      };
+    }
+  }
+
   // ===== ENDPOINTS PARA ADMIN =====
 
   /**

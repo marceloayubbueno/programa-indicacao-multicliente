@@ -668,6 +668,13 @@ export class WhatsAppClientService {
         throw new Error('Token de acesso inválido ou expirado');
       } else if (error.response?.status === 400) {
         const errorMessage = error.response?.data?.error?.message || 'Erro na requisição';
+        const errorCode = error.response?.data?.error?.code;
+        
+        // 🔧 TRATAMENTO ESPECÍFICO PARA ERRO 133010
+        if (errorCode === 133010) {
+          throw new Error('❌ Conta WhatsApp Business não registrada!\n\nPara enviar mensagens, você precisa:\n\n1. Acessar business.facebook.com\n2. Ir em WhatsApp > API Setup\n3. Clicar em "Registrar conta"\n4. Preencher informações do negócio\n5. Aguardar aprovação (1-3 dias úteis)\n\nStatus: ACCOUNT_NOT_REGISTERED\n\nApós o registro, você poderá enviar mensagens normalmente.');
+        }
+        
         throw new Error(`Erro na API: ${errorMessage}`);
       } else {
         throw new Error(`Erro na API: ${error.response?.data?.error?.message || error.message}`);
@@ -776,6 +783,99 @@ export class WhatsAppClientService {
       }
 
       throw new Error(`Erro na consulta à API do Meta: ${error.message}`);
+    }
+  }
+
+  /**
+   * Verificar status de registro da conta WhatsApp Business
+   */
+  async checkAccountRegistrationStatus(clientId: string) {
+    try {
+      console.log('=== VERIFICANDO STATUS DE REGISTRO DA CONTA ===');
+      console.log('ClientId:', clientId);
+
+      const clientConfig = await this.getConfigByClientId(clientId);
+      
+      if (!clientConfig.whatsappCredentials) {
+        throw new Error('Credenciais WhatsApp não configuradas');
+      }
+
+      const { accessToken, phoneNumberId, businessAccountId } = clientConfig.whatsappCredentials;
+
+      // Verificar status da conta fazendo uma requisição de teste
+      const accountStatus = await this.checkWhatsAppAccountStatus({
+        accessToken,
+        phoneNumberId,
+        businessAccountId
+      });
+
+      console.log('Status da conta:', accountStatus);
+
+      return {
+        success: true,
+        message: 'Status da conta verificado',
+        data: accountStatus
+      };
+
+    } catch (error) {
+      console.error('Erro ao verificar status da conta:', error);
+      throw error;
+    }
+  }
+
+  private async checkWhatsAppAccountStatus(credentials: any) {
+    try {
+      const { accessToken, phoneNumberId, businessAccountId } = credentials;
+
+      // Verificar informações da conta
+      const accountResponse = await axios.get(
+        `https://graph.facebook.com/v18.0/${businessAccountId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Resposta da conta:', accountResponse.data);
+
+      // Verificar informações do número
+      const phoneResponse = await axios.get(
+        `https://graph.facebook.com/v18.0/${phoneNumberId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Resposta do número:', phoneResponse.data);
+
+      return {
+        accountId: businessAccountId,
+        phoneNumberId: phoneNumberId,
+        accountStatus: accountResponse.data.verification_status || 'UNKNOWN',
+        phoneStatus: phoneResponse.data.code_verification_status || 'UNKNOWN',
+        isRegistered: accountResponse.data.verification_status === 'APPROVED',
+        isPhoneVerified: phoneResponse.data.code_verification_status === 'VERIFIED',
+        canSendMessages: accountResponse.data.verification_status === 'APPROVED' && 
+                        phoneResponse.data.code_verification_status === 'VERIFIED'
+      };
+
+    } catch (error) {
+      console.error('Erro ao verificar status da conta:', error);
+      
+      if (error.response?.status === 401) {
+        throw new Error('Token de acesso inválido ou expirado');
+      }
+      
+      if (error.response?.status === 404) {
+        throw new Error('Conta ou número não encontrado');
+      }
+
+      throw new Error(`Erro ao verificar status: ${error.message}`);
     }
   }
 } 

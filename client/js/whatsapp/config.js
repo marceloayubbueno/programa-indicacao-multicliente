@@ -927,3 +927,64 @@ async function forceRevalidateCredentials() {
         showError(`❌ Erro ao forçar revalidação: ${error.message}`);
     }
 } 
+
+async function checkAccountRegistrationStatus() {
+    console.log('Função checkAccountRegistrationStatus chamada');
+    try {
+        if (!whatsappConfig || !whatsappConfig.whatsappCredentials) {
+            showError('Configure o WhatsApp antes de verificar o status da conta');
+            return;
+        }
+
+        const token = getToken();
+        
+        console.log('Verificando status da conta...');
+        
+        const response = await fetch(`${window.APP_CONFIG.API_URL}/whatsapp/client/check-account-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('Status da conta verificado:', result);
+            
+            const status = result.data;
+            let message = `📋 Status da Conta WhatsApp Business:\n\n`;
+            message += `🏢 Conta: ${status.accountStatus}\n`;
+            message += `📱 Número: ${status.phoneStatus}\n`;
+            message += `✅ Registrada: ${status.isRegistered ? 'SIM' : 'NÃO'}\n`;
+            message += `✅ Número Verificado: ${status.isPhoneVerified ? 'SIM' : 'NÃO'}\n`;
+            message += `📤 Pode Enviar: ${status.canSendMessages ? 'SIM' : 'NÃO'}\n\n`;
+            
+            if (!status.canSendMessages) {
+                message += `⚠️ Para enviar mensagens, você precisa:\n\n`;
+                if (!status.isRegistered) {
+                    message += `1. Registrar a conta no WhatsApp Business Manager\n`;
+                }
+                if (!status.isPhoneVerified) {
+                    message += `2. Verificar o número de telefone\n`;
+                }
+                message += `3. Aguardar aprovação (1-3 dias úteis)\n\n`;
+                message += `Acesse: business.facebook.com > WhatsApp > API Setup`;
+            }
+            
+            showSuccess(message);
+            
+            // Adicionar log
+            await addActivityLog('account_status_check', `Status da conta verificado: ${status.canSendMessages ? 'PRONTO' : 'PENDENTE'}`);
+            
+        } else {
+            console.error('Erro ao verificar status da conta:', result);
+            showError(`❌ Erro ao verificar status: ${result.message}`);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao verificar status da conta:', error);
+        showError(`❌ Erro ao verificar status: ${error.message}`);
+    }
+} 
