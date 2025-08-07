@@ -15,6 +15,7 @@ import {
 import { WhatsAppClientService, CreateWhatsAppClientConfigDto, UpdateWhatsAppClientConfigDto } from './whatsapp-client.service';
 import { JwtClientAuthGuard } from '../../auth/guards/jwt-client-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { ClientId } from '../../auth/decorators/client-id.decorator';
 
 @Controller('whatsapp/client')
 export class WhatsAppClientController {
@@ -286,6 +287,36 @@ export class WhatsAppClientController {
         },
         error.status || HttpStatus.BAD_REQUEST
       );
+    }
+  }
+
+  @Post('force-revalidate')
+  @UseGuards(JwtClientAuthGuard)
+  async forceRevalidateCredentials(@ClientId() clientId: string) {
+    try {
+      console.log('=== CONTROLLER: FORÇAR REVALIDAÇÃO ===');
+      console.log('ClientId:', clientId);
+
+      const result = await this.whatsAppClientService.forceRevalidateCredentials(clientId);
+      
+      console.log('=== CONTROLLER: REVALIDAÇÃO CONCLUÍDA ===');
+      console.log('Resultado:', result);
+
+      return {
+        success: true,
+        message: 'Revalidação forçada concluída com sucesso',
+        data: result.data
+      };
+
+    } catch (error) {
+      console.error('=== CONTROLLER: ERRO NA REVALIDAÇÃO ===');
+      console.error('Erro completo:', error);
+
+      return {
+        success: false,
+        message: error.message || 'Erro ao forçar revalidação',
+        error: error.message
+      };
     }
   }
 

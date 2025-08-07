@@ -883,3 +883,47 @@ async function testWhatsAppCredentials() {
         showError(`Erro ao testar credenciais: ${error.message}`);
     }
 } 
+
+async function forceRevalidateCredentials() {
+    console.log('Função forceRevalidateCredentials chamada');
+    try {
+        if (!whatsappConfig || !whatsappConfig.whatsappCredentials) {
+            showError('Configure o WhatsApp antes de forçar revalidação');
+            return;
+        }
+
+        const token = getToken();
+        
+        console.log('Forçando revalidação...');
+        
+        const response = await fetch(`${window.APP_CONFIG.API_URL}/whatsapp/client/force-revalidate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('Revalidação forçada bem-sucedida:', result);
+            
+            // Recarregar configuração
+            await loadConfig();
+            
+            showSuccess(`✅ Revalidação forçada concluída!\n\nStatus: ${result.data.isVerified ? 'VERIFICADO' : 'NÃO VERIFICADO'}\n\nSe o número foi aprovado no Meta, tente enviar uma mensagem de teste agora.`);
+            
+            // Adicionar log
+            await addActivityLog('force_revalidation', `Revalidação forçada: ${result.data.isVerified ? 'VERIFICADO' : 'NÃO VERIFICADO'}`);
+            
+        } else {
+            console.error('Erro na revalidação forçada:', result);
+            showError(`❌ Erro na revalidação: ${result.message}`);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao forçar revalidação:', error);
+        showError(`❌ Erro ao forçar revalidação: ${error.message}`);
+    }
+} 

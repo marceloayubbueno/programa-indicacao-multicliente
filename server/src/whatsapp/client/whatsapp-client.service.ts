@@ -674,4 +674,108 @@ export class WhatsAppClientService {
       }
     }
   }
+
+  async forceRevalidateCredentials(clientId: string) {
+    try {
+      console.log('=== FORÇANDO REVALIDAÇÃO DE CREDENCIAIS ===');
+      console.log('ClientId:', clientId);
+
+      // Buscar configuração atual
+      const clientConfig = await this.getConfigByClientId(clientId);
+      
+      if (!clientConfig.whatsappCredentials) {
+        throw new Error('Configuração WhatsApp não encontrada');
+      }
+
+      const { accessToken, phoneNumberId, businessAccountId } = clientConfig.whatsappCredentials;
+
+      // Forçar consulta direta à API do Meta (sem cache)
+      const validationResult = await this.forceValidateWithMetaAPI({
+        accessToken,
+        phoneNumberId,
+        businessAccountId
+      });
+
+      console.log('Resultado da revalidação forçada:', validationResult);
+
+      // Atualizar configuração com novo status
+      const updateData = {
+        isVerified: validationResult.isVerified,
+        verificationStatus: validationResult.verificationStatus,
+        lastVerifiedAt: new Date(),
+        metaValidationData: validationResult.metaData
+      };
+
+      await this.whatsappClientConfigModel.findOneAndUpdate(
+        { clientId },
+        { 
+          $set: updateData,
+          $push: {
+            logs: {
+              type: 'force_revalidation',
+              message: `Revalidação forçada: ${validationResult.isVerified ? 'VERIFICADO' : 'NÃO VERIFICADO'}`,
+              timestamp: new Date(),
+              data: validationResult
+            }
+          }
+        },
+        { new: true }
+      );
+
+      return {
+        success: true,
+        message: 'Revalidação forçada concluída',
+        data: validationResult
+      };
+
+    } catch (error) {
+      console.error('Erro na revalidação forçada:', error);
+      throw error;
+    }
+  }
+
+  private async forceValidateWithMetaAPI(credentials: any) {
+    try {
+      const { accessToken, phoneNumberId, businessAccountId } = credentials;
+
+      // Consulta direta à API do Meta para obter status atual
+      const phoneNumberResponse = await axios.get(
+        `https://graph.facebook.com/v22.0/${phoneNumberId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Resposta da API do Meta (Phone Number):', phoneNumberResponse.data);
+
+      // Verificar status de verificação
+      const isVerified = phoneNumberResponse.data.code_verification_status === 'VERIFIED';
+      const verificationStatus = phoneNumberResponse.data.code_verification_status;
+
+      return {
+        isVerified,
+        verificationStatus,
+        metaData: phoneNumberResponse.data,
+        phoneNumberId,
+        businessAccountId,
+        verifiedName: phoneNumberResponse.data.verified_name || 'N/A'
+      };
+
+    } catch (error) {
+      console.error('Erro na consulta forçada à API do Meta:', error);
+      
+      if (error.response?.status === 401) {
+        throw new Error('Token de acesso inválido ou expirado');
+      }
+      
+      if (error.response?.status === 404) {
+        throw new Error('Número de telefone não encontrado');
+      }
+
+      throw new Error(`Erro na consulta à API do Meta: ${error.message}`);
+    }
+  }
 } 
