@@ -397,18 +397,48 @@ export class WhatsAppClientService {
       console.log('ClientId:', clientId);
       console.log('Credenciais:', JSON.stringify(credentials, null, 2));
 
+      const { accessToken, phoneNumberId, businessAccountId } = credentials;
+
       // Validar credenciais obrigatórias
-      if (!credentials.accessToken || !credentials.phoneNumberId || !credentials.businessAccountId) {
-        throw new Error('Credenciais incompletas. Necessário: accessToken, phoneNumberId, businessAccountId');
+      if (!accessToken || !phoneNumberId || !businessAccountId) {
+        throw new Error('Todas as credenciais são obrigatórias: accessToken, phoneNumberId, businessAccountId');
       }
 
       // Testar conexão com WhatsApp Business API
       const testResult = await this.testWhatsAppBusinessAPI(credentials);
       
-      console.log('=== FIM TESTE DE CREDENCIAIS ===');
-      console.log('Resultado:', testResult);
+      console.log('Resultado do teste da API:', testResult);
+
+      // 🔧 NOVA VALIDAÇÃO: Verificar status de verificação do número
+      if (testResult.data && testResult.data.codeVerificationStatus === 'NOT_VERIFIED') {
+        throw new Error('❌ Número WhatsApp não verificado!\n\nPara enviar mensagens, você precisa:\n1. Acessar business.facebook.com\n2. Ir em WhatsApp > API Setup\n3. Verificar o número de telefone\n4. Aguardar aprovação (1-3 dias úteis)\n\nStatus atual: NOT_VERIFIED');
+      }
+
+      // Buscar configuração do cliente
+      const clientConfig = await this.getConfigByClientId(clientId);
       
-      return testResult;
+      // Atualizar configuração com status verificado
+      const updatedConfig = await this.whatsAppClientConfigModel.findByIdAndUpdate(
+        clientConfig._id,
+        {
+          isVerified: true,
+          verifiedAt: new Date(),
+          'whatsappCredentials.accessToken': accessToken,
+          'whatsappCredentials.phoneNumberId': phoneNumberId,
+          'whatsappCredentials.businessAccountId': businessAccountId
+        },
+        { new: true }
+      );
+
+      console.log('=== TESTE DE CREDENCIAIS CONCLUÍDO COM SUCESSO ===');
+      console.log('Configuração atualizada:', updatedConfig);
+
+      return {
+        success: true,
+        message: 'Credenciais válidas! Conexão com WhatsApp Business API estabelecida.',
+        data: testResult.data
+      };
+
     } catch (error) {
       console.error('=== ERRO NO TESTE DE CREDENCIAIS ===');
       console.error('Erro:', error);
@@ -446,6 +476,18 @@ export class WhatsAppClientService {
 
       if (!clientConfig.isVerified) {
         throw new Error('Configuração não verificada. Teste as credenciais primeiro.');
+      }
+
+      // 🔧 NOVA VALIDAÇÃO: Verificar se o número está verificado na API
+      try {
+        const verificationTest = await this.testWhatsAppBusinessAPI(clientConfig.whatsappCredentials);
+        
+        if (verificationTest.data && verificationTest.data.codeVerificationStatus === 'NOT_VERIFIED') {
+          throw new Error('❌ Número WhatsApp não verificado!\n\nO número precisa ser verificado no WhatsApp Business Manager antes de enviar mensagens.\n\nStatus: NOT_VERIFIED\n\nPara verificar:\n1. Acesse business.facebook.com\n2. WhatsApp > API Setup\n3. Verifique o número de telefone\n4. Aguarde aprovação (1-3 dias úteis)');
+        }
+      } catch (verificationError) {
+        console.error('Erro na verificação do número:', verificationError);
+        throw verificationError;
       }
 
       // Enviar mensagem usando WhatsApp Business API

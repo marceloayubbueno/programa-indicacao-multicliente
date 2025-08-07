@@ -238,8 +238,11 @@ function updateConnectionStatus() {
     
     if (whatsappConfig && whatsappConfig.isActive && whatsappConfig.isVerified) {
         statusElement.innerHTML = `
-            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span class="text-green-400 font-medium">Conectado</span>
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span class="text-green-400 font-medium">Conectado e Ativo</span>
+                <span class="text-gray-400 text-sm">(${whatsappConfig.whatsappNumber})</span>
+            </div>
         `;
         if (toggleActiveBtn) {
             toggleActiveBtn.innerHTML = '<i class="fas fa-power-off mr-2"></i>Desativar';
@@ -248,18 +251,35 @@ function updateConnectionStatus() {
         }
     } else if (whatsappConfig && whatsappConfig.isVerified) {
         statusElement.innerHTML = `
-            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            <span class="text-yellow-400 font-medium">Inativo</span>
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <span class="text-yellow-400 font-medium">Verificado (Inativo)</span>
+                <span class="text-gray-400 text-sm">(${whatsappConfig.whatsappNumber})</span>
+            </div>
         `;
         if (toggleActiveBtn) {
             toggleActiveBtn.innerHTML = '<i class="fas fa-power-off mr-2"></i>Ativar';
             toggleActiveBtn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors';
             toggleActiveBtn.classList.remove('hidden');
         }
+    } else if (whatsappConfig && whatsappConfig.whatsappCredentials) {
+        statusElement.innerHTML = `
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+                <span class="text-orange-400 font-medium">Configurado (Não Verificado)</span>
+                <span class="text-gray-400 text-sm">Teste as credenciais</span>
+            </div>
+        `;
+        if (toggleActiveBtn) {
+            toggleActiveBtn.classList.add('hidden');
+        }
     } else {
         statusElement.innerHTML = `
-            <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-            <span class="text-red-400 font-medium">Não configurado</span>
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                <span class="text-red-400 font-medium">Não Configurado</span>
+                <span class="text-gray-400 text-sm">Configure as credenciais</span>
+            </div>
         `;
         if (toggleActiveBtn) {
             toggleActiveBtn.classList.add('hidden');
@@ -598,6 +618,12 @@ async function sendTestMessage() {
             showError('Configure o WhatsApp antes de enviar mensagens de teste');
             return;
         }
+
+        // 🔧 NOVA VALIDAÇÃO: Verificar se as credenciais foram testadas
+        if (!whatsappConfig.isVerified) {
+            showError('❌ Credenciais não verificadas!\n\nPara enviar mensagens de teste, você precisa:\n1. Preencher as credenciais do WhatsApp Business API\n2. Clicar em "Testar Credenciais"\n3. Aguardar a confirmação de sucesso\n\nDepois disso, você poderá enviar mensagens de teste.');
+            return;
+        }
         
         if (!confirm(`Enviar mensagem de teste para ${testNumber}?\n\nMensagem: "${testMessage}"`)) {
             return;
@@ -606,7 +632,7 @@ async function sendTestMessage() {
         console.log('Enviando mensagem de teste:', { testNumber, testMessage });
         
         const token = getToken();
-        const url = `${window.APP_CONFIG.API_URL}/whatsapp/client/test-message`; // Corrigido para usar endpoint de cliente
+        const url = `${window.APP_CONFIG.API_URL}/whatsapp/client/test-message`;
         console.log('URL do teste de envio:', url);
         
         const response = await fetch(url, {
@@ -628,7 +654,7 @@ async function sendTestMessage() {
             const result = await response.json();
             console.log('Resultado do teste de envio:', result);
             
-            showSuccess('Mensagem de teste enviada com sucesso! Verifique o WhatsApp do número de destino.');
+            showSuccess('✅ Mensagem de teste enviada com sucesso!\n\nVerifique o WhatsApp do número de destino.');
             
             // Adicionar log de atividade
             await addActivityLog('test_message_sent', `Mensagem de teste enviada para ${testNumber}`);
@@ -636,7 +662,17 @@ async function sendTestMessage() {
         } else {
             const errorData = await response.json();
             console.error('Erro no teste de envio:', errorData);
-            throw new Error(errorData.message || `HTTP ${response.status}`);
+            
+            // 🔧 MELHORIA: Mensagem de erro mais específica
+            let errorMessage = errorData.message || `HTTP ${response.status}`;
+            
+            if (errorMessage.includes('Configuração não verificada')) {
+                errorMessage = '❌ Credenciais não verificadas!\n\nExecute o teste de credenciais primeiro.';
+            } else if (errorMessage.includes('Credenciais do WhatsApp')) {
+                errorMessage = '❌ Credenciais inválidas!\n\nVerifique suas credenciais do WhatsApp Business API.';
+            }
+            
+            throw new Error(errorMessage);
         }
         
     } catch (error) {
@@ -687,19 +723,93 @@ function getLogIcon(type) {
         case 'template_approved': return 'fas fa-check-circle';
         case 'connection_test': return 'fas fa-plug';
         case 'message_failed': return 'fas fa-exclamation-triangle';
+        case 'credentials_tested': return 'fas fa-key';
+        case 'credentials_failed': return 'fas fa-key';
         default: return 'fas fa-info-circle';
     }
 }
 
 function showSuccess(message) {
     console.log('Sucesso:', message);
-    // Implementar notificação de sucesso
+    
+    // 🔧 MELHORIA: Formatação de mensagens de sucesso
+    let formattedMessage = message;
+    
+    // Se a mensagem contém quebras de linha, formatar como HTML
+    if (message.includes('\n')) {
+        formattedMessage = message.replace(/\n/g, '<br>');
+        
+        // Criar modal de sucesso mais informativo
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4">
+                <div class="p-6 border-b border-gray-700">
+                    <h2 class="text-xl font-semibold text-green-400 flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Sucesso
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="text-gray-300 text-sm leading-relaxed">
+                        ${formattedMessage}
+                    </div>
+                </div>
+                <div class="p-6 border-t border-gray-700 flex justify-end">
+                    <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors">
+                        OK
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        return;
+    }
+    
+    // Para mensagens simples, usar alert
     alert(message);
 }
 
 function showError(message) {
     console.error('Erro:', message);
-    // Implementar notificação de erro
+    
+    // 🔧 MELHORIA: Formatação de mensagens de erro
+    let formattedMessage = message;
+    
+    // Se a mensagem contém quebras de linha, formatar como HTML
+    if (message.includes('\n')) {
+        formattedMessage = message.replace(/\n/g, '<br>');
+        
+        // Criar modal de erro mais informativo
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4">
+                <div class="p-6 border-b border-gray-700">
+                    <h2 class="text-xl font-semibold text-red-400 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Erro
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="text-gray-300 text-sm leading-relaxed">
+                        ${formattedMessage}
+                    </div>
+                </div>
+                <div class="p-6 border-t border-gray-700 flex justify-end">
+                    <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-gray-200 rounded-lg transition-colors">
+                        Entendi
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        return;
+    }
+    
+    // Para mensagens simples, usar alert
     alert('Erro: ' + message);
 }
 
@@ -736,21 +846,36 @@ async function testWhatsAppCredentials() {
         if (response.ok) {
             const result = await response.json();
             console.log('Teste de credenciais bem-sucedido:', result);
-            showSuccess('Credenciais válidas! Conexão com WhatsApp Business API estabelecida.');
             
-            // Atualizar status de conexão
-            updateConnectionStatus();
+            // 🔧 MELHORIA: Verificar se há erro específico de verificação
+            if (result.data && result.data.codeVerificationStatus === 'NOT_VERIFIED') {
+                showError('❌ Número WhatsApp não verificado!\n\nPara enviar mensagens, você precisa:\n1. Acessar business.facebook.com\n2. Ir em WhatsApp > API Setup\n3. Verificar o número de telefone\n4. Aguardar aprovação (1-3 dias úteis)\n\nStatus atual: NOT_VERIFIED');
+                return;
+            }
+            
+            showSuccess('✅ Credenciais válidas! Conexão com WhatsApp Business API estabelecida.');
+            
+            // 🔧 MELHORIA: Recarregar configuração para atualizar status
+            await loadConfig();
             
             // Adicionar log de atividade
-            await addActivityLog('success', 'Credenciais testadas com sucesso');
+            await addActivityLog('credentials_tested', 'Credenciais testadas com sucesso');
             
         } else {
             const errorData = await response.json();
             console.error('Erro no teste de credenciais:', errorData);
-            showError(`Erro ao testar credenciais: ${errorData.message || 'Credenciais inválidas'}`);
+            
+            // 🔧 MELHORIA: Mensagem de erro mais específica
+            let errorMessage = errorData.message || 'Credenciais inválidas';
+            
+            if (errorMessage.includes('NOT_VERIFIED')) {
+                errorMessage = '❌ Número WhatsApp não verificado!\n\nPara enviar mensagens, você precisa:\n1. Acessar business.facebook.com\n2. Ir em WhatsApp > API Setup\n3. Verificar o número de telefone\n4. Aguardar aprovação (1-3 dias úteis)';
+            }
+            
+            showError(`Erro ao testar credenciais: ${errorMessage}`);
             
             // Adicionar log de atividade
-            await addActivityLog('error', `Falha no teste de credenciais: ${errorData.message}`);
+            await addActivityLog('credentials_failed', `Falha no teste de credenciais: ${errorMessage}`);
         }
         
     } catch (error) {
