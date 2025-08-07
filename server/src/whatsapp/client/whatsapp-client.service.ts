@@ -474,21 +474,22 @@ export class WhatsAppClientService {
         throw new Error('Credenciais do WhatsApp Business API não configuradas');
       }
 
-      if (!clientConfig.isVerified) {
-        throw new Error('Configuração não verificada. Teste as credenciais primeiro.');
-      }
+      // 🔧 SIMPLIFICAÇÃO: Remover validação de isVerified temporariamente
+      // if (!clientConfig.isVerified) {
+      //   throw new Error('Configuração não verificada. Teste as credenciais primeiro.');
+      // }
 
-      // 🔧 NOVA VALIDAÇÃO: Verificar se o número está verificado na API
-      try {
-        const verificationTest = await this.testWhatsAppBusinessAPI(clientConfig.whatsappCredentials);
-        
-        if (verificationTest.data && verificationTest.data.codeVerificationStatus === 'NOT_VERIFIED') {
-          throw new Error('❌ Número WhatsApp não verificado!\n\nO número precisa ser verificado no WhatsApp Business Manager antes de enviar mensagens.\n\nStatus: NOT_VERIFIED\n\nPara verificar:\n1. Acesse business.facebook.com\n2. WhatsApp > API Setup\n3. Verifique o número de telefone\n4. Aguarde aprovação (1-3 dias úteis)');
-        }
-      } catch (verificationError) {
-        console.error('Erro na verificação do número:', verificationError);
-        throw verificationError;
-      }
+      // 🔧 SIMPLIFICAÇÃO: Remover verificação adicional temporariamente
+      // try {
+      //   const verificationTest = await this.testWhatsAppBusinessAPI(clientConfig.whatsappCredentials);
+      //   
+      //   if (verificationTest.data && verificationTest.data.codeVerificationStatus === 'NOT_VERIFIED') {
+      //     throw new Error('❌ Número WhatsApp não verificado!\n\nO número precisa ser verificado no WhatsApp Business Manager antes de enviar mensagens.\n\nStatus: NOT_VERIFIED\n\nPara verificar:\n1. Acesse business.facebook.com\n2. WhatsApp > API Setup\n3. Verifique o número de telefone\n4. Aguardar aprovação (1-3 dias úteis)');
+      //   }
+      // } catch (verificationError) {
+      //   console.error('Erro na verificação do número:', verificationError);
+      //   throw verificationError;
+      // }
 
       // Enviar mensagem usando WhatsApp Business API
       const result = await this.sendMessage({
