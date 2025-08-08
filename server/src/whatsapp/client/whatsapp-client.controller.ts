@@ -3,10 +3,7 @@ import {
   Get, 
   Post, 
   Put, 
-  Delete, 
   Body, 
-  Param, 
-  Query, 
   UseGuards,
   Request,
   HttpStatus,
@@ -14,8 +11,6 @@ import {
 } from '@nestjs/common';
 import { WhatsAppClientService, CreateWhatsAppClientConfigDto, UpdateWhatsAppClientConfigDto } from './whatsapp-client.service';
 import { JwtClientAuthGuard } from '../../auth/guards/jwt-client-auth.guard';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { ClientId } from '../../auth/decorators/client-id.decorator';
 
 @Controller('whatsapp/client')
 export class WhatsAppClientController {
@@ -113,124 +108,28 @@ export class WhatsAppClientController {
   }
 
   /**
-   * Ativar/Desativar configuração de WhatsApp
+   * Enviar mensagem de teste
    */
-  @Put('config/toggle-active')
+  @Post('message')
   @UseGuards(JwtClientAuthGuard)
-  async toggleActive(
+  async sendTestMessage(
     @Request() req,
-    @Body() body: { isActive: boolean }
+    @Body() messageData: { to: string; message: string }
   ) {
     try {
       const clientId = req.user.clientId;
-      const config = await this.whatsAppClientService.toggleActive(clientId, body.isActive);
-
-      return {
-        success: true,
-        message: `Configuração ${body.isActive ? 'ativada' : 'desativada'} com sucesso`,
-        data: config
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: error.message || 'Erro ao alterar status da configuração',
-          error: error.response?.message || error.message
-        },
-        error.status || HttpStatus.BAD_REQUEST
-      );
-    }
-  }
-
-  /**
-   * Verificar número de WhatsApp
-   */
-  @Post('config/verify')
-  @UseGuards(JwtClientAuthGuard)
-  async verifyConfig(@Request() req: any) {
-    try {
-      const clientId = req.user.clientId;
-      const result = await this.whatsAppClientService.verifyConfig(clientId);
-      
-      return {
-        success: result.success,
-        message: result.message
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: error.message || 'Erro ao verificar configuração WhatsApp'
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  @Post('test-message')
-  @UseGuards(JwtClientAuthGuard)
-  async sendTestMessage(@Request() req: any, @Body() messageData: any) {
-    try {
-      console.log('=== CONTROLLER: INÍCIO ENVIO MENSAGEM DE TESTE ===');
-      console.log('ClientId:', req.user.clientId);
-      console.log('Dados da mensagem:', JSON.stringify(messageData, null, 2));
-      
-      const clientId = req.user.clientId;
       const result = await this.whatsAppClientService.sendTestMessage(clientId, messageData);
-      
-      console.log('=== CONTROLLER: MENSAGEM ENVIADA COM SUCESSO ===');
-      console.log('Resultado:', result);
-      
-      return result;
-    } catch (error) {
-      console.error('=== CONTROLLER: ERRO NO ENVIO ===');
-      console.error('Erro completo:', error);
-      console.error('Stack trace:', error.stack);
-      console.error('Mensagem:', error.message);
-      
-      throw new HttpException(
-        {
-          message: 'Erro ao enviar mensagem de teste',
-          details: error.message,
-          code: error.code || 'UNKNOWN'
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
 
-  /**
-   * Testar credenciais do WhatsApp Business API
-   */
-  @Post('test-credentials')
-  @UseGuards(JwtClientAuthGuard)
-  async testCredentials(@Request() req: any, @Body() credentials: any) {
-    try {
-      console.log('=== CONTROLLER: INÍCIO TESTE DE CREDENCIAIS ===');
-      console.log('ClientId:', req.user.clientId);
-      console.log('Credenciais:', JSON.stringify(credentials, null, 2));
-      
-      const clientId = req.user.clientId;
-      const result = await this.whatsAppClientService.testCredentials(clientId, credentials);
-      
-      console.log('=== CONTROLLER: CREDENCIAIS TESTADAS COM SUCESSO ===');
-      console.log('Resultado:', result);
-      
       return {
         success: true,
-        message: 'Credenciais testadas com sucesso',
+        message: 'Mensagem enviada com sucesso',
         data: result
       };
     } catch (error) {
-      console.error('=== CONTROLLER: ERRO NO TESTE DE CREDENCIAIS ===');
-      console.error('Erro completo:', error);
-      console.error('Stack trace:', error.stack);
-      console.error('Mensagem:', error.message);
-      
       throw new HttpException(
         {
           success: false,
-          message: error.message || 'Erro ao testar credenciais',
+          message: error.message || 'Erro ao enviar mensagem',
           error: error.response?.message || error.message
         },
         error.status || HttpStatus.BAD_REQUEST
@@ -239,260 +138,24 @@ export class WhatsAppClientController {
   }
 
   /**
-   * Buscar estatísticas de uso
+   * Obter histórico de mensagens do cliente
    */
-  @Get('statistics')
+  @Get('messages')
   @UseGuards(JwtClientAuthGuard)
-  async getStatistics(@Request() req) {
+  async getMessageHistory(@Request() req) {
     try {
       const clientId = req.user.clientId;
-      const statistics = await this.whatsAppClientService.getStatistics(clientId);
+      const messages = await this.whatsAppClientService.getMessageHistory(clientId);
 
       return {
         success: true,
-        data: statistics
+        data: messages
       };
     } catch (error) {
       throw new HttpException(
         {
           success: false,
-          message: error.message || 'Erro ao buscar estatísticas',
-          error: error.response?.message || error.message
-        },
-        error.status || HttpStatus.BAD_REQUEST
-      );
-    }
-  }
-
-  /**
-   * Deletar configuração de WhatsApp
-   */
-  @Delete('config')
-  @UseGuards(JwtClientAuthGuard)
-  async deleteConfig(@Request() req) {
-    try {
-      const clientId = req.user.clientId;
-      await this.whatsAppClientService.deleteConfig(clientId);
-
-      return {
-        success: true,
-        message: 'Configuração de WhatsApp deletada com sucesso'
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: error.message || 'Erro ao deletar configuração',
-          error: error.response?.message || error.message
-        },
-        error.status || HttpStatus.BAD_REQUEST
-      );
-    }
-  }
-
-  @Post('force-revalidate')
-  @UseGuards(JwtClientAuthGuard)
-  async forceRevalidateCredentials(@ClientId() clientId: string) {
-    try {
-      console.log('=== CONTROLLER: FORÇAR REVALIDAÇÃO ===');
-      console.log('ClientId:', clientId);
-
-      const result = await this.whatsAppClientService.forceRevalidateCredentials(clientId);
-      
-      console.log('=== CONTROLLER: REVALIDAÇÃO CONCLUÍDA ===');
-      console.log('Resultado:', result);
-
-      return {
-        success: true,
-        message: 'Revalidação forçada concluída com sucesso',
-        data: result.data
-      };
-
-    } catch (error) {
-      console.error('=== CONTROLLER: ERRO NA REVALIDAÇÃO ===');
-      console.error('Erro completo:', error);
-
-      return {
-        success: false,
-        message: error.message || 'Erro ao forçar revalidação',
-        error: error.message
-      };
-    }
-  }
-
-  @Post('check-account-status')
-  @UseGuards(JwtClientAuthGuard)
-  async checkAccountRegistrationStatus(@ClientId() clientId: string) {
-    try {
-      console.log('=== CONTROLLER: VERIFICAR STATUS DA CONTA ===');
-      console.log('ClientId:', clientId);
-
-      const result = await this.whatsAppClientService.checkAccountRegistrationStatus(clientId);
-      
-      console.log('=== CONTROLLER: STATUS DA CONTA VERIFICADO ===');
-      console.log('Resultado:', result);
-
-      return {
-        success: true,
-        message: 'Status da conta verificado com sucesso',
-        data: result.data
-      };
-
-    } catch (error) {
-      console.error('=== CONTROLLER: ERRO AO VERIFICAR STATUS ===');
-      console.error('Erro completo:', error);
-
-      return {
-        success: false,
-        message: error.message || 'Erro ao verificar status da conta',
-        error: error.message
-      };
-    }
-  }
-
-  // ===== ENDPOINTS PARA ADMIN =====
-
-  /**
-   * Listar todas as configurações (apenas admin)
-   */
-  @Get('admin/configs')
-  @UseGuards(JwtAuthGuard)
-  async getAllConfigs(
-    @Query('isActive') isActive?: string,
-    @Query('isVerified') isVerified?: string,
-    @Query('search') search?: string
-  ) {
-    try {
-      const filters: any = {};
-      
-      if (isActive !== undefined) {
-        filters.isActive = isActive === 'true';
-      }
-      
-      if (isVerified !== undefined) {
-        filters.isVerified = isVerified === 'true';
-      }
-      
-      if (search) {
-        filters.search = search;
-      }
-
-      const configs = await this.whatsAppClientService.getAllConfigs(filters);
-
-      return {
-        success: true,
-        data: configs,
-        total: configs.length
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: error.message || 'Erro ao buscar configurações',
-          error: error.response?.message || error.message
-        },
-        error.status || HttpStatus.BAD_REQUEST
-      );
-    }
-  }
-
-  /**
-   * Buscar configuração específica por clientId (apenas admin)
-   */
-  @Get('admin/config/:clientId')
-  @UseGuards(JwtAuthGuard)
-  async getConfigByClientId(@Param('clientId') clientId: string) {
-    try {
-      const config = await this.whatsAppClientService.getConfigByClientId(clientId);
-
-      return {
-        success: true,
-        data: config
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: error.message || 'Erro ao buscar configuração',
-          error: error.response?.message || error.message
-        },
-        error.status || HttpStatus.BAD_REQUEST
-      );
-    }
-  }
-
-  /**
-   * Atualizar configuração específica (apenas admin)
-   */
-  @Put('admin/config/:clientId')
-  @UseGuards(JwtAuthGuard)
-  async updateConfigByClientId(
-    @Param('clientId') clientId: string,
-    @Body() updateDto: UpdateWhatsAppClientConfigDto
-  ) {
-    try {
-      const config = await this.whatsAppClientService.updateConfig(clientId, updateDto);
-
-      return {
-        success: true,
-        message: 'Configuração atualizada com sucesso',
-        data: config
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: error.message || 'Erro ao atualizar configuração',
-          error: error.response?.message || error.message
-        },
-        error.status || HttpStatus.BAD_REQUEST
-      );
-    }
-  }
-
-  /**
-   * Deletar configuração específica (apenas admin)
-   */
-  @Delete('admin/config/:clientId')
-  @UseGuards(JwtAuthGuard)
-  async deleteConfigByClientId(@Param('clientId') clientId: string) {
-    try {
-      await this.whatsAppClientService.deleteConfig(clientId);
-
-      return {
-        success: true,
-        message: 'Configuração deletada com sucesso'
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: error.message || 'Erro ao deletar configuração',
-          error: error.response?.message || error.message
-        },
-        error.status || HttpStatus.BAD_REQUEST
-      );
-    }
-  }
-
-  /**
-   * Verificar número de WhatsApp (apenas admin)
-   */
-  @Post('admin/config/:clientId/verify')
-  @UseGuards(JwtAuthGuard)
-  async verifyNumberByClientId(@Param('clientId') clientId: string) {
-    try {
-      const result = await this.whatsAppClientService.verifyNumber(clientId);
-
-      return {
-        success: result.success,
-        message: result.message
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: error.message || 'Erro ao verificar número',
+          message: error.message || 'Erro ao buscar histórico de mensagens',
           error: error.response?.message || error.message
         },
         error.status || HttpStatus.BAD_REQUEST
