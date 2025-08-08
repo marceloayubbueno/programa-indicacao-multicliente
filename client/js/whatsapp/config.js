@@ -113,21 +113,29 @@ async function loadConfig() {
             console.log('Configuração carregada:', whatsappConfig);
             
             // Preencher formulário simplificado
-            document.getElementById('companyName').value = whatsappConfig.displayName || whatsappConfig.companyName || '';
-            document.getElementById('businessDescription').value = whatsappConfig.businessDescription || '';
+            if (whatsappConfig) {
+                document.getElementById('companyName').value = whatsappConfig.displayName || '';
+                document.getElementById('businessDescription').value = whatsappConfig.businessDescription || '';
+            } else {
+                // Configuração não encontrada, limpar campos
+                document.getElementById('companyName').value = '';
+                document.getElementById('businessDescription').value = '';
+                whatsappConfig = null;
+            }
             
         } else {
-            console.log('Configuração não encontrada, criando nova...');
-            whatsappConfig = {
-                displayName: '',
-                businessDescription: '',
-                isActive: false,
-                isVerified: false
-            };
+            console.log('Erro ao carregar configuração:', response.status);
+            // Limpar campos em caso de erro
+            document.getElementById('companyName').value = '';
+            document.getElementById('businessDescription').value = '';
+            whatsappConfig = null;
         }
     } catch (error) {
         console.error('Erro ao carregar configuração:', error);
-        showError('Erro ao carregar configuração');
+        // Limpar campos em caso de erro
+        document.getElementById('companyName').value = '';
+        document.getElementById('businessDescription').value = '';
+        whatsappConfig = null;
     }
 }
 
@@ -146,7 +154,7 @@ async function loadActivityLogs() {
         if (response.ok) {
             const data = await response.json();
             renderActivityLogs(data.data || []);
-        } else {
+    } else {
             renderActivityLogs([]);
         }
     } catch (error) {
@@ -180,8 +188,12 @@ async function saveWhatsAppConfig() {
         const token = getToken();
         const url = `${window.API_BASE_URL}/whatsapp/client/config`;
         
+        // Determinar se deve usar POST (criar) ou PUT (atualizar)
+        const method = whatsappConfig && whatsappConfig._id ? 'PUT' : 'POST';
+        console.log('Usando método:', method);
+        
         const response = await fetch(url, {
-            method: 'POST',
+            method: method,
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -191,7 +203,7 @@ async function saveWhatsAppConfig() {
         
         if (response.ok) {
             const result = await response.json();
-            whatsappConfig = result.data || result;
+            whatsappConfig = result.data;
             
             showSuccess('Configuração salva com sucesso!');
             await loadActivityLogs();
@@ -211,49 +223,6 @@ function resetWhatsAppConfig() {
         document.getElementById('businessDescription').value = '';
         showSuccess('Configuração resetada');
     }
-}
-
-async function sendTestMessage() {
-    try {
-        const testNumber = document.getElementById('testNumber').value.trim();
-        const testMessage = document.getElementById('testMessage').value.trim();
-        
-        if (!testNumber || !testMessage) {
-            showError('Número e mensagem são obrigatórios');
-            return;
-        }
-        
-        const token = getToken();
-        const url = `${window.API_BASE_URL}/whatsapp/client/message`;
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                to: testNumber,
-                message: testMessage
-            })
-        });
-        
-        if (response.ok) {
-            showSuccess('Mensagem de teste enviada com sucesso!');
-            await loadActivityLogs();
-        } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao enviar mensagem');
-        }
-    } catch (error) {
-        console.error('Erro ao enviar mensagem de teste:', error);
-        showError('Erro ao enviar mensagem: ' + error.message);
-    }
-}
-
-function fillTestDefaults() {
-    document.getElementById('testNumber').value = '+5511999999999';
-    document.getElementById('testMessage').value = 'Olá! Este é um teste do sistema Viral Lead';
 }
 
 async function refreshLogs() {

@@ -57,7 +57,7 @@ export class WhatsAppClientService {
       return await newConfig.save();
     } catch (error) {
       if (error instanceof ConflictException) {
-        throw error;
+      throw error;
       }
       throw new BadRequestException('Erro ao criar configuração: ' + error.message);
     }
@@ -66,21 +66,14 @@ export class WhatsAppClientService {
   /**
    * Obter configuração de WhatsApp por clientId
    */
-  async getConfigByClientId(clientId: string): Promise<WhatsAppClientConfigDocument> {
+  async getConfigByClientId(clientId: string): Promise<WhatsAppClientConfigDocument | null> {
     try {
       const config = await this.whatsAppClientConfigModel.findOne({
         clientId: new Types.ObjectId(clientId)
       });
 
-      if (!config) {
-        throw new NotFoundException('Configuração de WhatsApp não encontrada para este cliente');
-      }
-
-      return config;
+      return config; // Retorna null se não encontrar
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
       throw new BadRequestException('Erro ao buscar configuração: ' + error.message);
     }
   }
@@ -125,6 +118,9 @@ export class WhatsAppClientService {
     try {
       // Verificar se o cliente tem configuração
       const config = await this.getConfigByClientId(clientId);
+      if (!config) {
+        throw new BadRequestException('Configuração de WhatsApp não encontrada para este cliente');
+      }
       if (!config.isActive) {
         throw new BadRequestException('Configuração de WhatsApp não está ativa');
       }
@@ -185,13 +181,13 @@ export class WhatsAppClientService {
       };
 
       const response = await axios.post(url, payload, {
-        headers: {
+          headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'apikey': gupshupConfig.apiKey
-        }
+          }
       });
-
-      return {
+      
+        return {
         messageId: response.data.messageId,
         status: 'sent'
       };

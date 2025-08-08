@@ -61,6 +61,14 @@ export class WhatsAppClientController {
       const clientId = req.user.clientId;
       const config = await this.whatsAppClientService.getConfigByClientId(clientId);
 
+      if (!config) {
+        return {
+          success: true,
+          data: null,
+          message: 'Configuração não encontrada'
+        };
+      }
+
       return {
         success: true,
         data: config
