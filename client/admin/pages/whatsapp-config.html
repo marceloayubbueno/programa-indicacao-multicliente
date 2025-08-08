@@ -119,7 +119,7 @@
                                 <i class="fas fa-cog text-blue-400 mr-2"></i>
                                 Configuração Gupshup
                             </h2>
-                            <button onclick="testGupshupConnection()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+                            <button id="test-gupshup-connection" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
                                 <i class="fas fa-plug mr-2"></i>
                                 Testar Conexão
                             </button>
@@ -143,7 +143,7 @@
                                 <div class="relative">
                                     <input type="password" id="gupshup-api-key" value="ojlftrm5pv02cemljepf29g86wyrpuk8"
                                            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <button onclick="togglePasswordVisibility('gupshup-api-key')" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
+                                    <button id="toggle-api-key" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
@@ -174,10 +174,10 @@
 
                         <!-- Ações -->
                         <div class="flex gap-3 mt-6">
-                            <button onclick="saveGupshupConfig()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                            <button id="save-gupshup-config" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
                                 <i class="fas fa-save mr-2"></i>Salvar Configuração
                             </button>
-                            <button onclick="resetGupshupConfig()" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-medium transition-colors">
+                            <button id="reset-gupshup-config" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-medium transition-colors">
                                 <i class="fas fa-undo mr-2"></i>Resetar
                             </button>
                         </div>
@@ -190,7 +190,7 @@
                                 <i class="fas fa-dollar-sign text-green-400 mr-2"></i>
                                 Configuração de Preços
                             </h2>
-                            <button onclick="savePricing()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+                            <button id="save-pricing" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
                                 <i class="fas fa-save mr-2"></i>
                                 Salvar Preços
                             </button>
@@ -293,214 +293,12 @@
     <!-- Scripts -->
     <script src="../../js/config.js"></script>
     <script src="../../js/admin/auth.js"></script>
+    <script src="../../js/admin/whatsapp-admin.js"></script>
     <script>
         // Função de logout
         function handleLogout() {
             localStorage.removeItem('adminToken');
             window.location.href = 'login.html';
-        }
-
-        // Toggle password visibility
-        function togglePasswordVisibility(inputId) {
-            const input = document.getElementById(inputId);
-            const button = input.nextElementSibling;
-            const icon = button.querySelector('i');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-
-        // WhatsApp Business API Configuration Management
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('WhatsApp Gupshup Config page loaded');
-            
-            // Carregar configurações salvas
-            loadSavedConfig();
-        });
-
-        async function loadSavedConfig() {
-            try {
-                console.log('Carregando configurações salvas...');
-                
-                const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/config`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    }
-                });
-
-                if (response.ok) {
-                    const config = await response.json();
-                    console.log('Configurações carregadas:', config);
-                    
-                    // Preencher campos com dados salvos
-                    fillConfigFields(config);
-                    
-                    // Atualizar status
-                    updateStatusDisplay(config);
-                } else {
-                    console.log('Nenhuma configuração salva encontrada, usando padrão');
-                    setDefaultConfig();
-                }
-            } catch (error) {
-                console.error('Erro ao carregar configurações:', error);
-                setDefaultConfig();
-            }
-        }
-
-        function fillConfigFields(config) {
-            // Preencher configurações Gupshup
-            if (config.gupshupConfig) {
-                document.getElementById('gupshup-api-key').value = config.gupshupConfig.apiKey || 'ojlftrm5pv02cemljepf29g86wyrpuk8';
-                document.getElementById('gupshup-app-name').value = config.gupshupConfig.appName || 'ViralLeadWhatsApp';
-                document.getElementById('gupshup-client-id').value = config.gupshupConfig.clientId || '4000307927';
-                document.getElementById('gupshup-source-number').value = config.gupshupConfig.sourceNumber || '15557777720';
-            }
-
-            // Preencher configurações de preços
-            if (config.pricingConfig) {
-                document.getElementById('price-per-message').value = config.pricingConfig.pricePerMessage || '0.05';
-                document.getElementById('monthly-limit-per-client').value = config.pricingConfig.monthlyLimitPerClient || '1000';
-                document.getElementById('setup-fee').value = config.pricingConfig.setupFee || '0.00';
-            }
-        }
-
-        function setDefaultConfig() {
-            console.log('Using default Gupshup configuration');
-        }
-
-        async function saveGupshupConfig() {
-            console.log('Saving Gupshup configuration...');
-            
-            try {
-                const config = getGupshupConfig();
-                
-                const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/gupshup-config`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    },
-                    body: JSON.stringify(config)
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    alert('Configuração Gupshup salva com sucesso!');
-                    console.log('Gupshup config saved:', result);
-                    
-                    updateStatusDisplay(result);
-                } else {
-                    const error = await response.json();
-                    alert(`Erro ao salvar: ${error.message || 'Erro desconhecido'}`);
-                }
-            } catch (error) {
-                console.error('Error saving Gupshup config:', error);
-                alert('Erro ao conectar com o servidor');
-            }
-        }
-
-        async function savePricing() {
-            console.log('Saving pricing configuration...');
-            
-            try {
-                const pricing = getPricingConfig();
-                
-                const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/pricing-config`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    },
-                    body: JSON.stringify(pricing)
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    alert('Configuração de preços salva com sucesso!');
-                    console.log('Pricing config saved:', result);
-                } else {
-                    const error = await response.json();
-                    alert(`Erro ao salvar: ${error.message || 'Erro desconhecido'}`);
-                }
-            } catch (error) {
-                console.error('Error saving pricing config:', error);
-                alert('Erro ao conectar com o servidor');
-            }
-        }
-
-        async function testGupshupConnection() {
-            console.log('Testing Gupshup connection...');
-            
-            try {
-                const response = await fetch(`${window.API_BASE_URL}/admin/whatsapp/test-gupshup-connection`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    }
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    alert('Conexão com Gupshup testada com sucesso!');
-                    console.log('Gupshup connection test:', result);
-                    
-                    updateStatusDisplay(result);
-                } else {
-                    const error = await response.json();
-                    alert(`Erro no teste: ${error.message || 'Erro desconhecido'}`);
-                }
-            } catch (error) {
-                console.error('Error testing Gupshup connection:', error);
-                alert('Erro ao conectar com o servidor');
-            }
-        }
-
-        function resetGupshupConfig() {
-            console.log('Resetting Gupshup configuration...');
-            if (confirm('Tem certeza que deseja resetar a configuração do Gupshup?')) {
-                document.getElementById('gupshup-api-key').value = 'ojlftrm5pv02cemljepf29g86wyrpuk8';
-                document.getElementById('gupshup-app-name').value = 'ViralLeadWhatsApp';
-                document.getElementById('gupshup-client-id').value = '4000307927';
-                document.getElementById('gupshup-source-number').value = '15557777720';
-                
-                alert('Configuração Gupshup resetada!');
-            }
-        }
-
-        // Funções auxiliares
-        function getGupshupConfig() {
-            return {
-                apiKey: document.getElementById('gupshup-api-key').value,
-                appName: document.getElementById('gupshup-app-name').value,
-                clientId: document.getElementById('gupshup-client-id').value,
-                sourceNumber: document.getElementById('gupshup-source-number').value
-            };
-        }
-
-        function getPricingConfig() {
-            return {
-                pricePerMessage: parseFloat(document.getElementById('price-per-message').value) || 0.05,
-                monthlyLimitPerClient: parseInt(document.getElementById('monthly-limit-per-client').value) || 1000,
-                setupFee: parseFloat(document.getElementById('setup-fee').value) || 0.00
-            };
-        }
-
-        function updateStatusDisplay(config) {
-            if (config) {
-                document.getElementById('provider-name').textContent = 'Gupshup';
-                document.getElementById('connection-status').textContent = 'Conectado';
-                document.getElementById('whatsapp-status').innerHTML = 
-                    '<i class="fas fa-circle mr-1 text-green-400"></i>Plataforma Ativa';
-            }
         }
     </script>
 </body>
