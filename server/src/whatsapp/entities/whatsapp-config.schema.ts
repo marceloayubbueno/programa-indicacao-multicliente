@@ -18,6 +18,22 @@ export class WhatsAppConfig {
   };
 
   @Prop({ type: Object, default: {} })
+  gupshupConfig: {
+    apiKey: string;
+    appName: string;
+    clientId: string;
+    sourceNumber: string;
+    isConnected: boolean;
+  };
+
+  @Prop({ type: Object, default: {} })
+  pricingConfig: {
+    pricePerMessage: number;
+    monthlyLimitPerClient: number;
+    setupFee: number;
+  };
+
+  @Prop({ type: Object, default: {} })
   globalSettings: {
     // Configurações de Rate Limiting
     globalRateLimitPerMinute: number;

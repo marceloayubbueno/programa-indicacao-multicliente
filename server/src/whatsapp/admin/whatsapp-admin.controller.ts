@@ -7,6 +7,137 @@ import { WhatsAppAdminService } from './whatsapp-admin.service';
 export class WhatsAppAdminController {
   constructor(private readonly whatsappAdminService: WhatsAppAdminService) {}
 
+  // ===== ENDPOINTS GUPSHUP =====
+
+  @Get('gupshup-config')
+  async getGupshupConfig() {
+    try {
+      const config = await this.whatsappAdminService.getGupshupConfig();
+      return {
+        success: true,
+        data: config
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Erro ao buscar configuração Gupshup',
+          error: error.message
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post('gupshup-config')
+  async saveGupshupConfig(@Body() configData: any) {
+    try {
+      const result = await this.whatsappAdminService.saveGupshupConfig(configData);
+      return {
+        success: true,
+        data: result,
+        message: 'Configuração Gupshup salva com sucesso'
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Erro ao salvar configuração Gupshup',
+          error: error.message
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post('test-gupshup-connection')
+  async testGupshupConnection() {
+    try {
+      const result = await this.whatsappAdminService.testGupshupConnection();
+      return {
+        success: true,
+        data: result,
+        message: 'Conexão com Gupshup testada com sucesso'
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Erro ao testar conexão Gupshup',
+          error: error.message
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  // ===== ENDPOINTS DE PREÇOS =====
+
+  @Get('pricing-config')
+  async getPricingConfig() {
+    try {
+      const config = await this.whatsappAdminService.getPricingConfig();
+      return {
+        success: true,
+        data: config
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Erro ao buscar configuração de preços',
+          error: error.message
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post('pricing-config')
+  async savePricingConfig(@Body() pricingData: any) {
+    try {
+      const result = await this.whatsappAdminService.savePricingConfig(pricingData);
+      return {
+        success: true,
+        data: result,
+        message: 'Configuração de preços salva com sucesso'
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Erro ao salvar configuração de preços',
+          error: error.message
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  // ===== ENDPOINTS DE ESTATÍSTICAS =====
+
+  @Get('statistics')
+  async getStatistics() {
+    try {
+      const stats = await this.whatsappAdminService.getStatistics();
+      return {
+        success: true,
+        data: stats
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Erro ao buscar estatísticas',
+          error: error.message
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  // ===== ENDPOINTS LEGADOS (MANTIDOS PARA COMPATIBILIDADE) =====
+
   @Get('config')
   async getConfig() {
     try {

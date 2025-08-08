@@ -112,7 +112,7 @@ export class WhatsAppAdminService {
           connected: isConnected,
           messagesToday: await this.getMessagesToday(),
           dailyLimit: this.getDailyLimit(),
-          activeClients: await this.getActiveClients(),
+          activeClients: await this.getActiveClientsCount(),
           totalTemplates: await this.getTotalTemplates()
         };
       } catch (error) {
@@ -256,7 +256,7 @@ export class WhatsAppAdminService {
       connected: config.status?.connected || false,
       messagesToday: await this.getMessagesToday(),
       dailyLimit: this.getDailyLimit(),
-      activeClients: await this.getActiveClients(),
+      activeClients: await this.getActiveClientsCount(),
       totalTemplates: await this.getTotalTemplates()
     };
 
@@ -536,7 +536,7 @@ export class WhatsAppAdminService {
     return 5000; // WhatsApp Business API tem limite mais alto
   }
 
-  private async getActiveClients(): Promise<number> {
+  private async getActiveClientsCount(): Promise<number> {
     // TODO: Implementar contagem de clientes ativos
     return 0;
   }
@@ -727,6 +727,342 @@ export class WhatsAppAdminService {
     } catch (error) {
       console.error('Erro ao verificar status da mensagem:', error);
       throw error;
+    }
+  }
+
+  // ===== MÉTODOS GUPSHUP =====
+
+  async getGupshupConfig(): Promise<any> {
+    try {
+      const config = await this.getConfig();
+      return {
+        apiKey: config?.gupshupConfig?.apiKey || 'ojlftrm5pv02cemljepf29g86wyrpuk8',
+        appName: config?.gupshupConfig?.appName || 'ViralLeadWhatsApp',
+        clientId: config?.gupshupConfig?.clientId || '4000307927',
+        sourceNumber: config?.gupshupConfig?.sourceNumber || '15557777720',
+        isConnected: config?.gupshupConfig?.isConnected || false
+      };
+    } catch (error) {
+      console.error('Erro ao buscar configuração Gupshup:', error);
+      throw new Error('Erro ao buscar configuração Gupshup');
+    }
+  }
+
+  async saveGupshupConfig(configData: any): Promise<any> {
+    try {
+      const { apiKey, appName, clientId, sourceNumber } = configData;
+      
+      // Validar dados
+      if (!apiKey || !appName || !clientId || !sourceNumber) {
+        throw new Error('Todos os campos são obrigatórios');
+      }
+
+      // Buscar configuração existente ou criar nova
+      let config = await this.whatsappConfigModel.findOne({ type: 'admin' });
+      
+      if (!config) {
+        config = new this.whatsappConfigModel({
+          type: 'admin',
+          gupshupConfig: {
+            apiKey,
+            appName,
+            clientId,
+            sourceNumber,
+            isConnected: false
+          },
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      } else {
+        config.gupshupConfig = {
+          apiKey,
+          appName,
+          clientId,
+          sourceNumber,
+          isConnected: config.gupshupConfig?.isConnected || false
+        };
+        // Mongoose timestamps: true cuida automaticamente do updatedAt
+      }
+
+      const savedConfig = await config.save();
+      console.log('Configuração Gupshup salva:', savedConfig._id);
+
+      return {
+        apiKey: savedConfig.gupshupConfig.apiKey,
+        appName: savedConfig.gupshupConfig.appName,
+        clientId: savedConfig.gupshupConfig.clientId,
+        sourceNumber: savedConfig.gupshupConfig.sourceNumber,
+        isConnected: savedConfig.gupshupConfig.isConnected
+      };
+    } catch (error) {
+      console.error('Erro ao salvar configuração Gupshup:', error);
+      throw new Error('Erro ao salvar configuração Gupshup');
+    }
+  }
+
+  async testGupshupConnection(): Promise<any> {
+    try {
+      const config = await this.getGupshupConfig();
+      
+      if (!config.apiKey) {
+        throw new Error('API Key não configurada');
+      }
+
+      // Testar conexão com Gupshup
+      const testResult = await this.testGupshupApiConnection(config);
+      
+      // Atualizar status de conexão
+      await this.updateGupshupConnectionStatus(testResult.success);
+      
+      return {
+        success: testResult.success,
+        message: testResult.success ? 'Conexão com Gupshup estabelecida' : 'Falha na conexão com Gupshup',
+        details: testResult.details
+      };
+    } catch (error) {
+      console.error('Erro ao testar conexão Gupshup:', error);
+      throw new Error('Erro ao testar conexão Gupshup');
+    }
+  }
+
+  private async testGupshupApiConnection(config: any): Promise<any> {
+    try {
+      // Teste básico de conectividade com Gupshup
+      const response = await axios.get('https://api.gupshup.io/wa/api/v1/account/status', {
+        headers: {
+          'apikey': config.apiKey,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      return {
+        success: response.status === 200,
+        details: response.data
+      };
+    } catch (error) {
+      console.error('Erro na API Gupshup:', error.response?.data || error.message);
+      return {
+        success: false,
+        details: error.response?.data || error.message
+      };
+    }
+  }
+
+  private async updateGupshupConnectionStatus(isConnected: boolean): Promise<void> {
+    try {
+      await this.whatsappConfigModel.updateOne(
+        { type: 'admin' },
+        { 
+          $set: { 
+            'gupshupConfig.isConnected': isConnected,
+            updatedAt: new Date()
+          } 
+        }
+      );
+    } catch (error) {
+      console.error('Erro ao atualizar status de conexão:', error);
+    }
+  }
+
+  // ===== MÉTODOS DE PREÇOS =====
+
+  async getPricingConfig(): Promise<any> {
+    try {
+      const config = await this.getConfig();
+      return {
+        pricePerMessage: config?.pricingConfig?.pricePerMessage || 0.05,
+        monthlyLimitPerClient: config?.pricingConfig?.monthlyLimitPerClient || 1000,
+        setupFee: config?.pricingConfig?.setupFee || 0.00
+      };
+    } catch (error) {
+      console.error('Erro ao buscar configuração de preços:', error);
+      throw new Error('Erro ao buscar configuração de preços');
+    }
+  }
+
+  async savePricingConfig(pricingData: any): Promise<any> {
+    try {
+      const { pricePerMessage, monthlyLimitPerClient, setupFee } = pricingData;
+      
+      // Validar dados
+      if (pricePerMessage < 0.01 || pricePerMessage > 1.00) {
+        throw new Error('Preço por mensagem deve estar entre R$ 0,01 e R$ 1,00');
+      }
+      
+      if (monthlyLimitPerClient < 100 || monthlyLimitPerClient > 10000) {
+        throw new Error('Limite mensal deve estar entre 100 e 10.000 mensagens');
+      }
+      
+      if (setupFee < 0 || setupFee > 100) {
+        throw new Error('Taxa de setup deve estar entre R$ 0,00 e R$ 100,00');
+      }
+
+      // Buscar configuração existente ou criar nova
+      let config = await this.whatsappConfigModel.findOne({ type: 'admin' });
+      
+      if (!config) {
+        config = new this.whatsappConfigModel({
+          type: 'admin',
+          pricingConfig: {
+            pricePerMessage,
+            monthlyLimitPerClient,
+            setupFee
+          },
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      } else {
+        config.pricingConfig = {
+          pricePerMessage,
+          monthlyLimitPerClient,
+          setupFee
+        };
+        // Mongoose timestamps: true cuida automaticamente do updatedAt
+      }
+
+      const savedConfig = await config.save();
+      console.log('Configuração de preços salva:', savedConfig._id);
+
+      return {
+        pricePerMessage: savedConfig.pricingConfig.pricePerMessage,
+        monthlyLimitPerClient: savedConfig.pricingConfig.monthlyLimitPerClient,
+        setupFee: savedConfig.pricingConfig.setupFee
+      };
+    } catch (error) {
+      console.error('Erro ao salvar configuração de preços:', error);
+      throw new Error('Erro ao salvar configuração de preços');
+    }
+  }
+
+  // ===== MÉTODOS DE ESTATÍSTICAS =====
+
+  async getStatistics(): Promise<any> {
+    try {
+      // Buscar estatísticas do banco
+      const [
+        totalClients,
+        activeClients,
+        totalMessagesSent,
+        messagesThisMonth,
+        totalRevenue,
+        revenueThisMonth,
+        deliveryRate,
+        avgDeliveryTime
+      ] = await Promise.all([
+        this.getTotalClients(),
+        this.getActiveClientsStats(),
+        this.getTotalMessagesSent(),
+        this.getMessagesThisMonth(),
+        this.getTotalRevenue(),
+        this.getRevenueThisMonth(),
+        this.getDeliveryRate(),
+        this.getAverageDeliveryTime()
+      ]);
+
+      return {
+        totalClients,
+        activeClients,
+        totalMessagesSent,
+        messagesThisMonth,
+        totalRevenue,
+        revenueThisMonth,
+        deliveryRate,
+        avgDeliveryTime
+      };
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas:', error);
+      throw new Error('Erro ao buscar estatísticas');
+    }
+  }
+
+  private async getTotalClients(): Promise<number> {
+    try {
+      // Implementar lógica para contar clientes totais
+      return 0; // Placeholder
+    } catch (error) {
+      console.error('Erro ao contar clientes totais:', error);
+      return 0;
+    }
+  }
+
+  private async getActiveClientsStats(): Promise<number> {
+    try {
+      // Implementar lógica para contar clientes ativos
+      return 0; // Placeholder
+    } catch (error) {
+      console.error('Erro ao contar clientes ativos:', error);
+      return 0;
+    }
+  }
+
+  private async getTotalMessagesSent(): Promise<number> {
+    try {
+      const count = await this.whatsappMessageModel.countDocuments({});
+      return count;
+    } catch (error) {
+      console.error('Erro ao contar mensagens totais:', error);
+      return 0;
+    }
+  }
+
+  private async getMessagesThisMonth(): Promise<number> {
+    try {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      
+      const count = await this.whatsappMessageModel.countDocuments({
+        sentAt: { $gte: startOfMonth }
+      });
+      return count;
+    } catch (error) {
+      console.error('Erro ao contar mensagens do mês:', error);
+      return 0;
+    }
+  }
+
+  private async getTotalRevenue(): Promise<number> {
+    try {
+      // Implementar lógica para calcular receita total
+      return 0; // Placeholder
+    } catch (error) {
+      console.error('Erro ao calcular receita total:', error);
+      return 0;
+    }
+  }
+
+  private async getRevenueThisMonth(): Promise<number> {
+    try {
+      // Implementar lógica para calcular receita do mês
+      return 0; // Placeholder
+    } catch (error) {
+      console.error('Erro ao calcular receita do mês:', error);
+      return 0;
+    }
+  }
+
+  private async getDeliveryRate(): Promise<number> {
+    try {
+      const totalMessages = await this.whatsappMessageModel.countDocuments({});
+      const deliveredMessages = await this.whatsappMessageModel.countDocuments({
+        status: { $in: ['delivered', 'read'] }
+      });
+      
+      return totalMessages > 0 ? Math.round((deliveredMessages / totalMessages) * 100) : 0;
+    } catch (error) {
+      console.error('Erro ao calcular taxa de entrega:', error);
+      return 0;
+    }
+  }
+
+  private async getAverageDeliveryTime(): Promise<number> {
+    try {
+      // Implementar lógica para calcular tempo médio de entrega
+      return 0; // Placeholder
+    } catch (error) {
+      console.error('Erro ao calcular tempo médio de entrega:', error);
+      return 0;
     }
   }
 } 
