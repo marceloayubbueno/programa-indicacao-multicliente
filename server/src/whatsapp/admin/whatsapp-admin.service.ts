@@ -758,11 +758,10 @@ export class WhatsAppAdminService {
       }
 
       // Buscar configuração existente ou criar nova
-      let config = await this.whatsappConfigModel.findOne({ type: 'admin' });
+      let config = await this.whatsappConfigModel.findOne();
       
       if (!config) {
         config = new this.whatsappConfigModel({
-          type: 'admin',
           gupshupConfig: {
             apiKey,
             appName,
@@ -852,7 +851,7 @@ export class WhatsAppAdminService {
   private async updateGupshupConnectionStatus(isConnected: boolean): Promise<void> {
     try {
       await this.whatsappConfigModel.updateOne(
-        { type: 'admin' },
+        {},
         { 
           $set: { 
             'gupshupConfig.isConnected': isConnected,
@@ -899,11 +898,10 @@ export class WhatsAppAdminService {
       }
 
       // Buscar configuração existente ou criar nova
-      let config = await this.whatsappConfigModel.findOne({ type: 'admin' });
+      let config = await this.whatsappConfigModel.findOne();
       
       if (!config) {
         config = new this.whatsappConfigModel({
-          type: 'admin',
           pricingConfig: {
             pricePerMessage,
             monthlyLimitPerClient,
