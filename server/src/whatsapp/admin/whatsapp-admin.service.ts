@@ -735,12 +735,21 @@ export class WhatsAppAdminService {
   async getGupshupConfig(): Promise<any> {
     try {
       const config = await this.getConfig();
+      const apiKey = config?.gupshupConfig?.apiKey || 'ojlftrm5pv02cemljepf29g86wyrpuk8';
+      const appName = config?.gupshupConfig?.appName || 'ViralLeadWhatsApp';
+      const clientId = config?.gupshupConfig?.clientId || '4000307927';
+      const sourceNumber = config?.gupshupConfig?.sourceNumber || '15557777720';
+      
+      // Verificar se há configuração válida
+      const hasValidConfig = apiKey && apiKey.length > 10 && appName && clientId && sourceNumber;
+      const isConnected = config?.gupshupConfig?.isConnected || hasValidConfig;
+      
       return {
-        apiKey: config?.gupshupConfig?.apiKey || 'ojlftrm5pv02cemljepf29g86wyrpuk8',
-        appName: config?.gupshupConfig?.appName || 'ViralLeadWhatsApp',
-        clientId: config?.gupshupConfig?.clientId || '4000307927',
-        sourceNumber: config?.gupshupConfig?.sourceNumber || '15557777720',
-        isConnected: config?.gupshupConfig?.isConnected || false
+        apiKey,
+        appName,
+        clientId,
+        sourceNumber,
+        isConnected
       };
     } catch (error) {
       console.error('Erro ao buscar configuração Gupshup:', error);

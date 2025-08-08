@@ -168,7 +168,9 @@ class WhatsAppAdmin {
             }
         });
 
-        this.updateConnectionStatus(config.isConnected || false);
+        // Verificar se há configuração válida para determinar status
+        const hasValidConfig = config.apiKey && config.apiKey.length > 10;
+        this.updateConnectionStatus(config.isConnected || hasValidConfig);
     }
 
     /**
