@@ -11,7 +11,7 @@
 class WhatsAppAdmin {
     constructor() {
         this.config = {
-            apiBaseUrl: window.APP_CONFIG?.apiBaseUrl || '/api',
+            apiBaseUrl: window.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api',
             endpoints: {
                 gupshupConfig: '/admin/whatsapp/gupshup-config',
                 pricingConfig: '/admin/whatsapp/pricing-config',
@@ -541,6 +541,13 @@ class WhatsAppAdmin {
      */
     async makeRequest(method, endpoint, data = null) {
         const url = `${this.config.apiBaseUrl}${endpoint}`;
+        console.log('🌐 Fazendo requisição:', {
+            method,
+            url,
+            data,
+            apiBaseUrl: this.config.apiBaseUrl
+        });
+        
         const options = {
             method,
             headers: {
@@ -553,8 +560,16 @@ class WhatsAppAdmin {
             options.body = JSON.stringify(data);
         }
         
+        console.log('📤 Enviando requisição para:', url);
         const response = await fetch(url, options);
+        console.log('📥 Resposta recebida:', {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url
+        });
+        
         const result = await response.json();
+        console.log('📄 Dados da resposta:', result);
         
         if (!response.ok) {
             throw new Error(result.message || 'Erro na requisição');
