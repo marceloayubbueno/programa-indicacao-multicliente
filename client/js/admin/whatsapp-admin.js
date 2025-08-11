@@ -13,9 +13,11 @@ class WhatsAppAdmin {
         this.config = {
             apiBaseUrl: window.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api',
             endpoints: {
-                gupshupConfig: '/admin/whatsapp/gupshup-config',
+                twilioConfig: '/admin/whatsapp/twilio/config',
+                twilioTestConnection: '/admin/whatsapp/twilio/test-connection',
+                twilioTestMessage: '/admin/whatsapp/twilio/test-message',
+                twilioStatus: '/admin/whatsapp/twilio/status',
                 pricingConfig: '/admin/whatsapp/pricing-config',
-                testConnection: '/admin/whatsapp/test-gupshup-connection',
                 statistics: '/admin/whatsapp/statistics',
                 globalSettings: '/admin/whatsapp/global-settings'
             }
@@ -38,14 +40,23 @@ class WhatsAppAdmin {
      * Vincular eventos aos elementos da interface
      */
     bindEvents() {
-        // Botões de configuração
-        document.getElementById('save-gupshup-config')?.addEventListener('click', () => this.saveGupshupConfig());
-        document.getElementById('test-gupshup-connection')?.addEventListener('click', () => this.testGupshupConnection());
+        // Botões de configuração Twilio
+        document.getElementById('save-twilio-config')?.addEventListener('click', () => this.saveTwilioConfig());
+        document.getElementById('test-twilio-connection')?.addEventListener('click', () => this.testTwilioConnection());
+        document.getElementById('reset-twilio-config')?.addEventListener('click', () => this.resetTwilioConfig());
+        
+        // Botão de teste de mensagem
+        document.getElementById('send-test-message')?.addEventListener('click', () => this.sendTestMessage());
+        
+        // Botão de teste de conexão ativa
+        document.getElementById('test-active-connection')?.addEventListener('click', () => this.testActiveConnection());
+        
+        // Botão de preços
         document.getElementById('save-pricing')?.addEventListener('click', () => this.savePricing());
-        document.getElementById('reset-gupshup-config')?.addEventListener('click', () => this.resetGupshupConfig());
 
-        // Toggle de visibilidade da API key
-        document.getElementById('toggle-api-key')?.addEventListener('click', () => this.toggleApiKeyVisibility());
+        // Toggle de visibilidade das senhas
+        document.getElementById('toggle-account-sid')?.addEventListener('click', () => this.togglePasswordVisibility('twilio-account-sid', 'toggle-account-sid'));
+        document.getElementById('toggle-auth-token')?.addEventListener('click', () => this.togglePasswordVisibility('twilio-auth-token', 'toggle-auth-token'));
 
         // Validação em tempo real
         this.bindRealTimeValidation();
@@ -96,7 +107,7 @@ class WhatsAppAdmin {
     async loadInitialData() {
         try {
             await Promise.all([
-                this.loadGupshupConfig(),
+                this.loadTwilioConfig(),
                 this.loadPricingConfig(),
                 this.loadStatistics()
             ]);
@@ -107,16 +118,20 @@ class WhatsAppAdmin {
     }
 
     /**
-     * Carregar configuração do Gupshup
+     * Carregar configuração do Twilio
      */
-    async loadGupshupConfig() {
+    async loadTwilioConfig() {
         try {
-            const response = await this.makeRequest('GET', this.config.endpoints.gupshupConfig);
+            const response = await this.makeRequest('GET', this.config.endpoints.twilioConfig);
             if (response.success) {
-                this.fillGupshupConfig(response.data);
+                this.fillTwilioConfig(response.data);
+            } else {
+                // Se não há configuração, mostrar status como não configurado
+                this.updateConnectionStatus(false);
             }
         } catch (error) {
-            console.error('Erro ao carregar configuração Gupshup:', error);
+            console.error('Erro ao carregar configuração Twilio:', error);
+            this.updateConnectionStatus(false);
         }
     }
 
@@ -149,16 +164,16 @@ class WhatsAppAdmin {
     }
 
     /**
-     * Preencher configuração do Gupshup
+     * Preencher configuração do Twilio
      */
-    fillGupshupConfig(config) {
+    fillTwilioConfig(config) {
         if (!config) return;
 
         const elements = {
-            'gupshup-api-key': config.apiKey || 'ojlftrm5pv02cemljepf29g86wyrpuk8',
-            'gupshup-app-name': config.appName || 'ViralLeadWhatsApp',
-            'gupshup-client-id': config.clientId || '4000307927',
-            'gupshup-source-number': config.sourceNumber || '15557777720'
+            'twilio-account-sid': config.accountSid || '',
+            'twilio-auth-token': config.authToken || '',
+            'twilio-phone-number': config.phoneNumber || '',
+            'twilio-webhook-url': config.webhookUrl || ''
         };
 
         Object.entries(elements).forEach(([id, value]) => {
@@ -169,8 +184,8 @@ class WhatsAppAdmin {
         });
 
         // Verificar se há configuração válida para determinar status
-        const hasValidConfig = config.apiKey && config.apiKey.length > 10;
-        this.updateConnectionStatus(config.isConnected || hasValidConfig);
+        const hasValidConfig = config.accountSid && config.authToken && config.phoneNumber;
+        this.updateConnectionStatus(config.isActive || hasValidConfig);
     }
 
     /**
@@ -598,6 +613,205 @@ class WhatsAppAdmin {
         setInterval(() => {
             this.loadStatistics();
         }, 30000);
+    }
+
+    /**
+     * Salvar configuração Twilio
+     */
+    async saveTwilioConfig() {
+        try {
+            const config = this.getTwilioConfig();
+            
+            if (!this.validateTwilioConfig(config)) {
+                return;
+            }
+
+            this.showLoading('save-twilio-config', 'Salvando...');
+            
+            const method = config._id ? 'PUT' : 'POST';
+            const response = await this.makeRequest(method, this.config.endpoints.twilioConfig, config);
+            
+            if (response.success) {
+                this.showNotification('Configuração Twilio salva com sucesso!', 'success');
+                await this.loadTwilioConfig(); // Recarregar para atualizar status
+            } else {
+                this.showNotification('Erro ao salvar configuração', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao salvar configuração Twilio:', error);
+            this.showNotification(`Erro ao salvar: ${error.message}`, 'error');
+        } finally {
+            this.hideLoading('save-twilio-config', 'Salvar Configuração');
+        }
+    }
+
+    /**
+     * Testar conexão Twilio
+     */
+    async testTwilioConnection() {
+        try {
+            this.showLoading('test-twilio-connection', 'Testando...');
+            
+            const response = await this.makeRequest('POST', this.config.endpoints.twilioTestConnection);
+            
+            if (response.success) {
+                this.showNotification('Conexão Twilio testada com sucesso!', 'success');
+                await this.loadTwilioConfig(); // Recarregar para atualizar status
+            } else {
+                this.showNotification('Falha no teste de conexão', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao testar conexão Twilio:', error);
+            this.showNotification(`Erro no teste: ${error.message}`, 'error');
+        } finally {
+            this.hideLoading('test-twilio-connection', 'Testar Conexão');
+        }
+    }
+
+    /**
+     * Testar conexão ativa
+     */
+    async testActiveConnection() {
+        try {
+            this.showLoading('test-active-connection', 'Testando...');
+            
+            const response = await this.makeRequest('POST', this.config.endpoints.twilioTestConnection);
+            
+            if (response.success) {
+                this.showNotification('Conexão ativa testada com sucesso!', 'success');
+                await this.loadTwilioConfig(); // Recarregar para atualizar status
+            } else {
+                this.showNotification('Falha no teste de conexão ativa', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao testar conexão ativa:', error);
+            this.showNotification(`Erro no teste: ${error.message}`, 'error');
+        } finally {
+            this.hideLoading('test-active-connection', 'Testar Conexão Ativa');
+        }
+    }
+
+    /**
+     * Enviar mensagem de teste
+     */
+    async sendTestMessage() {
+        try {
+            const phoneNumber = document.getElementById('test-phone-number').value;
+            const message = document.getElementById('test-message').value;
+            
+            if (!phoneNumber || !message) {
+                this.showNotification('Preencha o número e a mensagem de teste', 'error');
+                return;
+            }
+
+            this.showLoading('send-test-message', 'Enviando...');
+            
+            const response = await this.makeRequest('POST', this.config.endpoints.twilioTestMessage, {
+                to: phoneNumber,
+                message: message
+            });
+            
+            if (response.success) {
+                this.showNotification('Mensagem de teste enviada com sucesso!', 'success');
+                this.showTestResult(true, response.message);
+            } else {
+                this.showNotification('Falha ao enviar mensagem de teste', 'error');
+                this.showTestResult(false, response.message);
+            }
+        } catch (error) {
+            console.error('Erro ao enviar mensagem de teste:', error);
+            this.showNotification(`Erro ao enviar: ${error.message}`, 'error');
+            this.showTestResult(false, error.message);
+        } finally {
+            this.hideLoading('send-test-message', 'Enviar Mensagem de Teste');
+        }
+    }
+
+    /**
+     * Mostrar resultado do teste
+     */
+    showTestResult(success, message) {
+        const resultDiv = document.getElementById('test-result');
+        const successDiv = document.getElementById('test-success');
+        const errorDiv = document.getElementById('test-error');
+        const successMessage = document.getElementById('success-message');
+        const errorMessage = document.getElementById('error-message');
+        
+        resultDiv.classList.remove('hidden');
+        
+        if (success) {
+            successDiv.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            successMessage.textContent = message;
+        } else {
+            successDiv.classList.add('hidden');
+            errorDiv.classList.remove('hidden');
+            errorMessage.textContent = message;
+        }
+    }
+
+    /**
+     * Resetar configuração Twilio
+     */
+    resetTwilioConfig() {
+        if (confirm('Tem certeza que deseja resetar a configuração Twilio?')) {
+            document.getElementById('twilio-account-sid').value = '';
+            document.getElementById('twilio-auth-token').value = '';
+            document.getElementById('twilio-phone-number').value = '';
+            document.getElementById('twilio-webhook-url').value = '';
+            this.showNotification('Configuração Twilio resetada', 'info');
+        }
+    }
+
+    /**
+     * Obter configuração Twilio do formulário
+     */
+    getTwilioConfig() {
+        return {
+            accountSid: document.getElementById('twilio-account-sid').value.trim(),
+            authToken: document.getElementById('twilio-auth-token').value.trim(),
+            phoneNumber: document.getElementById('twilio-phone-number').value.trim(),
+            webhookUrl: document.getElementById('twilio-webhook-url').value.trim()
+        };
+    }
+
+    /**
+     * Validar configuração Twilio
+     */
+    validateTwilioConfig(config) {
+        if (!config.accountSid || config.accountSid.length < 10) {
+            this.showNotification('Account SID é obrigatório e deve ter pelo menos 10 caracteres', 'error');
+            return false;
+        }
+        
+        if (!config.authToken || config.authToken.length < 10) {
+            this.showNotification('Auth Token é obrigatório e deve ter pelo menos 10 caracteres', 'error');
+            return false;
+        }
+        
+        if (!config.phoneNumber || !config.phoneNumber.includes('+')) {
+            this.showNotification('Número WhatsApp deve incluir código do país (+55)', 'error');
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Toggle de visibilidade de senha
+     */
+    togglePasswordVisibility(fieldId, buttonId) {
+        const field = document.getElementById(fieldId);
+        const button = document.getElementById(buttonId);
+        const icon = button.querySelector('i');
+        
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            field.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
     }
 }
 

@@ -354,35 +354,100 @@ server/src/whatsapp/entities/
 ### **✅ SERVICES - MANTER**
 ```
 server/src/whatsapp/
-├── whatsapp.service.ts ✅ MANTER
 ├── admin/
 │   └── whatsapp-admin.service.ts ✅ MANTER
 ├── client/
-│   └── whatsapp-client.service.ts ✅ SIMPLIFICADO
-└── flows/
-    └── whatsapp-flow.service.ts 📅 CRIAR
+│   └── whatsapp-client.service.ts ✅ SIMPLIFICADO (INTEGRADO COM TWILIO)
+└── providers/                    # ✅ NOVA ESTRUTURA LIMPA
+    ├── twilio.service.ts         # ✅ IMPLEMENTADO (integração Twilio)
+    ├── evolution.service.ts      # 🔮 FUTURO (após Twilio funcionando)
+    └── meta.service.ts           # 🔮 FUTURO (após Twilio funcionando)
 ```
 
 ### **✅ CONTROLLERS - MANTER**
 ```
 server/src/whatsapp/
-├── whatsapp.controller.ts ✅ MANTER
 ├── admin/
 │   └── whatsapp-admin.controller.ts ✅ MANTER
 ├── client/
 │   └── whatsapp-client.controller.ts ✅ SIMPLIFICADO
-└── flows/
-    └── whatsapp-flow.controller.ts 📅 CRIAR
+└── providers/                    # ✅ NOVA ESTRUTURA LIMPA
+    ├── twilio.controller.ts       # ✅ IMPLEMENTADO (endpoints Twilio)
+    ├── evolution.controller.ts    # 🔮 FUTURO (após Twilio funcionando)
+    └── meta.controller.ts         # 🔮 FUTURO (após Twilio funcionando)
+```
+
+### **✅ DTOs - MANTER**
+```
+server/src/whatsapp/providers/    # ✅ NOVA ESTRUTURA LIMPA
+├── twilio-config.dto.ts          # ✅ IMPLEMENTADO (validação Twilio)
+├── evolution-config.dto.ts       # 🔮 FUTURO (após Twilio funcionando)
+└── meta-config.dto.ts            # 🔮 FUTURO (após Twilio funcionando)
 ```
 
 ---
 
-## 🎯 **PRÓXIMOS PASSOS**
+## 🎯 **ESTRATÉGIA DE IMPLEMENTAÇÃO - FOCO NA TWILIO**
 
-### **HOJE (DIA 6)**
-1. **Criar interface de fluxos**
-2. **Implementar gatilhos automáticos**
-3. **Testar funcionalidades básicas**
+### **✅ FASE ATUAL: TWILIO FUNCIONANDO (PRIORIDADE MÁXIMA)**
+1. **Implementar e testar** integração Twilio completa
+2. **Validar** envio de mensagens via Twilio
+3. **Testar** configuração e conexão Twilio
+4. **Garantir** que Twilio está 100% funcional
+
+### **🔮 FASES FUTURAS (APÓS TWILIO FUNCIONANDO)**
+1. **FASE 2**: Evolution API (gratuita, self-hosted)
+2. **FASE 3**: Meta Business API (oficial, recursos avançados)
+
+### **🎯 PRÓXIMOS PASSOS (HOJE - DIA 6)**
+1. **Instalar dependência** `npm install twilio`
+2. **Testar** integração Twilio no backend
+3. **Validar** envio de mensagens de teste
+4. **Verificar** configuração e status da plataforma
+
+## 🏗️ **NOVA ESTRUTURA DE PASTAS - LIMPA E ORGANIZADA**
+
+### **✅ ESTRUTURA ATUAL (LIMPA E ORGANIZADA)**
+```
+whatsapp/
+├── entities/              # ✅ Schemas únicos (whatsapp-config, client-config, message, flow, template)
+├── providers/             # ✅ Integrações com APIs externas
+│   ├── twilio-config.dto.ts
+│   ├── twilio.controller.ts
+│   └── twilio.service.ts
+├── client/                # ✅ Área do cliente (frontend)
+│   ├── whatsapp-client.controller.ts
+│   ├── whatsapp-client.service.ts
+│   ├── whatsapp-client-templates.controller.ts
+│   └── whatsapp-client-templates.service.ts
+├── admin/                 # ✅ Área administrativa (backend)
+│   ├── whatsapp-admin.controller.ts
+│   └── whatsapp-admin.service.ts
+└── whatsapp.module.ts     # ✅ Módulo principal
+```
+
+### **🎯 BENEFÍCIOS DA NOVA ESTRUTURA**
+
+#### **✅ ORGANIZAÇÃO CLARA**
+- **`entities/`**: Schemas únicos do MongoDB
+- **`providers/`**: Integrações com APIs externas (Twilio, Evolution, Meta)
+- **`client/`**: Funcionalidades para área do cliente
+- **`admin/`**: Funcionalidades administrativas
+
+#### **✅ MÁXIMO REAPROVEITAMENTO**
+- **Um serviço principal** (`whatsapp-client.service.ts`) para todas as funcionalidades
+- **Providers isolados** para cada API externa
+- **Sem duplicação** de código entre áreas
+
+#### **✅ FACILIDADE DE MANUTENÇÃO**
+- **Mudanças em um lugar só** para funcionalidades principais
+- **APIs isoladas** para manutenção independente
+- **Estrutura escalável** para novas integrações
+
+#### **✅ PERFORMANCE OTIMIZADA**
+- **Sem arquivos redundantes**
+- **Imports limpos** e organizados
+- **Carregamento eficiente** de módulos
 
 ### **AMANHÃ (DIA 7)**
 1. **Implementar backend de fluxos**
@@ -408,6 +473,7 @@ server/src/whatsapp/
 - ✅ Backend - Schemas simplificados
 - ✅ Backend - Services simplificados
 - ✅ Backend - Controllers simplificados
+- ✅ **ESTRUTURA DE PASTAS LIMPA E ORGANIZADA** 🆕
 
 ### **🔄 EM ANDAMENTO**
 - 🔄 Fluxos de mensagens (DIA 6-7)

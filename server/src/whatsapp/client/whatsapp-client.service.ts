@@ -6,7 +6,7 @@ import { WhatsAppMessage, WhatsAppMessageDocument } from '../entities/whatsapp-m
 import { InjectModel as InjectAdminModel } from '@nestjs/mongoose';
 import { Model as AdminModel } from 'mongoose';
 import { WhatsAppConfig, WhatsAppConfigDocument } from '../entities/whatsapp-config.schema';
-import axios from 'axios';
+import { TwilioService } from '../providers/twilio.service';
 
 export interface CreateWhatsAppClientConfigDto {
   clientId: string;
@@ -29,6 +29,7 @@ export class WhatsAppClientService {
     private whatsappConfigModel: AdminModel<WhatsAppConfigDocument>,
     @InjectAdminModel(WhatsAppMessage.name)
     private whatsappMessageModel: Model<WhatsAppMessageDocument>,
+    private twilioService: TwilioService, // ✅ Integração com Twilio
   ) {}
 
   /**
@@ -57,7 +58,7 @@ export class WhatsAppClientService {
       return await newConfig.save();
     } catch (error) {
       if (error instanceof ConflictException) {
-      throw error;
+        throw error;
       }
       throw new BadRequestException('Erro ao criar configuração: ' + error.message);
     }
@@ -112,7 +113,7 @@ export class WhatsAppClientService {
   }
 
   /**
-   * Enviar mensagem de teste
+   * Enviar mensagem de teste - AGORA USANDO TWILIO ✅
    */
   async sendTestMessage(clientId: string, messageData: { to: string; message: string }): Promise<any> {
     try {
@@ -125,22 +126,27 @@ export class WhatsAppClientService {
         throw new BadRequestException('Configuração de WhatsApp não está ativa');
       }
 
-      // Obter configuração global do Gupshup
-      const globalConfig = await this.whatsappConfigModel.findOne();
-      if (!globalConfig?.gupshupConfig?.isConnected) {
-        throw new BadRequestException('API Gupshup não está configurada');
+      // ✅ USAR TWILIO SERVICE - MÁXIMO REAPROVEITAMENTO
+      const twilioResponse = await this.twilioService.sendTestMessage({
+        to: messageData.to,
+        message: messageData.message
+      });
+
+      if (!twilioResponse.success) {
+        throw new BadRequestException(twilioResponse.message);
       }
 
-      // Enviar mensagem via Gupshup
-      const response = await this.sendMessageViaGupshup(messageData, globalConfig.gupshupConfig);
-
       // Salvar mensagem no histórico
-      await this.saveMessageToHistory(clientId, messageData, response);
+      await this.saveMessageToHistory(clientId, messageData, {
+        messageId: twilioResponse.sid,
+        status: 'sent',
+        provider: 'Twilio'
+      });
 
       return {
         success: true,
-        message: 'Mensagem enviada com sucesso',
-        messageId: response.messageId
+        message: 'Mensagem enviada com sucesso via Twilio',
+        messageId: twilioResponse.sid
       };
     } catch (error) {
       throw new BadRequestException('Erro ao enviar mensagem: ' + error.message);
@@ -164,47 +170,85 @@ export class WhatsAppClientService {
   }
 
   /**
-   * Enviar mensagem via Gupshup
+   * ✅ NOVO: Verificar status da plataforma WhatsApp
    */
-  private async sendMessageViaGupshup(messageData: { to: string; message: string }, gupshupConfig: any): Promise<any> {
+  async getPlatformStatus(): Promise<{ isActive: boolean; provider: string; lastTest?: Date }> {
     try {
-      const url = 'https://api.gupshup.io/wa/api/v1/msg';
-      const payload = {
-        channel: 'whatsapp',
-        source: gupshupConfig.sourceNumber,
-        destination: messageData.to,
-        message: JSON.stringify({
-          type: 'text',
-          text: messageData.message
-        }),
-        'src.name': gupshupConfig.appName
-      };
-
-      const response = await axios.post(url, payload, {
-          headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'apikey': gupshupConfig.apiKey
-          }
-      });
+      const twilioStatus = await this.twilioService.getStatus();
       
-        return {
-        messageId: response.data.messageId,
-        status: 'sent'
+      return {
+        isActive: twilioStatus.isActive,
+        provider: 'Twilio',
+        lastTest: twilioStatus.lastTest || undefined
       };
     } catch (error) {
-      throw new Error('Erro ao enviar mensagem via Gupshup: ' + error.message);
+      return {
+        isActive: false,
+        provider: 'Twilio',
+        lastTest: undefined
+      };
     }
   }
 
   /**
-   * Salvar mensagem no histórico
+   * ✅ NOVO: Enviar mensagem genérica (flexível para múltiplos providers)
+   */
+  async sendMessage(clientId: string, messageData: { to: string; message: string; provider?: string }): Promise<any> {
+    try {
+      // Verificar se o cliente tem configuração
+      const config = await this.getConfigByClientId(clientId);
+      if (!config) {
+        throw new BadRequestException('Configuração de WhatsApp não encontrada para este cliente');
+      }
+      if (!config.isActive) {
+        throw new BadRequestException('Configuração de WhatsApp não está ativa');
+      }
+
+      // Por padrão, usar Twilio (provider ativo)
+      const provider = messageData.provider || 'twilio';
+      
+      if (provider === 'twilio') {
+        const response = await this.twilioService.sendTestMessage({
+          to: messageData.to,
+          message: messageData.message
+        });
+
+        if (!response.success) {
+          throw new BadRequestException(response.message);
+        }
+
+        // Salvar no histórico
+        await this.saveMessageToHistory(clientId, messageData, {
+          messageId: response.sid,
+          status: 'sent',
+          provider: 'Twilio'
+        });
+
+        return {
+          success: true,
+          message: 'Mensagem enviada com sucesso via Twilio',
+          messageId: response.sid,
+          provider: 'Twilio'
+        };
+      }
+
+      // ✅ FUTURO: Adicionar outros providers aqui
+      throw new BadRequestException(`Provider ${provider} não suportado ainda`);
+      
+    } catch (error) {
+      throw new BadRequestException('Erro ao enviar mensagem: ' + error.message);
+    }
+  }
+
+  /**
+   * Salvar mensagem no histórico - ADAPTADO PARA MULTI-PROVIDER ✅
    */
   private async saveMessageToHistory(clientId: string, messageData: { to: string; message: string }, response: any): Promise<void> {
     try {
       const message = new this.whatsappMessageModel({
         clientId: new Types.ObjectId(clientId),
         to: messageData.to,
-        from: 'Gupshup',
+        from: response.provider || 'Twilio', // ✅ Flexível
         content: {
           body: messageData.message
         },
@@ -212,7 +256,7 @@ export class WhatsAppClientService {
         providerResponse: {
           messageId: response.messageId,
           status: response.status,
-          provider: 'Gupshup'
+          provider: response.provider || 'Twilio'
         }
       });
 
