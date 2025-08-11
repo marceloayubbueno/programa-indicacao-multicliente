@@ -130,7 +130,8 @@ class WhatsAppAdmin {
             const response = await this.makeRequest('GET', this.config.endpoints.twilioConfig);
             console.log('🔍 DEBUG: Resposta loadTwilioConfig:', response);
             
-            if (response.success) {
+            // ✅ CORREÇÃO: Verificar se response.data existe e tem conteúdo
+            if (response.success && response.data && Object.keys(response.data).length > 0) {
                 console.log('🔍 DEBUG: Configuração encontrada, preenchendo...');
                 this.fillTwilioConfig(response.data);
             } else {
