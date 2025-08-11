@@ -216,7 +216,7 @@
                         </h4>
                         <p class="text-gray-400 text-sm mb-4">Clique em um bloco para usar como base</p>
                         
-                        <div id="template-blocks-sidebar" class="space-y-2 mb-6">
+                        <div id="template-blocks-sidebar" class="grid grid-cols-2 gap-3 mb-6">
                             <!-- Blocos serão carregados aqui -->
                         </div>
 
@@ -228,7 +228,7 @@
                             </h5>
                             <p class="text-gray-400 text-xs mb-3">Arraste para inserir no texto</p>
                             
-                            <div id="variables-sidebar" class="space-y-2">
+                            <div id="variables-sidebar" class="grid grid-cols-2 gap-2">
                                 <!-- Variáveis serão carregadas aqui -->
                             </div>
                         </div>
@@ -317,21 +317,19 @@
             
             if (typeof TemplateBlocks !== 'undefined' && TemplateBlocks.getAll) {
                 const blocksHTML = TemplateBlocks.getAll().map(block => `
-                    <div class="template-block cursor-pointer hover:bg-gray-700 transition-colors p-3 rounded-lg border border-gray-600" 
+                    <div class="template-block cursor-pointer hover:bg-gray-700 transition-colors p-2 rounded-lg border border-gray-600" 
                          data-block-id="${block.id}" 
                          draggable="true" 
                          ondragstart="handleDragStart(event, '${block.id}')"
                          ondragend="handleDragEnd(event)"
                          onclick="useTemplateBlock('${block.id}')">
-                        <div class="flex items-center gap-3">
-                            <span class="block-icon text-2xl">${block.icon}</span>
-                            <div class="flex-1">
-                                <div class="block-name text-gray-100 font-medium">${block.name}</div>
-                                <div class="text-xs text-gray-400">${block.description}</div>
+                        <div class="text-center">
+                            <span class="block-icon text-2xl block mb-2">${block.icon}</span>
+                            <div class="block-name text-gray-100 font-medium text-sm mb-1">${block.name}</div>
+                            <div class="text-xs text-gray-400 mb-2">${block.description}</div>
+                            <div class="text-xs text-gray-500">
+                                <i class="fas fa-grip-vertical mr-1"></i>Arraste
                             </div>
-                        </div>
-                        <div class="text-xs text-gray-500 mt-2">
-                            <i class="fas fa-grip-vertical mr-1"></i>Arraste para usar
                         </div>
                     </div>
                 `).join('');
@@ -381,15 +379,13 @@
                      ondragstart="handleVariableDragStart(event, '${variable.name}')"
                      ondragend="handleVariableDragEnd(event)"
                      onclick="insertVariable('${variable.name}')">
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg">${variable.icon}</span>
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-100 font-medium">{{${variable.name}}}</div>
-                            <div class="text-xs text-gray-400">${variable.description}</div>
+                    <div class="text-center">
+                        <span class="text-lg block mb-1">${variable.icon}</span>
+                        <div class="text-xs text-gray-100 font-medium mb-1">{{${variable.name}}}</div>
+                        <div class="text-xs text-gray-400 mb-1">${variable.description}</div>
+                        <div class="text-xs text-gray-500">
+                            <i class="fas fa-grip-vertical mr-1"></i>Arraste
                         </div>
-                    </div>
-                    <div class="text-xs text-gray-500 mt-1">
-                        <i class="fas fa-grip-vertical mr-1"></i>Arraste ou clique
                     </div>
                 </div>
             `).join('');
@@ -444,6 +440,50 @@
             
             // Mostrar feedback visual
             showSuccess(`Variável ${variable} inserida!`);
+        }
+
+        // Função para usar bloco (drag & drop ou clique)
+        function useTemplateBlock(blockId) {
+            console.log('useTemplateBlock chamado com:', blockId);
+            
+            if (typeof TemplateBlocks !== 'undefined' && TemplateBlocks.getById) {
+                const block = TemplateBlocks.getById(blockId);
+                if (!block) {
+                    console.error('Bloco não encontrado:', blockId);
+                    return;
+                }
+                
+                console.log('Bloco encontrado:', block);
+                
+                // Preencher formulário com dados do bloco
+                const nameField = document.getElementById('template-name');
+                const categoryField = document.getElementById('template-category');
+                const bodyField = document.getElementById('template-body');
+                const footerField = document.getElementById('template-footer');
+                const variablesField = document.getElementById('template-variables');
+                
+                if (nameField) nameField.value = block.name;
+                if (categoryField) categoryField.value = block.category;
+                if (bodyField) bodyField.value = block.content.body;
+                if (footerField) footerField.value = block.content.footer || '';
+                if (variablesField) variablesField.value = block.variables.join(', ');
+                
+                console.log('Formulário preenchido com sucesso');
+                
+                // Abrir modal de edição
+                openCreateTemplateModal();
+                
+                // Atualizar título do modal se existir
+                const modalTitle = document.getElementById('modal-title');
+                if (modalTitle) {
+                    modalTitle.textContent = `Novo Template - ${block.name}`;
+                }
+                
+                showSuccess(`Template "${block.name}" carregado com sucesso!`);
+            } else {
+                console.error('TemplateBlocks não está disponível');
+                showError('Erro ao carregar bloco de template');
+            }
         }
 
         function handleDragEnd(event) {
