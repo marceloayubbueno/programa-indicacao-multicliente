@@ -216,8 +216,21 @@
                         </h4>
                         <p class="text-gray-400 text-sm mb-4">Clique em um bloco para usar como base</p>
                         
-                        <div id="template-blocks-sidebar" class="space-y-2">
+                        <div id="template-blocks-sidebar" class="space-y-2 mb-6">
                             <!-- Blocos serão carregados aqui -->
+                        </div>
+
+                        <!-- Variáveis Disponíveis -->
+                        <div class="border-t border-gray-700 pt-4">
+                            <h5 class="text-md font-medium text-gray-100 mb-3 flex items-center gap-2">
+                                <i class="fas fa-tags text-green-400"></i>
+                                Variáveis Disponíveis
+                            </h5>
+                            <p class="text-gray-400 text-xs mb-3">Arraste para inserir no texto</p>
+                            
+                            <div id="variables-sidebar" class="space-y-2">
+                                <!-- Variáveis serão carregadas aqui -->
+                            </div>
                         </div>
                     </div>
                     
@@ -229,7 +242,7 @@
                          id="template-form-area">
                         <div id="drop-indicator" class="hidden mb-4 p-4 border-2 border-dashed border-blue-500 bg-blue-900/20 rounded-lg text-center">
                             <i class="fas fa-arrow-down text-blue-400 text-2xl mb-2"></i>
-                            <p class="text-blue-300">Solte o bloco aqui para preencher o formulário</p>
+                            <p class="text-blue-300" id="drop-message">Solte o bloco aqui para preencher o formulário</p>
                         </div>
                         <form id="template-form" class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -324,20 +337,113 @@
                 `).join('');
                 
                 container.innerHTML = blocksHTML;
+                
+                // Renderizar variáveis disponíveis
+                renderVariablesSidebar();
             } else {
                 console.error('TemplateBlocks não está disponível');
                 container.innerHTML = '<p class="text-gray-400 text-sm">Erro ao carregar blocos</p>';
             }
         }
 
-        // Funções de Drag & Drop
+        // Função para renderizar variáveis na sidebar
+        function renderVariablesSidebar() {
+            const container = document.getElementById('variables-sidebar');
+            if (!container) return;
+            
+            const commonVariables = [
+                { name: 'nome', description: 'Nome do indicador', icon: '👤' },
+                { name: 'empresa', description: 'Nome da empresa', icon: '🏢' },
+                { name: 'link', description: 'Link de indicação', icon: '🔗' },
+                { name: 'recompensa', description: 'Valor da recompensa', icon: '💰' },
+                { name: 'data_limite', description: 'Data limite', icon: '📅' },
+                { name: 'total_indicacoes', description: 'Total de indicações', icon: '📊' },
+                { name: 'ganhos', description: 'Ganhos totais', icon: '💵' },
+                { name: 'posicao', description: 'Posição no ranking', icon: '🏆' },
+                { name: 'meta', description: 'Meta atingida', icon: '🎯' },
+                { name: 'conquista', description: 'Conquista desbloqueada', icon: '🏅' },
+                { name: 'bonus', description: 'Bônus adicional', icon: '🎁' },
+                { name: 'acao', description: 'Ação a ser realizada', icon: '⚡' },
+                { name: 'prazo', description: 'Prazo para ação', icon: '⏰' },
+                { name: 'email', description: 'Email de contato', icon: '📧' },
+                { name: 'whatsapp', description: 'WhatsApp de contato', icon: '📱' },
+                { name: 'site', description: 'Site da empresa', icon: '🌐' },
+                { name: 'horario', description: 'Horário de atendimento', icon: '🕒' },
+                { name: 'oferta_especial', description: 'Oferta especial', icon: '🎉' },
+                { name: 'tempo_restante', description: 'Tempo restante', icon: '⏳' },
+                { name: 'link_acao', description: 'Link para ação', icon: '🔗' }
+            ];
+            
+            const variablesHTML = commonVariables.map(variable => `
+                <div class="variable-item cursor-pointer hover:bg-gray-700 transition-colors p-2 rounded-lg border border-gray-600" 
+                     data-variable-name="${variable.name}" 
+                     draggable="true" 
+                     ondragstart="handleVariableDragStart(event, '${variable.name}')"
+                     ondragend="handleVariableDragEnd(event)"
+                     onclick="insertVariable('${variable.name}')">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">${variable.icon}</span>
+                        <div class="flex-1">
+                            <div class="text-sm text-gray-100 font-medium">{{${variable.name}}}</div>
+                            <div class="text-xs text-gray-400">${variable.description}</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">
+                        <i class="fas fa-grip-vertical mr-1"></i>Arraste ou clique
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = variablesHTML;
+        }
+
+        // Funções de Drag & Drop para Blocos
         function handleDragStart(event, blockId) {
             event.dataTransfer.setData('text/plain', blockId);
+            event.dataTransfer.setData('type', 'block');
             event.dataTransfer.effectAllowed = 'copy';
             event.target.classList.add('opacity-50', 'scale-95', 'transform');
             
             // Adicionar classe de drag ativo
             event.target.classList.add('dragging');
+        }
+
+        // Funções de Drag & Drop para Variáveis
+        function handleVariableDragStart(event, variableName) {
+            event.dataTransfer.setData('text/plain', variableName);
+            event.dataTransfer.setData('type', 'variable');
+            event.dataTransfer.effectAllowed = 'copy';
+            event.target.classList.add('opacity-50', 'scale-95', 'transform');
+            event.target.classList.add('dragging');
+        }
+
+        function handleVariableDragEnd(event) {
+            event.target.classList.remove('opacity-50', 'scale-95', 'transform', 'dragging');
+        }
+
+        // Função para inserir variável no campo de texto
+        function insertVariable(variableName) {
+            const textarea = document.getElementById('template-body');
+            if (!textarea) return;
+            
+            const variable = `{{${variableName}}}`;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            // Inserir variável na posição do cursor
+            const newText = text.substring(0, start) + variable + text.substring(end);
+            textarea.value = newText;
+            
+            // Posicionar cursor após a variável inserida
+            textarea.selectionStart = start + variable.length;
+            textarea.selectionEnd = start + variable.length;
+            
+            // Focar no textarea
+            textarea.focus();
+            
+            // Mostrar feedback visual
+            showSuccess(`Variável ${variable} inserida!`);
         }
 
         function handleDragEnd(event) {
@@ -351,8 +457,17 @@
             
             // Mostrar indicador de drop
             const dropIndicator = document.getElementById('drop-indicator');
-            if (dropIndicator) {
+            const dropMessage = document.getElementById('drop-message');
+            if (dropIndicator && dropMessage) {
                 dropIndicator.classList.remove('hidden');
+                
+                // Verificar se é uma variável sendo arrastada
+                const type = event.dataTransfer.types.includes('type') ? 'variable' : 'block';
+                if (type === 'variable') {
+                    dropMessage.textContent = 'Solte a variável aqui para inserir no texto';
+                } else {
+                    dropMessage.textContent = 'Solte o bloco aqui para preencher o formulário';
+                }
             }
         }
 
@@ -376,16 +491,23 @@
                 dropIndicator.classList.add('hidden');
             }
             
-            const blockId = event.dataTransfer.getData('text/plain');
-            if (blockId) {
-                useTemplateBlock(blockId);
-                console.log('Bloco arrastado e solto:', blockId);
+            const data = event.dataTransfer.getData('text/plain');
+            const type = event.dataTransfer.getData('type');
+            
+            if (data) {
+                if (type === 'block') {
+                    useTemplateBlock(data);
+                    console.log('Bloco arrastado e solto:', data);
+                } else if (type === 'variable') {
+                    insertVariable(data);
+                    console.log('Variável arrastada e solta:', data);
+                }
             }
         }
 
         // Função para configurar drag & drop
         function setupTemplateBlocksDragAndDrop() {
-            console.log('Configurando drag & drop para blocos de template...');
+            console.log('Configurando drag & drop para blocos de template e variáveis...');
             
             // Adicionar indicador visual de área de drop
             const formArea = document.querySelector('#template-form').parentElement;
@@ -394,6 +516,120 @@
                 formArea.addEventListener('drop', handleDrop);
                 formArea.addEventListener('dragleave', handleDragLeave);
             }
+            
+            // Configurar drag & drop para variáveis
+            const textarea = document.getElementById('template-body');
+            if (textarea) {
+                textarea.addEventListener('dragover', handleDragOver);
+                textarea.addEventListener('drop', handleVariableDrop);
+                textarea.addEventListener('dragleave', handleDragLeave);
+            }
+        }
+
+        // Função específica para drop de variáveis no textarea
+        function handleVariableDrop(event) {
+            event.preventDefault();
+            
+            const data = event.dataTransfer.getData('text/plain');
+            const type = event.dataTransfer.getData('type');
+            
+            if (data && type === 'variable') {
+                insertVariable(data);
+                console.log('Variável inserida via drag & drop:', data);
+            }
+        }
+
+        // Função para abrir modal de criação de template
+        function openCreateTemplateModal() {
+            const modal = document.getElementById('template-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                // Limpar formulário
+                document.getElementById('template-form').reset();
+                // Focar no primeiro campo
+                document.getElementById('template-name').focus();
+            }
+        }
+
+        // Função para fechar modal
+        function closeTemplateModal() {
+            const modal = document.getElementById('template-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Função para salvar template
+        function saveTemplate() {
+            const form = document.getElementById('template-form');
+            const formData = new FormData(form);
+            
+            // Validar campos obrigatórios
+            const name = document.getElementById('template-name').value.trim();
+            const category = document.getElementById('template-category').value;
+            const body = document.getElementById('template-body').value.trim();
+            
+            if (!name || !category || !body) {
+                showError('Preencha todos os campos obrigatórios');
+                return;
+            }
+            
+            // Aqui você implementaria a lógica para salvar no backend
+            console.log('Salvando template:', {
+                name,
+                category,
+                body,
+                footer: document.getElementById('template-footer').value,
+                variables: document.getElementById('template-variables').value
+            });
+            
+            showSuccess('Template salvo com sucesso!');
+            closeTemplateModal();
+        }
+
+        // Funções de notificação
+        function showSuccess(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+            notification.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animar entrada
+            setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+            
+            // Remover após 3 segundos
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function showError(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+            notification.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animar entrada
+            setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+            
+            // Remover após 3 segundos
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
     </script>
 </body>
