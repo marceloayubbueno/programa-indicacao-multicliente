@@ -629,6 +629,14 @@ class WhatsAppAdmin {
         try {
             const config = this.getTwilioConfig();
             
+            // ✅ DEBUG: Verificar se está funcionando
+            console.log('🔍 DEBUG saveTwilioConfig:', {
+                config,
+                hasId: !!config._id,
+                twilioConfig: this.twilioConfig,
+                method: config._id ? 'PUT' : 'POST'
+            });
+            
             if (!this.validateTwilioConfig(config)) {
                 return;
             }
