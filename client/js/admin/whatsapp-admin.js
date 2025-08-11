@@ -126,10 +126,15 @@ class WhatsAppAdmin {
      */
     async loadTwilioConfig() {
         try {
+            console.log('🔍 DEBUG: Carregando configuração Twilio...');
             const response = await this.makeRequest('GET', this.config.endpoints.twilioConfig);
+            console.log('🔍 DEBUG: Resposta loadTwilioConfig:', response);
+            
             if (response.success) {
+                console.log('🔍 DEBUG: Configuração encontrada, preenchendo...');
                 this.fillTwilioConfig(response.data);
             } else {
+                console.log('🔍 DEBUG: Nenhuma configuração encontrada');
                 // Se não há configuração, mostrar status como não configurado
                 this.updateConnectionStatus(false);
             }
@@ -173,8 +178,12 @@ class WhatsAppAdmin {
     fillTwilioConfig(config) {
         if (!config) return;
 
+        console.log('🔍 DEBUG: fillTwilioConfig recebeu:', config);
+        console.log('🔍 DEBUG: config._id existe?', !!config._id);
+
         // ✅ SALVAR CONFIGURAÇÃO COMPLETA para uso posterior
         this.twilioConfig = config;
+        console.log('🔍 DEBUG: this.twilioConfig salvo:', this.twilioConfig);
 
         const elements = {
             'twilio-account-sid': config.accountSid || '',
