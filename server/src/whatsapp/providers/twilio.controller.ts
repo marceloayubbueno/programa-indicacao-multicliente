@@ -10,17 +10,29 @@ export class TwilioController {
 
   @Post('config')
   async createConfig(@Body() createDto: CreateTwilioConfigDto) {
-    return this.twilioService.createConfig(createDto);
+    const config = await this.twilioService.createConfig(createDto);
+    return {
+      success: true,
+      data: config
+    };
   }
 
   @Get('config')
   async getConfig() {
-    return this.twilioService.getConfig();
+    const config = await this.twilioService.getConfig();
+    return {
+      success: true,
+      data: config
+    };
   }
 
   @Put('config')
   async updateConfig(@Body() updateDto: UpdateTwilioConfigDto) {
-    return this.twilioService.updateConfig(updateDto);
+    const config = await this.twilioService.updateConfig(updateDto);
+    return {
+      success: true,
+      data: config
+    };
   }
 
   @Delete('config')
@@ -30,12 +42,22 @@ export class TwilioController {
 
   @Post('test-connection')
   async testConnection() {
-    return this.twilioService.testConnection();
+    const result = await this.twilioService.testConnection();
+    return {
+      success: result.success,
+      message: result.message,
+      data: result
+    };
   }
 
   @Post('test-message')
   async sendTestMessage(@Body() testDto: TestTwilioMessageDto) {
-    return this.twilioService.sendTestMessage(testDto);
+    const result = await this.twilioService.sendTestMessage(testDto);
+    return {
+      success: result.success,
+      message: result.message,
+      data: result
+    };
   }
 
   @Get('status')
