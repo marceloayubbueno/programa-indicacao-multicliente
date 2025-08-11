@@ -177,11 +177,23 @@ function getCategoryText(category) {
 }
 
 function getStatusColor(status) {
-    return status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300';
+    const statusColors = {
+        'draft': 'bg-gray-700 text-gray-300',
+        'pending': 'bg-yellow-900 text-yellow-300',
+        'approved': 'bg-green-900 text-green-300',
+        'rejected': 'bg-red-900 text-red-300'
+    };
+    return statusColors[status] || 'bg-gray-700 text-gray-300';
 }
 
 function getStatusText(status) {
-    return status === 'active' ? 'Ativo' : 'Inativo';
+    const statusTexts = {
+        'draft': 'Rascunho',
+        'pending': 'Pendente',
+        'approved': 'Aprovado',
+        'rejected': 'Rejeitado'
+    };
+    return statusTexts[status] || 'Desconhecido';
 }
 
 function formatDate(dateString) {
@@ -278,12 +290,18 @@ function resetForm() {
 
 function editTemplate(templateId) {
     currentTemplateId = templateId;
+    const template = templates.find(t => t._id === templateId);
+    if (!template) {
+        showError('Template não encontrado');
+        return;
+    }
+    
     document.getElementById('modal-title').textContent = 'Editar Template';
-    document.getElementById('template-name').value = currentTemplate.name;
-    document.getElementById('template-category').value = currentTemplate.category;
-    document.getElementById('template-body').value = currentTemplate.content.body;
-    document.getElementById('template-footer').value = currentTemplate.content.footer || '';
-    document.getElementById('template-variables').value = currentTemplate.variables ? currentTemplate.variables.join(',') : '';
+    document.getElementById('template-name').value = template.name;
+    document.getElementById('template-category').value = template.category;
+    document.getElementById('template-body').value = template.content.body;
+    document.getElementById('template-footer').value = template.content.footer || '';
+    document.getElementById('template-variables').value = template.variables ? template.variables.join(',') : '';
 
     document.getElementById('template-modal').classList.remove('hidden');
 }
@@ -362,18 +380,37 @@ async function deleteTemplate(templateId) {
 
 async function duplicateTemplate(templateId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/client/whatsapp/templates/${templateId}/duplicate`, {
+        const template = templates.find(t => t._id === templateId);
+        if (!template) {
+            showError('Template não encontrado');
+            return;
+        }
+
+        // Criar novo template baseado no existente
+        const formData = {
+            name: `${template.name} (Cópia)`,
+            category: template.category,
+            language: template.language || 'pt_BR',
+            content: {
+                body: template.content.body,
+                footer: template.content.footer
+            },
+            variables: template.variables || []
+        };
+
+        const response = await fetch(`${API_BASE_URL}/client/whatsapp/templates`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${getToken()}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify(formData)
         });
 
         const result = await response.json();
 
         if (result.success) {
-            showSuccess(result.message || 'Template duplicado com sucesso');
+            showSuccess('Template duplicado com sucesso');
             await loadTemplates();
         } else {
             showError(result.message || 'Erro ao duplicar template');
@@ -385,13 +422,55 @@ async function duplicateTemplate(templateId) {
 }
 
 function showSuccess(message) {
-    // Implementar notificação de sucesso
-    console.log('Sucesso:', message);
-    alert(message);
+    // Criar notificação de sucesso
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fas fa-check-circle"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animar entrada
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
 }
 
 function showError(message) {
-    // Implementar notificação de erro
-    console.error('Erro:', message);
-    alert('Erro: ' + message);
+    // Criar notificação de erro
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animar entrada
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Remover após 5 segundos
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 5000);
 } 

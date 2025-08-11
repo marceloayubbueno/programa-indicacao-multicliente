@@ -88,3 +88,8 @@
      }[m
  }[m
  [m
+[33m87e9bbb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: implementação completa Evolution API - frontend, backend e integração
+[33mc2d4655[m fix: restaurar prefixo whatsapp: para envio via WhatsApp Business API
+[33m209e388[m fix: corrigir formato de número WhatsApp no envio de mensagens Twilio
+[33m4c113c2[m fix: corrigir estrutura de resposta da API Twilio para compatibilidade com frontend
+[33m4a680a7[m fix: simplificar verificação de configuração existente para carregar corretamente

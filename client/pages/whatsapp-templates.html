@@ -17,6 +17,23 @@
         .block-name {
             @apply font-medium text-sm;
         }
+        
+        .template-block.dragging {
+            @apply shadow-lg border-blue-400;
+            transform: rotate(5deg) scale(1.05);
+        }
+        
+        .template-block:hover {
+            @apply border-blue-400;
+        }
+        
+        #template-form-area.drag-over {
+            @apply bg-gray-700 border-blue-500 border-2;
+        }
+        
+        .drop-zone-active {
+            @apply bg-blue-900/20 border-blue-500 border-2;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
@@ -139,8 +156,10 @@
                                 <label class="block text-sm font-medium text-gray-400 mb-2">Status</label>
                                 <select id="filter-status" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="">Todos</option>
-                                    <option value="active">Ativo</option>
-                                    <option value="inactive">Inativo</option>
+                                    <option value="draft">Rascunho</option>
+                                    <option value="pending">Pendente</option>
+                                    <option value="approved">Aprovado</option>
+                                    <option value="rejected">Rejeitado</option>
                                 </select>
                             </div>
                             <div>
@@ -203,7 +222,15 @@
                     </div>
                     
                     <!-- Formulário (Principal) -->
-                    <div class="flex-1 p-6">
+                    <div class="flex-1 p-6" 
+                         ondragover="handleDragOver(event)" 
+                         ondrop="handleDrop(event)"
+                         ondragleave="handleDragLeave(event)"
+                         id="template-form-area">
+                        <div id="drop-indicator" class="hidden mb-4 p-4 border-2 border-dashed border-blue-500 bg-blue-900/20 rounded-lg text-center">
+                            <i class="fas fa-arrow-down text-blue-400 text-2xl mb-2"></i>
+                            <p class="text-blue-300">Solte o bloco aqui para preencher o formulário</p>
+                        </div>
                         <form id="template-form" class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -262,8 +289,12 @@
     <script>
         // Inicializar blocos pré-definidos na sidebar
         document.addEventListener('DOMContentLoaded', function() {
-            // Renderizar blocos pré-definidos na sidebar
-            renderTemplateBlocksSidebar();
+            // Aguardar um pouco para garantir que os scripts estejam carregados
+            setTimeout(() => {
+                renderTemplateBlocksSidebar();
+                // Configurar drag & drop após renderizar os blocos
+                setupTemplateBlocksDragAndDrop();
+            }, 1000);
         });
 
         // Função para renderizar blocos na sidebar (versão simplificada)
@@ -271,19 +302,98 @@
             const container = document.getElementById('template-blocks-sidebar');
             if (!container) return;
             
-            const blocksHTML = TemplateBlocks.getAll().map(block => `
-                <div class="template-block" onclick="useTemplateBlock('${block.id}')">
-                    <div class="flex items-center gap-3">
-                        <span class="block-icon">${block.icon}</span>
-                        <div>
-                            <div class="block-name text-gray-100">${block.name}</div>
-                            <div class="text-xs text-gray-400">${block.description}</div>
+            if (typeof TemplateBlocks !== 'undefined' && TemplateBlocks.getAll) {
+                const blocksHTML = TemplateBlocks.getAll().map(block => `
+                    <div class="template-block cursor-pointer hover:bg-gray-700 transition-colors p-3 rounded-lg border border-gray-600" 
+                         data-block-id="${block.id}" 
+                         draggable="true" 
+                         ondragstart="handleDragStart(event, '${block.id}')"
+                         ondragend="handleDragEnd(event)"
+                         onclick="useTemplateBlock('${block.id}')">
+                        <div class="flex items-center gap-3">
+                            <span class="block-icon text-2xl">${block.icon}</span>
+                            <div class="flex-1">
+                                <div class="block-name text-gray-100 font-medium">${block.name}</div>
+                                <div class="text-xs text-gray-400">${block.description}</div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-grip-vertical mr-1"></i>Arraste para usar
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+                
+                container.innerHTML = blocksHTML;
+            } else {
+                console.error('TemplateBlocks não está disponível');
+                container.innerHTML = '<p class="text-gray-400 text-sm">Erro ao carregar blocos</p>';
+            }
+        }
+
+        // Funções de Drag & Drop
+        function handleDragStart(event, blockId) {
+            event.dataTransfer.setData('text/plain', blockId);
+            event.dataTransfer.effectAllowed = 'copy';
+            event.target.classList.add('opacity-50', 'scale-95', 'transform');
             
-            container.innerHTML = blocksHTML;
+            // Adicionar classe de drag ativo
+            event.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(event) {
+            event.target.classList.remove('opacity-50', 'scale-95', 'transform', 'dragging');
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+            event.currentTarget.classList.add('drag-over');
+            
+            // Mostrar indicador de drop
+            const dropIndicator = document.getElementById('drop-indicator');
+            if (dropIndicator) {
+                dropIndicator.classList.remove('hidden');
+            }
+        }
+
+        function handleDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+            
+            // Esconder indicador de drop
+            const dropIndicator = document.getElementById('drop-indicator');
+            if (dropIndicator) {
+                dropIndicator.classList.add('hidden');
+            }
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            
+            // Esconder indicador de drop
+            const dropIndicator = document.getElementById('drop-indicator');
+            if (dropIndicator) {
+                dropIndicator.classList.add('hidden');
+            }
+            
+            const blockId = event.dataTransfer.getData('text/plain');
+            if (blockId) {
+                useTemplateBlock(blockId);
+                console.log('Bloco arrastado e solto:', blockId);
+            }
+        }
+
+        // Função para configurar drag & drop
+        function setupTemplateBlocksDragAndDrop() {
+            console.log('Configurando drag & drop para blocos de template...');
+            
+            // Adicionar indicador visual de área de drop
+            const formArea = document.querySelector('#template-form').parentElement;
+            if (formArea) {
+                formArea.addEventListener('dragover', handleDragOver);
+                formArea.addEventListener('drop', handleDrop);
+                formArea.addEventListener('dragleave', handleDragLeave);
+            }
         }
     </script>
 </body>

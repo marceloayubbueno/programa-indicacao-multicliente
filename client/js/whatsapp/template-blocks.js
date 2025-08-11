@@ -180,10 +180,14 @@ function useTemplateBlock(blockId) {
   document.getElementById('template-variables').value = block.variables.join(', ');
   
   // Abrir modal de edição
-  openCreateTemplateModal();
-  
-  // Atualizar título do modal
-  document.getElementById('modal-title').textContent = `Editar ${block.name}`;
+  if (typeof openCreateTemplateModal === 'function') {
+    openCreateTemplateModal();
+    
+    // Atualizar título do modal
+    document.getElementById('modal-title').textContent = `Novo Template - ${block.name}`;
+  } else {
+    console.error('Função openCreateTemplateModal não encontrada');
+  }
 }
 
 // Configurar drag & drop
