@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp - Área Administrativa</title>
+    <title>WhatsApp Multi-API - Área Administrativa</title>
     <link rel="stylesheet" href="../../css/tailwind.output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -35,8 +35,8 @@
                 <!-- Header -->
                 <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm border-b border-gray-700">
                     <div class="flex flex-col gap-2">
-                        <h1 class="text-3xl font-bold text-red-400">Configuração WhatsApp</h1>
-                        <p class="text-gray-400">Gerenciar API Gupshup e configurações SaaS</p>
+                        <h1 class="text-3xl font-bold text-red-400">WhatsApp Multi-API</h1>
+                        <p class="text-gray-400">Gerenciar múltiplas APIs WhatsApp e configurações SaaS</p>
                     </div>
                     <div class="flex items-center gap-4">
                         <div class="text-right">
@@ -56,7 +56,7 @@
                         <div class="flex items-center justify-between mb-6">
                             <h2 class="text-xl font-semibold text-gray-100">
                                 <i class="fas fa-whatsapp text-green-400 mr-2"></i>
-                                Status da API Gupshup
+                                Status da Plataforma WhatsApp
                             </h2>
                             <div class="flex items-center gap-2">
                                 <span id="whatsapp-status" class="px-3 py-1 rounded-full text-xs font-medium bg-gray-600 text-gray-300">
@@ -68,8 +68,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div class="bg-gray-700 rounded-lg p-4">
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm text-gray-400">Provedor</span>
-                                    <span id="provider-name" class="text-sm font-medium text-gray-300">Gupshup</span>
+                                    <span class="text-sm text-gray-400">Provider Ativo</span>
+                                    <span id="provider-name" class="text-sm font-medium text-gray-300">-</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-400">Status</span>
@@ -110,16 +110,116 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Configuração Gupshup -->
+                                        </div>
+                    
+                    <!-- Seleção de Provider -->
                     <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
                         <div class="flex items-center justify-between mb-6">
                             <h2 class="text-xl font-semibold text-gray-100">
-                                <i class="fas fa-cog text-blue-400 mr-2"></i>
-                                Configuração Gupshup
+                                <i class="fas fa-plug text-blue-400 mr-2"></i>
+                                Seleção de Provider WhatsApp
                             </h2>
-                            <button id="test-gupshup-connection" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+                            <button id="test-active-connection" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+                                <i class="fas fa-plug mr-2"></i>
+                                Testar Conexão Ativa
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Twilio -->
+                            <div class="provider-option" data-provider="twilio">
+                                <div class="bg-gray-700 rounded-lg p-4 border-2 border-blue-500/50 hover:border-blue-400 transition-colors cursor-pointer">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-check-circle text-blue-400 mr-2"></i>
+                                            <span class="font-medium text-gray-100">Twilio</span>
+                                        </div>
+                                        <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">ATIVO</span>
+                                    </div>
+                                    <p class="text-sm text-gray-400 mb-3">API oficial e confiável para WhatsApp Business</p>
+                                    <div class="text-xs text-gray-500">
+                                        <div class="flex items-center mb-1">
+                                            <i class="fas fa-check text-green-400 mr-2"></i>
+                                            Alta confiabilidade
+                                        </div>
+                                        <div class="flex items-center mb-1">
+                                            <i class="fas fa-check text-green-400 mr-2"></i>
+                                            Suporte oficial
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-check text-green-400 mr-2"></i>
+                                            Documentação completa
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Evolution API (disabled) -->
+                            <div class="provider-option" data-provider="evolution">
+                                <div class="bg-gray-700 rounded-lg p-4 border-2 border-gray-600/50 opacity-50 cursor-not-allowed">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                            <span class="font-medium text-gray-500">Evolution API</span>
+                                        </div>
+                                        <span class="text-xs bg-gray-600 text-gray-400 px-2 py-1 rounded-full">FASE 2</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mb-3">API gratuita e self-hosted para controle total</p>
+                                    <div class="text-xs text-gray-500">
+                                        <div class="flex items-center mb-1">
+                                            <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                            Em desenvolvimento
+                                        </div>
+                                        <div class="flex items-center mb-1">
+                                            <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                            Disponível em breve
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                            Controle total
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Meta Business API (disabled) -->
+                            <div class="provider-option" data-provider="meta">
+                                <div class="bg-gray-700 rounded-lg p-4 border-2 border-gray-600/50 opacity-50 cursor-not-allowed">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                            <span class="font-medium text-gray-500">Meta Business API</span>
+                                        </div>
+                                        <span class="text-xs bg-gray-600 text-gray-400 px-2 py-1 rounded-full">FASE 3</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mb-3">API oficial do Meta para WhatsApp Business</p>
+                                    <div class="text-xs text-gray-500">
+                                        <div class="flex items-center mb-1">
+                                            <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                            Em desenvolvimento
+                                        </div>
+                                        <div class="flex items-center mb-1">
+                                            <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                            Disponível em breve
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                            Recursos avançados
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuração Twilio (ATIVA) -->
+                    <div id="twilio-config" class="provider-config bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-semibold text-gray-100">
+                                <i class="fas fa-cog text-blue-400 mr-2"></i>
+                                Configuração Twilio
+                            </h2>
+                            <button id="test-twilio-connection" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
                                 <i class="fas fa-plug mr-2"></i>
                                 Testar Conexão
                             </button>
@@ -129,57 +229,146 @@
                             <div class="flex items-start">
                                 <i class="fas fa-info-circle text-blue-400 mt-1 mr-3"></i>
                                 <div>
-                                    <h3 class="text-blue-400 font-medium mb-2">Configuração da API Gupshup</h3>
-                                    <p class="text-sm text-gray-300 mb-2">Configure as credenciais da API Gupshup para gerenciar o WhatsApp Business da plataforma.</p>
+                                    <h3 class="text-blue-400 font-medium mb-2">Configuração da API Twilio</h3>
+                                    <p class="text-sm text-gray-300 mb-2">Configure as credenciais da API Twilio para gerenciar o WhatsApp Business da plataforma.</p>
                                     <p class="text-xs text-gray-400">Estas credenciais são usadas para todos os clientes da plataforma.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Configurações Gupshup -->
+                        <!-- Configurações Twilio -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">API Key</label>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Account SID</label>
                                 <div class="relative">
-                                    <input type="password" id="gupshup-api-key" value="ojlftrm5pv02cemljepf29g86wyrpuk8"
+                                    <input type="password" id="twilio-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <button id="toggle-api-key" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
+                                    <button id="toggle-account-sid" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
-                                <p class="text-xs text-gray-400 mt-1">Chave de API da conta Gupshup</p>
+                                <p class="text-xs text-gray-400 mt-1">Account SID da conta Twilio</p>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">App Name</label>
-                                <input type="text" id="gupshup-app-name" value="ViralLeadWhatsApp" readonly
-                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <p class="text-xs text-gray-400 mt-1">Nome do app configurado no Gupshup</p>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Auth Token</label>
+                                <div class="relative">
+                                    <input type="password" id="twilio-auth-token" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <button id="toggle-auth-token" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1">Auth Token da conta Twilio</p>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Client ID</label>
-                                <input type="text" id="gupshup-client-id" value="4000307927" readonly
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Número WhatsApp</label>
+                                <input type="text" id="twilio-phone-number" placeholder="+15551234567"
                                        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <p class="text-xs text-gray-400 mt-1">ID do cliente no Gupshup</p>
+                                <p class="text-xs text-gray-400 mt-1">Número WhatsApp Business verificado</p>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Número Técnico</label>
-                                <input type="text" id="gupshup-source-number" value="15557777720" readonly
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Webhook URL (Opcional)</label>
+                                <input type="url" id="twilio-webhook-url" placeholder="https://seu-dominio.com/webhooks/twilio"
                                        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <p class="text-xs text-gray-400 mt-1">Número técnico da plataforma</p>
+                                <p class="text-xs text-gray-400 mt-1">URL para receber notificações de status</p>
                             </div>
                         </div>
 
                         <!-- Ações -->
                         <div class="flex gap-3 mt-6">
-                            <button id="save-gupshup-config" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                            <button id="save-twilio-config" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
                                 <i class="fas fa-save mr-2"></i>Salvar Configuração
                             </button>
-                            <button id="reset-gupshup-config" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-medium transition-colors">
+                            <button id="reset-twilio-config" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-medium transition-colors">
                                 <i class="fas fa-undo mr-2"></i>Resetar
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Configuração Evolution API (DESABILITADA) -->
+                    <div id="evolution-config" class="provider-config hidden bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8 opacity-50">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-semibold text-gray-100">
+                                <i class="fas fa-cog text-gray-500 mr-2"></i>
+                                Configuração Evolution API
+                            </h2>
+                            <button disabled class="bg-gray-600 text-gray-400 px-4 py-2 rounded-lg cursor-not-allowed">
+                                <i class="fas fa-clock mr-2"></i>
+                                Disponível na FASE 2
+                            </button>
+                        </div>
+
+                        <div class="bg-gray-900/20 border border-gray-600 rounded-lg p-4 mb-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-gray-500 mt-1 mr-3"></i>
+                                <div>
+                                    <h3 class="text-gray-500 font-medium mb-2">Evolution API - Em Desenvolvimento</h3>
+                                    <p class="text-sm text-gray-400 mb-2">Esta API será implementada na FASE 2 do projeto.</p>
+                                    <p class="text-xs text-gray-500">API gratuita e self-hosted para controle total.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos desabilitados -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">Base URL</label>
+                                <input type="url" disabled placeholder="https://sua-evolution-api.com"
+                                       class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-500 cursor-not-allowed">
+                                <p class="text-xs text-gray-500 mt-1">URL base da sua instância Evolution API</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">API Key</label>
+                                <input type="password" disabled placeholder="Sua API Key"
+                                       class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-500 cursor-not-allowed">
+                                <p class="text-xs text-gray-500 mt-1">Chave de API da Evolution API</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuração Meta Business API (DESABILITADA) -->
+                    <div id="meta-config" class="provider-config hidden bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8 opacity-50">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-semibold text-gray-100">
+                                <i class="fas fa-cog text-gray-500 mr-2"></i>
+                                Configuração Meta Business API
+                            </h2>
+                            <button disabled class="bg-gray-600 text-gray-400 px-4 py-2 rounded-lg cursor-not-allowed">
+                                <i class="fas fa-clock mr-2"></i>
+                                Disponível na FASE 3
+                            </button>
+                        </div>
+
+                        <div class="bg-gray-900/20 border border-gray-600 rounded-lg p-4 mb-6">
+                            <div class="flex items-center justify-between">
+                                <i class="fas fa-info-circle text-gray-500 mt-1 mr-3"></i>
+                                <div>
+                                    <h3 class="text-gray-500 font-medium mb-2">Meta Business API - Em Desenvolvimento</h3>
+                                    <p class="text-sm text-gray-400 mb-2">Esta API será implementada na FASE 3 do projeto.</p>
+                                    <p class="text-xs text-gray-500">API oficial do Meta para WhatsApp Business.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos desabilitados -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">Access Token</label>
+                                <input type="password" disabled placeholder="Seu Access Token"
+                                       class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-500 cursor-not-allowed">
+                                <p class="text-xs text-gray-500 mt-1">Token de acesso do Meta Business</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">Phone Number ID</label>
+                                <input type="text" disabled placeholder="ID do número WhatsApp"
+                                       class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-500 cursor-not-allowed">
+                                <p class="text-xs text-gray-500 mt-1">ID do número WhatsApp Business</p>
+                            </div>
                         </div>
                     </div>
 
