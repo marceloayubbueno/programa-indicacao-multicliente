@@ -34,6 +34,28 @@
         .drop-zone-active {
             @apply bg-blue-900/20 border-blue-500 border-2;
         }
+        
+        .active-tab {
+            @apply border-blue-500 text-white bg-gray-700;
+        }
+        
+        /* Estilização da scrollbar */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: #374151;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: #6B7280;
+            border-radius: 3px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
@@ -208,27 +230,40 @@
                 </div>
                 
                 <div class="flex">
-                    <!-- Blocos Pré-definidos (Lateral) -->
-                    <div class="w-80 bg-gray-750 p-4 border-r border-gray-700">
-                        <h4 class="text-lg font-semibold text-gray-100 mb-4">
-                            <i class="fas fa-puzzle-piece text-blue-400 mr-2"></i>
-                            Blocos Pré-definidos
-                        </h4>
-                        <p class="text-gray-400 text-sm mb-4">Clique em um bloco para usar como base</p>
-                        
-                        <div id="template-blocks-sidebar" class="grid grid-cols-2 gap-3 mb-6">
-                            <!-- Blocos serão carregados aqui -->
+                    <!-- Sidebar com Menu de Alternância -->
+                    <div class="w-80 bg-gray-800 border-r border-gray-700">
+                        <!-- Menu de Alternância -->
+                        <div class="flex border-b border-gray-700">
+                            <button id="tab-blocks" class="flex-1 px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 transition-colors border-b-2 border-transparent hover:border-blue-500 active-tab" onclick="switchTab('blocks')">
+                                <i class="fas fa-puzzle-piece mr-2"></i>Blocos
+                            </button>
+                            <button id="tab-variables" class="flex-1 px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 transition-colors border-b-2 border-transparent hover:border-blue-500" onclick="switchTab('variables')">
+                                <i class="fas fa-tags mr-2"></i>Variáveis
+                            </button>
                         </div>
-
-                        <!-- Variáveis Disponíveis -->
-                        <div class="border-t border-gray-700 pt-4">
-                            <h5 class="text-md font-medium text-gray-100 mb-3 flex items-center gap-2">
+                        
+                        <!-- Conteúdo dos Blocos -->
+                        <div id="content-blocks" class="p-4">
+                            <h4 class="text-md font-medium text-gray-100 mb-3 flex items-center gap-2">
+                                <i class="fas fa-puzzle-piece text-blue-400"></i>
+                                Blocos Pré-definidos
+                            </h4>
+                            <p class="text-gray-400 text-xs mb-3">Clique ou arraste para usar como base</p>
+                            
+                            <div id="template-blocks-sidebar" class="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
+                                <!-- Blocos serão carregados aqui -->
+                            </div>
+                        </div>
+                        
+                        <!-- Conteúdo das Variáveis -->
+                        <div id="content-variables" class="p-4 hidden">
+                            <h4 class="text-md font-medium text-gray-100 mb-3 flex items-center gap-2">
                                 <i class="fas fa-tags text-green-400"></i>
                                 Variáveis Disponíveis
-                            </h5>
+                            </h4>
                             <p class="text-gray-400 text-xs mb-3">Arraste para inserir no texto</p>
                             
-                            <div id="variables-sidebar" class="grid grid-cols-2 gap-2">
+                            <div id="variables-sidebar" class="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
                                 <!-- Variáveis serão carregadas aqui -->
                             </div>
                         </div>
@@ -545,6 +580,26 @@
             }
         }
 
+        // Função para alternar entre abas
+        function switchTab(tabName) {
+            // Remover classe ativa de todas as abas
+            document.getElementById('tab-blocks').classList.remove('active-tab', 'border-blue-500', 'text-white', 'bg-gray-700');
+            document.getElementById('tab-variables').classList.remove('active-tab', 'border-blue-500', 'text-white', 'bg-gray-700');
+            
+            // Esconder todos os conteúdos
+            document.getElementById('content-blocks').classList.add('hidden');
+            document.getElementById('content-variables').classList.add('hidden');
+            
+            // Ativar aba selecionada
+            if (tabName === 'blocks') {
+                document.getElementById('tab-blocks').classList.add('active-tab', 'border-blue-500', 'text-white', 'bg-gray-700');
+                document.getElementById('content-blocks').classList.remove('hidden');
+            } else if (tabName === 'variables') {
+                document.getElementById('tab-variables').classList.add('active-tab', 'border-blue-500', 'text-white', 'bg-gray-700');
+                document.getElementById('content-variables').classList.remove('hidden');
+            }
+        }
+
         // Função para configurar drag & drop
         function setupTemplateBlocksDragAndDrop() {
             console.log('Configurando drag & drop para blocos de template e variáveis...');
@@ -584,8 +639,12 @@
             const modal = document.getElementById('template-modal');
             if (modal) {
                 modal.classList.remove('hidden');
-                // Limpar formulário
-                document.getElementById('template-form').reset();
+                // NÃO limpar formulário se já tem dados (caso de bloco carregado)
+                const nameField = document.getElementById('template-name');
+                if (nameField && !nameField.value.trim()) {
+                    // Só limpar se estiver vazio
+                    document.getElementById('template-form').reset();
+                }
                 // Focar no primeiro campo
                 document.getElementById('template-name').focus();
             }
