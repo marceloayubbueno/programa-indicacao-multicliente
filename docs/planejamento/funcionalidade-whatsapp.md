@@ -387,23 +387,23 @@ server/src/whatsapp/providers/    # ✅ NOVA ESTRUTURA LIMPA
 
 ---
 
-## 🎯 **ESTRATÉGIA DE IMPLEMENTAÇÃO - EVOLUTION API PRIMEIRO**
+## 🎯 **ESTRATÉGIA DE IMPLEMENTAÇÃO - TWILIO PRIMEIRO**
 
-### **✅ FASE ATUAL: EVOLUTION API (PRIORIDADE MÁXIMA)**
-1. **Implementar e testar** integração Evolution API completa
-2. **Validar** envio de mensagens via Evolution API
-3. **Testar** configuração e conexão Evolution API
-4. **Garantir** que Evolution API está 100% funcional
+### **✅ FASE ATUAL: TWILIO (PRIORIDADE MÁXIMA)**
+1. **Implementar e testar** integração Twilio completa
+2. **Validar** envio de mensagens via Twilio
+3. **Testar** configuração e conexão Twilio
+4. **Garantir** que Twilio está 100% funcional
 
-### **🔮 FASES FUTURAS (APÓS EVOLUTION API FUNCIONANDO)**
-1. **FASE 2**: Twilio (quando justificar custo de $14/mês)
-2. **FASE 3**: Meta Business API (oficial, recursos avançados)
+### **🔮 FASES FUTURAS (APÓS TWILIO FUNCIONANDO)**
+1. **FASE 2**: Meta Business API (oficial, recursos avançados)
+2. **FASE 3**: Outras APIs conforme necessidade
 
 ### **🎯 PRÓXIMOS PASSOS (HOJE - DIA 6)**
-1. **Implementar Evolution API** (gratuita, self-hosted)
-2. **Criar schema** para configuração Evolution API
-3. **Implementar service** para Evolution API
-4. **Testar** integração Evolution API no backend
+1. **Focar em Twilio** (estável e confiável)
+2. **Testar** integração Twilio no backend
+3. **Validar** envio de mensagens
+4. **Preparar** para Meta Business API futura
 
 ## 🏗️ **NOVA ESTRUTURA DE PASTAS - LIMPA E ORGANIZADA**
 

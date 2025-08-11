@@ -15,9 +15,7 @@ import { WhatsAppTemplate, WhatsAppTemplateSchema } from './entities/whatsapp-te
 import { WhatsAppFlow, WhatsAppFlowSchema } from './entities/whatsapp-flow.schema';
 import { WhatsAppMessage, WhatsAppMessageSchema } from './entities/whatsapp-message.schema';
 import { WhatsAppTwilioConfig, WhatsAppTwilioConfigSchema } from './providers/whatsapp-twilio-config.schema';
-import { EvolutionController } from './providers/evolution.controller';
-import { EvolutionService } from './providers/evolution.service';
-import { WhatsAppEvolutionConfig, WhatsAppEvolutionConfigSchema } from './providers/whatsapp-evolution-config.schema';
+
 
 @Module({
   imports: [
@@ -28,7 +26,7 @@ import { WhatsAppEvolutionConfig, WhatsAppEvolutionConfigSchema } from './provid
       { name: WhatsAppFlow.name, schema: WhatsAppFlowSchema },
       { name: WhatsAppMessage.name, schema: WhatsAppMessageSchema },
       { name: WhatsAppTwilioConfig.name, schema: WhatsAppTwilioConfigSchema },
-      { name: WhatsAppEvolutionConfig.name, schema: WhatsAppEvolutionConfigSchema },
+
     ]),
   ],
   controllers: [
@@ -36,14 +34,14 @@ import { WhatsAppEvolutionConfig, WhatsAppEvolutionConfigSchema } from './provid
     WhatsAppClientController,
     WhatsAppClientTemplatesController,
     TwilioController,
-    EvolutionController,
+
   ],
   providers: [
     WhatsAppAdminService,
     WhatsAppClientService,
     WhatsAppClientTemplatesService,
     TwilioService,
-    EvolutionService,
+
   ],
   exports: [
     WhatsAppAdminService,

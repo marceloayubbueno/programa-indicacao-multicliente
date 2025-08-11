@@ -140,17 +140,17 @@
                                 </div>
                             </div>
                             
-                            <!-- Evolution API (ATIVA) -->
-                            <div class="provider-option flex-1" data-provider="evolution">
-                                <div class="bg-gray-700 rounded-lg p-4 border-2 border-blue-500/50 cursor-pointer hover:bg-gray-600 transition-colors">
+                            <!-- Evolution API (REMOVIDA) -->
+                            <div class="provider-option flex-1" data-provider="evolution" style="display: none;">
+                                <div class="bg-gray-700 rounded-lg p-4 border-2 border-gray-600/50 opacity-50 cursor-not-allowed">
                                     <div class="flex items-center justify-between mb-2">
                                         <div class="flex items-center">
-                                            <i class="fas fa-rocket text-blue-400 mr-2"></i>
-                                            <span class="text-blue-400">Evolution API</span>
+                                            <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                            <span class="text-gray-500">Evolution API</span>
                                         </div>
-                                        <span class="text-xs bg-blue-600 text-blue-200 px-2 py-1 rounded-full">ATIVA</span>
+                                        <span class="text-xs bg-gray-600 text-gray-400 px-2 py-1 rounded-full">REMOVIDA</span>
                                     </div>
-                                    <p class="text-xs text-gray-300">API gratuita e self-hosted</p>
+                                    <p class="text-xs text-gray-500">API removida - não recomendada para produção</p>
                                 </div>
                             </div>
                             
@@ -291,100 +291,34 @@
                         </div>
                     </div>
 
-                    <!-- Configuração Evolution API (ATIVA) -->
-                    <div id="evolution-config" class="provider-config hidden bg-gray-800 rounded-xl p-6 border border-blue-700 mb-8">
+                    <!-- Configuração Evolution API (REMOVIDA) -->
+                    <div id="evolution-config" class="provider-config hidden bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8 opacity-50">
                         <div class="flex items-center justify-between mb-6">
                             <h2 class="text-xl font-semibold text-gray-100">
-                                <i class="fas fa-cog text-blue-400 mr-2"></i>
-                                Configuração Evolution API
+                                <i class="fas fa-ban text-red-400 mr-2"></i>
+                                Evolution API Removida
                             </h2>
-                            <button id="test-evolution-connection" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                                <i class="fas fa-plug mr-2"></i>
-                                Testar Conexão
+                            <button disabled class="bg-gray-600 text-gray-400 px-4 py-2 rounded-lg cursor-not-allowed">
+                                <i class="fas fa-ban mr-2"></i>
+                                API Removida
                             </button>
                         </div>
 
-                        <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mb-6">
+                        <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-6">
                             <div class="flex items-start">
-                                <i class="fas fa-info-circle text-blue-400 mt-1 mr-3"></i>
+                                <i class="fas fa-exclamation-triangle text-red-400 mt-1 mr-3"></i>
                                 <div>
-                                    <h3 class="text-blue-400 font-medium mb-2">Configuração da Evolution API</h3>
-                                    <p class="text-sm text-gray-300 mb-2">Configure as credenciais da Evolution API para gerenciar o WhatsApp Business da plataforma.</p>
-                                    <p class="text-xs text-gray-400">API gratuita e self-hosted para controle total sem custos.</p>
+                                    <h3 class="text-red-400 font-medium mb-2">Evolution API Removida</h3>
+                                    <p class="text-sm text-gray-300 mb-2">Esta API foi removida por não ser recomendada para produção.</p>
+                                    <p class="text-xs text-gray-400">Use Twilio (estável) ou aguarde Meta Business API.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Configurações Evolution API -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Instance Name</label>
-                                <input type="text" id="evolution-instance-name" placeholder="minha-instancia"
-                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <p class="text-xs text-gray-400 mt-1">Nome da instância Evolution API</p>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">API Key</label>
-                                <div class="relative">
-                                    <input type="password" id="evolution-api-key" placeholder="Sua API Key"
-                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <button id="toggle-evolution-api-key" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <p class="text-xs text-gray-400 mt-1">Chave de API da Evolution API</p>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Base URL</label>
-                                <input type="url" id="evolution-webhook-url" placeholder="https://sua-evolution-api.com"
-                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <p class="text-xs text-gray-400 mt-1">URL base da sua instância Evolution API</p>
-                            </div>
-                        </div>
-
-                        <!-- Ações -->
-                        <div class="flex gap-3 mt-6">
-                            <button id="save-evolution-config" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
-                                <i class="fas fa-save mr-2"></i>
-                                Salvar Configuração
-                            </button>
-                            <button id="reset-evolution-config" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
-                                <i class="fas fa-undo mr-2"></i>
-                                Resetar
-                            </button>
-                        </div>
-
-                        <!-- Teste de Envio de Mensagens -->
-                        <div class="mt-8 p-6 bg-gray-700/50 rounded-lg border border-gray-600">
-                            <h3 class="text-lg font-semibold text-gray-200 mb-4">
-                                <i class="fas fa-paper-plane text-blue-400 mr-2"></i>
-                                Teste de Envio de Mensagens
-                            </h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">Número de Destino</label>
-                                    <input type="text" id="evolution-test-to" placeholder="5511999999999"
-                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <p class="text-xs text-gray-400 mt-1">Número com código do país (ex: 5511999999999)</p>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-2">Mensagem de Teste</label>
-                                    <input type="text" id="evolution-test-message" placeholder="Teste da Evolution API"
-                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <p class="text-xs text-gray-400 mt-1">Mensagem para testar o envio</p>
-                                </div>
-                            </div>
-                            
-                            <button id="send-evolution-test-message" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
-                                <i class="fas fa-paper-plane mr-2"></i>
-                                Enviar Mensagem de Teste
-                            </button>
-                            
-                            <div id="evolution-test-result" class="mt-4 hidden"></div>
+                        <div class="text-center py-8">
+                            <i class="fas fa-ban text-red-400 text-4xl mb-4"></i>
+                            <p class="text-gray-400">Evolution API removida do sistema</p>
+                            <p class="text-xs text-gray-500 mt-2">Use Twilio para funcionalidade estável</p>
                         </div>
                     </div>
 
