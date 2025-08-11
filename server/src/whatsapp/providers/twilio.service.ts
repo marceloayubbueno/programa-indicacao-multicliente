@@ -120,8 +120,8 @@ export class TwilioService {
       // Enviar mensagem via WhatsApp
       const message = await this.client.messages.create({
         body: testDto.message,
-        from: config.phoneNumber,  // ✅ SEM 'whatsapp:' prefix
-        to: testDto.to             // ✅ SEM 'whatsapp:' prefix
+        from: `whatsapp:${config.phoneNumber}`,  // ✅ COM 'whatsapp:' prefix para WhatsApp
+        to: `whatsapp:${testDto.to}`             // ✅ COM 'whatsapp:' prefix para WhatsApp
       });
 
       // Atualizar estatísticas
