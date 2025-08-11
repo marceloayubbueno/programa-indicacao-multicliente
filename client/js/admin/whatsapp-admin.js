@@ -17,6 +17,10 @@ class WhatsAppAdmin {
                 twilioTestConnection: '/admin/whatsapp/twilio/test-connection',
                 twilioTestMessage: '/admin/whatsapp/twilio/test-message',
                 twilioStatus: '/admin/whatsapp/twilio/status',
+                evolutionConfig: '/admin/whatsapp/evolution/config',
+                evolutionTestConnection: '/admin/whatsapp/evolution/test-connection',
+                evolutionTestMessage: '/admin/whatsapp/evolution/test-message',
+                evolutionStatus: '/admin/whatsapp/evolution/status',
                 pricingConfig: '/admin/whatsapp/pricing-config',
                 statistics: '/admin/whatsapp/statistics',
                 globalSettings: '/admin/whatsapp/global-settings'
@@ -25,7 +29,9 @@ class WhatsAppAdmin {
         
         // ✅ INICIALIZAR PROPRIEDADES PARA ARMAZENAR CONFIGURAÇÕES
         this.twilioConfig = null;
+        this.evolutionConfig = null;
         this.pricingConfig = null;
+        this.currentProvider = 'twilio'; // Provider padrão
         
         this.init();
     }
@@ -49,7 +55,13 @@ class WhatsAppAdmin {
         document.getElementById('test-twilio-connection')?.addEventListener('click', () => this.testTwilioConnection());
         document.getElementById('reset-twilio-config')?.addEventListener('click', () => this.resetTwilioConfig());
         
-        // Botão de teste de mensagem
+        // Botões de configuração Evolution API
+        document.getElementById('save-evolution-config')?.addEventListener('click', () => this.saveEvolutionConfig());
+        document.getElementById('test-evolution-connection')?.addEventListener('click', () => this.testEvolutionConnection());
+        document.getElementById('reset-evolution-config')?.addEventListener('click', () => this.resetEvolutionConfig());
+        document.getElementById('send-evolution-test-message')?.addEventListener('click', () => this.sendEvolutionTestMessage());
+        
+        // Botão de teste de mensagem Twilio
         document.getElementById('send-test-message')?.addEventListener('click', () => this.sendTestMessage());
         
         // Botão de teste de conexão ativa
@@ -61,9 +73,13 @@ class WhatsAppAdmin {
         // Toggle de visibilidade das senhas
         document.getElementById('toggle-account-sid')?.addEventListener('click', () => this.togglePasswordVisibility('twilio-account-sid', 'toggle-account-sid'));
         document.getElementById('toggle-auth-token')?.addEventListener('click', () => this.togglePasswordVisibility('twilio-auth-token', 'toggle-auth-token'));
+        document.getElementById('toggle-evolution-api-key')?.addEventListener('click', () => this.togglePasswordVisibility('evolution-api-key', 'toggle-evolution-api-key'));
 
         // Validação em tempo real
         this.bindRealTimeValidation();
+        
+        // Seleção de provider
+        this.bindProviderSelection();
     }
 
     /**
@@ -112,12 +128,33 @@ class WhatsAppAdmin {
         try {
             await Promise.all([
                 this.loadTwilioConfig(),
+                this.loadEvolutionConfig(),
                 this.loadPricingConfig(),
                 this.loadStatistics()
             ]);
         } catch (error) {
             console.error('Erro ao carregar dados iniciais:', error);
             this.showNotification('Erro ao carregar configurações', 'error');
+        }
+    }
+
+    /**
+     * Carregar configuração da Evolution API
+     */
+    async loadEvolutionConfig() {
+        try {
+            console.log('🔍 DEBUG: Carregando configuração Evolution API...');
+            const response = await this.makeRequest('GET', this.config.endpoints.evolutionConfig);
+            console.log('🔍 DEBUG: Resposta loadEvolutionConfig:', response);
+            
+            if (response.success && response.data) {
+                console.log('🔍 DEBUG: Configuração Evolution encontrada, preenchendo...');
+                this.fillEvolutionConfig(response.data);
+            } else {
+                console.log('🔍 DEBUG: Nenhuma configuração Evolution encontrada');
+            }
+        } catch (error) {
+            console.error('Erro ao carregar configuração Evolution API:', error);
         }
     }
 
@@ -171,6 +208,33 @@ class WhatsAppAdmin {
         } catch (error) {
             console.error('Erro ao carregar estatísticas:', error);
         }
+    }
+
+    /**
+     * Preencher configuração da Evolution API
+     */
+    fillEvolutionConfig(config) {
+        if (!config) return;
+
+        console.log('🔍 DEBUG: fillEvolutionConfig recebeu:', config);
+        console.log('🔍 DEBUG: config._id existe?', !!config._id);
+
+        // ✅ SALVAR CONFIGURAÇÃO COMPLETA para uso posterior
+        this.evolutionConfig = config;
+        console.log('🔍 DEBUG: this.evolutionConfig salvo:', this.evolutionConfig);
+
+        const elements = {
+            'evolution-instance-name': config.instanceName || '',
+            'evolution-api-key': config.apiKey || '',
+            'evolution-webhook-url': config.webhookUrl || ''
+        };
+
+        Object.entries(elements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.value = value;
+            }
+        });
     }
 
     /**
@@ -753,6 +817,59 @@ class WhatsAppAdmin {
     }
 
     /**
+     * Enviar mensagem de teste Evolution API
+     */
+    async sendEvolutionTestMessage() {
+        try {
+            const phoneNumber = document.getElementById('evolution-test-to').value;
+            const message = document.getElementById('evolution-test-message').value;
+            
+            if (!phoneNumber || !message) {
+                this.showNotification('Preencha o número e a mensagem de teste', 'error');
+                return;
+            }
+
+            this.showLoading('send-evolution-test-message', 'Enviando...');
+            
+            const response = await this.makeRequest('POST', this.config.endpoints.evolutionTestMessage, {
+                to: phoneNumber,
+                message: message
+            });
+            
+            if (response.success) {
+                this.showNotification('Mensagem de teste Evolution enviada com sucesso!', 'success');
+                this.showEvolutionTestResult(true, response.message);
+            } else {
+                this.showNotification('Falha ao enviar mensagem de teste Evolution', 'error');
+                this.showEvolutionTestResult(false, response.message);
+            }
+        } catch (error) {
+            console.error('Erro ao enviar mensagem de teste Evolution:', error);
+            this.showNotification(`Erro ao enviar: ${error.message}`, 'error');
+            this.showEvolutionTestResult(false, error.message);
+        } finally {
+            this.hideLoading('send-evolution-test-message', 'Enviar Mensagem de Teste');
+        }
+    }
+
+    /**
+     * Mostrar resultado do teste Evolution
+     */
+    showEvolutionTestResult(success, message) {
+        const resultDiv = document.getElementById('evolution-test-result');
+        
+        resultDiv.classList.remove('hidden');
+        resultDiv.innerHTML = `
+            <div class="p-3 rounded-lg ${success ? 'bg-green-900/20 border border-green-500/30' : 'bg-red-900/20 border border-red-500/30'}">
+                <div class="flex items-center">
+                    <i class="fas ${success ? 'fa-check-circle text-green-400' : 'fa-exclamation-circle text-red-400'} mr-2"></i>
+                    <span class="${success ? 'text-green-400' : 'text-red-400'} text-sm">${message}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
      * Mostrar resultado do teste
      */
     showTestResult(success, message) {
@@ -789,6 +906,78 @@ class WhatsAppAdmin {
     }
 
     /**
+     * Salvar configuração Evolution API
+     */
+    async saveEvolutionConfig() {
+        try {
+            const config = this.getEvolutionConfig();
+            
+            console.log('🔍 DEBUG saveEvolutionConfig:', {
+                config,
+                hasId: !!config._id,
+                evolutionConfig: this.evolutionConfig,
+                method: config._id ? 'PUT' : 'POST'
+            });
+            
+            if (!this.validateEvolutionConfig(config)) {
+                return;
+            }
+
+            this.showLoading('save-evolution-config', 'Salvando...');
+            
+            const method = config._id ? 'PUT' : 'POST';
+            const response = await this.makeRequest(method, this.config.endpoints.evolutionConfig, config);
+            
+            if (response.success) {
+                this.showNotification('Configuração Evolution API salva com sucesso!', 'success');
+                await this.loadEvolutionConfig(); // Recarregar para atualizar status
+            } else {
+                this.showNotification('Erro ao salvar configuração Evolution', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao salvar configuração Evolution API:', error);
+            this.showNotification(`Erro ao salvar: ${error.message}`, 'error');
+        } finally {
+            this.hideLoading('save-evolution-config', 'Salvar Configuração');
+        }
+    }
+
+    /**
+     * Testar conexão Evolution API
+     */
+    async testEvolutionConnection() {
+        try {
+            this.showLoading('test-evolution-connection', 'Testando...');
+            
+            const response = await this.makeRequest('POST', this.config.endpoints.evolutionTestConnection);
+            
+            if (response.success) {
+                this.showNotification('Conexão Evolution API testada com sucesso!', 'success');
+                await this.loadEvolutionConfig(); // Recarregar para atualizar status
+            } else {
+                this.showNotification('Falha no teste de conexão Evolution', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao testar conexão Evolution API:', error);
+            this.showNotification(`Erro no teste: ${error.message}`, 'error');
+        } finally {
+            this.hideLoading('test-evolution-connection', 'Testar Conexão');
+        }
+    }
+
+    /**
+     * Resetar configuração Evolution API
+     */
+    resetEvolutionConfig() {
+        if (confirm('Tem certeza que deseja resetar a configuração Evolution API?')) {
+            document.getElementById('evolution-instance-name').value = '';
+            document.getElementById('evolution-api-key').value = '';
+            document.getElementById('evolution-webhook-url').value = '';
+            this.showNotification('Configuração Evolution API resetada', 'info');
+        }
+    }
+
+    /**
      * Obter configuração Twilio do formulário
      */
     getTwilioConfig() {
@@ -801,6 +990,21 @@ class WhatsAppAdmin {
             authToken: document.getElementById('twilio-auth-token').value.trim(),
             phoneNumber: document.getElementById('twilio-phone-number').value.trim(),
             webhookUrl: document.getElementById('twilio-webhook-url').value.trim()
+        };
+    }
+
+    /**
+     * Obter configuração Evolution API do formulário
+     */
+    getEvolutionConfig() {
+        // Verificar se existe configuração carregada
+        const existingConfig = this.evolutionConfig || {};
+        
+        return {
+            _id: existingConfig._id, // ✅ IMPORTANTE: ID para determinar POST vs PUT
+            instanceName: document.getElementById('evolution-instance-name').value.trim(),
+            apiKey: document.getElementById('evolution-api-key').value.trim(),
+            webhookUrl: document.getElementById('evolution-webhook-url').value.trim()
         };
     }
 
@@ -827,6 +1031,28 @@ class WhatsAppAdmin {
     }
 
     /**
+     * Validar configuração Evolution API
+     */
+    validateEvolutionConfig(config) {
+        if (!config.instanceName || config.instanceName.length < 3) {
+            this.showNotification('Instance Name é obrigatório e deve ter pelo menos 3 caracteres', 'error');
+            return false;
+        }
+        
+        if (!config.apiKey || config.apiKey.length < 10) {
+            this.showNotification('API Key é obrigatória e deve ter pelo menos 10 caracteres', 'error');
+            return false;
+        }
+        
+        if (!config.webhookUrl || !config.webhookUrl.startsWith('http')) {
+            this.showNotification('Base URL deve ser uma URL válida (http:// ou https://)', 'error');
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
      * Toggle de visibilidade de senha
      */
     togglePasswordVisibility(fieldId, buttonId) {
@@ -841,6 +1067,66 @@ class WhatsAppAdmin {
             field.type = 'password';
             icon.className = 'fas fa-eye';
         }
+    }
+
+    /**
+     * Vincular seleção de provider
+     */
+    bindProviderSelection() {
+        const providerOptions = document.querySelectorAll('.provider-option');
+        
+        providerOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const provider = option.dataset.provider;
+                this.selectProvider(provider);
+            });
+        });
+    }
+
+    /**
+     * Selecionar provider
+     */
+    selectProvider(provider) {
+        console.log('🔍 DEBUG: Selecionando provider:', provider);
+        
+        // Ocultar todas as configurações
+        document.querySelectorAll('.provider-config').forEach(config => {
+            config.classList.add('hidden');
+        });
+        
+        // Mostrar configuração do provider selecionado
+        const configElement = document.getElementById(`${provider}-config`);
+        if (configElement) {
+            configElement.classList.remove('hidden');
+        }
+        
+        // Atualizar UI de seleção
+        this.updateProviderSelectionUI(provider);
+        
+        // Atualizar provider ativo
+        this.currentProvider = provider;
+        
+        console.log('🔍 DEBUG: Provider selecionado:', this.currentProvider);
+    }
+
+    /**
+     * Atualizar UI de seleção de provider
+     */
+    updateProviderSelectionUI(selectedProvider) {
+        const providerOptions = document.querySelectorAll('.provider-option');
+        
+        providerOptions.forEach(option => {
+            const provider = option.dataset.provider;
+            const container = option.querySelector('div');
+            
+            if (provider === selectedProvider) {
+                container.classList.remove('border-gray-600/50', 'opacity-50', 'cursor-not-allowed');
+                container.classList.add('border-blue-500/50', 'cursor-pointer');
+            } else {
+                container.classList.remove('border-blue-500/50', 'cursor-pointer');
+                container.classList.add('border-gray-600/50', 'opacity-50', 'cursor-not-allowed');
+            }
+        });
     }
 }
 
