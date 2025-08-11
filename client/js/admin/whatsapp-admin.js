@@ -23,6 +23,10 @@ class WhatsAppAdmin {
             }
         };
         
+        // ✅ INICIALIZAR PROPRIEDADES PARA ARMAZENAR CONFIGURAÇÕES
+        this.twilioConfig = null;
+        this.pricingConfig = null;
+        
         this.init();
     }
 
@@ -168,6 +172,9 @@ class WhatsAppAdmin {
      */
     fillTwilioConfig(config) {
         if (!config) return;
+
+        // ✅ SALVAR CONFIGURAÇÃO COMPLETA para uso posterior
+        this.twilioConfig = config;
 
         const elements = {
             'twilio-account-sid': config.accountSid || '',
@@ -767,7 +774,11 @@ class WhatsAppAdmin {
      * Obter configuração Twilio do formulário
      */
     getTwilioConfig() {
+        // Verificar se existe configuração carregada
+        const existingConfig = this.twilioConfig || {};
+        
         return {
+            _id: existingConfig._id, // ✅ IMPORTANTE: ID para determinar POST vs PUT
             accountSid: document.getElementById('twilio-account-sid').value.trim(),
             authToken: document.getElementById('twilio-auth-token').value.trim(),
             phoneNumber: document.getElementById('twilio-phone-number').value.trim(),
