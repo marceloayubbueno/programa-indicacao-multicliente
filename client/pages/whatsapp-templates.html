@@ -337,11 +337,19 @@
     <script>
         // Inicializar blocos pré-definidos na sidebar
         document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticação primeiro
+            if (!checkAuth()) {
+                return;
+            }
+            
             // Aguardar um pouco para garantir que os scripts estejam carregados
             setTimeout(() => {
                 renderTemplateBlocksSidebar();
                 // Configurar drag & drop após renderizar os blocos
                 setupTemplateBlocksDragAndDrop();
+                
+                // Carregar templates existentes
+                loadTemplates();
             }, 1000);
         });
 
@@ -600,6 +608,60 @@
             }
         }
 
+        // Função para verificar autenticação
+        function checkAuth() {
+            const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            const clientId = localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
+            
+            if (!token || !clientId) {
+                showError('Sessão expirada. Faça login novamente.');
+                // Redirecionar para login se necessário
+                setTimeout(() => {
+                    window.location.href = '../login.html';
+                }, 2000);
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Função para carregar templates existentes
+        async function loadTemplates() {
+            try {
+                if (!checkAuth()) return;
+                
+                const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+                const clientId = localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
+                
+                const isProduction = window.location.hostname === 'app.virallead.com.br';
+                const apiBaseUrl = isProduction 
+                    ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+                    : 'http://localhost:3000';
+                
+                const response = await fetch(`${apiBaseUrl}/client/whatsapp/templates`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Client-ID': clientId
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                
+                const templates = await response.json();
+                console.log('Templates carregados:', templates);
+                
+                // Aqui você pode implementar a renderização da lista de templates
+                // Por enquanto, apenas logamos no console
+                
+            } catch (error) {
+                console.error('Erro ao carregar templates:', error);
+                showError(`Erro ao carregar templates: ${error.message}`);
+            }
+        }
+
         // Função para configurar drag & drop
         function setupTemplateBlocksDragAndDrop() {
             console.log('Configurando drag & drop para blocos de template e variáveis...');
@@ -659,31 +721,84 @@
         }
 
         // Função para salvar template
-        function saveTemplate() {
-            const form = document.getElementById('template-form');
-            const formData = new FormData(form);
-            
-            // Validar campos obrigatórios
-            const name = document.getElementById('template-name').value.trim();
-            const category = document.getElementById('template-category').value;
-            const body = document.getElementById('template-body').value.trim();
-            
-            if (!name || !category || !body) {
-                showError('Preencha todos os campos obrigatórios');
-                return;
+        async function saveTemplate() {
+            try {
+                // Validar campos obrigatórios
+                const name = document.getElementById('template-name').value.trim();
+                const category = document.getElementById('template-category').value;
+                const body = document.getElementById('template-body').value.trim();
+                
+                if (!name || !category || !body) {
+                    showError('Preencha todos os campos obrigatórios');
+                    return;
+                }
+                
+                // Preparar dados do template
+                const templateData = {
+                    name: name,
+                    category: category,
+                    content: body,
+                    footer: document.getElementById('template-footer').value.trim() || '',
+                    variables: document.getElementById('template-variables').value.trim() || '',
+                    status: 'draft' // Status inicial como rascunho
+                };
+                
+                console.log('Enviando template para API:', templateData);
+                
+                // Obter token de autenticação
+                const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+                if (!token) {
+                    showError('Token de autenticação não encontrado. Faça login novamente.');
+                    return;
+                }
+                
+                // Obter clientId do localStorage ou sessionStorage
+                const clientId = localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
+                if (!clientId) {
+                    showError('ID do cliente não encontrado. Faça login novamente.');
+                    return;
+                }
+                
+                // Determinar URL da API baseada no ambiente
+                const isProduction = window.location.hostname === 'app.virallead.com.br';
+                const apiBaseUrl = isProduction 
+                    ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+                    : 'http://localhost:3000';
+                
+                // Fazer requisição para a API
+                const response = await fetch(`${apiBaseUrl}/client/whatsapp/templates`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-Client-ID': clientId
+                    },
+                    body: JSON.stringify(templateData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
+                }
+                
+                const savedTemplate = await response.json();
+                console.log('Template salvo com sucesso:', savedTemplate);
+                
+                showSuccess('Template salvo com sucesso!');
+                closeTemplateModal();
+                
+                // Limpar formulário após salvar
+                document.getElementById('template-form').reset();
+                
+                // Opcional: Recarregar lista de templates se existir
+                if (typeof loadTemplates === 'function') {
+                    loadTemplates();
+                }
+                
+            } catch (error) {
+                console.error('Erro ao salvar template:', error);
+                showError(`Erro ao salvar template: ${error.message}`);
             }
-            
-            // Aqui você implementaria a lógica para salvar no backend
-            console.log('Salvando template:', {
-                name,
-                category,
-                body,
-                footer: document.getElementById('template-footer').value,
-                variables: document.getElementById('template-variables').value
-            });
-            
-            showSuccess('Template salvo com sucesso!');
-            closeTemplateModal();
         }
 
         // Funções de notificação
