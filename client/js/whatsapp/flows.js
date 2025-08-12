@@ -104,7 +104,48 @@ async function loadFlows() {
 
 async function loadTemplates() {
     try {
-        // Mock data para desenvolvimento frontend
+        console.log('📥 Carregando templates da API para fluxos WhatsApp...');
+        
+        // 1. OBTER CREDENCIAIS DE AUTENTICAÇÃO
+        const token = getToken();
+        if (!token) {
+            console.error('❌ Token não encontrado');
+            return;
+        }
+        
+        // 2. CONFIGURAÇÃO DA API
+        const isProduction = window.location.hostname === 'app.virallead.com.br';
+        const apiBaseUrl = isProduction 
+            ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+            : 'http://localhost:3000';
+        
+        // 3. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
+        const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erro ${response.status}: ${response.statusText}`);
+        }
+        
+        const responseData = await response.json();
+        console.log('✅ Templates carregados da API:', responseData);
+        
+        // 4. EXTRAIR ARRAY DE TEMPLATES
+        templates = responseData.data || responseData;
+        console.log(`📋 ${templates.length} templates carregados para fluxos`);
+        
+        // 5. ATUALIZAR DROPDOWNS EXISTENTES
+        updateTemplateDropdowns();
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar templates da API:', error);
+        showError('Erro ao carregar templates da API');
+        
+        // Fallback para dados mockados em caso de erro
         templates = [
             {
                 id: '1',
@@ -125,9 +166,6 @@ async function loadTemplates() {
                 content: 'Oferta especial para você: {{discount}}% de desconto!'
             }
         ];
-    } catch (error) {
-        console.error('Erro ao carregar templates:', error);
-        showError('Erro ao carregar templates');
     }
 }
 
@@ -385,20 +423,25 @@ function addMessage() {
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
             <div>
-                <label class="block text-gray-300 text-sm font-medium mb-1">Template</label>
-                <select name="templateId" required class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="block text-gray-300 text-sm font-medium mb-1">Template *</label>
+                <select name="templateId" required class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="showTemplatePreview(${messageCounter})">
                     <option value="">Selecione um template</option>
-                    ${templates.map(template => `<option value="${template.id}">${template.name}</option>`).join('')}
+                    ${templates.map(template => `<option value="${template._id || template.id}" data-content="${template.content?.body || template.content || ''}" data-variables="${Array.isArray(template.variables) ? template.variables.join(', ') : template.variables || ''}">${template.name} (${template.category})</option>`).join('')}
                 </select>
+                <div id="template-preview-${messageCounter}" class="mt-2 p-2 bg-gray-800 rounded text-xs text-gray-300 hidden">
+                    <!-- Preview do template será mostrado aqui -->
+                </div>
             </div>
             <div>
-                <label class="block text-gray-300 text-sm font-medium mb-1">Gatilho</label>
+                <label class="block text-gray-300 text-sm font-medium mb-1">Gatilho *</label>
                 <select name="trigger" required class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Selecione um gatilho</option>
                     <option value="indicator_joined">Indicador se juntou</option>
                     <option value="lead_indicated">Lead foi indicado</option>
                     <option value="lead_converted">Lead foi convertido</option>
                     <option value="reward_earned">Recompensa ganha</option>
+                    <option value="campaign_started">Campanha iniciada</option>
+                    <option value="goal_reached">Meta atingida</option>
                 </select>
             </div>
         </div>
@@ -427,6 +470,81 @@ function removeMessage(messageId) {
     if (messageDiv) {
         messageDiv.remove();
     }
+}
+
+// Função para mostrar preview do template selecionado
+function showTemplatePreview(messageId) {
+    const select = document.querySelector(`#message-${messageId} select[name="templateId"]`);
+    const previewDiv = document.getElementById(`template-preview-${messageId}`);
+    
+    if (!select || !previewDiv) return;
+    
+    const selectedOption = select.options[select.selectedIndex];
+    if (!selectedOption || !selectedOption.value) {
+        previewDiv.classList.add('hidden');
+        return;
+    }
+    
+    const content = selectedOption.dataset.content || 'Sem conteúdo';
+    const variables = selectedOption.dataset.variables || '';
+    
+    let previewHTML = `
+        <div class="space-y-2">
+            <div class="font-medium text-blue-300">Preview do Template:</div>
+            <div class="text-gray-300">${content}</div>
+    `;
+    
+    if (variables) {
+        previewHTML += `
+            <div class="mt-2">
+                <span class="text-yellow-300 font-medium">Variáveis:</span>
+                <div class="flex flex-wrap gap-1 mt-1">
+                    ${variables.split(',').map(v => 
+                        `<span class="px-2 py-1 bg-gray-700 text-gray-200 rounded text-xs">{{${v.trim()}}}</span>`
+                    ).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    previewHTML += '</div>';
+    previewDiv.innerHTML = previewHTML;
+    previewDiv.classList.remove('hidden');
+}
+
+// Função para atualizar dropdowns de templates existentes
+function updateTemplateDropdowns() {
+    console.log('🔄 Atualizando dropdowns de templates existentes...');
+    
+    // Buscar todos os dropdowns de template na página
+    const templateDropdowns = document.querySelectorAll('select[name="templateId"]');
+    
+    templateDropdowns.forEach(dropdown => {
+        // Salvar valor selecionado atual
+        const currentValue = dropdown.value;
+        
+        // Limpar opções existentes (exceto a primeira)
+        const firstOption = dropdown.querySelector('option:first-child');
+        dropdown.innerHTML = '';
+        if (firstOption) {
+            dropdown.appendChild(firstOption);
+        }
+        
+        // Adicionar novas opções dos templates carregados
+        templates.forEach(template => {
+            const option = document.createElement('option');
+            option.value = template._id || template.id;
+            option.textContent = template.name;
+            dropdown.appendChild(option);
+        });
+        
+        // Restaurar valor selecionado se ainda existir
+        if (currentValue && templates.some(t => (t._id || t.id) === currentValue)) {
+            dropdown.value = currentValue;
+        }
+        
+        console.log(`✅ Dropdown atualizado com ${templates.length} templates`);
+    });
 }
 
 function toggleSendOptions(messageId) {
