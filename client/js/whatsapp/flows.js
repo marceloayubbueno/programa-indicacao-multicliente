@@ -295,7 +295,7 @@ async function getIndicatorsCount(campaignId) {
     try {
         const apiBaseUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000' 
-            : 'https://programma-indicacao-multicliente-production.up.railway.app';
+            : 'https://programa-indicacao-multicliente-production.up.railway.app';
         
         const token = getToken();
         if (!token) {
@@ -303,7 +303,8 @@ async function getIndicatorsCount(campaignId) {
             return 0;
         }
         
-        const response = await fetch(`${apiBaseUrl}/api/participants?campaignId=${campaignId}&tipo=indicador`, {
+        // Buscar todos os participantes e filtrar por campanha e tipo
+        const response = await fetch(`${apiBaseUrl}/api/participants`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -312,12 +313,19 @@ async function getIndicatorsCount(campaignId) {
         });
         
         if (!response.ok) {
-            console.warn(`⚠️ Erro ao buscar indicadores: ${response.status}`);
+            console.warn(`⚠️ Erro ao buscar participantes: ${response.status}`);
             return 0;
         }
         
         const data = await response.json();
-        const indicators = data.data || data || [];
+        const participants = data.participants || data.data || data || [];
+        
+        // Filtrar indicadores da campanha específica
+        const indicators = participants.filter(p => 
+            p.tipo === 'indicador' && 
+            (p.campaignId === campaignId || p.campaignName === campaigns.find(c => c._id === campaignId)?.name)
+        );
+        
         console.log(`📊 ${indicators.length} indicadores encontrados para campanha ${campaignId}`);
         return indicators.length;
         
@@ -332,7 +340,7 @@ async function getLeadsCount(campaignId) {
     try {
         const apiBaseUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000' 
-            : 'https://programma-indicacao-multicliente-production.up.railway.app';
+            : 'https://programa-indicacao-multicliente-production.up.railway.app';
         
         const token = getToken();
         if (!token) {
@@ -340,7 +348,8 @@ async function getLeadsCount(campaignId) {
             return 0;
         }
         
-        const response = await fetch(`${apiBaseUrl}/api/referrals?campaignId=${campaignId}&referralSource=landing-page`, {
+        // Buscar todos os referrals e filtrar por campanha
+        const response = await fetch(`${apiBaseUrl}/api/referrals`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -349,12 +358,19 @@ async function getLeadsCount(campaignId) {
         });
         
         if (!response.ok) {
-            console.warn(`⚠️ Erro ao buscar leads: ${response.status}`);
+            console.warn(`⚠️ Erro ao buscar referrals: ${response.status}`);
             return 0;
         }
         
         const data = await response.json();
-        const leads = data.data || data || [];
+        const referrals = data.data || data || [];
+        
+        // Filtrar leads da campanha específica (referrals com referralSource = 'landing-page')
+        const leads = referrals.filter(r => 
+            r.referralSource === 'landing-page' && 
+            (r.campaignId === campaignId || r.campaignName === campaigns.find(c => c._id === campaignId)?.name)
+        );
+        
         console.log(`📊 ${leads.length} leads encontrados para campanha ${campaignId}`);
         return leads.length;
         
