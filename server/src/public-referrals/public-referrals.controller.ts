@@ -301,7 +301,6 @@ export class PublicReferralsController {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${lpCompleta.metaTitle || lpCompleta.name}</title>
             <style>${lpCompleta.compiledOutput.css || ''}</style>
-            <script src="/js/config.js"></script>
           </head>
           <body>
             <div id="lp-container">
@@ -409,6 +408,12 @@ export class PublicReferralsController {
                   }
                 }
                 return false;
+              };
+
+              // === FUNÇÃO PARA GERAR LINKS CORRETOS ===
+              window.generateReferralLink = function(code) {
+                // 🌍 URL CORRETA PARA LINKS DE INDICAÇÃO
+                return \`https://lp.virallead.com.br/indicacao/\${code}\`;
               };
 
               // === FUNÇÃO PARA AUTO-BIND DOS FORMULÁRIOS ===

@@ -834,8 +834,8 @@ export class LPIndicadoresService {
       // Gerar link de compartilhamento se não existir
       let referralLink: string | null = null;
       if (indicator.uniqueReferralCode) {
-        // 🔧 CORREÇÃO: Usar CLIENT_URL (domínio personalizado) com proxy para backend
-        const baseUrl = process.env.CLIENT_URL || 'http://localhost:5501';
+        // 🔧 CORREÇÃO: Links de indicação SEMPRE usam domínio lp.virallead.com.br
+        const baseUrl = 'https://lp.virallead.com.br';
         
         referralLink = `${baseUrl}/indicacao/${indicator.uniqueReferralCode}`;
       }

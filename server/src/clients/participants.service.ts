@@ -895,7 +895,7 @@ export class ParticipantsService {
         email: indicator.email,
         phone: indicator.phone,
         referralCode: indicator.uniqueReferralCode,
-        referralLink: `/indicacao/${indicator.uniqueReferralCode}`,
+        referralLink: `https://lp.virallead.com.br/indicacao/${indicator.uniqueReferralCode}`,
         totalIndicacoes: indicator.totalIndicacoes || 0,
         indicacoesAprovadas: indicator.indicacoesAprovadas || 0,
         lastIndicacaoAt: indicator.lastIndicacaoAt,
