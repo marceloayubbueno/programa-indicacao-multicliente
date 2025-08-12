@@ -242,7 +242,7 @@ function populateCampaignDropdown() {
     console.log(`✅ Dropdown de campanhas populado com ${activeCampaignsCount} campanhas ativas`);
 }
 
-function updateAudienceOptions() {
+async function updateAudienceOptions() {
     const campaignSelect = document.getElementById('flow-campaign');
     const audienceSelect = document.getElementById('flow-audience');
     
@@ -259,14 +259,109 @@ function updateAudienceOptions() {
     
     // Campanha selecionada - habilitar e popular opções
     audienceSelect.disabled = false;
-    audienceSelect.innerHTML = `
-        <option value="">Selecione o público-alvo</option>
-        <option value="indicators">Indicadores da Campanha</option>
-        <option value="leads">Leads da Campanha</option>
-        <option value="mixed">Indicadores e Leads da Campanha</option>
-    `;
+    audienceSelect.innerHTML = '<option value="">Carregando público-alvo...</option>';
     
-    console.log(`✅ Opções de público-alvo atualizadas para campanha: ${selectedCampaignId}`);
+    try {
+        // Buscar dados reais da campanha selecionada
+        const [indicatorsCount, leadsCount] = await Promise.all([
+            getIndicatorsCount(selectedCampaignId),
+            getLeadsCount(selectedCampaignId)
+        ]);
+        
+        // Popular opções com contadores reais
+        audienceSelect.innerHTML = `
+            <option value="">Selecione o público-alvo</option>
+            <option value="indicators">Indicadores da Campanha (${indicatorsCount})</option>
+            <option value="leads">Leads da Campanha (${leadsCount})</option>
+            <option value="mixed">Indicadores e Leads da Campanha (${indicatorsCount + leadsCount})</option>
+        `;
+        
+        console.log(`✅ Público-alvo carregado para campanha ${selectedCampaignId}: ${indicatorsCount} indicadores, ${leadsCount} leads`);
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar público-alvo:', error);
+        // Fallback para opções básicas
+        audienceSelect.innerHTML = `
+            <option value="">Selecione o público-alvo</option>
+            <option value="indicators">Indicadores da Campanha</option>
+            <option value="leads">Leads da Campanha</option>
+            <option value="mixed">Indicadores e Leads da Campanha</option>
+        `;
+    }
+}
+
+// Função para buscar contagem de indicadores por campanha
+async function getIndicatorsCount(campaignId) {
+    try {
+        const apiBaseUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : 'https://api.virallead.com.br';
+        
+        const token = getTokenFromSystem();
+        if (!token) {
+            console.warn('⚠️ Token não encontrado para buscar indicadores');
+            return 0;
+        }
+        
+        const response = await fetch(`${apiBaseUrl}/api/participants?campaignId=${campaignId}&tipo=indicador`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            console.warn(`⚠️ Erro ao buscar indicadores: ${response.status}`);
+            return 0;
+        }
+        
+        const data = await response.json();
+        const indicators = data.data || data || [];
+        console.log(`📊 ${indicators.length} indicadores encontrados para campanha ${campaignId}`);
+        return indicators.length;
+        
+    } catch (error) {
+        console.error('❌ Erro ao buscar indicadores:', error);
+        return 0;
+    }
+}
+
+// Função para buscar contagem de leads por campanha
+async function getLeadsCount(campaignId) {
+    try {
+        const apiBaseUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : 'https://api.virallead.com.br';
+        
+        const token = getTokenFromSystem();
+        if (!token) {
+            console.warn('⚠️ Token não encontrado para buscar leads');
+            return 0;
+        }
+        
+        const response = await fetch(`${apiBaseUrl}/api/referrals?campaignId=${campaignId}&referralSource=landing-page`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            console.warn(`⚠️ Erro ao buscar leads: ${response.status}`);
+            return 0;
+        }
+        
+        const data = await response.json();
+        const leads = data.data || data || [];
+        console.log(`📊 ${leads.length} leads encontrados para campanha ${campaignId}`);
+        return leads.length;
+        
+    } catch (error) {
+        console.error('❌ Erro ao buscar leads:', error);
+        return 0;
+    }
 }
 
 function setupEventListeners() {
