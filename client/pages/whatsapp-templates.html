@@ -335,22 +335,26 @@
     <script src="../js/whatsapp/template-blocks.js"></script>
     <script src="../js/whatsapp/templates.js"></script>
     <script>
-        // Inicializar blocos pré-definidos na sidebar
+        // Inicializar blocos pré-definidos na sidebar seguindo padrões JWT Multicliente
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar autenticação primeiro
-            if (!checkAuth()) {
-                return;
-            }
+            console.log('🚀 Inicializando página de templates WhatsApp');
             
-            // Aguardar um pouco para garantir que os scripts estejam carregados
+            // 1. CARREGAR INTERFACE SEM BLOQUEAR (Padrão do sistema)
             setTimeout(() => {
                 renderTemplateBlocksSidebar();
-                // Configurar drag & drop após renderizar os blocos
                 setupTemplateBlocksDragAndDrop();
-                
-                // Carregar templates existentes
-                loadTemplates();
+                console.log('✅ Interface carregada com sucesso');
             }, 1000);
+            
+            // 2. TENTAR CARREGAR TEMPLATES (Se autenticado)
+            setTimeout(() => {
+                if (checkAuth()) {
+                    console.log('🔐 Usuário autenticado - carregando templates');
+                    loadTemplates();
+                } else {
+                    console.log('⚠️ Usuário não autenticado - interface disponível para visualização');
+                }
+            }, 1500);
         });
 
         // Função para renderizar blocos na sidebar (versão simplificada)
@@ -608,37 +612,57 @@
             }
         }
 
-        // Função para verificar autenticação
+        // Função para verificar autenticação seguindo padrões JWT Multicliente
         function checkAuth() {
             const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
             const clientId = localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
             
+            // Log para debugging seguindo padrões do sistema
+            console.log('🔐 Verificando autenticação JWT Multicliente:', { 
+                hasToken: !!token, 
+                hasClientId: !!clientId,
+                tokenPreview: token ? `${token.substring(0, 20)}...` : null,
+                clientId: clientId,
+                currentUrl: window.location.href
+            });
+            
             if (!token || !clientId) {
-                showError('Sessão expirada. Faça login novamente.');
-                // Redirecionar para login se necessário
-                setTimeout(() => {
-                    window.location.href = '../login.html';
-                }, 2000);
+                console.warn('⚠️ Autenticação JWT Multicliente falhou');
+                console.warn('Token:', !!token, 'ClientID:', !!clientId);
                 return false;
             }
             
+            console.log('✅ Autenticação JWT Multicliente válida');
             return true;
         }
 
-        // Função para carregar templates existentes
+        // Função para carregar templates existentes seguindo padrões JWT Multicliente
         async function loadTemplates() {
             try {
-                if (!checkAuth()) return;
+                // 1. VALIDAÇÃO DE AUTENTICAÇÃO (Padrão JWT Multicliente)
+                if (!checkAuth()) {
+                    console.warn('⚠️ Autenticação falhou - não foi possível carregar templates');
+                    return;
+                }
                 
+                // 2. OBTER CREDENCIAIS DE AUTENTICAÇÃO
                 const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
                 const clientId = localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
                 
+                // 3. CONFIGURAÇÃO DA API (Seguindo padrões do sistema)
                 const isProduction = window.location.hostname === 'app.virallead.com.br';
                 const apiBaseUrl = isProduction 
                     ? 'https://programa-indicacao-multicliente-production.up.railway.app'
                     : 'http://localhost:3000';
                 
-                const response = await fetch(`${apiBaseUrl}/client/whatsapp/templates`, {
+                console.log('📥 Carregando templates via JWT Multicliente:', {
+                    apiUrl: `${apiBaseUrl}/api/client/whatsapp/templates`,
+                    clientId: clientId,
+                    hasToken: !!token
+                });
+                
+                // 4. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
+                const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -646,18 +670,24 @@
                     }
                 });
                 
+                // 5. TRATAMENTO DE RESPOSTA
                 if (!response.ok) {
+                    console.error('❌ Erro ao carregar templates:', response.status, response.statusText);
                     throw new Error(`Erro ${response.status}: ${response.statusText}`);
                 }
                 
                 const templates = await response.json();
-                console.log('Templates carregados:', templates);
+                console.log('✅ Templates carregados com sucesso via JWT Multicliente:', templates);
                 
+                // 6. IMPLEMENTAR RENDERIZAÇÃO DA LISTA (Futuro)
                 // Aqui você pode implementar a renderização da lista de templates
-                // Por enquanto, apenas logamos no console
+                // Por enquanto, apenas logamos no console para validação
+                
+                // TODO: Implementar renderização da lista de templates
+                // renderTemplatesList(templates);
                 
             } catch (error) {
-                console.error('Erro ao carregar templates:', error);
+                console.error('❌ Erro ao carregar templates:', error);
                 showError(`Erro ao carregar templates: ${error.message}`);
             }
         }
@@ -720,10 +750,16 @@
             }
         }
 
-        // Função para salvar template
+        // Função para salvar template seguindo padrões JWT Multicliente
         async function saveTemplate() {
             try {
-                // Validar campos obrigatórios
+                // 1. VALIDAÇÃO DE AUTENTICAÇÃO (Padrão JWT Multicliente)
+                if (!checkAuth()) {
+                    showError('Autenticação necessária. Faça login para continuar.');
+                    return;
+                }
+                
+                // 2. VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS
                 const name = document.getElementById('template-name').value.trim();
                 const category = document.getElementById('template-category').value;
                 const body = document.getElementById('template-body').value.trim();
@@ -733,40 +769,32 @@
                     return;
                 }
                 
-                // Preparar dados do template
+                // 3. PREPARAÇÃO DOS DADOS (Seguindo schema do MongoDB)
                 const templateData = {
                     name: name,
                     category: category,
                     content: body,
                     footer: document.getElementById('template-footer').value.trim() || '',
                     variables: document.getElementById('template-variables').value.trim() || '',
-                    status: 'draft' // Status inicial como rascunho
+                    status: 'draft', // Status inicial como rascunho
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
                 };
                 
-                console.log('Enviando template para API:', templateData);
+                console.log('📤 Enviando template para API JWT Multicliente:', templateData);
                 
-                // Obter token de autenticação
+                // 4. OBTER CREDENCIAIS DE AUTENTICAÇÃO
                 const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-                if (!token) {
-                    showError('Token de autenticação não encontrado. Faça login novamente.');
-                    return;
-                }
-                
-                // Obter clientId do localStorage ou sessionStorage
                 const clientId = localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
-                if (!clientId) {
-                    showError('ID do cliente não encontrado. Faça login novamente.');
-                    return;
-                }
                 
-                // Determinar URL da API baseada no ambiente
+                // 5. CONFIGURAÇÃO DA API (Seguindo padrões do sistema)
                 const isProduction = window.location.hostname === 'app.virallead.com.br';
                 const apiBaseUrl = isProduction 
                     ? 'https://programa-indicacao-multicliente-production.up.railway.app'
                     : 'http://localhost:3000';
                 
-                // Fazer requisição para a API
-                const response = await fetch(`${apiBaseUrl}/client/whatsapp/templates`, {
+                // 6. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
+                const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -776,27 +804,30 @@
                     body: JSON.stringify(templateData)
                 });
                 
+                // 7. TRATAMENTO DE RESPOSTA
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
+                    console.error('❌ Erro na API:', response.status, errorData);
                     throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
                 }
                 
                 const savedTemplate = await response.json();
-                console.log('Template salvo com sucesso:', savedTemplate);
+                console.log('✅ Template salvo com sucesso via JWT Multicliente:', savedTemplate);
                 
+                // 8. FEEDBACK PARA USUÁRIO
                 showSuccess('Template salvo com sucesso!');
                 closeTemplateModal();
                 
-                // Limpar formulário após salvar
+                // 9. LIMPEZA E RECARREGAMENTO
                 document.getElementById('template-form').reset();
                 
-                // Opcional: Recarregar lista de templates se existir
+                // Recarregar lista de templates se existir
                 if (typeof loadTemplates === 'function') {
                     loadTemplates();
                 }
                 
             } catch (error) {
-                console.error('Erro ao salvar template:', error);
+                console.error('❌ Erro ao salvar template:', error);
                 showError(`Erro ao salvar template: ${error.message}`);
             }
         }
