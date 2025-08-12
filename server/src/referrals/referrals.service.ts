@@ -42,7 +42,7 @@ export class ReferralsService {
         campaignId: ref.campaignId,
         campaignIdType: typeof ref.campaignId,
         hasCampaignId: !!ref.campaignId,
-        campaignName: ref.campaignId?.name,
+        campaignName: (ref.campaignId as any)?.name,
         campaignObject: ref.campaignId
       });
     });
@@ -74,8 +74,8 @@ export class ReferralsService {
     this.logger.debug(`🔍 [DEBUG] getCampaignNameSafely recebeu:`, {
       campaignId: campaignId,
       type: typeof campaignId,
-      hasName: campaignId?.name,
-      name: campaignId?.name
+      hasName: (campaignId as any)?.name,
+      name: (campaignId as any)?.name
     });
     
     // ✅ MESMA LÓGICA DO INDICADOR
