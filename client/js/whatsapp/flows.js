@@ -295,9 +295,9 @@ async function getIndicatorsCount(campaignId) {
     try {
         const apiBaseUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000' 
-            : 'https://api.virallead.com.br';
+            : 'https://programma-indicacao-multicliente-production.up.railway.app';
         
-        const token = getTokenFromSystem();
+        const token = getToken();
         if (!token) {
             console.warn('⚠️ Token não encontrado para buscar indicadores');
             return 0;
@@ -332,9 +332,9 @@ async function getLeadsCount(campaignId) {
     try {
         const apiBaseUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000' 
-            : 'https://api.virallead.com.br';
+            : 'https://programma-indicacao-multicliente-production.up.railway.app';
         
-        const token = getTokenFromSystem();
+        const token = getToken();
         if (!token) {
             console.warn('⚠️ Token não encontrado para buscar leads');
             return 0;
