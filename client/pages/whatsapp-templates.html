@@ -688,15 +688,26 @@
                 console.log('📥 Carregando templates via JWT Multicliente:', {
                     apiUrl: `${apiBaseUrl}/api/client/whatsapp/templates`,
                     clientId: clientId,
-                    hasToken: !!token
+                    hasToken: !!token,
+                    tokenLength: token ? token.length : 0,
+                    tokenPreview: token ? `${token.substring(0, 20)}...` : null
                 });
                 
-                // 4. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
+                // 4. REQUISIÇÃO PARA API (Padrão JWT Multicliente CORRETO)
+                // SEGUINDO PADRÕES: Token JWT já contém clientId, NÃO precisa de header X-Client-ID
+                console.log('🌐 Fazendo requisição GET para API:', {
+                    url: `${apiBaseUrl}/api/client/whatsapp/templates`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token ? token.substring(0, 20) + '...' : 'NULO'}`
+                    }
+                });
+                
                 const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'X-Client-ID': clientId
+                        'Authorization': `Bearer ${token}`
+                        // REMOVIDO: 'X-Client-ID': clientId - Token JWT já contém essa informação
                     }
                 });
                 
@@ -817,19 +828,39 @@
                 const token = getTokenFromSystem();
                 const clientId = getClientIdFromSystem();
                 
+                // Log detalhado para debugging da autenticação
+                console.log('🔐 Credenciais obtidas para API:', {
+                    hasToken: !!token,
+                    tokenLength: token ? token.length : 0,
+                    tokenPreview: token ? `${token.substring(0, 20)}...` : null,
+                    hasClientId: !!clientId,
+                    clientId: clientId,
+                    apiUrl: `${apiBaseUrl}/api/client/whatsapp/templates`
+                });
+                
                 // 5. CONFIGURAÇÃO DA API (Seguindo padrões do sistema)
                 const isProduction = window.location.hostname === 'app.virallead.com.br';
                 const apiBaseUrl = isProduction 
                     ? 'https://programa-indicacao-multicliente-production.up.railway.app'
                     : 'http://localhost:3000';
                 
-                // 6. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
+                // 6. REQUISIÇÃO PARA API (Padrão JWT Multicliente CORRETO)
+                // SEGUINDO PADRÕES: Token JWT já contém clientId, NÃO precisa de header X-Client-ID
+                console.log('🌐 Fazendo requisição para API:', {
+                    url: `${apiBaseUrl}/api/client/whatsapp/templates`,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token ? token.substring(0, 20) + '...' : 'NULO'}`
+                    }
+                });
+                
                 const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                        'X-Client-ID': clientId
+                        'Authorization': `Bearer ${token}`
+                        // REMOVIDO: 'X-Client-ID': clientId - Token JWT já contém essa informação
                     },
                     body: JSON.stringify(templateData)
                 });
