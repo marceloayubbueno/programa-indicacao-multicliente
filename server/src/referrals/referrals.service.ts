@@ -42,7 +42,7 @@ export class ReferralsService {
         campaignId: ref.campaignId,
         campaignIdType: typeof ref.campaignId,
         hasCampaignId: !!ref.campaignId,
-        campaignName: (ref.campaignId as any)?.name,
+        campaignName: this.safeGetProperty(ref.campaignId, 'name'),
         campaignObject: ref.campaignId
       });
     });
@@ -55,7 +55,7 @@ export class ReferralsService {
       leadPhone: ref.leadPhone,
       status: ref.status,
       createdAt: (ref as any).createdAt,
-      indicatorName: (ref.indicatorId && (ref.indicatorId as any).name) ? (ref.indicatorId as any).name : '-',
+      indicatorName: this.safeGetProperty(ref.indicatorId, 'name') || '-',
       campaignName: this.getCampaignNameSafely(ref.campaignId), // 🔧 CORREÇÃO: Usar função helper
       referralSource: (ref as any).referralSource || 'manual',
       indicatorReferralCode: (ref as any).indicatorReferralCode || null,
@@ -63,7 +63,20 @@ export class ReferralsService {
     }));
   }
 
-  // === FUNÇÃO HELPER PARA CAMPANHA (SEGUINDO LÓGICA DO INDICADOR) ===
+  // === FUNÇÕES HELPER PARA PROPRIEDADES SEGURAS ===
+  
+  /**
+   * 🔧 FUNÇÃO HELPER: Obter propriedade de forma segura
+   * Resolve problemas de TypeScript com ObjectId populado
+   */
+  private safeGetProperty(obj: any, property: string): any {
+    if (!obj) return null;
+    if (typeof obj === 'string') return null;
+    if (typeof obj === 'object' && obj !== null) {
+      return obj[property] || null;
+    }
+    return null;
+  }
   
   /**
    * 🔧 FUNÇÃO HELPER: Obter nome da campanha de forma segura
@@ -74,8 +87,8 @@ export class ReferralsService {
     this.logger.debug(`🔍 [DEBUG] getCampaignNameSafely recebeu:`, {
       campaignId: campaignId,
       type: typeof campaignId,
-      hasName: (campaignId as any)?.name,
-      name: (campaignId as any)?.name
+      hasName: this.safeGetProperty(campaignId, 'name'),
+      name: this.safeGetProperty(campaignId, 'name')
     });
     
     // ✅ MESMA LÓGICA DO INDICADOR
@@ -87,8 +100,9 @@ export class ReferralsService {
       return 'Campanha ID';
     }
     
-    if (campaignId.name) {
-      return campaignId.name;
+    const name = this.safeGetProperty(campaignId, 'name');
+    if (name) {
+      return name;
     }
     
     return 'Campanha N/A';
