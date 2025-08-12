@@ -214,12 +214,8 @@ async function loadCampaigns() {
         console.error('❌ Erro ao carregar campanhas da API:', error);
         showError('Erro ao carregar campanhas da API');
         
-        // Fallback para dados mockados em caso de erro
-        campaigns = [
-            { id: '1', name: 'Campanha de Verão 2024', status: 'active' },
-            { id: '2', name: 'Promoção Black Friday', status: 'active' },
-            { id: '3', name: 'Programa de Indicações', status: 'active' }
-        ];
+        // Em caso de erro, não mostrar campanhas mockadas
+        campaigns = [];
         populateCampaignDropdown();
     }
 }
@@ -231,9 +227,10 @@ function populateCampaignDropdown() {
     // Limpar opções existentes (exceto a primeira)
     campaignSelect.innerHTML = '<option value="">Selecione uma campanha</option>';
     
-    // Adicionar campanhas ativas
+    // Adicionar campanhas ativas (baseado no schema real)
     campaigns.forEach(campaign => {
-        if (campaign.status === 'active' || campaign.status === 'published') {
+        // Status pode ser 'draft', 'active', 'published', etc.
+        if (campaign.status !== 'inactive' && campaign.status !== 'deleted') {
             const option = document.createElement('option');
             option.value = campaign._id || campaign.id;
             option.textContent = campaign.name;
@@ -241,7 +238,8 @@ function populateCampaignDropdown() {
         }
     });
     
-    console.log(`✅ Dropdown de campanhas populado com ${campaigns.filter(c => c.status === 'active' || c.status === 'published').length} campanhas ativas`);
+    const activeCampaignsCount = campaigns.filter(c => c.status !== 'inactive' && c.status !== 'deleted').length;
+    console.log(`✅ Dropdown de campanhas populado com ${activeCampaignsCount} campanhas ativas`);
 }
 
 function updateAudienceOptions() {
