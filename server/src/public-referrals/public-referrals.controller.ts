@@ -364,8 +364,12 @@ export class PublicReferralsController {
                 };
 
                 try {
-                  const apiUrl = process.env.API_BASE_URL || 'http://localhost:3000/api';
+                  // 🌍 USAR URL CORRETA DA API - CORREÇÃO CRÍTICA
+                  const apiUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
                   const fullUrl = \`\${apiUrl}/lp-divulgacao/submit-referral\`;
+                  
+                  console.log('📡 [LP-FORM] Enviando para:', fullUrl);
+                  console.log('📡 [LP-FORM] Payload:', payload);
                   
                   const response = await fetch(fullUrl, {
                     method: 'POST',
@@ -373,7 +377,9 @@ export class PublicReferralsController {
                     body: JSON.stringify(payload)
                   });
                   
+                  console.log('📡 [LP-FORM] Status da resposta:', response.status);
                   const result = await response.json();
+                  console.log('📡 [LP-FORM] Resultado:', result);
                   
                   if (response.ok && result.success) {
                     if (feedback) { 
@@ -396,6 +402,7 @@ export class PublicReferralsController {
                     }
                   }
                 } catch (err) {
+                  console.error('❌ [LP-FORM] Erro:', err);
                   if (feedback) { 
                     feedback.textContent = 'Erro de conexão. Tente novamente.'; 
                     feedback.style.color = 'red'; 
@@ -406,15 +413,34 @@ export class PublicReferralsController {
 
               // === FUNÇÃO PARA AUTO-BIND DOS FORMULÁRIOS ===
               window.bindReferralForms = function() {
-                const forms = document.querySelectorAll('.lp-referral-form, form[data-type="referral"], form');
+                console.log('🔗 [LP-FORM] Iniciando auto-bind dos formulários...');
+                
+                // Buscar TODOS os formulários na página
+                const forms = document.querySelectorAll('form');
+                console.log('🔗 [LP-FORM] Encontrados ' + forms.length + ' formulários');
                 
                 forms.forEach((form, index) => {
+                  console.log('🔗 [LP-FORM] Processando formulário ' + (index + 1) + ':', form);
+                  
+                  // Verificar se o formulário já tem onsubmit
                   if (!form.onsubmit) {
+                    console.log('🔗 [LP-FORM] Configurando onsubmit para formulário ' + (index + 1));
                     form.onsubmit = function(event) {
+                      console.log('🔗 [LP-FORM] Formulário ' + (index + 1) + ' submetido!');
                       return window.submitReferralForm(event, form);
                     };
+                  } else {
+                    console.log('🔗 [LP-FORM] Formulário ' + (index + 1) + ' já tem onsubmit configurado');
                   }
+                  
+                  // Adicionar listener adicional para garantir captura
+                  form.addEventListener('submit', function(event) {
+                    console.log('🔗 [LP-FORM] Event listener capturou submit do formulário ' + (index + 1));
+                    return window.submitReferralForm(event, form);
+                  });
                 });
+                
+                console.log('🔗 [LP-FORM] Auto-bind concluído!');
               };
             </script>
             

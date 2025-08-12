@@ -210,7 +210,7 @@ class DataAdapter {
         const baseUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
                        (window.location.hostname === 'localhost' ? 
                         'http://localhost:3000/indicacao' : 
-                        'https://app.virallead.com.br/indicacao');
+                        'https://programa-indicacao-multicliente-production.up.railway.app/indicacao');
         
         console.log(`🚨 [H4-FRONTEND] Configurações de URL:`, {
             hasAppConfig: !!window.APP_CONFIG,
@@ -231,8 +231,8 @@ class DataAdapter {
         // 🌍 URL DINÂMICA PARA LINKS DE COMPARTILHAMENTO - USANDO CONFIG CENTRALIZADO
         const baseUrl = window.APP_CONFIG ? window.APP_CONFIG.REFERRAL_BASE_URL : 
                        (window.location.hostname === 'localhost' ? 
-                        'http://localhost:3000/indicacao' : 
-                        'https://app.virallead.com.br/indicacao');
+                        'https://programa-indicacao-multicliente-production.up.railway.app/indicacao' : 
+                        'https://programa-indicacao-multicliente-production.up.railway.app/indicacao');
         return `${baseUrl}/${participant.shareLink}`;
     }
 

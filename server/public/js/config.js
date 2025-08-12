@@ -18,8 +18,8 @@ const ENV = {
     },
     production: {
         API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/api',
-        CLIENT_URL: 'https://app.virallead.com.br',
-        REFERRAL_BASE_URL: 'https://app.virallead.com.br/indicacao'
+        CLIENT_URL: 'https://programa-indicacao-multicliente-production.up.railway.app',
+        REFERRAL_BASE_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/indicacao'
     }
 };
 

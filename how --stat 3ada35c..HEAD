@@ -1,0 +1,10 @@
+[33m77857c5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: corrige endpoints e implementa filtros corretos para contadores de público-alvo em whatsapp flows
+[33me9827f3[m fix: corrige erro getTokenFromSystem e API base URL para contadores reais de público-alvo
+[33mb704eaf[m feat: implementa filtro inteligente de público-alvo com contadores reais de indicadores e leads por campanha
+[33m6d82d0d[m fix: corrige endpoint de campanhas para /api/campaigns em whatsapp flows
+[33m5b658c2[m fix: remove campanhas mockadas e usa schema real do backend + endpoint correto /api/client/campaigns
+[33m2ed6ce7[m feat: integra seleção de campanhas nos fluxos WhatsApp + público-alvo dinâmico + validações
+[33m7607acd[m feat: integra templates da API na página de fluxos WhatsApp + preview de templates + dropdowns dinâmicos
+[33meac38ba[m feat: corrige cores para padrão dark theme + implementa funcionalidades de edição e exclusão de templates
+[33mbb5389a[m fix: corrige estrutura de dados para API + alinha frontend com schema do backend
+[33mc16a117[m fix: corrige erro TypeError templates.map + extrai array de templates da resposta da API
