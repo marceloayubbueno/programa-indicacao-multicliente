@@ -718,10 +718,14 @@
                     throw new Error(`Erro ${response.status}: ${response.statusText}`);
                 }
                 
-                const templates = await response.json();
-                console.log('✅ Templates carregados com sucesso via JWT Multicliente:', templates);
+                const responseData = await response.json();
+                console.log('✅ Templates carregados com sucesso via JWT Multicliente:', responseData);
                 
-                // 6. RENDERIZAR LISTA DE TEMPLATES NA TELA
+                // 6. EXTRAIR ARRAY DE TEMPLATES E RENDERIZAR NA TELA
+                // A API retorna {success: true, data: Array}, precisamos extrair o array
+                const templates = responseData.data || responseData;
+                console.log('📋 Array de templates extraído:', templates);
+                
                 renderTemplatesList(templates);
                 
             } catch (error) {
