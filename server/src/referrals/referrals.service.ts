@@ -26,12 +26,27 @@ export class ReferralsService {
   }
 
   async findAll(): Promise<any[]> {
-    this.logger.debug('Buscando todas as indicações no MongoDB');
+    this.logger.debug('🔍 [DEBUG] Buscando todas as indicações no MongoDB');
     const referrals = await this.referralModel.find()
       .populate('indicatorId', 'name')
       .populate('campaignId', 'name')
       .sort({ createdAt: -1 })
       .exec();
+    
+    this.logger.debug(`🔍 [DEBUG] Encontrados ${referrals.length} referrals`);
+    
+    // 🔍 LOGS DE DIAGNÓSTICO - SEM ALTERAR LÓGICA EXISTENTE
+    referrals.forEach((ref, index) => {
+      this.logger.debug(`🔍 [DEBUG] Referral ${index + 1}:`, {
+        id: ref._id,
+        campaignId: ref.campaignId,
+        campaignIdType: typeof ref.campaignId,
+        hasCampaignId: !!ref.campaignId,
+        campaignName: ref.campaignId?.name,
+        campaignObject: ref.campaignId
+      });
+    });
+    
     // Mapear para retornar os campos necessários para o frontend
     return referrals.map(ref => ({
       _id: ref._id,
@@ -41,11 +56,42 @@ export class ReferralsService {
       status: ref.status,
       createdAt: (ref as any).createdAt,
       indicatorName: (ref.indicatorId && (ref.indicatorId as any).name) ? (ref.indicatorId as any).name : '-',
-      campaignName: (ref.campaignId && (ref.campaignId as any).name) ? (ref.campaignId as any).name : '-',
+      campaignName: this.getCampaignNameSafely(ref.campaignId), // 🔧 CORREÇÃO: Usar função helper
       referralSource: (ref as any).referralSource || 'manual',
       indicatorReferralCode: (ref as any).indicatorReferralCode || null,
       rewardValue: (ref as any).rewardValue || 0,
     }));
+  }
+
+  // === FUNÇÃO HELPER PARA CAMPANHA (SEGUINDO LÓGICA DO INDICADOR) ===
+  
+  /**
+   * 🔧 FUNÇÃO HELPER: Obter nome da campanha de forma segura
+   * Segue exatamente a mesma lógica do indicador
+   */
+  private getCampaignNameSafely(campaignId: any): string {
+    // 🔍 DEBUG: Log para entender o que está chegando
+    this.logger.debug(`🔍 [DEBUG] getCampaignNameSafely recebeu:`, {
+      campaignId: campaignId,
+      type: typeof campaignId,
+      hasName: campaignId?.name,
+      name: campaignId?.name
+    });
+    
+    // ✅ MESMA LÓGICA DO INDICADOR
+    if (!campaignId) {
+      return 'Sem Campanha';
+    }
+    
+    if (typeof campaignId === 'string') {
+      return 'Campanha ID';
+    }
+    
+    if (campaignId.name) {
+      return campaignId.name;
+    }
+    
+    return 'Campanha N/A';
   }
 
   // === MÉTODOS PARA SISTEMA DE RECOMPENSAS ===
