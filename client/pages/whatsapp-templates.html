@@ -679,12 +679,13 @@
                 const token = getTokenFromSystem();
                 const clientId = getClientIdFromSystem();
                 
-                // 3. CONFIGURAÇÃO DA API (Seguindo padrões do sistema)
+                // 3. CONFIGURAÇÃO DA API (Seguindo padrões do sistema) - MOVIDO PARA CIMA
                 const isProduction = window.location.hostname === 'app.virallead.com.br';
                 const apiBaseUrl = isProduction 
                     ? 'https://programa-indicacao-multicliente-production.up.railway.app'
                     : 'http://localhost:3000';
                 
+                // Log detalhado para debugging (AGORA apiBaseUrl já está definido)
                 console.log('📥 Carregando templates via JWT Multicliente:', {
                     apiUrl: `${apiBaseUrl}/api/client/whatsapp/templates`,
                     clientId: clientId,
@@ -828,7 +829,13 @@
                 const token = getTokenFromSystem();
                 const clientId = getClientIdFromSystem();
                 
-                // Log detalhado para debugging da autenticação
+                // 5. CONFIGURAÇÃO DA API (Seguindo padrões do sistema) - MOVIDO PARA CIMA
+                const isProduction = window.location.hostname === 'app.virallead.com.br';
+                const apiBaseUrl = isProduction 
+                    ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+                    : 'http://localhost:3000';
+                
+                // Log detalhado para debugging da autenticação (AGORA apiBaseUrl já está definido)
                 console.log('🔐 Credenciais obtidas para API:', {
                     hasToken: !!token,
                     tokenLength: token ? token.length : 0,
@@ -837,12 +844,6 @@
                     clientId: clientId,
                     apiUrl: `${apiBaseUrl}/api/client/whatsapp/templates`
                 });
-                
-                // 5. CONFIGURAÇÃO DA API (Seguindo padrões do sistema)
-                const isProduction = window.location.hostname === 'app.virallead.com.br';
-                const apiBaseUrl = isProduction 
-                    ? 'https://programa-indicacao-multicliente-production.up.railway.app'
-                    : 'http://localhost:3000';
                 
                 // 6. REQUISIÇÃO PARA API (Padrão JWT Multicliente CORRETO)
                 // SEGUINDO PADRÕES: Token JWT já contém clientId, NÃO precisa de header X-Client-ID
