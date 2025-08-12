@@ -189,7 +189,7 @@ async function loadCampaigns() {
             : 'http://localhost:3000';
         
         // 3. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
-        const response = await fetch(`${apiBaseUrl}/api/client/campaigns`, {
+        const response = await fetch(`${apiBaseUrl}/api/campaigns`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
