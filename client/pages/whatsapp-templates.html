@@ -612,27 +612,57 @@
             }
         }
 
-        // Função para verificar autenticação seguindo padrões JWT Multicliente
+        // Função para obter token seguindo padrões do sistema
+        function getTokenFromSystem() {
+            if (typeof getToken === 'function') {
+                return getToken();
+            }
+            return localStorage.getItem('clientToken') || sessionStorage.getItem('clientToken');
+        }
+
+        // Função para obter clientId seguindo padrões do sistema
+        function getClientIdFromSystem() {
+            return localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
+        }
+
+        // Função para verificar autenticação seguindo padrões JWT Multicliente do sistema
         function checkAuth() {
-            const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-            const clientId = localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
+            // SEGUINDO PADRÕES DO SISTEMA: usar funções padronizadas
+            const token = getTokenFromSystem();
+            const clientId = getClientIdFromSystem();
             
             // Log para debugging seguindo padrões do sistema
-            console.log('🔐 Verificando autenticação JWT Multicliente:', { 
+            console.log('🔐 Verificando autenticação JWT Multicliente (SISTEMA):', { 
                 hasToken: !!token, 
                 hasClientId: !!clientId,
                 tokenPreview: token ? `${token.substring(0, 20)}...` : null,
                 clientId: clientId,
-                currentUrl: window.location.href
+                currentUrl: window.location.href,
+                localStorageKeys: Object.keys(localStorage).filter(key => key.includes('Token') || key.includes('client')),
+                getTokenFunction: typeof getToken === 'function' ? 'DISPONÍVEL' : 'NÃO DISPONÍVEL',
+                tokenSource: typeof getToken === 'function' ? 'getToken()' : 'localStorage.clientToken'
             });
             
             if (!token || !clientId) {
                 console.warn('⚠️ Autenticação JWT Multicliente falhou');
-                console.warn('Token:', !!token, 'ClientID:', !!clientId);
+                console.warn('Token (clientToken):', !!token, 'ClientID:', !!clientId);
+                console.warn('🔍 Verificando localStorage:', {
+                    clientToken: localStorage.getItem('clientToken') ? 'EXISTE' : 'NÃO EXISTE',
+                    authToken: localStorage.getItem('authToken') ? 'EXISTE' : 'NÃO EXISTE',
+                    clientId: localStorage.getItem('clientId') ? 'EXISTE' : 'NÃO EXISTE'
+                });
+                
+                // Log adicional para debugging
+                console.warn('🔍 Debug completo do localStorage:', {
+                    allKeys: Object.keys(localStorage),
+                    tokenKeys: Object.keys(localStorage).filter(key => key.includes('Token')),
+                    clientKeys: Object.keys(localStorage).filter(key => key.includes('client') || key.includes('Client'))
+                });
+                
                 return false;
             }
             
-            console.log('✅ Autenticação JWT Multicliente válida');
+            console.log('✅ Autenticação JWT Multicliente válida (SISTEMA)');
             return true;
         }
 
@@ -645,9 +675,9 @@
                     return;
                 }
                 
-                // 2. OBTER CREDENCIAIS DE AUTENTICAÇÃO
-                const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-                const clientId = localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
+                // 2. OBTER CREDENCIAIS DE AUTENTICAÇÃO (SEGUINDO PADRÕES DO SISTEMA)
+                const token = getTokenFromSystem();
+                const clientId = getClientIdFromSystem();
                 
                 // 3. CONFIGURAÇÃO DA API (Seguindo padrões do sistema)
                 const isProduction = window.location.hostname === 'app.virallead.com.br';
@@ -783,9 +813,9 @@
                 
                 console.log('📤 Enviando template para API JWT Multicliente:', templateData);
                 
-                // 4. OBTER CREDENCIAIS DE AUTENTICAÇÃO
-                const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-                const clientId = localStorage.getItem('clientId') || sessionStorage.getItem('clientId');
+                // 4. OBTER CREDENCIAIS DE AUTENTICAÇÃO (SEGUINDO PADRÕES DO SISTEMA)
+                const token = getTokenFromSystem();
+                const clientId = getClientIdFromSystem();
                 
                 // 5. CONFIGURAÇÃO DA API (Seguindo padrões do sistema)
                 const isProduction = window.location.hostname === 'app.virallead.com.br';
