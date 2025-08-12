@@ -427,25 +427,18 @@ export class PublicReferralsController {
                 forms.forEach((form, index) => {
                   console.log('🔗 [LP-FORM] Processando formulário ' + (index + 1) + ':', form);
                   
-                  // Verificar se o formulário já tem onsubmit
-                  if (!form.onsubmit) {
-                    console.log('🔗 [LP-FORM] Configurando onsubmit para formulário ' + (index + 1));
-                    form.onsubmit = function(event) {
-                      console.log('🔗 [LP-FORM] Formulário ' + (index + 1) + ' submetido!');
-                      return window.submitReferralForm(event, form);
-                    };
-                  } else {
-                    console.log('🔗 [LP-FORM] Formulário ' + (index + 1) + ' já tem onsubmit configurado');
-                  }
+                  // 🔧 CORREÇÃO: Usar APENAS addEventListener para evitar duplicação
+                  // Remover qualquer onsubmit existente para garantir limpeza
+                  form.onsubmit = null;
                   
-                  // Adicionar listener adicional para garantir captura
+                  // Adicionar APENAS um listener de submit
                   form.addEventListener('submit', function(event) {
                     console.log('🔗 [LP-FORM] Event listener capturou submit do formulário ' + (index + 1));
                     return window.submitReferralForm(event, form);
                   });
                 });
                 
-                console.log('🔗 [LP-FORM] Auto-bind concluído!');
+                console.log('🔗 [LP-FORM] Auto-bind concluído! (Sem duplicação)');
               };
             </script>
             
