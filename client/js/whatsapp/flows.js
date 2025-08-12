@@ -4,6 +4,7 @@
 // Variáveis globais
 let flows = [];
 let templates = [];
+let campaigns = [];
 let currentFlow = null;
 let messageCounter = 1;
 
@@ -22,6 +23,7 @@ async function initWhatsAppFlows() {
         // Carregar dados iniciais
         await loadFlows();
         await loadTemplates();
+        await loadCampaigns();
         
         // Configurar eventos
         setupEventListeners();
@@ -167,6 +169,106 @@ async function loadTemplates() {
             }
         ];
     }
+}
+
+async function loadCampaigns() {
+    try {
+        console.log('📥 Carregando campanhas para fluxos WhatsApp...');
+        
+        // 1. OBTER CREDENCIAIS DE AUTENTICAÇÃO
+        const token = getToken();
+        if (!token) {
+            console.error('❌ Token não encontrado');
+            return;
+        }
+        
+        // 2. CONFIGURAÇÃO DA API
+        const isProduction = window.location.hostname === 'app.virallead.com.br';
+        const apiBaseUrl = isProduction 
+            ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+            : 'http://localhost:3000';
+        
+        // 3. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
+        const response = await fetch(`${apiBaseUrl}/api/client/campaigns`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erro ${response.status}: ${response.statusText}`);
+        }
+        
+        const responseData = await response.json();
+        console.log('✅ Campanhas carregadas da API:', responseData);
+        
+        // 4. EXTRAIR ARRAY DE CAMPANHAS
+        campaigns = responseData.data || responseData;
+        console.log(`📋 ${campaigns.length} campanhas carregadas para fluxos`);
+        
+        // 5. POPULAR DROPDOWN DE CAMPANHAS
+        populateCampaignDropdown();
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar campanhas da API:', error);
+        showError('Erro ao carregar campanhas da API');
+        
+        // Fallback para dados mockados em caso de erro
+        campaigns = [
+            { id: '1', name: 'Campanha de Verão 2024', status: 'active' },
+            { id: '2', name: 'Promoção Black Friday', status: 'active' },
+            { id: '3', name: 'Programa de Indicações', status: 'active' }
+        ];
+        populateCampaignDropdown();
+    }
+}
+
+function populateCampaignDropdown() {
+    const campaignSelect = document.getElementById('flow-campaign');
+    if (!campaignSelect) return;
+    
+    // Limpar opções existentes (exceto a primeira)
+    campaignSelect.innerHTML = '<option value="">Selecione uma campanha</option>';
+    
+    // Adicionar campanhas ativas
+    campaigns.forEach(campaign => {
+        if (campaign.status === 'active' || campaign.status === 'published') {
+            const option = document.createElement('option');
+            option.value = campaign._id || campaign.id;
+            option.textContent = campaign.name;
+            campaignSelect.appendChild(option);
+        }
+    });
+    
+    console.log(`✅ Dropdown de campanhas populado com ${campaigns.filter(c => c.status === 'active' || c.status === 'published').length} campanhas ativas`);
+}
+
+function updateAudienceOptions() {
+    const campaignSelect = document.getElementById('flow-campaign');
+    const audienceSelect = document.getElementById('flow-audience');
+    
+    if (!campaignSelect || !audienceSelect) return;
+    
+    const selectedCampaignId = campaignSelect.value;
+    
+    if (!selectedCampaignId) {
+        // Nenhuma campanha selecionada - desabilitar público-alvo
+        audienceSelect.disabled = true;
+        audienceSelect.innerHTML = '<option value="">Primeiro selecione uma campanha</option>';
+        return;
+    }
+    
+    // Campanha selecionada - habilitar e popular opções
+    audienceSelect.disabled = false;
+    audienceSelect.innerHTML = `
+        <option value="">Selecione o público-alvo</option>
+        <option value="indicators">Indicadores da Campanha</option>
+        <option value="leads">Leads da Campanha</option>
+        <option value="mixed">Indicadores e Leads da Campanha</option>
+    `;
+    
+    console.log(`✅ Opções de público-alvo atualizadas para campanha: ${selectedCampaignId}`);
 }
 
 function setupEventListeners() {
@@ -391,6 +493,17 @@ function closeFlowModal() {
 
 function resetForm() {
     document.getElementById('flow-form').reset();
+    
+    // Resetar campo de campanha e público-alvo
+    const campaignSelect = document.getElementById('flow-campaign');
+    const audienceSelect = document.getElementById('flow-audience');
+    if (campaignSelect) campaignSelect.value = '';
+    if (audienceSelect) {
+        audienceSelect.value = '';
+        audienceSelect.disabled = true;
+        audienceSelect.innerHTML = '<option value="">Primeiro selecione uma campanha</option>';
+    }
+    
     const container = document.getElementById('messages-container');
     if (container) {
         container.innerHTML = '';
@@ -572,6 +685,10 @@ function editFlow(flowId) {
     document.getElementById('modal-title').textContent = 'Editar Fluxo';
     
     // Preencher formulário
+    if (flow.campaignId) {
+        document.getElementById('flow-campaign').value = flow.campaignId;
+        updateAudienceOptions(); // Atualizar opções de público-alvo
+    }
     document.getElementById('flow-name').value = flow.name;
     document.getElementById('flow-audience').value = flow.targetAudience;
     document.getElementById('flow-description').value = flow.description || '';
@@ -604,14 +721,15 @@ function editFlow(flowId) {
 async function saveFlow() {
     try {
         const formData = {
+            campaignId: document.getElementById('flow-campaign').value,
             name: document.getElementById('flow-name').value,
             targetAudience: document.getElementById('flow-audience').value,
             description: document.getElementById('flow-description').value,
             messages: []
         };
         
-        if (!formData.name || !formData.targetAudience) {
-            showError('Preencha todos os campos obrigatórios');
+        if (!formData.campaignId || !formData.name || !formData.targetAudience) {
+            showError('Preencha todos os campos obrigatórios (Campanha, Nome e Público-Alvo)');
             return;
         }
         

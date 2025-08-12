@@ -178,6 +178,15 @@
                 </div>
                 
                 <form id="flow-form" class="p-6 space-y-6">
+                    <!-- NOVO: Seleção de Campanha -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Campanha *</label>
+                        <select id="flow-campaign" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateAudienceOptions()">
+                            <option value="">Selecione uma campanha</option>
+                            <!-- Opções de campanhas serão carregadas dinamicamente -->
+                        </select>
+                    </div>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-2">Nome do Fluxo *</label>
@@ -185,11 +194,9 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-2">Público-Alvo *</label>
-                            <select id="flow-audience" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">Selecione o público-alvo</option>
-                                <option value="indicators">Indicadores</option>
-                                <option value="leads">Leads</option>
-                                <option value="mixed">Misto</option>
+                            <select id="flow-audience" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+                                <option value="">Primeiro selecione uma campanha</option>
+                                <!-- Opções serão atualizadas dinamicamente baseadas na campanha -->
                             </select>
                         </div>
                     </div>
