@@ -738,6 +738,22 @@
         function renderTemplatesList(templates) {
             console.log('🎨 Renderizando lista de templates:', templates);
             
+            // Log detalhado da estrutura de cada template
+            if (templates && templates.length > 0) {
+                console.log('🔍 Estrutura detalhada do primeiro template:', {
+                    template: templates[0],
+                    keys: Object.keys(templates[0]),
+                    variables: templates[0].variables,
+                    variablesType: typeof templates[0].variables,
+                    variablesIsArray: Array.isArray(templates[0].variables),
+                    content: templates[0].content,
+                    body: templates[0].body,
+                    name: templates[0].name,
+                    category: templates[0].category,
+                    status: templates[0].status
+                });
+            }
+            
             const templatesContainer = document.getElementById('templates-list');
             if (!templatesContainer) {
                 console.error('❌ Container de templates não encontrado');
@@ -791,24 +807,24 @@
                     
                     <div class="mb-3">
                         <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                            ${template.content || template.body || 'Sem conteúdo'}
+                            ${template.content?.body || template.body || 'Sem conteúdo'}
                         </p>
                     </div>
                     
-                    ${template.footer ? `
+                    ${template.content?.footer ? `
                         <div class="mb-3">
                             <p class="text-xs text-gray-500 dark:text-gray-500 italic">
-                                ${template.footer}
+                                ${template.content.footer}
                             </p>
                         </div>
                     ` : ''}
                     
-                    ${template.variables ? `
+                    ${template.variables && template.variables.length > 0 ? `
                         <div class="mb-3">
                             <div class="flex flex-wrap gap-1">
-                                ${template.variables.split(',').map(variable => 
+                                ${template.variables.map(variable => 
                                     `<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                        {{${variable.trim()}}}
+                                        {{${String(variable).trim()}}}
                                     </span>`
                                 ).join('')}
                             </div>
@@ -902,13 +918,17 @@
                     return;
                 }
                 
-                // 3. PREPARAÇÃO DOS DADOS (Seguindo schema do MongoDB)
+                // 3. PREPARAÇÃO DOS DADOS (Seguindo schema CORRETO do MongoDB)
+                // ESTRUTURA: content é um objeto com body, footer, etc.
                 const templateData = {
                     name: name,
                     category: category,
-                    content: body,
-                    footer: document.getElementById('template-footer').value.trim() || '',
-                    variables: document.getElementById('template-variables').value.trim() || '',
+                    content: {
+                        body: body,
+                        footer: document.getElementById('template-footer').value.trim() || ''
+                    },
+                    variables: document.getElementById('template-variables').value.trim() ? 
+                        document.getElementById('template-variables').value.trim().split(',').map(v => v.trim()) : [],
                     status: 'draft', // Status inicial como rascunho
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString()
