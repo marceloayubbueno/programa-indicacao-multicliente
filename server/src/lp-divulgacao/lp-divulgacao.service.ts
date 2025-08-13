@@ -343,8 +343,16 @@ export class LPDivulgacaoService {
       this.logger.log(`LP encontrada: ${lp.name}`);
 
       // Extrair IDs necessários
-      const campaignId = lp.campaignId?._id?.toString() || lp.campaignId?.toString() || lp.campaignId;
+      let campaignId = lp.campaignId?._id?.toString() || lp.campaignId?.toString() || lp.campaignId;
       const clientId = lp.clientId?._id?.toString() || lp.clientId?.toString() || lp.clientId;
+      
+      // 🚨 CORREÇÃO: Se recebemos campaignCode, usar ele em vez do da LP
+      if (submitReferralFormDto.campaignCode) {
+        campaignId = submitReferralFormDto.campaignCode;
+        this.logger.log(`🎯 Usando campaignCode recebido: ${campaignId}`);
+      } else {
+        this.logger.log(`⚠️ Usando campaignId da LP: ${campaignId}`);
+      }
 
       // Buscar indicador pelo código único (se fornecido)
       let indicadorId = null;
