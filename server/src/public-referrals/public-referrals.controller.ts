@@ -449,7 +449,7 @@ export class PublicReferralsController {
               localStorage.setItem('currentIndicatorCode', '${codigo}');
               localStorage.setItem('currentIndicatorName', '${indicador.name}');
               localStorage.setItem('currentLpDivulgacaoId', '${targetLP._id}');
-              localStorage.setItem('currentCampaignCode', ''); // ← NOVO: Será preenchido pelo service
+              localStorage.setItem('currentCampaignCode', '${indicador.campaignId?._id?.toString() || ''}'); // ← CORREÇÃO: Extrair campaignId do indicador
               
               // Auto-bind dos formulários
               setTimeout(() => {

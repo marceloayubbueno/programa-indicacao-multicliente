@@ -6,9 +6,6 @@ export class Campaign extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true, unique: true })
-  uniqueCode: string;
-
   @Prop({ required: false })
   description?: string;
 

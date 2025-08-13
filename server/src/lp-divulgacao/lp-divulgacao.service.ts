@@ -317,8 +317,7 @@ export class LPDivulgacaoService {
         email,
         phone,
         lpId,
-        indicatorCode,
-        campaignCode // ← NOVO: Código da campanha
+        indicatorCode
       } = submitReferralFormDto;
 
       // Validações básicas
@@ -338,28 +337,8 @@ export class LPDivulgacaoService {
 
       this.logger.log(`LP encontrada: ${lp.name}`);
 
-      // ✅ NOVO: Buscar campanha pelo código único (igual ao indicador)
-      let campaignId: string | null = null;
-      let campaignData: any = null;
-
-      if (campaignCode) {
-        campaignData = await this.campaignModel.findOne({
-          uniqueCode: campaignCode
-        });
-        
-        if (campaignData) {
-          campaignId = campaignData._id?.toString() || null;
-          this.logger.log(`Campanha encontrada: ${campaignData.name || 'Sem nome'} (${campaignCode})`);
-        } else {
-          this.logger.warn(`Campanha não encontrada para código: ${campaignCode}`);
-        }
-      }
-
-      // Fallback: usar campaignId da LP se não encontrar pelo código
-      if (!campaignId) {
-        campaignId = lp.campaignId?._id?.toString() || lp.campaignId?.toString() || null;
-      }
-
+      // Extrair IDs necessários
+      const campaignId = lp.campaignId?._id?.toString() || lp.campaignId?.toString() || lp.campaignId;
       const clientId = lp.clientId?._id?.toString() || lp.clientId?.toString() || lp.clientId;
 
       // Buscar indicador pelo código único (se fornecido)
@@ -388,7 +367,7 @@ export class LPDivulgacaoService {
         leadEmail: email,
         leadPhone: phone,
         campaignId: campaignId,
-        campaignName: campaignData?.name || (lp.campaignId as any)?.name || 'LP Divulgacao',
+        campaignName: (lp.campaignId as any)?.name || 'LP Divulgacao',
         clientId: clientId,
         indicatorId: indicadorId || null,
         indicatorName: (indicadorData as any)?.name || null,
@@ -423,7 +402,7 @@ export class LPDivulgacaoService {
           leadName: savedReferral.leadName,
           leadEmail: savedReferral.leadEmail,
           indicatorName: (indicadorData as any)?.name || null,
-          campaignName: campaignData?.name || (lp.campaignId as any)?.name || 'LP Divulgacao'
+          campaignName: (lp.campaignId as any)?.name || 'LP Divulgacao'
         }
       };
 
