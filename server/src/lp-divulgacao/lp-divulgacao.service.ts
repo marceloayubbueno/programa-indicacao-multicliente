@@ -7,7 +7,6 @@ import { UpdateLPDivulgacaoDto } from './dto/update-lp-divulgacao.dto';
 import { Referral, ReferralDocument } from '../referrals/entities/referral.schema';
 import { Participant } from '../clients/entities/participant.schema';
 import { ReferralsService } from '../referrals/referrals.service';
-import { Campaign } from '../campaigns/entities/campaign.schema';
 
 @Injectable()
 export class LPDivulgacaoService {
@@ -16,7 +15,6 @@ export class LPDivulgacaoService {
     @InjectModel(LPDivulgacao.name) private lpDivulgacaoModel: Model<LPDivulgacaoDocument>,
     @InjectModel(Referral.name) private referralModel: Model<ReferralDocument>,
     @InjectModel(Participant.name) private participantModel: Model<Participant>,
-    @InjectModel(Campaign.name) private campaignModel: Model<Campaign>,
     private readonly referralsService: ReferralsService,
   ) {}
 
