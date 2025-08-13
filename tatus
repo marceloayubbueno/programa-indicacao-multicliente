@@ -93,3 +93,4 @@
 [33m209e388[m fix: corrigir formato de número WhatsApp no envio de mensagens Twilio
 [33m4c113c2[m fix: corrigir estrutura de resposta da API Twilio para compatibilidade com frontend
 [33m4a680a7[m fix: simplificar verificação de configuração existente para carregar corretamente
+[33m7fbf534[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m CORREÇÃO: Usar campaignCode recebido para associar campanha ao lead

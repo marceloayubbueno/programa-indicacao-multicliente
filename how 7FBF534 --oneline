@@ -1,0 +1,65 @@
+[33m1ac922d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m BACKUP: Estado atual antes da restauração - Sistema quebrado com funcionalidades de cabeçalho configurável
+[33mdcd2e0b[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: corrigir autenticação JWT no sistema de cabeçalho WhatsApp - Incluir auth.js na página whatsapp-config.html - Ajustar getAuthToken() para usar padrão do sistema (getToken()) - Seguir padrão JWT multicliente conforme planejamento
+[33mc9ee500[m deploy: forçar novo deploy no Railway - Sistema de cabeçalho configurável implementado
+[33mdbe5dbe[m feat: implementar backend para cabeçalho configurável WhatsApp - Schema expandido com companyInfo, headerConfig e socialMedia - Novos DTOs para validação de dados - Novos endpoints: PUT/GET header-config, POST header-preview - Service com métodos para gerenciar configuração e gerar preview - Frontend integrado com APIs do backend - Sistema mantém compatibilidade com Twilio existente
+[33m03ccaaa[m feat: implementar sistema de cabeçalho configurável para mensagens WhatsApp - Interface completa com configuração de empresa, cabeçalho personalizável e preview em tempo real - Sistema de validação e controle de estado - Página de demonstração para testes
+[33m7fbf534[m CORREÇÃO: Usar campaignCode recebido para associar campanha ao lead
+[33m0d1fe28[m DEBUG: Adicionar logs no service para verificar dados recebidos do formulário
+[33m22977a3[m FIX: Corrigir erro TypeScript com type casting seguro para campaignId
+[33m0141d32[m DEBUG: Adicionar logs para verificar dados do indicador e campaignId
+[33me9e0a8c[m CORREÇÃO: Remover CampaignModel injetado do LPDivulgacaoService
+[33m72833c9[m CORREÇÃO: Extrair campaignId do indicador para associar campanha ao lead
+[33m30e91d2[m fix: adicionado Campaign no LPDivulgacaoModule - dependência resolvida
+[33mb45eb99[m fix: correção de erros TypeScript - deploy funcionando
+[33m460f1d0[m feat: implementação associação campanha ↔ LP divulgacao - código único para campanhas
+[33m19199e6[m  CORREÇÃO DEFINITIVA: TypeScript - Função safeGetProperty para acessar propriedades de ObjectId populado sem erros
+[33m4e23594[m  CORREÇÃO: Erro TypeScript resolvido - Adicionado cast para 'any' em propriedades name do campaignId
+[33m00195f1[m  CORREÇÃO: Exibição de campanha na página referrals - Adicionada função helper getCampaignNameSafely() seguindo lógica do indicador + logs de diagnóstico para identificar problema
+[33m56e652a[m  CORREÇÃO CRÍTICA: Eliminada duplicação de leads - Removido duplo binding de formulários em public-referrals.controller.ts
+[33mdfe5dae[m  CORREÇÃO: Links de indicação agora usam domínio lp.virallead.com.br - Corrigido participants.service.ts para retornar links absolutos corretos
+[33mb2f44f1[m fix: corrige envio de leads em LPs de divulgação - corrige URL da API e melhora captura de formulários
+[33m77857c5[m fix: corrige endpoints e implementa filtros corretos para contadores de público-alvo em whatsapp flows
+[33me9827f3[m fix: corrige erro getTokenFromSystem e API base URL para contadores reais de público-alvo
+[33mb704eaf[m feat: implementa filtro inteligente de público-alvo com contadores reais de indicadores e leads por campanha
+[33m6d82d0d[m fix: corrige endpoint de campanhas para /api/campaigns em whatsapp flows
+[33m5b658c2[m fix: remove campanhas mockadas e usa schema real do backend + endpoint correto /api/client/campaigns
+[33m2ed6ce7[m feat: integra seleção de campanhas nos fluxos WhatsApp + público-alvo dinâmico + validações
+[33m7607acd[m feat: integra templates da API na página de fluxos WhatsApp + preview de templates + dropdowns dinâmicos
+[33meac38ba[m feat: corrige cores para padrão dark theme + implementa funcionalidades de edição e exclusão de templates
+[33mbb5389a[m fix: corrige estrutura de dados para API + alinha frontend com schema do backend
+[33mc16a117[m fix: corrige erro TypeError templates.map + extrai array de templates da resposta da API
+[33m26048bb[m feat: implementa renderização de templates na tela + funções editTemplate e deleteTemplate
+[33m6c6b388[m fix: corrige erro ReferenceError apiBaseUrl + reorganiza ordem de declaração das variáveis
+[33mf483874[m fix: corrige erro CORS removendo header X-Client-ID + implementa padrão JWT Multicliente correto
+[33m7a8a47b[m fix: corrige autenticação JWT Multicliente seguindo padrões do sistema + usa getToken() e clientToken corretamente
+[33ma233263[m fix: corrige padrões JWT Multicliente + remove redirecionamento automático + corrige endpoints da API
+[33m22bf5f6[m feat: implementa salvamento de templates na API + autenticação e validação
+[33m9d7a7ac[m fix: corrige persistência de blocos + implementa menu de abas com scroll
+[33m7ade2ae[m fix: corrige drag & drop de blocos + layout em grid para blocos e variáveis
+[33me938822[m fix: implementa drag & drop completo para templates e variáveis + correções de funcionalidade
+[33mdea59f9[m feat: implementa drag & drop para templates WhatsApp + correções de UI/UX
+[33m0a1e111[m chore(railway): trigger redeploy - 11/08/2025, 14:38:46
+[33m3b6196b[m feat: implementa nova funcionalidade WhatsApp com integra??o Twilio e remove provedor Evolution
+[33m87e9bbb[m feat: implementação completa Evolution API - frontend, backend e integração
+[33mc2d4655[m fix: restaurar prefixo whatsapp: para envio via WhatsApp Business API
+[33m209e388[m fix: corrigir formato de número WhatsApp no envio de mensagens Twilio
+[33m4c113c2[m fix: corrigir estrutura de resposta da API Twilio para compatibilidade com frontend
+[33m4a680a7[m fix: simplificar verificação de configuração existente para carregar corretamente
+[33m447cb09[m fix: corrigir detecção de configuração existente no loadTwilioConfig
+[33m9120ff7[m feat: integração Twilio WhatsApp - estrutura limpa e organizada
+[33m3d1788a[m debug: adicionar logs para diagnosticar problema POST vs PUT
+[33m5d65a47[m fix: corrigir lógica POST vs PUT para configuração Twilio
+[33m63919e7[m feat: integração Twilio WhatsApp - estrutura limpa e organizada
+[33mc79f13b[m feat: WhatsApp Multi-API - Frontend completo para Twilio, Evolution e Meta
+[33m1e320ca[m fix: correções WhatsApp - área cliente simplificada - Removida seção 'Configuração Simplificada' - Removida seção 'Teste de Envio' - Corrigido backend para retornar null quando não há configuração - Corrigido frontend para tratar configuração não encontrada - Corrigido método POST/PUT baseado na existência da configuração
+[33m5345e46[m DIA 3, 4, 5 CONCLUÍDOS: Backend simplificado - SaaS Platform Style - Schemas: WhatsAppClientConfig simplificado (apenas campos essenciais) - Services: WhatsAppClientService simplificado (apenas funcionalidades essenciais) - Controllers: WhatsAppClientController simplificado (apenas endpoints essenciais) - Removidas credenciais complexas e validações desnecessárias
+[33madb1c88[m DIA 2 CONCLUÍDO: Frontend - Área Cliente simplificada - SaaS Platform Style - Apenas nome da empresa e descrição - Removidas credenciais complexas - Interface limpa e focada
+[33md3769a1[m docs: Atualizar planejamento WhatsApp com progresso atual - Semana 1 e 2 concluídas - Semana 3 em andamento (53.3%) - Sistema de templates implementado - Progresso geral: 50.7%
+[33mb828185[m fix: correct connection status logic to show active when valid config exists
+[33m3ff5a58[m fix: correct database queries and remove invalid type field
+[33mc17e754[m fix: correct API URL configuration and add debug logs
+[33maa001ee[m feat: implement WhatsApp admin endpoints for Gupshup, pricing and statistics
+[33meba0e48[m feat: implement WhatsApp admin JavaScript module with advanced functionality
+[33ma34a4b7[m feat: redesign admin whatsapp config for SaaS model with Gupshup
+[33m78ed185[m  Simplificar validações no envio de mensagem de teste para debug
+[33m018f7c9[m feat: adiciona verificação de status de registro da conta WhatsApp - resolve erro 133010 Account not r

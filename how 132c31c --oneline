@@ -1,0 +1,64 @@
+[33mc9ee500[m deploy: forçar novo deploy no Railway - Sistema de cabeçalho configurável implementado
+[33mb45eb99[m fix: correção de erros TypeScript - deploy funcionando
+[33m0a1e111[m chore(railway): trigger redeploy - 11/08/2025, 14:38:46
+[33m0a65b75[m feat: melhorias WhatsApp - validação NOT_VERIFIED e deploy preparado
+[33m5810aa0[m chore(railway): trigger redeploy - 04/08/2025, 17:14:14
+[33maa4528a[m chore(railway): trigger redeploy - 04/08/2025, 15:53:55
+[33m2ee0b3a[m chore(railway): trigger redeploy - 04/08/2025, 15:46:17
+[33m40692d0[m chore(railway): trigger redeploy - 04/08/2025, 15:29:10
+[33m3d46435[m chore(railway): trigger redeploy - 04/08/2025, 15:07:44
+[33m613b96b[m chore(railway): trigger redeploy - 29/07/2025, 19:48:02
+[33me2899cf[m chore(railway): trigger redeploy - 29/07/2025, 19:32:33
+[33m6b34ba9[m chore(railway): trigger redeploy - 29/07/2025, 18:41:06
+[33m71c8c7d[m chore(railway): trigger redeploy - 29/07/2025, 18:02:28
+[33mba0cc68[m  Force deploy: Debug logs não apareceram
+[33mf49b977[m  DEPLOY: Trigger com logs debug email editor
+[33m5002a1e[m revert: desfazer mudanças que quebraram o deploy
+[33m17962bb[m trigger: redeploy para resolver erro de build
+[33m1222d5b[m FIX: Corrigido deploy - Mantido (config as any)._id que estava funcionando
+[33m8a4aa96[m chore(railway): trigger redeploy - 26/07/2025, 15:22:54
+[33m25e39c9[m chore(railway): trigger redeploy - 26/07/2025, 15:15:57
+[33md00de78[m chore(railway): trigger redeploy - 26/07/2025, 15:09:54
+[33m0a7437e[m chore(railway): trigger redeploy - 26/07/2025, 14:52:51
+[33mfec1196[m chore(railway): trigger redeploy - 26/07/2025, 14:07:17
+[33m08663fc[m chore(railway): trigger redeploy - 26/07/2025, 13:20:29
+[33m9c79d03[m chore(railway): trigger redeploy - 25/07/2025, 20:34:04
+[33m67ab076[m fix: incluir todas as alterações pendentes para deploy de produção - CRUD templates de e-mail marketing
+[33meca02a7[m chore(railway): trigger redeploy - 22/07/2025, 22:08:04
+[33m894ea88[m chore(railway): trigger redeploy - 22/07/2025, 22:04:07
+[33m9c8878a[m chore(railway): trigger redeploy - 22/07/2025, 21:51:21
+[33me565117[m chore(railway): trigger redeploy - 22/07/2025, 21:42:17
+[33me8f7728[m chore(railway): trigger redeploy - 22/07/2025, 21:31:38
+[33m09bee90[m chore(railway): trigger redeploy - 22/07/2025, 21:24:01
+[33m5ec74c1[m chore(railway): trigger redeploy - 22/07/2025, 20:00:14
+[33md737f4b[m chore(deploy): alteração trivial para forçar novo deploy e limpar cache do Railway
+[33md3295e0[m fix(deploy): remove .nvmrc inválido que quebrava o build do Railway
+[33m7cfd94c[m chore(railway): trigger redeploy - 19/07/2025 10:35:18
+[33m4136782[m chore(railway): trigger redeploy - 18/07/2025 18:51:52
+[33ma9f5735[m feat: atualizações para deploy - remove README-DESENVOLVIMENTO.md
+[33m8792cf9[m feat: implementação completa do sistema de email marketing com editor visual GrapesJS e fluxos condicionais - Sistema JWT multicliente validado e seguro para produção - Funcionalidades: editor de templates, fluxos condicionais, listas de indicadores - Autenticação corrigida para usar clientToken consistentemente - Pronto para deploy em produção
+[33m333c7cd[m 🔧 Force Vercel redeploy para aplicar proxy corretamente
+[33m9318852[m test: adicionar arquivo de teste para validar deploy de arquivos estáticos
+[33m497cc97[m chore: trigger redeploy Railway
+[33m591b02d[m chore: trigger redeploy
+[33m5e41021[m chore: trigger redeploy
+[33m3127676[m chore: trigger redeploy Railway - build travado
+[33mecc8319[m feat: ajustes finais integração Make.com, correção de autenticação, ajustes de menu e deploy full
+[33mdf4e5c0[m feat(automation): adiciona sistema completo de automação para deploy, commits e monitoramento
+[33mf4b7e74[m chore(railway): trigger redeploy after reset to working commit 3f2779d
+[33m1c19d2c[m chore(railway): trigger redeploy after reset to working commit
+[33mc7d9d75[m  CORREÇÃO DEPLOY: Problema UTF-8 Resolvido
+[33m6d14c7e[m  PRONTO PARA DEPLOY: Sistema Completo v2.0
+[33m2059b8c[m  Finalizando correções URLs hardcoded para deploy
+[33m6f272f6[m fix: corrigir página 'Meus Dados' e outras páginas críticas
+[33m66e182f[m fix: corrigir redirecionamentos 404 após login
+[33mc7a0309[m fix: URGENTE - corrigir localhost hardcoded em teste-gratis.js
+[33m57bf6f5[m fix: corrigir URLs hardcoded na área de CLIENTE
+[33mf5f3069[m fix: corrigir CORS e URLs hardcoded que impediam login admin
+[33me929b45[m feat: adicionar pasta admin dentro de client para deploy Vercel
+[33m40904f6[m feat: add index.html for Vercel deployment
+[33m0fab7c2[m fix: correções críticas para Railway deploy
+[33mc5f5f87[m feat: configuração com URL real do Railway
+[33m84cfa71[m fix: configuração Railway para resolver build failed
+[33m3d9cc67[m fix: configurações de produção para Railway
+[33m5147c18[m feat: sistema de indicação multicliente - ready for deploy
