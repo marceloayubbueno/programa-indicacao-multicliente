@@ -43,9 +43,14 @@ export class CampaignsService {
     let createdCampaign: Campaign | null = null; // Inicializar como null
 
     try {
+      // ✅ NOVO: Gerar código único para a campanha
+      const uniqueCode = this.generateUniqueCode();
+      console.log('[CREATE-CAMPAIGN] Código único gerado:', uniqueCode);
+
       // Cria a campanha primeiro para obter o _id
       const created = new this.campaignModel({
         ...data,
+        uniqueCode, // ← NOVO: Adicionar código único
       });
       createdCampaign = await created.save();
       const campaignId = createdCampaign._id;
@@ -713,5 +718,11 @@ export class CampaignsService {
       console.error('[REPAIR] ❌ Erro geral na reparação:', error.message);
       throw error;
     }
+  }
+
+  private generateUniqueCode(): string {
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 10);
+    return `${timestamp}-${randomString}`;
   }
 } 

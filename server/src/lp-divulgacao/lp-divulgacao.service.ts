@@ -7,6 +7,7 @@ import { UpdateLPDivulgacaoDto } from './dto/update-lp-divulgacao.dto';
 import { Referral, ReferralDocument } from '../referrals/entities/referral.schema';
 import { Participant } from '../clients/entities/participant.schema';
 import { ReferralsService } from '../referrals/referrals.service';
+import { Campaign, CampaignDocument } from '../campaigns/entities/campaign.schema';
 
 @Injectable()
 export class LPDivulgacaoService {
@@ -15,6 +16,7 @@ export class LPDivulgacaoService {
     @InjectModel(LPDivulgacao.name) private lpDivulgacaoModel: Model<LPDivulgacaoDocument>,
     @InjectModel(Referral.name) private referralModel: Model<ReferralDocument>,
     @InjectModel(Participant.name) private participantModel: Model<Participant>,
+    @InjectModel(Campaign.name) private campaignModel: Model<CampaignDocument>,
     private readonly referralsService: ReferralsService,
   ) {}
 
@@ -315,7 +317,8 @@ export class LPDivulgacaoService {
         email,
         phone,
         lpId,
-        indicatorCode
+        indicatorCode,
+        campaignCode // ← NOVO: Código da campanha
       } = submitReferralFormDto;
 
       // Validações básicas
@@ -335,8 +338,28 @@ export class LPDivulgacaoService {
 
       this.logger.log(`LP encontrada: ${lp.name}`);
 
-      // Extrair IDs necessários
-      const campaignId = lp.campaignId?._id?.toString() || lp.campaignId?.toString() || lp.campaignId;
+      // ✅ NOVO: Buscar campanha pelo código único (igual ao indicador)
+      let campaignId = null;
+      let campaignData = null;
+
+      if (campaignCode) {
+        campaignData = await this.campaignModel.findOne({
+          uniqueCode: campaignCode
+        });
+        
+        if (campaignData) {
+          campaignId = campaignData._id.toString();
+          this.logger.log(`Campanha encontrada: ${campaignData.name} (${campaignCode})`);
+        } else {
+          this.logger.warn(`Campanha não encontrada para código: ${campaignCode}`);
+        }
+      }
+
+      // Fallback: usar campaignId da LP se não encontrar pelo código
+      if (!campaignId) {
+        campaignId = lp.campaignId?._id?.toString() || lp.campaignId?.toString() || lp.campaignId;
+      }
+
       const clientId = lp.clientId?._id?.toString() || lp.clientId?.toString() || lp.clientId;
 
       // Buscar indicador pelo código único (se fornecido)
@@ -365,7 +388,7 @@ export class LPDivulgacaoService {
         leadEmail: email,
         leadPhone: phone,
         campaignId: campaignId || null,
-        campaignName: (lp.campaignId as any)?.name || 'LP Divulgacao',
+        campaignName: campaignData?.name || (lp.campaignId as any)?.name || 'LP Divulgacao',
         clientId: clientId,
         indicatorId: indicadorId || null,
         indicatorName: (indicadorData as any)?.name || null,

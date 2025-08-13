@@ -346,17 +346,19 @@ export class PublicReferralsController {
                 // Buscar informações do indicador do localStorage
                 const indicatorCode = localStorage.getItem('currentIndicatorCode');
                 const indicatorName = localStorage.getItem('currentIndicatorName');
+                const campaignCode = localStorage.getItem('currentCampaignCode'); // ← NOVO: Código da campanha
 
                 // Captura dados de origem (UTM, referrer, userAgent, etc)
                 const urlParams = new URL(window.location.href).searchParams;
                 const indicatorCodeFromUrl = urlParams.get('ref') || '';
                 const finalIndicatorCode = indicatorCodeFromUrl || indicatorCode || '';
 
-                // Monta payload com código do indicador
+                // Monta payload com código do indicador e da campanha
                 const payload = {
                   name, email, phone, company, lpId,
                   indicatorCode: finalIndicatorCode || null,
                   indicatorName: indicatorName || null,
+                  campaignCode: campaignCode || null, // ← NOVO: Código da campanha
                   referrerUrl: document.referrer,
                   userAgent: navigator.userAgent,
                   language: navigator.language
@@ -447,6 +449,7 @@ export class PublicReferralsController {
               localStorage.setItem('currentIndicatorCode', '${codigo}');
               localStorage.setItem('currentIndicatorName', '${indicador.name}');
               localStorage.setItem('currentLpDivulgacaoId', '${targetLP._id}');
+              localStorage.setItem('currentCampaignCode', ''); // ← NOVO: Será preenchido pelo service
               
               // Auto-bind dos formulários
               setTimeout(() => {
