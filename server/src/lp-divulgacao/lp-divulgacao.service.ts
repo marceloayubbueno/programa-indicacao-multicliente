@@ -309,6 +309,13 @@ export class LPDivulgacaoService {
   async submitReferralForm(submitReferralFormDto: any): Promise<any> {
     try {
       this.logger.log('Iniciando submitReferralForm');
+      
+      // 🚨 DEBUG: Verificar o que está sendo recebido
+      console.log('🚨 [DEBUG-SERVICE] ========== DADOS RECEBIDOS ==========');
+      console.log('🚨 [DEBUG-SERVICE] Payload completo:', JSON.stringify(submitReferralFormDto, null, 2));
+      console.log('🚨 [DEBUG-SERVICE] campaignCode:', submitReferralFormDto.campaignCode);
+      console.log('🚨 [DEBUG-SERVICE] indicatorCode:', submitReferralFormDto.indicatorCode);
+      console.log('🚨 [DEBUG-SERVICE] ===========================================');
 
       const {
         name,
