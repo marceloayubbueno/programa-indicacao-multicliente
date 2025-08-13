@@ -7,7 +7,7 @@ import { UpdateLPDivulgacaoDto } from './dto/update-lp-divulgacao.dto';
 import { Referral, ReferralDocument } from '../referrals/entities/referral.schema';
 import { Participant } from '../clients/entities/participant.schema';
 import { ReferralsService } from '../referrals/referrals.service';
-import { Campaign, CampaignDocument } from '../campaigns/entities/campaign.schema';
+import { Campaign } from '../campaigns/entities/campaign.schema';
 
 @Injectable()
 export class LPDivulgacaoService {
@@ -16,7 +16,7 @@ export class LPDivulgacaoService {
     @InjectModel(LPDivulgacao.name) private lpDivulgacaoModel: Model<LPDivulgacaoDocument>,
     @InjectModel(Referral.name) private referralModel: Model<ReferralDocument>,
     @InjectModel(Participant.name) private participantModel: Model<Participant>,
-    @InjectModel(Campaign.name) private campaignModel: Model<CampaignDocument>,
+    @InjectModel(Campaign.name) private campaignModel: Model<Campaign>,
     private readonly referralsService: ReferralsService,
   ) {}
 
@@ -339,8 +339,8 @@ export class LPDivulgacaoService {
       this.logger.log(`LP encontrada: ${lp.name}`);
 
       // ✅ NOVO: Buscar campanha pelo código único (igual ao indicador)
-      let campaignId = null;
-      let campaignData = null;
+      let campaignId: string | null = null;
+      let campaignData: any = null;
 
       if (campaignCode) {
         campaignData = await this.campaignModel.findOne({
@@ -348,8 +348,8 @@ export class LPDivulgacaoService {
         });
         
         if (campaignData) {
-          campaignId = campaignData._id.toString();
-          this.logger.log(`Campanha encontrada: ${campaignData.name} (${campaignCode})`);
+          campaignId = campaignData._id?.toString() || null;
+          this.logger.log(`Campanha encontrada: ${campaignData.name || 'Sem nome'} (${campaignCode})`);
         } else {
           this.logger.warn(`Campanha não encontrada para código: ${campaignCode}`);
         }
@@ -357,7 +357,7 @@ export class LPDivulgacaoService {
 
       // Fallback: usar campaignId da LP se não encontrar pelo código
       if (!campaignId) {
-        campaignId = lp.campaignId?._id?.toString() || lp.campaignId?.toString() || lp.campaignId;
+        campaignId = lp.campaignId?._id?.toString() || lp.campaignId?.toString() || null;
       }
 
       const clientId = lp.clientId?._id?.toString() || lp.clientId?.toString() || lp.clientId;
@@ -387,7 +387,7 @@ export class LPDivulgacaoService {
         leadName: name,
         leadEmail: email,
         leadPhone: phone,
-        campaignId: campaignId || null,
+        campaignId: campaignId,
         campaignName: campaignData?.name || (lp.campaignId as any)?.name || 'LP Divulgacao',
         clientId: clientId,
         indicatorId: indicadorId || null,
@@ -423,7 +423,7 @@ export class LPDivulgacaoService {
           leadName: savedReferral.leadName,
           leadEmail: savedReferral.leadEmail,
           indicatorName: (indicadorData as any)?.name || null,
-          campaignName: (lp.campaignId as any)?.name || 'LP Divulgacao'
+          campaignName: campaignData?.name || (lp.campaignId as any)?.name || 'LP Divulgacao'
         }
       };
 
