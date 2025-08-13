@@ -196,6 +196,14 @@ export class PublicReferralsController {
 
       const indicador = validation.participant!;
       this.logger.log(`✅ Indicador encontrado: ${indicador.name} (${indicador.email})`);
+      
+      // 🚨 DEBUG: Verificar o que o indicador tem
+      console.log('🚨 [DEBUG-INDICADOR] ========== DADOS DO INDICADOR ==========');
+      console.log('🚨 [DEBUG-INDICADOR] Indicador completo:', JSON.stringify(indicador, null, 2));
+      console.log('🚨 [DEBUG-INDICADOR] campaignId:', indicador.campaignId);
+      console.log('🚨 [DEBUG-INDICADOR] campaignId._id:', indicador.campaignId?._id);
+      console.log('🚨 [DEBUG-INDICADOR] campaignId.name:', indicador.campaignId?.name);
+      console.log('🚨 [DEBUG-INDICADOR] ===========================================');
 
       // 2. Buscar LP de Divulgação ativa do cliente
       let targetLP: any = null;
