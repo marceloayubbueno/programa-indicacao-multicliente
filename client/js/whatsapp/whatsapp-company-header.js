@@ -297,43 +297,43 @@ class WhatsAppCompanyHeader {
                     <div class="text-blue-400 font-semibold mb-2">📱 Visualização no Celular:</div>
                     
                     <!-- Tela de Celular Simples -->
-                    <div class="mx-auto w-64 h-80 bg-black rounded-2xl p-2 shadow-lg">
+                    <div class="mx-auto w-96 h-[480px] bg-black rounded-2xl p-3 shadow-lg">
                       <!-- Tela Interna -->
                       <div class="w-full h-full bg-gray-900 rounded-xl overflow-hidden relative">
                         <!-- Status Bar Simples -->
-                        <div class="bg-gray-800 px-3 py-1 flex justify-between items-center text-white text-xs">
+                        <div class="bg-gray-800 px-4 py-2 flex justify-between items-center text-white text-sm">
                           <span>16:46</span>
                           <div class="flex items-center space-x-1">
-                            <div class="w-1 h-1 bg-white rounded-full"></div>
-                            <div class="w-1 h-1 bg-white rounded-full"></div>
-                            <div class="w-1 h-1 bg-white rounded-full"></div>
+                            <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                            <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                            <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
                           </div>
                         </div>
                         
                         <!-- Cabeçalho WhatsApp Simples -->
-                        <div class="bg-[#075E54] text-white px-3 py-2">
-                          <div class="flex items-center space-x-2">
-                            <div class="w-6 h-6 bg-blue-400 rounded-full flex items-center justify-center">
-                              <i class="fas fa-sticky-note text-white text-xs"></i>
+                        <div class="bg-[#075E54] text-white px-4 py-3">
+                          <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
+                              <i class="fas fa-sticky-note text-white text-sm"></i>
                             </div>
-                            <span class="text-sm font-medium">ANOTAÇÕES</span>
+                            <span class="text-base font-medium">ANOTAÇÕES</span>
                           </div>
                         </div>
                         
                         <!-- Corpo da Mensagem -->
-                        <div class="p-3 bg-gray-900 h-full">
+                        <div class="p-4 bg-gray-900 h-full">
                           <!-- Separador "Hoje" -->
-                          <div class="flex justify-center mb-3">
-                            <div class="bg-gray-700 text-white text-xs rounded-full px-3 py-1">Hoje</div>
+                          <div class="flex justify-center mb-4">
+                            <div class="bg-gray-700 text-white text-sm rounded-full px-4 py-2">Hoje</div>
                           </div>
                           
                           <!-- Mensagem -->
                           <div class="flex justify-end">
-                            <div class="max-w-48">
-                              <div class="bg-[#075E54] p-3 rounded-lg text-white text-xs">
-                                <div class="space-y-2">
+                            <div class="max-w-56">
+                              <div class="bg-[#075E54] p-4 rounded-lg text-white text-sm">
+                                <div class="space-y-3">
                                   ${this.generateDynamicMessageContent()}
-                                  <div class="text-xs text-gray-300 text-right mt-2">16:44 ✓</div>
+                                  <div class="text-sm text-gray-300 text-right mt-3">16:44 ✓</div>
                                 </div>
                               </div>
                             </div>
@@ -341,16 +341,16 @@ class WhatsAppCompanyHeader {
                         </div>
                         
                         <!-- Barra de Input Simples -->
-                        <div class="absolute bottom-0 left-0 right-0 bg-gray-800 px-3 py-2">
-                          <div class="flex items-center space-x-2">
-                            <div class="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
-                              <i class="fas fa-plus text-white text-xs"></i>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gray-800 px-4 py-3">
+                          <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                              <i class="fas fa-plus text-white text-sm"></i>
                             </div>
-                            <div class="flex-1 bg-gray-600 rounded-full px-3 py-1 text-xs text-gray-300">
+                            <div class="flex-1 bg-gray-600 rounded-full px-4 py-2 text-sm text-gray-300">
                               Mensagem
                             </div>
-                            <div class="w-6 h-6 bg-transparent rounded-full flex items-center justify-center">
-                              <i class="fas fa-microphone text-white text-xs"></i>
+                            <div class="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
+                              <i class="fas fa-microphone text-white text-sm"></i>
                             </div>
                           </div>
                         </div>
@@ -377,48 +377,48 @@ class WhatsAppCompanyHeader {
                 <div class="text-blue-400 font-semibold mb-2">📱 Visualização no Celular:</div>
                 
                 <!-- Tela de Celular Simples Vazia -->
-                <div class="mx-auto w-64 h-80 bg-black rounded-2xl p-2 shadow-lg">
+                <div class="mx-auto w-96 h-[480px] bg-black rounded-2xl p-3 shadow-lg">
                   <!-- Tela Interna -->
                   <div class="w-full h-full bg-gray-900 rounded-xl overflow-hidden relative">
                     <!-- Status Bar Simples -->
-                    <div class="bg-gray-800 px-3 py-1 flex justify-between items-center text-white text-xs">
+                    <div class="bg-gray-800 px-4 py-2 flex justify-between items-center text-white text-sm">
                       <span>16:46</span>
                       <div class="flex items-center space-x-1">
-                        <div class="w-1 h-1 bg-white rounded-full"></div>
-                        <div class="w-1 h-1 bg-white rounded-full"></div>
-                        <div class="w-1 h-1 bg-white rounded-full"></div>
+                        <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                        <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                        <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
                       </div>
                     </div>
                     
                     <!-- Cabeçalho WhatsApp Simples -->
-                    <div class="bg-[#075E54] text-white px-3 py-2">
-                      <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 bg-blue-400 rounded-full flex items-center justify-center">
-                          <i class="fas fa-sticky-note text-white text-xs"></i>
+                    <div class="bg-[#075E54] text-white px-4 py-3">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
+                          <i class="fas fa-sticky-note text-white text-sm"></i>
                         </div>
-                        <span class="text-sm font-medium">ANOTAÇÕES</span>
+                        <span class="text-base font-medium">ANOTAÇÕES</span>
                       </div>
                     </div>
                     
                     <!-- Corpo da Mensagem Vazio -->
-                    <div class="p-3 bg-gray-900 h-full flex items-center justify-center">
+                    <div class="p-4 bg-gray-900 h-full flex items-center justify-center">
                       <div class="text-center text-gray-500">
-                        <i class="fas fa-comment-dots text-2xl mb-2 opacity-30"></i>
-                        <div class="text-xs">Configure o cabeçalho para ver a mensagem</div>
+                        <i class="fas fa-comment-dots text-3xl mb-3 opacity-30"></i>
+                        <div class="text-sm">Configure o cabeçalho para ver a mensagem</div>
                       </div>
                     </div>
                     
                     <!-- Barra de Input Simples -->
-                    <div class="absolute bottom-0 left-0 right-0 bg-gray-800 px-3 py-2">
-                      <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
-                          <i class="fas fa-plus text-white text-xs"></i>
+                    <div class="absolute bottom-0 left-0 right-0 bg-gray-800 px-4 py-3">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                          <i class="fas fa-plus text-white text-sm"></i>
                         </div>
-                        <div class="flex-1 bg-gray-600 rounded-full px-3 py-1 text-xs text-gray-300">
+                        <div class="flex-1 bg-gray-600 rounded-full px-4 py-2 text-sm text-gray-300">
                           Mensagem
                         </div>
-                        <div class="w-6 h-6 bg-transparent rounded-full flex items-center justify-center">
-                          <i class="fas fa-microphone text-white text-xs"></i>
+                        <div class="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
+                          <i class="fas fa-microphone text-white text-sm"></i>
                         </div>
                       </div>
                     </div>
