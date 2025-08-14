@@ -37,7 +37,7 @@ class WhatsAppCompanyHeader {
   }
 
   getJWTToken() {
-    return localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
+    return localStorage.getItem('clientToken');
   }
 
   extractClientId(token) {
@@ -52,7 +52,22 @@ class WhatsAppCompanyHeader {
 
   async loadCompanyHeader() {
     try {
-      // Por enquanto, usar dados mock para desenvolvimento
+      // Tentar carregar do servidor primeiro
+      const response = await fetch('/api/whatsapp/company-header', {
+        headers: { 'Authorization': `Bearer ${this.getJWTToken()}` }
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.data) {
+          this.config = result.data;
+          this.populateForm();
+          console.log('Configuração carregada do servidor:', result.data);
+          return;
+        }
+      }
+      
+      // Se não conseguir do servidor, usar dados mock como fallback
       const mockData = {
         companyInfo: {
           name: 'Viral lead',
@@ -86,12 +101,7 @@ class WhatsAppCompanyHeader {
 
       this.config = mockData;
       this.populateForm();
-      
-      // TODO: Implementar chamada real para API quando backend estiver pronto
-      // const response = await fetch('/api/whatsapp/company-header', {
-      //   headers: { 'Authorization': `Bearer ${this.getJWTToken()}` }
-      // });
-      // this.config = await response.json();
+      console.log('Usando dados mock como fallback');
       
     } catch (error) {
       console.error('Erro ao carregar configuração:', error);
@@ -280,25 +290,34 @@ class WhatsAppCompanyHeader {
     try {
       const formData = this.collectFormData();
       
-      // Por enquanto, salvar no localStorage para desenvolvimento
+      // Salvar no backend via API
+      const response = await fetch('/api/whatsapp/company-header', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.getJWTToken()}`
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      // Salvar também no localStorage como backup
       localStorage.setItem('whatsapp-company-header', JSON.stringify(formData));
       
-      // TODO: Implementar chamada real para API quando backend estiver pronto
-      // const response = await fetch('/api/whatsapp/company-header', {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${this.getJWTToken()}`
-      //   },
-      //   body: JSON.stringify(formData)
-      // });
-      
-      this.showSuccess('Configuração salva com sucesso!');
-      console.log('Configuração salva:', formData);
+      this.showSuccess('Configuração salva com sucesso no servidor!');
+      console.log('Configuração salva no servidor:', result);
       
     } catch (error) {
-      console.error('Erro ao salvar:', error);
-      this.showError('Erro ao salvar configuração');
+      console.error('Erro ao salvar no servidor:', error);
+      
+      // Fallback: salvar apenas no localStorage
+      localStorage.setItem('whatsapp-company-header', JSON.stringify(formData));
+      this.showError('Erro ao salvar no servidor, mas dados salvos localmente');
     }
   }
 
