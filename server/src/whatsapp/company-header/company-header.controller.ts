@@ -15,8 +15,8 @@ export class CompanyHeaderController {
     @Body() createCompanyHeaderDto: CreateCompanyHeaderDto,
     @ClientId() clientId: string,
   ) {
-    createCompanyHeaderDto.clientId = clientId;
-    return this.companyHeaderService.create(createCompanyHeaderDto);
+    const dtoWithClientId = { ...createCompanyHeaderDto, clientId };
+    return this.companyHeaderService.create(dtoWithClientId);
   }
 
   @Get()
