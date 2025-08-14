@@ -289,22 +289,33 @@ class WhatsAppCompanyHeader {
   async saveCompanyHeader() {
     try {
       const formData = this.collectFormData();
+      const token = this.getJWTToken();
+      
+      console.log('🔍 [DEBUG] Frontend - Iniciando saveCompanyHeader...');
+      console.log('🔍 [DEBUG] Token JWT:', token ? 'EXISTE' : 'NÃO EXISTE');
+      console.log('🔍 [DEBUG] Dados do formulário:', JSON.stringify(formData, null, 2));
       
       // Salvar no backend via API
       const response = await fetch('/api/whatsapp/company-header', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getJWTToken()}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(formData)
       });
       
+      console.log('🔍 [DEBUG] Response status:', response.status);
+      console.log('🔍 [DEBUG] Response headers:', response.headers);
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ [DEBUG] Response error:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
       
       const result = await response.json();
+      console.log('✅ [DEBUG] Response success:', result);
       
       // Salvar também no localStorage como backup
       localStorage.setItem('whatsapp-company-header', JSON.stringify(formData));
@@ -313,7 +324,7 @@ class WhatsAppCompanyHeader {
       console.log('Configuração salva no servidor:', result);
       
     } catch (error) {
-      console.error('Erro ao salvar no servidor:', error);
+      console.error('❌ [DEBUG] Erro ao salvar no servidor:', error);
       
       // Fallback: salvar apenas no localStorage
       localStorage.setItem('whatsapp-company-header', JSON.stringify(formData));

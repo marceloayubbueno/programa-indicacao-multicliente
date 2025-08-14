@@ -36,18 +36,33 @@ export class CompanyHeaderService {
   }
 
   async upsertByClientId(clientId: string, companyHeaderData: CreateCompanyHeaderDto): Promise<WhatsAppCompanyHeader> {
+    console.log('🔍 [DEBUG] Service.upsertByClientId - Iniciando...');
+    console.log('🔍 [DEBUG] clientId:', clientId);
+    console.log('🔍 [DEBUG] dados:', JSON.stringify(companyHeaderData, null, 2));
+    
     const filter = { clientId, isActive: true };
     const update = { ...companyHeaderData, clientId };
     const options = { upsert: true, new: true, setDefaultsOnInsert: true };
 
-    const result = await this.companyHeaderModel.findOneAndUpdate(filter, update, options).exec();
-    
-    if (!result) {
-      // Se por algum motivo não retornou, criar manualmente
-      return this.create(companyHeaderData as CreateCompanyHeaderDto);
+    console.log('🔍 [DEBUG] Filter:', JSON.stringify(filter, null, 2));
+    console.log('🔍 [DEBUG] Update:', JSON.stringify(update, null, 2));
+    console.log('🔍 [DEBUG] Options:', JSON.stringify(options, null, 2));
+
+    try {
+      const result = await this.companyHeaderModel.findOneAndUpdate(filter, update, options).exec();
+      console.log('✅ [DEBUG] Resultado do MongoDB:', result ? result._id : 'null');
+      
+      if (!result) {
+        console.log('⚠️ [DEBUG] Resultado null, criando manualmente...');
+        // Se por algum motivo não retornou, criar manualmente
+        return this.create(companyHeaderData as CreateCompanyHeaderDto);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ [DEBUG] Erro no MongoDB:', error);
+      throw error;
     }
-    
-    return result;
   }
 
   async deleteByClientId(clientId: string): Promise<boolean> {

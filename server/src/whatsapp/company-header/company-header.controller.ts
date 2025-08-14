@@ -33,8 +33,18 @@ export class CompanyHeaderController {
     @Body() updateCompanyHeaderDto: UpdateCompanyHeaderDto,
     @ClientId() clientId: string,
   ) {
-    const config = await this.companyHeaderService.upsertByClientId(clientId, updateCompanyHeaderDto as CreateCompanyHeaderDto);
-    return { message: 'Configuração atualizada com sucesso', data: config };
+    console.log('🔍 [DEBUG] PUT /whatsapp/company-header - Iniciando...');
+    console.log('🔍 [DEBUG] clientId recebido:', clientId);
+    console.log('🔍 [DEBUG] dados recebidos:', JSON.stringify(updateCompanyHeaderDto, null, 2));
+    
+    try {
+      const config = await this.companyHeaderService.upsertByClientId(clientId, updateCompanyHeaderDto as CreateCompanyHeaderDto);
+      console.log('✅ [DEBUG] Configuração salva com sucesso:', config._id);
+      return { message: 'Configuração atualizada com sucesso', data: config };
+    } catch (error) {
+      console.error('❌ [DEBUG] Erro ao salvar:', error);
+      throw error;
+    }
   }
 
   @Delete()
