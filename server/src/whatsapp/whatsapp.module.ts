@@ -27,6 +27,7 @@ import { CompanyHeaderModule } from './company-header/company-header.module';
       { name: WhatsAppFlow.name, schema: WhatsAppFlowSchema },
       { name: WhatsAppMessage.name, schema: WhatsAppMessageSchema },
       { name: WhatsAppTwilioConfig.name, schema: WhatsAppTwilioConfigSchema },
+      { name: WhatsAppCompanyHeader.name, schema: WhatsAppCompanyHeaderSchema },
     ]),
     CompanyHeaderModule,
   ],
