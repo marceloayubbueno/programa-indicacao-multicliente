@@ -297,9 +297,9 @@ class WhatsAppCompanyHeader {
                 <!-- Frame do iPhone REAL -->
                 <div class="relative mx-auto">
                   <!-- Bordas do iPhone com formato REAL super arredondado -->
-                  <div class="w-80 h-[700px] bg-black rounded-[5rem] p-4 shadow-2xl">
+                  <div class="w-80 h-[750px] bg-black rounded-[8rem] p-5 shadow-2xl">
                     <!-- Tela do iPhone com fundo ESCURO -->
-                    <div class="w-full h-full bg-black rounded-[4rem] overflow-hidden relative">
+                    <div class="w-full h-full bg-black rounded-[7rem] overflow-hidden relative">
                       <!-- Notch Superior (Dynamic Island) -->
                       <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-36 h-8 bg-black rounded-b-3xl z-10 flex items-center justify-center">
                         <div class="w-20 h-1 bg-black rounded-full"></div>
@@ -394,7 +394,7 @@ class WhatsAppCompanyHeader {
                   </div>
                   
                   <!-- Home Indicator iOS -->
-                  <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-black rounded-full"></div>
+                  <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-black rounded-full"></div>
                 </div>
               </div>
             </div>
@@ -415,8 +415,8 @@ class WhatsAppCompanyHeader {
               <!-- iPhone Vazio com formato REAL super arredondado -->
               <div class="mx-auto max-w-sm">
                 <div class="relative mx-auto">
-                  <div class="w-80 h-[700px] bg-black rounded-[5rem] p-4 shadow-2xl">
-                    <div class="w-full h-full bg-black rounded-[4rem] overflow-hidden relative">
+                  <div class="w-80 h-[750px] bg-black rounded-[8rem] p-5 shadow-2xl">
+                    <div class="w-full h-full bg-black rounded-[7rem] overflow-hidden relative">
                       <!-- Notch Superior (Dynamic Island) -->
                       <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-36 h-8 bg-black rounded-b-3xl z-10 flex items-center justify-center">
                         <div class="w-20 h-1 bg-black rounded-full"></div>
@@ -490,7 +490,7 @@ class WhatsAppCompanyHeader {
                   </div>
                   
                   <!-- Home Indicator iOS -->
-                  <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-black rounded-full"></div>
+                  <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-black rounded-full"></div>
                 </div>
               </div>
             </div>
