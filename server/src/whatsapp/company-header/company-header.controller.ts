@@ -39,7 +39,7 @@ export class CompanyHeaderController {
     
     try {
       const config = await this.companyHeaderService.upsertByClientId(clientId, updateCompanyHeaderDto as CreateCompanyHeaderDto);
-      console.log('✅ [DEBUG] Configuração salva com sucesso:', config._id);
+      console.log('✅ [DEBUG] Configuração salva com sucesso:', config);
       return { message: 'Configuração atualizada com sucesso', data: config };
     } catch (error) {
       console.error('❌ [DEBUG] Erro ao salvar:', error);
