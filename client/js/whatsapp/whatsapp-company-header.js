@@ -233,11 +233,11 @@ class WhatsAppCompanyHeader {
         }
       });
 
-      // Event listeners para campos de texto
-      const textFields = [
-        'companyName', 'companyDescription', 'website', 'phone', 'email',
-        'instagram', 'facebook', 'linkedin', 'whatsapp', 'separator', 'customText'
-      ];
+             // Event listeners para campos de texto
+       const textFields = [
+         'companyName', 'companyDescription', 'website', 'phone', 'email',
+         'instagram', 'facebook', 'linkedin', 'whatsapp', 'separator', 'customText', 'testPhoneNumber'
+       ];
 
       textFields.forEach(id => {
         const field = document.getElementById(id);
@@ -933,46 +933,184 @@ Sua indicação foi aprovada e você ganhou R$ 50!
     console.log('✅ [FRONTEND] Todos os dados foram limpos e recarregados');
   }
 
-  // Método para limpar o formulário
-  clearForm() {
-    console.log('🔍 [FRONTEND] clearForm() - Limpando formulário...');
-    
-    try {
-      // Limpar todos os campos de texto
-      const textFields = [
-        'companyName', 'companyDescription', 'website', 'phone', 'email',
-        'instagram', 'facebook', 'linkedin', 'whatsapp', 'separator', 'customText'
-      ];
-      
-      textFields.forEach(id => {
-        const field = document.getElementById(id);
-        if (field) {
-          field.value = '';
-          console.log(`🔍 [FRONTEND] Campo ${id} limpo`);
-        }
-      });
-      
-      // Desmarcar todos os checkboxes
-      const checkboxes = [
-        'includeDescription', 'includeWebsite', 'includePhone', 'includeEmail',
-        'includeInstagram', 'includeFacebook', 'includeLinkedin', 'includeWhatsapp',
-        'headerEnabled'
-      ];
-      
-      checkboxes.forEach(id => {
-        const checkbox = document.getElementById(id);
-        if (checkbox) {
-          checkbox.checked = false;
-          console.log(`🔍 [FRONTEND] Checkbox ${id} desmarcado`);
-        }
-      });
-      
-      console.log('✅ [FRONTEND] Formulário limpo com sucesso');
-    } catch (error) {
-      console.error('❌ [FRONTEND] Erro ao limpar formulário:', error);
-    }
-  }
-}
+     // Método para limpar o formulário
+   clearForm() {
+     console.log('🔍 [FRONTEND] clearForm() - Limpando formulário...');
+     
+     try {
+       // Limpar todos os campos de texto
+       const textFields = [
+         'companyName', 'companyDescription', 'website', 'phone', 'email',
+         'instagram', 'facebook', 'linkedin', 'whatsapp', 'separator', 'customText', 'testPhoneNumber'
+       ];
+       
+       textFields.forEach(id => {
+         const field = document.getElementById(id);
+         if (field) {
+           field.value = '';
+           console.log(`🔍 [FRONTEND] Campo ${id} limpo`);
+         }
+       });
+       
+       // Desmarcar todos os checkboxes
+       const checkboxes = [
+         'includeDescription', 'includeWebsite', 'includePhone', 'includeEmail',
+         'includeInstagram', 'includeFacebook', 'includeLinkedin', 'includeWhatsapp',
+         'headerEnabled'
+       ];
+       
+       checkboxes.forEach(id => {
+         const checkbox = document.getElementById(id);
+         if (checkbox) {
+           checkbox.checked = false;
+           console.log(`🔍 [FRONTEND] Checkbox ${id} desmarcado`);
+         }
+       });
+       
+       console.log('✅ [FRONTEND] Formulário limpo com sucesso');
+     } catch (error) {
+       console.error('❌ [FRONTEND] Erro ao limpar formulário:', error);
+     }
+   }
+
+   // NOVO MÉTODO: Enviar teste WhatsApp
+   async sendTestWhatsApp() {
+     console.log('🔍 [FRONTEND] sendTestWhatsApp() - Iniciando envio de teste...');
+     
+     try {
+       // Validar se o cabeçalho está ativo
+       const headerEnabled = document.getElementById('headerEnabled');
+       if (!headerEnabled || !headerEnabled.checked) {
+         this.showError('Ative o cabeçalho personalizado antes de enviar o teste');
+         return;
+       }
+       
+       // Coletar número de teste
+       const testPhone = document.getElementById('testPhoneNumber')?.value.trim();
+       if (!testPhone) {
+         this.showError('Digite um número de telefone para teste');
+         return;
+       }
+       
+       // Validar formato do número (deve começar com +)
+       if (!testPhone.startsWith('+')) {
+         this.showError('O número deve estar no formato internacional (+5511999999999)');
+         return;
+       }
+       
+       // Gerar conteúdo do cabeçalho
+       const headerContent = this.generateHeaderContent();
+       if (!headerContent) {
+         this.showError('Configure pelo menos um campo para incluir no cabeçalho');
+         return;
+       }
+       
+       // Criar mensagem de teste
+       const testMessage = `${headerContent}\n\n---\n\n📱 **MENSAGEM DE TESTE**\n\nEsta é uma mensagem de teste da plataforma WhatsApp Multi-API.\n\n✅ Se você recebeu esta mensagem, a configuração está funcionando perfeitamente!\n\n🕐 Enviado em: ${new Date().toLocaleString('pt-BR')}\n\n🎯 Use esta funcionalidade para testar seus cabeçalhos antes de enviar para clientes reais.`;
+       
+       console.log('🔍 [FRONTEND] Dados para teste:', {
+         testPhone,
+         headerContent: headerContent.substring(0, 100) + '...',
+         messageLength: testMessage.length
+       });
+       
+       // Mostrar loading
+       this.showSuccess('Enviando mensagem de teste...');
+       
+       // Enviar via API
+       const apiUrl = window.APP_CONFIG?.API_URL || '/api';
+       const url = `${apiUrl}/whatsapp/test-message`;
+       console.log('🔍 [FRONTEND] Fazendo requisição POST para:', url);
+       
+       const response = await fetch(url, {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${this.getJWTToken()}`
+         },
+         body: JSON.stringify({
+           phoneNumber: testPhone,
+           message: testMessage,
+           clientId: this.clientId
+         })
+       });
+       
+       console.log('🔍 [FRONTEND] Response status:', response.status);
+       console.log('🔍 [FRONTEND] Response ok:', response.ok);
+       
+       if (!response.ok) {
+         const errorText = await response.text();
+         console.error('❌ [FRONTEND] Response error:', errorText);
+         throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+       }
+       
+       const result = await response.json();
+       console.log('✅ [FRONTEND] Teste enviado com sucesso:', result);
+       
+       this.showSuccess(`Mensagem de teste enviada com sucesso para ${testPhone}!`);
+       
+       // Atualizar logs de atividade
+       this.addActivityLog(`✅ Teste WhatsApp enviado para ${testPhone}`, 'success');
+       
+     } catch (error) {
+       console.error('❌ [FRONTEND] Erro ao enviar teste WhatsApp:', error);
+       
+       let errorMessage = 'Erro ao enviar mensagem de teste';
+       if (error.message.includes('HTTP error!')) {
+         errorMessage = 'Erro no servidor. Verifique se o WhatsApp está configurado no admin.';
+       } else if (error.message.includes('fetch')) {
+         errorMessage = 'Erro de conexão. Verifique sua internet.';
+       }
+       
+       this.showError(errorMessage);
+       this.addActivityLog(`❌ Erro ao enviar teste: ${errorMessage}`, 'error');
+     }
+   }
+
+   // NOVO MÉTODO: Adicionar log de atividade
+   addActivityLog(message, type = 'info') {
+     try {
+       const logsContainer = document.getElementById('activityLogs');
+       if (!logsContainer) return;
+       
+       const logElement = document.createElement('div');
+       const timestamp = new Date().toLocaleTimeString('pt-BR');
+       
+       let icon = 'ℹ️';
+       let colorClass = 'text-gray-300';
+       
+       if (type === 'success') {
+         icon = '✅';
+         colorClass = 'text-green-400';
+       } else if (type === 'error') {
+         icon = '❌';
+         colorClass = 'text-red-400';
+       } else if (type === 'warning') {
+         icon = '⚠️';
+         colorClass = 'text-yellow-400';
+       }
+       
+       logElement.innerHTML = `
+         <div class="flex items-center space-x-2 ${colorClass}">
+           <span class="text-xs opacity-70">${timestamp}</span>
+           <span>${icon}</span>
+           <span class="text-sm">${message}</span>
+         </div>
+       `;
+       
+       logsContainer.insertBefore(logElement, logsContainer.firstChild);
+       
+       // Manter apenas os últimos 10 logs
+       const logs = logsContainer.children;
+       if (logs.length > 10) {
+         logsContainer.removeChild(logs[logs.length - 1]);
+       }
+       
+     } catch (error) {
+       console.error('❌ [FRONTEND] Erro ao adicionar log:', error);
+     }
+   }
+ }
 
 // Inicializar quando DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
@@ -1017,6 +1155,17 @@ window.clearAllData = function() {
   if (window.whatsappCompanyHeader) {
     console.log('🔍 [FRONTEND] Instância encontrada, executando clearAllData...');
     window.whatsappCompanyHeader.clearAllData();
+  } else {
+    console.error('❌ [FRONTEND] Instância WhatsAppCompanyHeader não encontrada!');
+  }
+};
+
+// NOVA FUNÇÃO: Enviar teste WhatsApp
+window.sendTestWhatsApp = function() {
+  console.log('🔍 [FRONTEND] Função global sendTestWhatsApp() chamada');
+  if (window.whatsappCompanyHeader) {
+    console.log('🔍 [FRONTEND] Instância encontrada, executando sendTestWhatsApp...');
+    window.whatsappCompanyHeader.sendTestWhatsApp();
   } else {
     console.error('❌ [FRONTEND] Instância WhatsAppCompanyHeader não encontrada!');
   }
