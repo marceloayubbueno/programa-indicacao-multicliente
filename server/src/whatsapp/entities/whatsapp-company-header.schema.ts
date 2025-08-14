@@ -8,7 +8,7 @@ export class WhatsAppCompanyHeader {
   @Prop({ required: true, index: true })
   clientId: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Object })
   companyInfo: {
     name: string;
     description?: string;
@@ -18,7 +18,7 @@ export class WhatsAppCompanyHeader {
     address?: string;
   };
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Object })
   socialMedia: {
     instagram?: string;
     facebook?: string;
@@ -26,14 +26,14 @@ export class WhatsAppCompanyHeader {
     whatsapp?: string;
   };
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Object })
   headerConfig: {
     enabled: boolean;
     separator: string;
     customText?: string;
   };
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Object })
   activeFields: {
     description: boolean;
     website: boolean;
