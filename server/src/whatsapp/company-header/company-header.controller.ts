@@ -59,7 +59,23 @@ export class CompanyHeaderController {
   ) {
     console.log('🔍 [CONTROLLER] PUT /whatsapp/company-header - Iniciando...');
     console.log('🔍 [CONTROLLER] clientId recebido:', clientId);
-    console.log('🔍 [CONTROLLER] dados recebidos:', JSON.stringify(updateCompanyHeaderDto, null, 2));
+    console.log('🔍 [CONTROLLER] dados recebidos (RAW):', JSON.stringify(updateCompanyHeaderDto, null, 2));
+    
+    // Validar se todos os campos obrigatórios estão presentes
+    const requiredFields = ['companyInfo', 'socialMedia', 'headerConfig', 'activeFields'];
+    const missingFields = requiredFields.filter(field => !updateCompanyHeaderDto[field]);
+    
+    if (missingFields.length > 0) {
+      console.error('❌ [CONTROLLER] Campos obrigatórios ausentes:', missingFields);
+      throw new Error(`Campos obrigatórios ausentes: ${missingFields.join(', ')}`);
+    }
+    
+    // Validar estrutura dos dados
+    console.log('🔍 [CONTROLLER] Validando estrutura dos dados...');
+    console.log('🔍 [CONTROLLER] companyInfo:', updateCompanyHeaderDto.companyInfo);
+    console.log('🔍 [CONTROLLER] socialMedia:', updateCompanyHeaderDto.socialMedia);
+    console.log('🔍 [CONTROLLER] headerConfig:', updateCompanyHeaderDto.headerConfig);
+    console.log('🔍 [CONTROLLER] activeFields:', updateCompanyHeaderDto.activeFields);
     
     try {
       const config = await this.companyHeaderService.upsertByClientId(clientId, updateCompanyHeaderDto as CreateCompanyHeaderDto);
