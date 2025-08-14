@@ -483,25 +483,11 @@ class WhatsAppCompanyHeader {
   resetCompanyHeader() {
     console.log('🔍 [FRONTEND] resetCompanyHeader() - Iniciando reset...');
     
-    if (confirm('Tem certeza que deseja resetar todas as configurações?')) {
+    if (confirm('Tem certeza que deseja resetar todas as configurações? Isso limpará todos os dados salvos.')) {
       console.log('🔍 [FRONTEND] Usuário confirmou reset');
       
-      // Limpar formulário
-      const form = document.querySelector('form');
-      if (form) {
-        form.reset();
-        console.log('🔍 [FRONTEND] Formulário resetado');
-      }
-      
-      // Limpar localStorage
-      localStorage.removeItem('whatsapp-company-header');
-      console.log('🔍 [FRONTEND] localStorage limpo');
-      
-      // Recarregar configuração padrão
-      this.loadCompanyHeader();
-      
-      // Atualizar preview
-      this.updateMessagePreview();
+      // Usar o novo método para limpar tudo
+      this.clearAllData();
       
       this.showSuccess('Configuração resetada com sucesso!');
       console.log('✅ [FRONTEND] Reset concluído com sucesso');
@@ -523,6 +509,66 @@ class WhatsAppCompanyHeader {
   showError(message) {
     console.error('❌ [FRONTEND] ERROR:', message);
     alert(message); // TODO: Substituir por notificação mais elegante
+  }
+
+  // Método para limpar completamente o localStorage e forçar recarregamento
+  clearAllData() {
+    console.log('🔍 [FRONTEND] clearAllData() - Limpando todos os dados...');
+    
+    // Limpar localStorage
+    localStorage.removeItem('whatsapp-company-header');
+    console.log('✅ [FRONTEND] localStorage limpo');
+    
+    // Limpar configuração atual
+    this.config = null;
+    
+    // Limpar formulário
+    this.clearForm();
+    
+    // Recarregar dados do servidor
+    this.loadCompanyHeader();
+    
+    console.log('✅ [FRONTEND] Todos os dados foram limpos e recarregados');
+  }
+
+  // Método para limpar o formulário
+  clearForm() {
+    console.log('🔍 [FRONTEND] clearForm() - Limpando formulário...');
+    
+    try {
+      // Limpar todos os campos de texto
+      const textFields = [
+        'companyName', 'companyDescription', 'website', 'phone', 'email',
+        'instagram', 'facebook', 'linkedin', 'whatsapp', 'separator', 'customText'
+      ];
+      
+      textFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+          field.value = '';
+          console.log(`🔍 [FRONTEND] Campo ${id} limpo`);
+        }
+      });
+      
+      // Desmarcar todos os checkboxes
+      const checkboxes = [
+        'includeDescription', 'includeWebsite', 'includePhone', 'includeEmail',
+        'includeInstagram', 'includeFacebook', 'includeLinkedin', 'includeWhatsapp',
+        'headerEnabled'
+      ];
+      
+      checkboxes.forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+          checkbox.checked = false;
+          console.log(`🔍 [FRONTEND] Checkbox ${id} desmarcado`);
+        }
+      });
+      
+      console.log('✅ [FRONTEND] Formulário limpo com sucesso');
+    } catch (error) {
+      console.error('❌ [FRONTEND] Erro ao limpar formulário:', error);
+    }
   }
 }
 
@@ -558,6 +604,17 @@ window.previewHeader = function() {
   if (window.whatsappCompanyHeader) {
     console.log('🔍 [FRONTEND] Instância encontrada, executando previewHeader...');
     window.whatsappCompanyHeader.previewHeader();
+  } else {
+    console.error('❌ [FRONTEND] Instância WhatsAppCompanyHeader não encontrada!');
+  }
+};
+
+// NOVA FUNÇÃO: Limpar todos os dados e forçar recarregamento
+window.clearAllData = function() {
+  console.log('🔍 [FRONTEND] Função global clearAllData() chamada');
+  if (window.whatsappCompanyHeader) {
+    console.log('🔍 [FRONTEND] Instância encontrada, executando clearAllData...');
+    window.whatsappCompanyHeader.clearAllData();
   } else {
     console.error('❌ [FRONTEND] Instância WhatsAppCompanyHeader não encontrada!');
   }
