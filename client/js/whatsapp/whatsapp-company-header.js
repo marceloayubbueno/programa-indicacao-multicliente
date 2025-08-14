@@ -93,32 +93,47 @@ class WhatsAppCompanyHeader {
         }
       }
       
-      console.log('⚠️ [FRONTEND] Não foi possível carregar do servidor, usando dados mock...');
-      // Se não conseguir do servidor, usar dados mock como fallback
-      const mockData = {
+      // Se não conseguir do servidor, verificar localStorage
+      console.log('⚠️ [FRONTEND] Não foi possível carregar do servidor, verificando localStorage...');
+      const savedData = localStorage.getItem('whatsapp-company-header');
+      
+      if (savedData) {
+        try {
+          this.config = JSON.parse(savedData);
+          this.populateForm();
+          console.log('✅ [FRONTEND] Configuração carregada do localStorage:', this.config);
+          return;
+        } catch (parseError) {
+          console.error('❌ [FRONTEND] Erro ao parsear dados do localStorage:', parseError);
+        }
+      }
+      
+      // Se não houver dados salvos, usar dados padrão vazios
+      console.log('⚠️ [FRONTEND] Nenhum dado encontrado, usando dados padrão vazios...');
+      const defaultData = {
         companyInfo: {
-          name: 'Viral lead',
-          description: 'Plataforma de indicação',
-          website: 'https://virallead.com.br/',
-          phone: '28999468999',
-          email: 'marcelo_ayub@hotmail.com'
+          name: '',
+          description: '',
+          website: '',
+          phone: '',
+          email: ''
         },
         socialMedia: {
-          instagram: '@empresa',
-          facebook: 'facebook.com/empresa',
-          linkedin: 'linkedin.com/company/empresa',
-          whatsapp: '(11) 99999-9999'
+          instagram: '',
+          facebook: '',
+          linkedin: '',
+          whatsapp: ''
         },
         headerConfig: {
           enabled: false,
           separator: '---',
-          customText: 'Texto adicional opcional'
+          customText: ''
         },
         activeFields: {
-          description: true,
-          website: true,
-          phone: true,
-          email: true,
+          description: false,
+          website: false,
+          phone: false,
+          email: false,
           instagram: false,
           facebook: false,
           linkedin: false,
@@ -126,12 +141,24 @@ class WhatsAppCompanyHeader {
         }
       };
 
-      this.config = mockData;
+      this.config = defaultData;
       this.populateForm();
-      console.log('Usando dados mock como fallback');
+      console.log('✅ [FRONTEND] Formulário preenchido com dados padrão vazios');
       
     } catch (error) {
-      console.error('Erro ao carregar configuração:', error);
+      console.error('❌ [FRONTEND] Erro ao carregar configuração:', error);
+      
+      // Em caso de erro, usar dados padrão vazios
+      const defaultData = {
+        companyInfo: { name: '', description: '', website: '', phone: '', email: '' },
+        socialMedia: { instagram: '', facebook: '', linkedin: '', whatsapp: '' },
+        headerConfig: { enabled: false, separator: '---', customText: '' },
+        activeFields: { description: false, website: false, phone: false, email: false, instagram: false, facebook: false, linkedin: false, whatsapp: false }
+      };
+      
+      this.config = defaultData;
+      this.populateForm();
+      console.log('✅ [FRONTEND] Formulário preenchido com dados padrão após erro');
     }
   }
 
