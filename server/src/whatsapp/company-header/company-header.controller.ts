@@ -15,17 +15,41 @@ export class CompanyHeaderController {
     @Body() createCompanyHeaderDto: CreateCompanyHeaderDto,
     @ClientId() clientId: string,
   ) {
-    const dtoWithClientId = { ...createCompanyHeaderDto, clientId };
-    return this.companyHeaderService.create(dtoWithClientId);
+    console.log('🔍 [CONTROLLER] POST /whatsapp/company-header - Iniciando...');
+    console.log('🔍 [CONTROLLER] clientId recebido:', clientId);
+    console.log('🔍 [CONTROLLER] dados recebidos:', JSON.stringify(createCompanyHeaderDto, null, 2));
+    
+    try {
+      const dtoWithClientId = { ...createCompanyHeaderDto, clientId };
+      const result = await this.companyHeaderService.create(dtoWithClientId);
+      console.log('✅ [CONTROLLER] Configuração criada com sucesso:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ [CONTROLLER] Erro ao criar:', error);
+      throw error;
+    }
   }
 
   @Get()
   async findByClientId(@ClientId() clientId: string) {
-    const config = await this.companyHeaderService.findByClientId(clientId);
-    if (!config) {
-      return { message: 'Configuração não encontrada', data: null };
+    console.log('🔍 [CONTROLLER] GET /whatsapp/company-header - Iniciando...');
+    console.log('🔍 [CONTROLLER] clientId recebido:', clientId);
+    
+    try {
+      const config = await this.companyHeaderService.findByClientId(clientId);
+      console.log('🔍 [CONTROLLER] Resultado da busca:', config ? 'ENCONTRADO' : 'NÃO ENCONTRADO');
+      if (config) {
+        console.log('🔍 [CONTROLLER] Dados encontrados:', JSON.stringify(config, null, 2));
+      }
+      
+      if (!config) {
+        return { message: 'Configuração não encontrada', data: null };
+      }
+      return { message: 'Configuração encontrada', data: config };
+    } catch (error) {
+      console.error('❌ [CONTROLLER] Erro ao buscar:', error);
+      throw error;
     }
-    return { message: 'Configuração encontrada', data: config };
   }
 
   @Put()
@@ -33,35 +57,55 @@ export class CompanyHeaderController {
     @Body() updateCompanyHeaderDto: UpdateCompanyHeaderDto,
     @ClientId() clientId: string,
   ) {
-    console.log('🔍 [DEBUG] PUT /whatsapp/company-header - Iniciando...');
-    console.log('🔍 [DEBUG] clientId recebido:', clientId);
-    console.log('🔍 [DEBUG] dados recebidos:', JSON.stringify(updateCompanyHeaderDto, null, 2));
+    console.log('🔍 [CONTROLLER] PUT /whatsapp/company-header - Iniciando...');
+    console.log('🔍 [CONTROLLER] clientId recebido:', clientId);
+    console.log('🔍 [CONTROLLER] dados recebidos:', JSON.stringify(updateCompanyHeaderDto, null, 2));
     
     try {
       const config = await this.companyHeaderService.upsertByClientId(clientId, updateCompanyHeaderDto as CreateCompanyHeaderDto);
-      console.log('✅ [DEBUG] Configuração salva com sucesso:', config);
+      console.log('✅ [CONTROLLER] Configuração salva com sucesso:', config);
       return { message: 'Configuração atualizada com sucesso', data: config };
     } catch (error) {
-      console.error('❌ [DEBUG] Erro ao salvar:', error);
+      console.error('❌ [CONTROLLER] Erro ao salvar:', error);
       throw error;
     }
   }
 
   @Delete()
   async deleteByClientId(@ClientId() clientId: string) {
-    const deleted = await this.companyHeaderService.deleteByClientId(clientId);
-    if (deleted) {
-      return { message: 'Configuração removida com sucesso' };
+    console.log('🔍 [CONTROLLER] DELETE /whatsapp/company-header - Iniciando...');
+    console.log('🔍 [CONTROLLER] clientId recebido:', clientId);
+    
+    try {
+      const deleted = await this.companyHeaderService.deleteByClientId(clientId);
+      console.log('🔍 [CONTROLLER] Resultado da exclusão:', deleted ? 'EXCLUÍDO' : 'NÃO ENCONTRADO');
+      
+      if (deleted) {
+        return { message: 'Configuração removida com sucesso' };
+      }
+      return { message: 'Configuração não encontrada' };
+    } catch (error) {
+      console.error('❌ [CONTROLLER] Erro ao excluir:', error);
+      throw error;
     }
-    return { message: 'Configuração não encontrada' };
   }
 
   @Get('active')
   async findActiveByClientId(@ClientId() clientId: string) {
-    const config = await this.companyHeaderService.findActiveByClientId(clientId);
-    if (!config) {
-      return { message: 'Configuração ativa não encontrada', data: null };
+    console.log('🔍 [CONTROLLER] GET /whatsapp/company-header/active - Iniciando...');
+    console.log('🔍 [CONTROLLER] clientId recebido:', clientId);
+    
+    try {
+      const config = await this.companyHeaderService.findActiveByClientId(clientId);
+      console.log('🔍 [CONTROLLER] Resultado da busca ativa:', config ? 'ENCONTRADO' : 'NÃO ENCONTRADO');
+      
+      if (!config) {
+        return { message: 'Configuração ativa não encontrada', data: null };
+      }
+      return { message: 'Configuração ativa encontrada', data: config };
+    } catch (error) {
+      console.error('❌ [CONTROLLER] Erro ao buscar ativo:', error);
+      throw error;
     }
-    return { message: 'Configuração ativa encontrada', data: config };
   }
 }
