@@ -69,8 +69,10 @@ class WhatsAppCompanyHeader {
     console.log('🔍 [FRONTEND] loadCompanyHeader() - Iniciando carregamento...');
     try {
       // Tentar carregar do servidor primeiro
-      const url = '/api/whatsapp/company-header';
+      const apiUrl = window.APP_CONFIG?.API_URL || '/api';
+      const url = `${apiUrl}/whatsapp/company-header`;
       console.log('🔍 [FRONTEND] Fazendo requisição para:', url);
+      console.log('🔍 [FRONTEND] API_URL configurada:', apiUrl);
       
       const response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${this.getJWTToken()}` }
@@ -363,8 +365,10 @@ class WhatsAppCompanyHeader {
       console.log('🔍 [FRONTEND] Dados do formulário:', JSON.stringify(formData, null, 2));
       
       // Salvar no backend via API
-      const url = '/api/whatsapp/company-header';
+      const apiUrl = window.APP_CONFIG?.API_URL || '/api';
+      const url = `${apiUrl}/whatsapp/company-header`;
       console.log('🔍 [FRONTEND] Fazendo requisição PUT para:', url);
+      console.log('🔍 [FRONTEND] API_URL configurada:', apiUrl);
       
       const response = await fetch(url, {
         method: 'PUT',
