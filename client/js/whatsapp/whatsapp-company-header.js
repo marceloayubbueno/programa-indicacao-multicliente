@@ -292,109 +292,108 @@ class WhatsAppCompanyHeader {
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-600">
               <div class="text-blue-300 font-semibold mb-3">🍎 Preview EXATO - iPhone REAL + WhatsApp Dark:</div>
               
-              <!-- iPhone REAL com formato super arredondado -->
+              <!-- iPhone REAL com template Tailwind profissional -->
               <div class="mx-auto max-w-sm">
-                <!-- Frame do iPhone REAL -->
                 <div class="relative mx-auto">
-                  <!-- Bordas do iPhone com formato REAL super arredondado -->
-                  <div class="w-80 h-[750px] bg-black rounded-[8rem] p-5 shadow-2xl">
-                    <!-- Tela do iPhone com fundo ESCURO -->
-                    <div class="w-full h-full bg-black rounded-[7rem] overflow-hidden relative">
-                      <!-- Notch Superior (Dynamic Island) -->
-                      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-36 h-8 bg-black rounded-b-3xl z-10 flex items-center justify-center">
-                        <div class="w-20 h-1 bg-black rounded-full"></div>
+                  <!-- iPhone REAL com bordas MÁXIMAS -->
+                  <div class="w-80 h-[800px] bg-gradient-to-b from-gray-900 to-black rounded-[40px] p-6 shadow-2xl border-4 border-gray-800">
+                    <!-- Tela do iPhone com bordas MÁXIMAS -->
+                    <div class="w-full h-full bg-black rounded-[32px] overflow-hidden relative">
+                      <!-- Notch Superior REAL -->
+                      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-10 bg-black rounded-b-3xl z-10 flex items-center justify-center">
+                        <div class="w-24 h-1.5 bg-gray-700 rounded-full"></div>
                       </div>
                       
-                      <!-- Status Bar EXATA como a imagem -->
-                      <div class="absolute top-2 left-0 right-0 flex justify-between items-center px-8 text-white text-xs font-medium z-20">
+                      <!-- Status Bar iOS REAL -->
+                      <div class="absolute top-3 left-0 right-0 flex justify-between items-center px-10 text-white text-xs font-medium z-20">
                         <div class="flex items-center space-x-2">
                           <span class="font-semibold">16:46</span>
-                          <div class="w-3 h-2 border border-white rounded-tl-sm rounded-tr-sm border-b-0"></div>
+                          <div class="w-4 h-2.5 border border-white rounded-tl-sm rounded-tr-sm border-b-0"></div>
                         </div>
                         <div class="flex items-center space-x-2">
                           <div class="w-1 h-1 bg-white rounded-full"></div>
                           <div class="w-1 h-1 bg-white rounded-full"></div>
                           <div class="w-1 h-1 bg-white rounded-full"></div>
-                          <div class="w-3 h-2 border border-white rounded-tl-sm rounded-tr-sm border-b-0"></div>
+                          <div class="w-4 h-2.5 border border-white rounded-tl-sm rounded-tr-sm border-b-0"></div>
                           <span class="text-white">31</span>
                         </div>
                       </div>
                       
-                      <!-- Cabeçalho WhatsApp EXATO como a imagem -->
-                      <div class="bg-[#075E54] text-white pt-14 pb-4 px-4 relative">
+                      <!-- Cabeçalho WhatsApp REAL -->
+                      <div class="bg-[#075E54] text-white pt-16 pb-4 px-4 relative">
                         <div class="flex items-center justify-between">
                           <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center shadow-sm">
-                              <i class="fas fa-sticky-note text-white text-lg"></i>
+                            <div class="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center shadow-lg">
+                              <i class="fas fa-sticky-note text-white text-xl"></i>
                             </div>
                             <div>
-                              <div class="font-bold text-base">ANOTAÇÕES</div>
+                              <div class="font-bold text-lg">ANOTAÇÕES</div>
                               <div class="text-sm opacity-90">Você</div>
                             </div>
                           </div>
                           <div class="flex items-center space-x-4">
-                            <i class="fas fa-video text-white text-lg opacity-80"></i>
-                            <i class="fas fa-phone text-white text-lg opacity-80"></i>
-                            <i class="fas fa-ellipsis-v text-white text-lg opacity-80"></i>
+                            <i class="fas fa-video text-white text-xl opacity-80"></i>
+                            <i class="fas fa-phone text-white text-xl opacity-80"></i>
+                            <i class="fas fa-ellipsis-v text-white text-xl opacity-80"></i>
                           </div>
                         </div>
                       </div>
                       
-                      <!-- Corpo do Chat com fundo ESCURO como a imagem -->
+                      <!-- Corpo do Chat REAL -->
                       <div class="bg-gray-900 h-full p-4 overflow-y-auto relative">
-                        <!-- Background Pattern ESCURO como na imagem -->
-                        <div class="absolute inset-0 opacity-20">
+                        <!-- Background Pattern REAL -->
+                        <div class="absolute inset-0 opacity-10">
                           <div class="w-full h-full" style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23FFFFFF" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
                         </div>
                         
-                        <!-- Separador "Hoje" EXATO como a imagem -->
+                        <!-- Separador "Hoje" REAL -->
                         <div class="flex justify-center mb-4 relative z-10">
-                          <div class="bg-gray-700 text-white text-xs rounded-full px-4 py-1.5 font-medium">Hoje</div>
+                          <div class="bg-gray-700 text-white text-xs rounded-full px-4 py-2 font-medium">Hoje</div>
                         </div>
                         
-                        <!-- Mensagem EXATA como a imagem com conteúdo DINÂMICO -->
+                        <!-- Mensagem REAL com conteúdo DINÂMICO -->
                         <div class="flex justify-end relative z-10">
                           <div class="max-w-xs">
-                            <div class="bg-[#075E54] p-4 rounded-2xl shadow-sm relative">
-                              <!-- Triângulo da mensagem (tail) -->
-                              <div class="absolute bottom-0 right-0 w-0 h-0 border-l-[8px] border-l-transparent border-t-[8px] border-t-[#075E54] transform translate-x-1"></div>
+                            <div class="bg-[#075E54] p-4 rounded-3xl shadow-lg relative">
+                              <!-- Triângulo da mensagem REAL -->
+                              <div class="absolute bottom-0 right-0 w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-[#075E54] transform translate-x-1"></div>
                               
-                              <!-- Conteúdo da mensagem DINÂMICO baseado nos checkboxes -->
-                              <div class="text-white text-sm space-y-2">
+                              <!-- Conteúdo da mensagem DINÂMICO -->
+                              <div class="text-white text-sm space-y-3">
                                 ${this.generateDynamicMessageContent()}
-                                <div class="text-xs text-gray-300 mt-2 text-right">16:44 ✓</div>
+                                <div class="text-xs text-gray-300 mt-3 text-right">16:44 ✓</div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                       
-                      <!-- Barra de Input EXATA como a imagem -->
-                      <div class="absolute bottom-0 left-0 right-0 bg-black border-t border-gray-800 px-4 py-3">
+                      <!-- Barra de Input REAL -->
+                      <div class="absolute bottom-0 left-0 right-0 bg-black border-t border-gray-800 px-4 py-4">
                         <div class="flex items-center space-x-3">
-                          <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-                            <i class="fas fa-plus text-white text-sm"></i>
+                          <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+                            <i class="fas fa-plus text-white text-base"></i>
                           </div>
-                          <div class="flex-1 bg-gray-700 rounded-full px-4 py-2 flex items-center">
+                          <div class="flex-1 bg-gray-700 rounded-full px-4 py-3 flex items-center">
                             <i class="fas fa-search text-gray-400 mr-2"></i>
                             <span class="text-gray-400 text-sm">Mensagem</span>
                           </div>
-                          <div class="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
-                            <i class="fas fa-camera text-white text-sm"></i>
+                          <div class="w-10 h-10 bg-transparent rounded-full flex items-center justify-center">
+                            <i class="fas fa-camera text-white text-base"></i>
                           </div>
-                          <div class="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
-                            <i class="fas fa-image text-white text-sm"></i>
+                          <div class="w-10 h-10 bg-transparent rounded-full flex items-center justify-center">
+                            <i class="fas fa-image text-white text-base"></i>
                           </div>
-                          <div class="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
-                            <i class="fas fa-microphone text-white text-sm"></i>
+                          <div class="w-10 h-10 bg-transparent rounded-full flex items-center justify-center">
+                            <i class="fas fa-microphone text-white text-base"></i>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <!-- Home Indicator iOS -->
-                  <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-black rounded-full"></div>
+                  <!-- Home Indicator iOS REAL -->
+                  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-36 h-1.5 bg-black rounded-full"></div>
                 </div>
               </div>
             </div>
@@ -412,52 +411,52 @@ class WhatsAppCompanyHeader {
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-600">
               <div class="text-blue-300 font-semibold mb-3">🍎 Preview EXATO - iPhone REAL + WhatsApp Dark:</div>
               
-              <!-- iPhone Vazio com formato REAL super arredondado -->
+              <!-- iPhone Vazio com template Tailwind REAL -->
               <div class="mx-auto max-w-sm">
                 <div class="relative mx-auto">
-                  <div class="w-80 h-[750px] bg-black rounded-[8rem] p-5 shadow-2xl">
-                    <div class="w-full h-full bg-black rounded-[7rem] overflow-hidden relative">
-                      <!-- Notch Superior (Dynamic Island) -->
-                      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-36 h-8 bg-black rounded-b-3xl z-10 flex items-center justify-center">
-                        <div class="w-20 h-1 bg-black rounded-full"></div>
+                  <div class="w-80 h-[800px] bg-gradient-to-b from-gray-900 to-black rounded-[40px] p-6 shadow-2xl border-4 border-gray-800">
+                    <div class="w-full h-full bg-black rounded-[32px] overflow-hidden relative">
+                      <!-- Notch Superior REAL -->
+                      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-10 bg-black rounded-b-3xl z-10 flex items-center justify-center">
+                        <div class="w-24 h-1.5 bg-gray-700 rounded-full"></div>
                       </div>
                       
-                      <!-- Status Bar iOS -->
-                      <div class="absolute top-2 left-0 right-0 flex justify-between items-center px-8 text-white text-xs font-medium z-20">
+                      <!-- Status Bar iOS REAL -->
+                      <div class="absolute top-3 left-0 right-0 flex justify-between items-center px-10 text-white text-xs font-medium z-20">
                         <div class="flex items-center space-x-2">
                           <span class="font-semibold">16:46</span>
-                          <div class="w-3 h-2 border border-white rounded-tl-sm rounded-tr-sm border-b-0"></div>
+                          <div class="w-4 h-2.5 border border-white rounded-tl-sm rounded-tr-sm border-b-0"></div>
                         </div>
                         <div class="flex items-center space-x-2">
                           <div class="w-1 h-1 bg-white rounded-full"></div>
                           <div class="w-1 h-1 bg-white rounded-full"></div>
                           <div class="w-1 h-1 bg-white rounded-full"></div>
-                          <div class="w-3 h-2 border border-white rounded-tl-sm rounded-tr-sm border-b-0"></div>
+                          <div class="w-4 h-2.5 border border-white rounded-tl-sm rounded-tr-sm border-b-0"></div>
                           <span class="text-white">31</span>
                         </div>
                       </div>
                       
-                      <!-- Cabeçalho WhatsApp -->
-                      <div class="bg-[#075E54] text-white pt-14 pb-4 px-4 relative">
+                      <!-- Cabeçalho WhatsApp REAL -->
+                      <div class="bg-[#075E54] text-white pt-16 pb-4 px-4 relative">
                         <div class="flex items-center justify-between">
                           <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center shadow-sm">
-                              <i class="fas fa-sticky-note text-white text-lg"></i>
+                            <div class="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center shadow-lg">
+                              <i class="fas fa-sticky-note text-white text-xl"></i>
                             </div>
                             <div>
-                              <div class="font-bold text-base">ANOTAÇÕES</div>
+                              <div class="font-bold text-lg">ANOTAÇÕES</div>
                               <div class="text-sm opacity-90">Você</div>
                             </div>
                           </div>
                           <div class="flex items-center space-x-4">
-                            <i class="fas fa-video text-white text-lg opacity-80"></i>
-                            <i class="fas fa-phone text-white text-lg opacity-80"></i>
-                            <i class="fas fa-ellipsis-v text-white text-lg opacity-80"></i>
+                            <i class="fas fa-video text-white text-xl opacity-80"></i>
+                            <i class="fas fa-phone text-white text-xl opacity-80"></i>
+                            <i class="fas fa-ellipsis-v text-white text-xl opacity-80"></i>
                           </div>
                         </div>
                       </div>
                       
-                      <!-- Corpo do Chat Vazio com fundo ESCURO -->
+                      <!-- Corpo do Chat Vazio REAL -->
                       <div class="bg-gray-900 h-full flex items-center justify-center">
                         <div class="text-center text-gray-500">
                           <i class="fas fa-comment-dots text-6xl mb-4 opacity-30"></i>
@@ -465,32 +464,32 @@ class WhatsAppCompanyHeader {
                         </div>
                       </div>
                       
-                      <!-- Barra de Input -->
-                      <div class="absolute bottom-0 left-0 right-0 bg-black border-t border-gray-800 px-4 py-3">
+                      <!-- Barra de Input REAL -->
+                      <div class="absolute bottom-0 left-0 right-0 bg-black border-t border-gray-800 px-4 py-4">
                         <div class="flex items-center space-x-3">
-                          <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-                            <i class="fas fa-plus text-white text-sm"></i>
+                          <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+                            <i class="fas fa-plus text-white text-base"></i>
                           </div>
-                          <div class="flex-1 bg-gray-700 rounded-full px-4 py-2 flex items-center">
+                          <div class="flex-1 bg-gray-700 rounded-full px-4 py-3 flex items-center">
                             <i class="fas fa-search text-gray-400 mr-2"></i>
                             <span class="text-gray-400 text-sm">Mensagem</span>
                           </div>
-                          <div class="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
-                            <i class="fas fa-camera text-white text-sm"></i>
+                          <div class="w-10 h-10 bg-transparent rounded-full flex items-center justify-center">
+                            <i class="fas fa-camera text-white text-base"></i>
                           </div>
-                          <div class="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
-                            <i class="fas fa-image text-white text-sm"></i>
+                          <div class="w-10 h-10 bg-transparent rounded-full flex items-center justify-center">
+                            <i class="fas fa-image text-white text-base"></i>
                           </div>
-                          <div class="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
-                            <i class="fas fa-microphone text-white text-sm"></i>
+                          <div class="w-10 h-10 bg-transparent rounded-full flex items-center justify-center">
+                            <i class="fas fa-microphone text-white text-base"></i>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <!-- Home Indicator iOS -->
-                  <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-black rounded-full"></div>
+                  <!-- Home Indicator iOS REAL -->
+                  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-36 h-1.5 bg-black rounded-full"></div>
                 </div>
               </div>
             </div>
