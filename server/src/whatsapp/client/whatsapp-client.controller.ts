@@ -122,22 +122,29 @@ export class WhatsAppClientController {
   @UseGuards(JwtClientAuthGuard)
   async sendTestMessage(
     @Request() req,
-    @Body() messageData: { to: string; message: string }
+    @Body() messageData: { phoneNumber: string; message: string; clientId?: string }
   ) {
     try {
       const clientId = req.user.clientId;
-      const result = await this.whatsAppClientService.sendTestMessage(clientId, messageData);
+      
+      // Mapear phoneNumber para 'to' (compatibilidade com Twilio)
+      const mappedData = {
+        to: messageData.phoneNumber,
+        message: messageData.message
+      };
+      
+      const result = await this.whatsAppClientService.sendTestMessage(clientId, mappedData);
 
       return {
         success: true,
-        message: 'Mensagem enviada com sucesso',
+        message: 'Mensagem de teste enviada com sucesso',
         data: result
       };
     } catch (error) {
       throw new HttpException(
         {
           success: false,
-          message: error.message || 'Erro ao enviar mensagem',
+          message: error.message || 'Erro ao enviar mensagem de teste',
           error: error.response?.message || error.message
         },
         error.status || HttpStatus.BAD_REQUEST
