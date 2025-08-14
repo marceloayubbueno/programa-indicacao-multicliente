@@ -40,7 +40,14 @@ export class CompanyHeaderService {
     const update = { ...companyHeaderData, clientId };
     const options = { upsert: true, new: true, setDefaultsOnInsert: true };
 
-    return this.companyHeaderModel.findOneAndUpdate(filter, update, options).exec();
+    const result = await this.companyHeaderModel.findOneAndUpdate(filter, update, options).exec();
+    
+    if (!result) {
+      // Se por algum motivo não retornou, criar manualmente
+      return this.create(companyHeaderData as CreateCompanyHeaderDto);
+    }
+    
+    return result;
   }
 
   async deleteByClientId(clientId: string): Promise<boolean> {
