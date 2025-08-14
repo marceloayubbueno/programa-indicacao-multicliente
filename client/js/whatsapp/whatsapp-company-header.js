@@ -288,18 +288,18 @@ class WhatsAppCompanyHeader {
               <div class="text-gray-300 whitespace-pre-line">${headerContent}</div>
             </div>
             
-            <!-- Preview EXATO como a imagem - iPhone Real + WhatsApp Dark -->
+            <!-- Preview EXATO como a imagem - iPhone REAL + WhatsApp Dark -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-600">
-              <div class="text-blue-300 font-semibold mb-3">🍎 Preview EXATO - iPhone + WhatsApp Dark:</div>
+              <div class="text-blue-300 font-semibold mb-3">🍎 Preview EXATO - iPhone REAL + WhatsApp Dark:</div>
               
-              <!-- iPhone Real com formato correto -->
+              <!-- iPhone REAL com formato super arredondado -->
               <div class="mx-auto max-w-sm">
                 <!-- Frame do iPhone REAL -->
                 <div class="relative mx-auto">
-                  <!-- Bordas do iPhone com formato REAL -->
-                  <div class="w-80 h-[700px] bg-black rounded-[4rem] p-3 shadow-2xl">
+                  <!-- Bordas do iPhone com formato REAL super arredondado -->
+                  <div class="w-80 h-[700px] bg-black rounded-[5rem] p-4 shadow-2xl">
                     <!-- Tela do iPhone com fundo ESCURO -->
-                    <div class="w-full h-full bg-black rounded-[3.5rem] overflow-hidden relative">
+                    <div class="w-full h-full bg-black rounded-[4rem] overflow-hidden relative">
                       <!-- Notch Superior (Dynamic Island) -->
                       <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-36 h-8 bg-black rounded-b-3xl z-10 flex items-center justify-center">
                         <div class="w-20 h-1 bg-black rounded-full"></div>
@@ -352,46 +352,16 @@ class WhatsAppCompanyHeader {
                           <div class="bg-gray-700 text-white text-xs rounded-full px-4 py-1.5 font-medium">Hoje</div>
                         </div>
                         
-                        <!-- Mensagem EXATA como a imagem -->
+                        <!-- Mensagem EXATA como a imagem com conteúdo DINÂMICO -->
                         <div class="flex justify-end relative z-10">
                           <div class="max-w-xs">
                             <div class="bg-[#075E54] p-4 rounded-2xl shadow-sm relative">
                               <!-- Triângulo da mensagem (tail) -->
                               <div class="absolute bottom-0 right-0 w-0 h-0 border-l-[8px] border-l-transparent border-t-[8px] border-t-[#075E54] transform translate-x-1"></div>
                               
-                              <!-- Conteúdo da mensagem EXATO -->
+                              <!-- Conteúdo da mensagem DINÂMICO baseado nos checkboxes -->
                               <div class="text-white text-sm space-y-2">
-                                <div class="font-semibold">Viral lead</div>
-                                <div>Plataforma de indicação de clientes</div>
-                                <div class="flex items-center space-x-2">
-                                  <i class="fas fa-globe text-green-400"></i>
-                                  <span class="text-green-400 underline">https://virallead.com.br/</span>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                  <i class="fas fa-phone text-green-400"></i>
-                                  <span class="text-green-400 underline">28999468999</span>
-                                </div>
-                                <div class="text-xs text-gray-300">16:42</div>
-                                <div class="border-t border-gray-400 my-2"></div>
-                                <div>Olá João Silva, seja bem-vindo ao nosso programa de indicações! 🎁</div>
-                                <div class="font-semibold">*Oferta Especial* Ganhe R$ 50 por cada indicação aprovada!</div>
-                                <div class="font-semibold">*Fale Conosco*</div>
-                                <div class="flex items-center space-x-2">
-                                  <i class="fab fa-whatsapp text-green-400"></i>
-                                  <span class="text-green-400 underline">WhatsApp: (28) 99946-8999</span>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                  <i class="fas fa-envelope text-green-400"></i>
-                                  <span class="text-green-400 underline">Email: marcelo_ayub@hotmail.com</span>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                  <i class="fas fa-lightbulb text-green-400"></i>
-                                  <span class="font-semibold">*Como Funciona:* 1. Indique amigos e familiares 2. Eles se cadastram usando seu código 3. Você recebe R$ 50 por cada aprovação!</span>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                  <span>🚀</span>
-                                  <span class="font-semibold">*Comece Agora!* Use o código: REF123</span>
-                                </div>
+                                ${this.generateDynamicMessageContent()}
                                 <div class="text-xs text-gray-300 mt-2 text-right">16:44 ✓</div>
                               </div>
                             </div>
@@ -430,7 +400,7 @@ class WhatsAppCompanyHeader {
             </div>
           </div>
         `;
-        console.log('✅ [FRONTEND] Preview EXATO implementado como a imagem');
+        console.log('✅ [FRONTEND] Preview EXATO implementado com iPhone REAL e mensagens dinâmicas');
       } else {
         previewDiv.innerHTML = `
           <div class="space-y-4">
@@ -438,15 +408,15 @@ class WhatsAppCompanyHeader {
               Configure os dados da empresa e marque os campos para incluir no cabeçalho...
             </div>
             
-            <!-- Preview vazio com iPhone real e fundo escuro -->
+            <!-- Preview vazio com iPhone REAL e fundo escuro -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-600">
-              <div class="text-blue-300 font-semibold mb-3">🍎 Preview EXATO - iPhone + WhatsApp Dark:</div>
+              <div class="text-blue-300 font-semibold mb-3">🍎 Preview EXATO - iPhone REAL + WhatsApp Dark:</div>
               
-              <!-- iPhone Vazio com formato REAL -->
+              <!-- iPhone Vazio com formato REAL super arredondado -->
               <div class="mx-auto max-w-sm">
                 <div class="relative mx-auto">
-                  <div class="w-80 h-[700px] bg-black rounded-[4rem] p-3 shadow-2xl">
-                    <div class="w-full h-full bg-black rounded-[3.5rem] overflow-hidden relative">
+                  <div class="w-80 h-[700px] bg-black rounded-[5rem] p-4 shadow-2xl">
+                    <div class="w-full h-full bg-black rounded-[4rem] overflow-hidden relative">
                       <!-- Notch Superior (Dynamic Island) -->
                       <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-36 h-8 bg-black rounded-b-3xl z-10 flex items-center justify-center">
                         <div class="w-20 h-1 bg-black rounded-full"></div>
@@ -526,7 +496,7 @@ class WhatsAppCompanyHeader {
             </div>
           </div>
         `;
-        console.log('🔍 [FRONTEND] Preview vazio com iPhone real e fundo escuro');
+        console.log('🔍 [FRONTEND] Preview vazio com iPhone REAL e fundo escuro');
       }
     } catch (error) {
       console.error('❌ [FRONTEND] Erro ao atualizar preview:', error);
@@ -743,6 +713,96 @@ Sua indicação foi aprovada e você ganhou R$ 50!
     });
 
     return message;
+  }
+
+  // NOVA FUNÇÃO: Gerar conteúdo dinâmico baseado nos checkboxes
+  generateDynamicMessageContent() {
+    console.log('🔍 [FRONTEND] generateDynamicMessageContent() - Gerando mensagem dinâmica...');
+    
+    let content = '';
+    
+    // Verificar cada campo e adicionar se estiver marcado
+    const companyName = document.getElementById('companyName')?.value.trim();
+    const companyDescription = document.getElementById('companyDescription')?.value.trim();
+    const companyWebsite = document.getElementById('website')?.value.trim();
+    const companyPhone = document.getElementById('phone')?.value.trim();
+    const companyEmail = document.getElementById('email')?.value.trim();
+    
+    // Verificar checkboxes com IDs corretos do HTML
+    const includeName = document.getElementById('includeCompanyName')?.checked;
+    const includeDescription = document.getElementById('includeDescription')?.checked;
+    const includeWebsite = document.getElementById('includeWebsite')?.checked;
+    const includePhone = document.getElementById('includePhone')?.checked;
+    const includeEmail = document.getElementById('includeEmail')?.checked;
+    
+    console.log('🔍 [FRONTEND] Checkboxes:', { includeName, includeDescription, includeWebsite, includePhone, includeEmail });
+    console.log('🔍 [FRONTEND] Valores:', { companyName, companyDescription, companyWebsite, companyPhone, companyEmail });
+    
+    // Adicionar campos marcados
+    if (includeName && companyName) {
+      content += `<div class="font-semibold">${companyName}</div>`;
+    }
+    
+    if (includeDescription && companyDescription) {
+      content += `<div>${companyDescription}</div>`;
+    }
+    
+    if (includeWebsite && companyWebsite) {
+      content += `<div class="flex items-center space-x-2">
+        <i class="fas fa-globe text-green-400"></i>
+        <span class="text-green-400 underline">${companyWebsite}</span>
+      </div>`;
+    }
+    
+    if (includePhone && companyPhone) {
+      content += `<div class="flex items-center space-x-2">
+        <i class="fas fa-phone text-green-400"></i>
+        <span class="text-green-400 underline">${companyPhone}</span>
+      </div>`;
+    }
+    
+    if (includeEmail && companyEmail) {
+      content += `<div class="flex items-center space-x-2">
+        <i class="fas fa-envelope text-green-400"></i>
+        <span class="text-green-400 underline">${companyEmail}</span>
+      </div>`;
+    }
+    
+    // Adicionar timestamp inicial
+    if (content) {
+      content += `<div class="text-xs text-gray-300">16:42</div>`;
+    }
+    
+    // Adicionar separador se houver conteúdo
+    if (content) {
+      content += `<div class="border-t border-gray-400 my-2"></div>`;
+    }
+    
+    // Adicionar mensagem de template
+    content += `
+      <div>Olá João Silva, seja bem-vindo ao nosso programa de indicações! 🎁</div>
+      <div class="font-semibold">*Oferta Especial* Ganhe R$ 50 por cada indicação aprovada!</div>
+      <div class="font-semibold">*Fale Conosco*</div>
+      <div class="flex items-center space-x-2">
+        <i class="fab fa-whatsapp text-green-400"></i>
+        <span class="text-green-400 underline">WhatsApp: (28) 99946-8999</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-envelope text-green-400"></i>
+        <span class="text-green-400 underline">Email: marcelo_ayub@hotmail.com</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-lightbulb text-green-400"></i>
+        <span class="font-semibold">*Como Funciona:* 1. Indique amigos e familiares 2. Eles se cadastram usando seu código 3. Você recebe R$ 50 por cada aprovação!</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span>🚀</span>
+        <span class="font-semibold">*Comece Agora!* Use o código: REF123</span>
+      </div>
+    `;
+    
+    console.log('✅ [FRONTEND] Conteúdo dinâmico gerado:', content);
+    return content;
   }
 
   async saveCompanyHeader() {
