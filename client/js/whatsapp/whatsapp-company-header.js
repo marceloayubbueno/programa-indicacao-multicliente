@@ -2,8 +2,9 @@
  * 📱 WHATSAPP COMPANY HEADER - CONFIGURAÇÃO FLEXÍVEL
  * Sistema de configuração da empresa e cabeçalho configurável para WhatsApp
  * 
- * NOVA FUNCIONALIDADE: Checkboxes individuais para cada campo
+ * FUNCIONALIDADE: Checkboxes individuais para cada campo
  * Cliente escolhe exatamente o que quer no cabeçalho
+ * MANTÉM LAYOUT ORIGINAL DO SISTEMA
  *
  * Funcionalidades:
  * - Configuração flexível da empresa (checkboxes por campo)
@@ -12,7 +13,7 @@
  * - Validações e tratamento de erros
  *
  * Autor: Sistema de Indicação
- * Versão: 2.0.0 - Flexível por Campo
+ * Versão: 2.0.0 - Flexível por Campo + Layout Original
  * Data: 2025
  */
 
@@ -134,33 +135,13 @@ function getClientIdFromToken() {
 function setupCheckboxHandlers() {
     Object.keys(fieldMappings).forEach(checkboxId => {
         const checkbox = document.getElementById(checkboxId);
-        const field = document.getElementById(fieldMappings[checkboxId]);
-        
-        if (checkbox && field) {
+        if (checkbox) {
             // Handler para mudança do checkbox
             checkbox.addEventListener('change', function() {
-                toggleField(field, this.checked);
                 updateMessagePreview();
             });
-            
-            // Handler para mudança do campo
-            field.addEventListener('input', updateMessagePreview);
         }
     });
-}
-
-// Ativar/desativar campo baseado no checkbox
-function toggleField(field, enabled) {
-    if (enabled) {
-        field.disabled = false;
-        field.classList.remove('opacity-50');
-        field.classList.add('focus:ring-2', 'focus:ring-blue-500');
-    } else {
-        field.disabled = true;
-        field.classList.add('opacity-50');
-        field.classList.remove('focus:ring-2', 'focus:ring-blue-500');
-        field.value = ''; // Limpar campo quando desabilitado
-    }
 }
 
 // ============================================================================
@@ -217,7 +198,7 @@ function getMockCompanyHeader() {
             separator: '---',
             customText: 'Entre em contato conosco!'
         },
-        // NOVA: Configuração de campos ativos
+        // Configuração de campos ativos
         activeFields: {
             description: true,
             website: true,
@@ -253,7 +234,7 @@ function getDefaultCompanyHeader() {
             separator: '---',
             customText: ''
         },
-        // NOVA: Todos os campos desabilitados por padrão
+        // Todos os campos desabilitados por padrão
         activeFields: {
             description: false,
             website: false,
@@ -289,7 +270,7 @@ function populateForm(config) {
     document.getElementById('separator').value = config.headerConfig?.separator || '---';
     document.getElementById('customText').value = config.headerConfig?.customText || '';
 
-    // NOVA: Configurar checkboxes baseado nos campos ativos
+    // Configurar checkboxes baseado nos campos ativos
     if (config.activeFields) {
         document.getElementById('includeDescription').checked = config.activeFields.description || false;
         document.getElementById('includeWebsite').checked = config.activeFields.website || false;
@@ -299,15 +280,6 @@ function populateForm(config) {
         document.getElementById('includeFacebook').checked = config.activeFields.facebook || false;
         document.getElementById('includeLinkedin').checked = config.activeFields.linkedin || false;
         document.getElementById('includeWhatsapp').checked = config.activeFields.whatsapp || false;
-
-        // Aplicar estado dos campos
-        Object.keys(fieldMappings).forEach(checkboxId => {
-            const checkbox = document.getElementById(checkboxId);
-            const field = document.getElementById(fieldMappings[checkboxId]);
-            if (checkbox && field) {
-                toggleField(field, checkbox.checked);
-            }
-        });
     }
 }
 
@@ -383,7 +355,7 @@ function collectFormData() {
             separator: document.getElementById('separator').value.trim() || '---',
             customText: document.getElementById('customText').value.trim()
         },
-        // NOVA: Coletar estado dos campos ativos
+        // Coletar estado dos campos ativos
         activeFields: {
             description: document.getElementById('includeDescription').checked,
             website: document.getElementById('includeWebsite').checked,
@@ -471,7 +443,7 @@ function updateMessagePreview() {
     }
 }
 
-// Gerar conteúdo do cabeçalho (NOVA LÓGICA FLEXÍVEL)
+// Gerar conteúdo do cabeçalho (LÓGICA FLEXÍVEL)
 function generateHeaderContent() {
     const enabled = document.getElementById('headerEnabled').checked;
     if (!enabled) return '';
