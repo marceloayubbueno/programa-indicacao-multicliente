@@ -288,14 +288,55 @@ class WhatsAppCompanyHeader {
               <div class="text-gray-300 whitespace-pre-line">${headerContent}</div>
             </div>
             
-            <!-- Preview da Mensagem Completa -->
-            <div class="bg-blue-900 p-4 rounded-lg border border-blue-600">
-              <div class="text-blue-300 font-semibold mb-2">💬 Mensagem Completa (Preview):</div>
-              <div class="text-gray-100 whitespace-pre-line bg-gray-800 p-3 rounded border border-gray-600">${fullMessage}</div>
+            <!-- Preview da Mensagem Completa - Estilo WhatsApp -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-600">
+              <div class="text-blue-300 font-semibold mb-3">💬 Mensagem Completa (Preview WhatsApp):</div>
+              
+              <!-- Telefone Simulado -->
+              <div class="mx-auto max-w-xs">
+                <!-- Cabeçalho do Telefone -->
+                <div class="bg-green-500 text-white text-center py-3 px-4 rounded-t-lg relative">
+                  <div class="flex items-center justify-center">
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
+                      <i class="fas fa-building text-green-500 text-sm"></i>
+                    </div>
+                    <div class="text-left">
+                      <div class="font-semibold text-sm">${document.getElementById('companyName')?.value.trim() || 'Empresa'}</div>
+                      <div class="text-xs opacity-90">online</div>
+                    </div>
+                  </div>
+                  <div class="absolute top-3 right-4">
+                    <i class="fas fa-phone text-white text-sm"></i>
+                  </div>
+                </div>
+                
+                <!-- Corpo da Mensagem -->
+                <div class="bg-gray-100 p-4 rounded-b-lg min-h-[300px]">
+                  <!-- Mensagem do WhatsApp -->
+                  <div class="space-y-3">
+                    <!-- Cabeçalho da Empresa -->
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                      <div class="text-gray-800 text-sm whitespace-pre-line">${headerContent}</div>
+                      <div class="text-xs text-gray-500 mt-2">${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
+                    </div>
+                    
+                    <!-- Separador -->
+                    <div class="text-center">
+                      <div class="text-gray-400 text-xs">${document.getElementById('separator')?.value.trim() || '---'}</div>
+                    </div>
+                    
+                    <!-- Mensagem do Template -->
+                    <div class="bg-green-500 text-white p-3 rounded-lg shadow-sm ml-8">
+                      <div class="text-sm whitespace-pre-line">${this.generateTemplateExample()}</div>
+                      <div class="text-xs opacity-90 mt-2 text-right">${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         `;
-        console.log('✅ [FRONTEND] Preview completo atualizado');
+        console.log('✅ [FRONTEND] Preview completo atualizado com design WhatsApp');
       } else {
         previewDiv.innerHTML = `
           <div class="space-y-4">
@@ -303,15 +344,40 @@ class WhatsAppCompanyHeader {
               Configure os dados da empresa e marque os campos para incluir no cabeçalho...
             </div>
             
-            <div class="bg-blue-900 p-4 rounded-lg border border-blue-600">
-              <div class="text-blue-300 font-semibold mb-2">💬 Mensagem Completa (Preview):</div>
-              <div class="text-gray-100 whitespace-pre-line bg-gray-800 p-3 rounded border border-gray-600">
-                Configure o cabeçalho da empresa para ver como ficará a mensagem completa...
+            <!-- Preview vazio com design WhatsApp -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-600">
+              <div class="text-blue-300 font-semibold mb-3">💬 Mensagem Completa (Preview WhatsApp):</div>
+              
+              <!-- Telefone Simulado Vazio -->
+              <div class="mx-auto max-w-xs">
+                <!-- Cabeçalho do Telefone -->
+                <div class="bg-green-500 text-white text-center py-3 px-4 rounded-t-lg relative">
+                  <div class="flex items-center justify-center">
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
+                      <i class="fas fa-building text-green-500 text-sm"></i>
+                    </div>
+                    <div class="text-left">
+                      <div class="font-semibold text-sm">Empresa</div>
+                      <div class="text-xs opacity-90">online</div>
+                    </div>
+                  </div>
+                  <div class="absolute top-3 right-4">
+                    <i class="fas fa-phone text-white text-sm"></i>
+                  </div>
+                </div>
+                
+                <!-- Corpo da Mensagem Vazio -->
+                <div class="bg-gray-100 p-4 rounded-b-lg min-h-[300px] flex items-center justify-center">
+                  <div class="text-center text-gray-500">
+                    <i class="fas fa-comment-dots text-4xl mb-2"></i>
+                    <div class="text-sm">Configure o cabeçalho para ver a mensagem</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         `;
-        console.log('🔍 [FRONTEND] Preview atualizado com mensagem padrão');
+        console.log('🔍 [FRONTEND] Preview atualizado com mensagem padrão e design WhatsApp');
       }
     } catch (error) {
       console.error('❌ [FRONTEND] Erro ao atualizar preview:', error);
