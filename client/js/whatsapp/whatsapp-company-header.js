@@ -1,16 +1,18 @@
 /**
- * 📱 WHATSAPP COMPANY HEADER - CONFIGURAÇÃO COMPLETA
+ * 📱 WHATSAPP COMPANY HEADER - CONFIGURAÇÃO FLEXÍVEL
  * Sistema de configuração da empresa e cabeçalho configurável para WhatsApp
  * 
+ * NOVA FUNCIONALIDADE: Checkboxes individuais para cada campo
+ * Cliente escolhe exatamente o que quer no cabeçalho
+ *
  * Funcionalidades:
- * - Configuração completa da empresa (dados, redes sociais)
- * - Configuração do cabeçalho das mensagens
+ * - Configuração flexível da empresa (checkboxes por campo)
  * - Preview em tempo real das mensagens
  * - Integração com sistema JWT multicliente
  * - Validações e tratamento de erros
- * 
+ *
  * Autor: Sistema de Indicação
- * Versão: 1.0.0
+ * Versão: 2.0.0 - Flexível por Campo
  * Data: 2025
  */
 
@@ -22,28 +24,40 @@ let companyHeaderConfig = null;
 let clientId = null;
 let isInitialized = false;
 
+// Mapeamento dos checkboxes para campos
+const fieldMappings = {
+    'includeDescription': 'businessDescription',
+    'includeWebsite': 'website',
+    'includePhone': 'phone',
+    'includeEmail': 'email',
+    'includeInstagram': 'instagram',
+    'includeFacebook': 'facebook',
+    'includeLinkedin': 'linkedin',
+    'includeWhatsapp': 'whatsappBusiness'
+};
+
 // ============================================================================
 // INICIALIZAÇÃO E AUTENTICAÇÃO
 // ============================================================================
 
 // Inicialização quando DOM estiver carregado
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🚀 Iniciando WhatsApp Company Header...');
+    console.log('🚀 Iniciando WhatsApp Company Header Flexível...');
     await initCompanyHeader();
 });
 
 // Função principal de inicialização
 async function initCompanyHeader() {
     try {
-        console.log('📋 Iniciando sistema de cabeçalho da empresa...');
-        
+        console.log('📋 Iniciando sistema de cabeçalho flexível da empresa...');
+
         // Verificar se API_BASE_URL está definido
         if (!window.API_BASE_URL) {
             console.error('❌ API_BASE_URL não está definido!');
             showError('Erro de configuração: API_BASE_URL não encontrado');
             return;
         }
-        
+
         console.log('✅ API_BASE_URL:', window.API_BASE_URL);
 
         // Verificar autenticação
@@ -59,19 +73,20 @@ async function initCompanyHeader() {
             showError('Token inválido - clientId não encontrado');
             return;
         }
-        
+
         console.log('✅ ClientId extraído:', clientId);
 
         // Carregar dados iniciais
         await loadCompanyHeader();
         await loadActivityLogs();
-        
+
         // Configurar eventos de preview em tempo real
         setupRealTimePreview();
-        
+        setupCheckboxHandlers();
+
         isInitialized = true;
-        console.log('✅ WhatsApp Company Header inicializado com sucesso');
-        
+        console.log('✅ WhatsApp Company Header Flexível inicializado com sucesso');
+
     } catch (error) {
         console.error('❌ Erro ao inicializar Company Header:', error);
         showError('Erro ao carregar configurações: ' + error.message);
@@ -99,7 +114,7 @@ function getToken() {
 function getClientIdFromToken() {
     const token = getToken();
     if (!token) return null;
-    
+
     try {
         // Decodificar JWT para extrair clientId
         const payload = JSON.parse(atob(token.split('.')[1]));
@@ -112,6 +127,43 @@ function getClientIdFromToken() {
 }
 
 // ============================================================================
+// CONFIGURAÇÃO DOS CHECKBOXES
+// ============================================================================
+
+// Configurar handlers dos checkboxes
+function setupCheckboxHandlers() {
+    Object.keys(fieldMappings).forEach(checkboxId => {
+        const checkbox = document.getElementById(checkboxId);
+        const field = document.getElementById(fieldMappings[checkboxId]);
+        
+        if (checkbox && field) {
+            // Handler para mudança do checkbox
+            checkbox.addEventListener('change', function() {
+                toggleField(field, this.checked);
+                updateMessagePreview();
+            });
+            
+            // Handler para mudança do campo
+            field.addEventListener('input', updateMessagePreview);
+        }
+    });
+}
+
+// Ativar/desativar campo baseado no checkbox
+function toggleField(field, enabled) {
+    if (enabled) {
+        field.disabled = false;
+        field.classList.remove('opacity-50');
+        field.classList.add('focus:ring-2', 'focus:ring-blue-500');
+    } else {
+        field.disabled = true;
+        field.classList.add('opacity-50');
+        field.classList.remove('focus:ring-2', 'focus:ring-blue-500');
+        field.value = ''; // Limpar campo quando desabilitado
+    }
+}
+
+// ============================================================================
 // CARREGAMENTO E PERSISTÊNCIA DE DADOS
 // ============================================================================
 
@@ -119,24 +171,24 @@ function getClientIdFromToken() {
 async function loadCompanyHeader() {
     try {
         console.log('📥 Carregando configuração da empresa para clientId:', clientId);
-        
+
         // Por enquanto, usar dados mock para desenvolvimento
         // TODO: Implementar API real quando backend estiver pronto
         const mockData = getMockCompanyHeader();
-        
+
         companyHeaderConfig = mockData;
         console.log('✅ Configuração carregada (mock):', companyHeaderConfig);
-        
+
         // Preencher formulário
         populateForm(companyHeaderConfig);
-        
+
         // Atualizar preview
         updateMessagePreview();
-        
+
     } catch (error) {
         console.error('❌ Erro ao carregar configuração:', error);
         showError('Erro ao carregar configuração: ' + error.message);
-        
+
         // Usar dados padrão em caso de erro
         companyHeaderConfig = getDefaultCompanyHeader();
         populateForm(companyHeaderConfig);
@@ -164,6 +216,17 @@ function getMockCompanyHeader() {
             enabled: true,
             separator: '---',
             customText: 'Entre em contato conosco!'
+        },
+        // NOVA: Configuração de campos ativos
+        activeFields: {
+            description: true,
+            website: true,
+            phone: true,
+            email: false,
+            instagram: true,
+            facebook: false,
+            linkedin: false,
+            whatsapp: true
         }
     };
 }
@@ -189,6 +252,17 @@ function getDefaultCompanyHeader() {
             enabled: true,
             separator: '---',
             customText: ''
+        },
+        // NOVA: Todos os campos desabilitados por padrão
+        activeFields: {
+            description: false,
+            website: false,
+            phone: false,
+            email: false,
+            instagram: false,
+            facebook: false,
+            linkedin: false,
+            whatsapp: false
         }
     };
 }
@@ -196,24 +270,45 @@ function getDefaultCompanyHeader() {
 // Preencher formulário com dados
 function populateForm(config) {
     if (!config) return;
-    
+
     // Dados da empresa
     document.getElementById('companyName').value = config.companyInfo?.name || '';
     document.getElementById('businessDescription').value = config.companyInfo?.description || '';
     document.getElementById('website').value = config.companyInfo?.website || '';
     document.getElementById('phone').value = config.companyInfo?.phone || '';
     document.getElementById('email').value = config.companyInfo?.email || '';
-    
+
     // Redes sociais
     document.getElementById('instagram').value = config.socialMedia?.instagram || '';
     document.getElementById('facebook').value = config.socialMedia?.facebook || '';
     document.getElementById('linkedin').value = config.socialMedia?.linkedin || '';
     document.getElementById('whatsappBusiness').value = config.socialMedia?.whatsapp || '';
-    
+
     // Configuração do cabeçalho
     document.getElementById('headerEnabled').checked = config.headerConfig?.enabled || false;
     document.getElementById('separator').value = config.headerConfig?.separator || '---';
     document.getElementById('customText').value = config.headerConfig?.customText || '';
+
+    // NOVA: Configurar checkboxes baseado nos campos ativos
+    if (config.activeFields) {
+        document.getElementById('includeDescription').checked = config.activeFields.description || false;
+        document.getElementById('includeWebsite').checked = config.activeFields.website || false;
+        document.getElementById('includePhone').checked = config.activeFields.phone || false;
+        document.getElementById('includeEmail').checked = config.activeFields.email || false;
+        document.getElementById('includeInstagram').checked = config.activeFields.instagram || false;
+        document.getElementById('includeFacebook').checked = config.activeFields.facebook || false;
+        document.getElementById('includeLinkedin').checked = config.activeFields.linkedin || false;
+        document.getElementById('includeWhatsapp').checked = config.activeFields.whatsapp || false;
+
+        // Aplicar estado dos campos
+        Object.keys(fieldMappings).forEach(checkboxId => {
+            const checkbox = document.getElementById(checkboxId);
+            const field = document.getElementById(fieldMappings[checkboxId]);
+            if (checkbox && field) {
+                toggleField(field, checkbox.checked);
+            }
+        });
+    }
 }
 
 // ============================================================================
@@ -224,30 +319,30 @@ function populateForm(config) {
 async function saveCompanyHeader() {
     try {
         console.log('💾 Salvando configuração da empresa...');
-        
+
         // Validar dados obrigatórios
         if (!validateCompanyData()) {
             return;
         }
-        
+
         // Coletar dados do formulário
         const configData = collectFormData();
         console.log('📋 Dados coletados:', configData);
-        
+
         // Por enquanto, salvar localmente (mock)
         // TODO: Implementar API real quando backend estiver pronto
         companyHeaderConfig = configData;
-        
+
         // Salvar no localStorage para persistência
         localStorage.setItem('companyHeaderConfig', JSON.stringify(configData));
-        
+
         showSuccess('✅ Configuração salva com sucesso!');
-        
+
         // Atualizar preview
         updateMessagePreview();
-        
+
         console.log('✅ Configuração salva com sucesso');
-        
+
     } catch (error) {
         console.error('❌ Erro ao salvar configuração:', error);
         showError('Erro ao salvar configuração: ' + error.message);
@@ -257,12 +352,12 @@ async function saveCompanyHeader() {
 // Validar dados da empresa
 function validateCompanyData() {
     const companyName = document.getElementById('companyName').value.trim();
-    
+
     if (!companyName || companyName.length < 2) {
         showError('❌ Nome da empresa é obrigatório (mínimo 2 caracteres)');
         return false;
     }
-    
+
     return true;
 }
 
@@ -287,6 +382,17 @@ function collectFormData() {
             enabled: document.getElementById('headerEnabled').checked,
             separator: document.getElementById('separator').value.trim() || '---',
             customText: document.getElementById('customText').value.trim()
+        },
+        // NOVA: Coletar estado dos campos ativos
+        activeFields: {
+            description: document.getElementById('includeDescription').checked,
+            website: document.getElementById('includeWebsite').checked,
+            phone: document.getElementById('includePhone').checked,
+            email: document.getElementById('includeEmail').checked,
+            instagram: document.getElementById('includeInstagram').checked,
+            facebook: document.getElementById('includeFacebook').checked,
+            linkedin: document.getElementById('includeLinkedin').checked,
+            whatsapp: document.getElementById('includeWhatsapp').checked
         }
     };
 }
@@ -312,7 +418,7 @@ function setupRealTimePreview() {
         'instagram', 'facebook', 'linkedin', 'whatsappBusiness',
         'headerEnabled', 'separator', 'customText'
     ];
-    
+
     inputs.forEach(inputId => {
         const element = document.getElementById(inputId);
         if (element) {
@@ -329,47 +435,47 @@ function setupRealTimePreview() {
 function updateMessagePreview() {
     const previewContainer = document.getElementById('messagePreview');
     if (!previewContainer) return;
-    
+
     try {
         const headerContent = generateHeaderContent();
         const templateContent = getTemplateContent();
-        
+
         let preview = '';
-        
+
         // Adicionar cabeçalho se estiver ativado
         if (headerContent) {
             preview += headerContent + '\n\n';
         }
-        
+
         // Adicionar separador
         if (headerContent && templateContent) {
             const separator = document.getElementById('separator').value || '---';
             preview += separator + '\n\n';
         }
-        
+
         // Adicionar conteúdo do template
         if (templateContent) {
             preview += templateContent;
         }
-        
+
         // Se não houver conteúdo, mostrar mensagem padrão
         if (!preview.trim()) {
             preview = 'Configure os dados da empresa para ver o preview da mensagem...';
         }
-        
+
         previewContainer.innerHTML = preview.replace(/\n/g, '<br>');
-        
+
     } catch (error) {
         console.error('❌ Erro ao gerar preview:', error);
         previewContainer.innerHTML = '<p class="text-red-400">Erro ao gerar preview</p>';
     }
 }
 
-// Gerar conteúdo do cabeçalho
+// Gerar conteúdo do cabeçalho (NOVA LÓGICA FLEXÍVEL)
 function generateHeaderContent() {
     const enabled = document.getElementById('headerEnabled').checked;
     if (!enabled) return '';
-    
+
     const companyName = document.getElementById('companyName').value.trim();
     const description = document.getElementById('businessDescription').value.trim();
     const website = document.getElementById('website').value.trim();
@@ -380,42 +486,59 @@ function generateHeaderContent() {
     const linkedin = document.getElementById('linkedin').value.trim();
     const whatsapp = document.getElementById('whatsappBusiness').value.trim();
     const customText = document.getElementById('customText').value.trim();
-    
+
     let header = '';
-    
+
     // Nome da empresa (obrigatório)
     if (companyName) {
         header += `🏢 **${companyName}**\n`;
     }
-    
-    // Descrição
-    if (description) {
+
+    // Descrição (só se checkbox estiver ativo)
+    if (document.getElementById('includeDescription').checked && description) {
         header += `📝 ${description}\n`;
     }
-    
-    // Informações de contato
-    if (website || phone || email) {
-        if (website) header += `🌐 ${website}\n`;
-        if (phone) header += `📞 ${phone}\n`;
-        if (email) header += `📧 ${email}\n`;
+
+    // Informações de contato (só campos ativos)
+    const contactInfo = [];
+    if (document.getElementById('includeWebsite').checked && website) {
+        contactInfo.push(`🌐 ${website}`);
     }
-    
-    // Redes sociais
+    if (document.getElementById('includePhone').checked && phone) {
+        contactInfo.push(`📞 ${phone}`);
+    }
+    if (document.getElementById('includeEmail').checked && email) {
+        contactInfo.push(`📧 ${email}`);
+    }
+
+    if (contactInfo.length > 0) {
+        header += contactInfo.join(' | ') + '\n';
+    }
+
+    // Redes sociais (só campos ativos)
     const socialMedia = [];
-    if (instagram) socialMedia.push(`📸 ${instagram}`);
-    if (facebook) socialMedia.push(`👍 ${facebook}`);
-    if (linkedin) socialMedia.push(`💼 ${linkedin}`);
-    if (whatsapp) socialMedia.push(`💬 ${whatsapp}`);
-    
+    if (document.getElementById('includeInstagram').checked && instagram) {
+        socialMedia.push(`📸 ${instagram}`);
+    }
+    if (document.getElementById('includeFacebook').checked && facebook) {
+        socialMedia.push(`👍 ${facebook}`);
+    }
+    if (document.getElementById('includeLinkedin').checked && linkedin) {
+        socialMedia.push(`💼 ${linkedin}`);
+    }
+    if (document.getElementById('includeWhatsapp').checked && whatsapp) {
+        socialMedia.push(`💬 ${whatsapp}`);
+    }
+
     if (socialMedia.length > 0) {
         header += socialMedia.join(' | ') + '\n';
     }
-    
+
     // Texto personalizado
     if (customText) {
         header += `\n💡 ${customText}\n`;
     }
-    
+
     return header.trim();
 }
 
@@ -446,7 +569,7 @@ async function loadActivityLogs() {
     try {
         const token = getToken();
         const url = `${window.API_BASE_URL}/whatsapp/client/messages`;
-        
+
         const response = await fetch(url, {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -533,4 +656,4 @@ window.resetCompanyHeader = resetCompanyHeader;
 window.previewHeader = previewHeader;
 window.refreshLogs = refreshLogs;
 
-console.log('✅ WhatsApp Company Header carregado com sucesso!');
+console.log('✅ WhatsApp Company Header Flexível carregado com sucesso!');
