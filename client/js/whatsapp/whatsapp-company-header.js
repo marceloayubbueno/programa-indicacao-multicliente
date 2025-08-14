@@ -288,57 +288,119 @@ class WhatsAppCompanyHeader {
               <div class="text-gray-300 whitespace-pre-line">${headerContent}</div>
             </div>
             
-            <!-- Preview da Mensagem Completa - Estilo WhatsApp Realista -->
+            <!-- Preview da Mensagem Completa - Smartphone Realista -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-600">
-              <div class="text-blue-300 font-semibold mb-3">💬 Preview WhatsApp:</div>
+              <div class="text-blue-300 font-semibold mb-3">💬 Preview WhatsApp Realista:</div>
               
-              <!-- Telefone Simulado - Design Realista -->
+              <!-- Smartphone Realista -->
               <div class="mx-auto max-w-sm">
-                <!-- Cabeçalho do Telefone -->
-                <div class="bg-green-500 text-white text-center py-4 px-4 rounded-t-2xl relative shadow-lg">
-                  <div class="flex items-center justify-center">
-                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 shadow-md">
-                      <i class="fas fa-building text-green-500 text-lg"></i>
-                    </div>
-                    <div class="text-left">
-                      <div class="font-semibold text-base">${document.getElementById('companyName')?.value.trim() || 'Empresa'}</div>
-                      <div class="text-sm opacity-90">online</div>
+                <!-- Frame do Smartphone -->
+                <div class="relative mx-auto">
+                  <!-- Bordas do Smartphone -->
+                  <div class="w-80 h-[600px] bg-black rounded-[3rem] p-2 shadow-2xl">
+                    <!-- Tela do Smartphone -->
+                    <div class="w-full h-full bg-gray-900 rounded-[2.5rem] overflow-hidden relative">
+                      <!-- Notch Superior -->
+                      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-black rounded-b-3xl z-10"></div>
+                      
+                      <!-- Status Bar -->
+                      <div class="absolute top-2 left-0 right-0 flex justify-between items-center px-6 text-white text-xs z-20">
+                        <span>9:41</span>
+                        <div class="flex items-center space-x-1">
+                          <div class="w-4 h-2 border border-white rounded-sm"></div>
+                          <div class="w-1 h-1 bg-white rounded-full"></div>
+                          <div class="w-1 h-1 bg-white rounded-full"></div>
+                          <div class="w-1 h-1 bg-white rounded-full"></div>
+                        </div>
+                      </div>
+                      
+                      <!-- Cabeçalho WhatsApp -->
+                      <div class="bg-[#075E54] text-white pt-12 pb-3 px-4 relative">
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                              <i class="fas fa-building text-[#075E54] text-lg"></i>
+                            </div>
+                            <div>
+                              <div class="font-semibold text-base">${document.getElementById('companyName')?.value.trim() || 'Empresa'}</div>
+                              <div class="text-sm opacity-90">online</div>
+                            </div>
+                          </div>
+                          <div class="flex items-center space-x-4">
+                            <i class="fas fa-search text-white text-lg opacity-80"></i>
+                            <i class="fas fa-ellipsis-v text-white text-lg opacity-80"></i>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Corpo do Chat -->
+                      <div class="bg-[#E5DDD5] h-full p-4 overflow-y-auto">
+                        <!-- Background Pattern (opcional) -->
+                        <div class="absolute inset-0 opacity-5">
+                          <div class="w-full h-full" style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23000000" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+                        </div>
+                        
+                        <!-- Mensagens -->
+                        <div class="space-y-3 relative z-10">
+                          <!-- Cabeçalho da Empresa -->
+                          <div class="flex justify-start">
+                            <div class="max-w-xs">
+                              <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-200">
+                                ${this.formatHeaderForWhatsApp(headerContent)}
+                                <div class="text-xs text-gray-500 mt-2 text-right">${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <!-- Separador -->
+                          <div class="flex justify-center">
+                            <div class="bg-gray-300 text-gray-600 text-xs rounded-full px-4 py-1">${document.getElementById('separator')?.value.trim() || '---'}</div>
+                          </div>
+                          
+                          <!-- Mensagem do Template -->
+                          <div class="flex justify-end">
+                            <div class="max-w-xs">
+                              <div class="bg-[#DCF8C6] p-3 rounded-2xl shadow-sm">
+                                <div class="text-sm text-gray-800 whitespace-pre-line">${this.generateTemplateExample()}</div>
+                                <div class="text-xs text-gray-500 mt-2 text-right">${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} ✓✓</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Barra de Navegação Inferior -->
+                      <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+                        <div class="flex justify-around items-center py-2">
+                          <div class="flex flex-col items-center">
+                            <i class="fas fa-comments text-gray-400 text-lg"></i>
+                            <span class="text-xs text-gray-400 mt-1">Chats</span>
+                          </div>
+                          <div class="flex flex-col items-center">
+                            <i class="fas fa-phone text-gray-400 text-lg"></i>
+                            <span class="text-xs text-gray-400 mt-1">Calls</span>
+                          </div>
+                          <div class="flex flex-col items-center">
+                            <i class="fas fa-users text-gray-400 text-lg"></i>
+                            <span class="text-xs text-gray-400 mt-1">Status</span>
+                          </div>
+                          <div class="flex flex-col items-center">
+                            <i class="fas fa-ellipsis-h text-gray-400 text-lg"></i>
+                            <span class="text-xs text-gray-400 mt-1">More</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="absolute top-4 right-4 flex space-x-2">
-                    <i class="fas fa-video text-white text-sm opacity-80"></i>
-                    <i class="fas fa-phone text-white text-sm opacity-80"></i>
-                    <i class="fas fa-ellipsis-v text-white text-sm opacity-80"></i>
-                  </div>
-                </div>
-                
-                <!-- Corpo da Mensagem -->
-                <div class="bg-gray-100 p-4 rounded-b-2xl min-h-[400px] shadow-lg">
-                  <!-- Mensagem do WhatsApp -->
-                  <div class="space-y-4">
-                    <!-- Cabeçalho da Empresa - Cada linha separada -->
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 max-w-xs">
-                      ${this.formatHeaderForWhatsApp(headerContent)}
-                      <div class="text-xs text-gray-500 mt-3 text-right">${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
-                    </div>
-                    
-                    <!-- Separador -->
-                    <div class="text-center">
-                      <div class="text-gray-400 text-xs bg-gray-200 rounded-full px-3 py-1 inline-block">${document.getElementById('separator')?.value.trim() || '---'}</div>
-                    </div>
-                    
-                    <!-- Mensagem do Template -->
-                    <div class="bg-green-500 text-white p-4 rounded-2xl shadow-sm ml-8 max-w-xs">
-                      <div class="text-sm whitespace-pre-line">${this.generateTemplateExample()}</div>
-                      <div class="text-xs opacity-90 mt-3 text-right">${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
-                    </div>
-                  </div>
+                  
+                  <!-- Botão Home (opcional) -->
+                  <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gray-600 rounded-full"></div>
                 </div>
               </div>
             </div>
           </div>
         `;
-        console.log('✅ [FRONTEND] Preview completo atualizado com design WhatsApp realista');
+        console.log('✅ [FRONTEND] Preview completo atualizado com smartphone realista');
       } else {
         previewDiv.innerHTML = `
           <div class="space-y-4">
@@ -346,42 +408,88 @@ class WhatsAppCompanyHeader {
               Configure os dados da empresa e marque os campos para incluir no cabeçalho...
             </div>
             
-            <!-- Preview vazio com design WhatsApp realista -->
+            <!-- Preview vazio com smartphone realista -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-600">
-              <div class="text-blue-300 font-semibold mb-3">💬 Preview WhatsApp:</div>
+              <div class="text-blue-300 font-semibold mb-3">💬 Preview WhatsApp Realista:</div>
               
-              <!-- Telefone Simulado Vazio -->
+              <!-- Smartphone Vazio -->
               <div class="mx-auto max-w-sm">
-                <!-- Cabeçalho do Telefone -->
-                <div class="bg-green-500 text-white text-center py-4 px-4 rounded-t-2xl relative shadow-lg">
-                  <div class="flex items-center justify-center">
-                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 shadow-md">
-                      <i class="fas fa-building text-green-500 text-lg"></i>
+                <div class="relative mx-auto">
+                  <div class="w-80 h-[600px] bg-black rounded-[3rem] p-2 shadow-2xl">
+                    <div class="w-full h-full bg-gray-900 rounded-[2.5rem] overflow-hidden relative">
+                      <!-- Notch Superior -->
+                      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-black rounded-b-3xl z-10"></div>
+                      
+                      <!-- Status Bar -->
+                      <div class="absolute top-2 left-0 right-0 flex justify-between items-center px-6 text-white text-xs z-20">
+                        <span>9:41</span>
+                        <div class="flex items-center space-x-1">
+                          <div class="w-4 h-2 border border-white rounded-sm"></div>
+                          <div class="w-1 h-1 bg-white rounded-full"></div>
+                          <div class="w-1 h-1 bg-white rounded-full"></div>
+                          <div class="w-1 h-1 bg-white rounded-full"></div>
+                        </div>
+                      </div>
+                      
+                      <!-- Cabeçalho WhatsApp -->
+                      <div class="bg-[#075E54] text-white pt-12 pb-3 px-4 relative">
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                              <i class="fas fa-building text-[#075E54] text-lg"></i>
+                            </div>
+                            <div>
+                              <div class="font-semibold text-base">Empresa</div>
+                              <div class="text-sm opacity-90">online</div>
+                            </div>
+                          </div>
+                          <div class="flex items-center space-x-4">
+                            <i class="fas fa-search text-white text-lg opacity-80"></i>
+                            <i class="fas fa-ellipsis-v text-white text-lg opacity-80"></i>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Corpo do Chat Vazio -->
+                      <div class="bg-[#E5DDD5] h-full flex items-center justify-center">
+                        <div class="text-center text-gray-500">
+                          <i class="fas fa-comment-dots text-6xl mb-4 opacity-30"></i>
+                          <div class="text-sm">Configure o cabeçalho para ver a mensagem</div>
+                        </div>
+                      </div>
+                      
+                      <!-- Barra de Navegação Inferior -->
+                      <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+                        <div class="flex justify-around items-center py-2">
+                          <div class="flex flex-col items-center">
+                            <i class="fas fa-comments text-gray-400 text-lg"></i>
+                            <span class="text-xs text-gray-400 mt-1">Chats</span>
+                          </div>
+                          <div class="flex flex-col items-center">
+                            <i class="fas fa-phone text-gray-400 text-lg"></i>
+                            <span class="text-xs text-gray-400 mt-1">Calls</span>
+                          </div>
+                          <div class="flex flex-col items-center">
+                            <i class="fas fa-users text-gray-400 text-lg"></i>
+                            <span class="text-xs text-gray-400 mt-1">Status</span>
+                          </div>
+                          <div class="flex flex-col items-center">
+                            <i class="fas fa-ellipsis-h text-gray-400 text-lg"></i>
+                            <span class="text-xs text-gray-400 mt-1">More</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div class="text-left">
-                      <div class="font-semibold text-base">Empresa</div>
-                      <div class="text-sm opacity-90">online</div>
-                    </div>
                   </div>
-                  <div class="absolute top-4 right-4 flex space-x-2">
-                    <i class="fas fa-video text-white text-sm opacity-80"></i>
-                    <i class="fas fa-phone text-white text-sm opacity-80"></i>
-                    <i class="fas fa-ellipsis-v text-white text-sm opacity-80"></i>
-                  </div>
-                </div>
-                
-                <!-- Corpo da Mensagem Vazio -->
-                <div class="bg-gray-100 p-4 rounded-b-2xl min-h-[400px] shadow-lg flex items-center justify-center">
-                  <div class="text-center text-gray-500">
-                    <i class="fas fa-comment-dots text-5xl mb-3 opacity-50"></i>
-                    <div class="text-sm">Configure o cabeçalho para ver a mensagem</div>
-                  </div>
+                  
+                  <!-- Botão Home -->
+                  <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gray-600 rounded-full"></div>
                 </div>
               </div>
             </div>
           </div>
         `;
-        console.log('🔍 [FRONTEND] Preview atualizado com mensagem padrão e design WhatsApp realista');
+        console.log('🔍 [FRONTEND] Preview atualizado com smartphone vazio realista');
       }
     } catch (error) {
       console.error('❌ [FRONTEND] Erro ao atualizar preview:', error);
