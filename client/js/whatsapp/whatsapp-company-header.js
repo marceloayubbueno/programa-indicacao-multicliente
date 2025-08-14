@@ -1019,8 +1019,10 @@ Sua indicação foi aprovada e você ganhou R$ 50!
        
        // Enviar via API
        const apiUrl = window.APP_CONFIG?.API_URL || '/api';
-       const url = `${apiUrl}/whatsapp/test-message`;
+       const url = `${apiUrl}/whatsapp/client/message`;
        console.log('🔍 [FRONTEND] Fazendo requisição POST para:', url);
+       console.log('🔍 [DEBUG] URL CORRETA: /whatsapp/client/message'); // DEBUG: Forçar deploy
+       console.log('🔍 [FORCE-DEPLOY] Código atualizado em:', new Date().toISOString()); // FORÇAR DEPLOY
        
        const response = await fetch(url, {
          method: 'POST',
