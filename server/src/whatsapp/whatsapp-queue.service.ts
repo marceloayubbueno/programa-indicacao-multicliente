@@ -18,11 +18,15 @@ export class WhatsAppQueueService {
    */
   async addToQueue(createQueueMessageDto: CreateQueueMessageDto): Promise<WhatsAppQueue> {
     try {
+      // Garantir que priority não seja undefined
+      const priority = createQueueMessageDto.priority || MessagePriority.MEDIUM;
+      
       // Calcular posição na fila baseada na prioridade
-      const queuePosition = await this.calculateQueuePosition(createQueueMessageDto.priority);
+      const queuePosition = await this.calculateQueuePosition(priority);
       
       const queueMessage = new this.whatsappQueueModel({
         ...createQueueMessageDto,
+        priority,
         queuePosition,
         status: QueueStatus.PENDING,
         retryCount: 0,

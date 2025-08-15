@@ -127,8 +127,8 @@ export class WhatsAppQueue {
   attemptsCount: number;
 
   // Campo para ordenação da fila (prioridade + timestamp)
-  @Prop({ type: Date, default: Date.now })
-  queuePosition: Date;
+  @Prop({ type: Number, default: 0 })
+  queuePosition: number;
 }
 
 export const WhatsAppQueueSchema = SchemaFactory.createForClass(WhatsAppQueue);

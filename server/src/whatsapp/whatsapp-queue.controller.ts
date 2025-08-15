@@ -3,7 +3,7 @@ import { WhatsAppQueueService } from './whatsapp-queue.service';
 import { CreateQueueMessageDto } from './dto/create-queue-message.dto';
 import { UpdateQueueMessageDto } from './dto/update-queue-message.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { QueueStatus, MessagePriority } from './entities/whatsapp-queue.schema';
+import { QueueStatus, MessagePriority, WhatsAppQueueDocument } from './entities/whatsapp-queue.schema';
 
 @Controller('admin/whatsapp/queue')
 @UseGuards(JwtAuthGuard)
@@ -267,9 +267,10 @@ export class WhatsAppQueueController {
       }
       
       // Marcar mensagens como processando
-      const processingPromises = messages.map(msg =>
-        this.whatsappQueueService.updateMessageStatus(msg._id.toString(), QueueStatus.PROCESSING)
-      );
+      const processingPromises = messages.map(msg => {
+        const msgDoc = msg as WhatsAppQueueDocument;
+        return this.whatsappQueueService.updateMessageStatus(msgDoc._id.toString(), QueueStatus.PROCESSING);
+      });
       
       await Promise.all(processingPromises);
       
@@ -278,12 +279,15 @@ export class WhatsAppQueueController {
         message: `${messages.length} mensagens marcadas para processamento`,
         data: {
           processedCount: messages.length,
-          messages: messages.map(msg => ({
-            id: msg._id,
-            clientId: msg.clientId,
-            priority: msg.priority,
-            trigger: msg.trigger,
-          })),
+          messages: messages.map(msg => {
+            const msgDoc = msg as WhatsAppQueueDocument;
+            return {
+              id: msgDoc._id,
+              clientId: msg.clientId,
+              priority: msg.priority,
+              trigger: msg.trigger,
+            };
+          }),
         },
       };
     } catch (error) {
