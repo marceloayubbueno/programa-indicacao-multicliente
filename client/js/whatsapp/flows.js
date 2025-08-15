@@ -49,7 +49,23 @@ function getToken() {
 
 async function loadFlows() {
     try {
-        // Mock data para desenvolvimento frontend
+        const token = getToken();
+        const response = await fetch('/api/whatsapp/flows', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao carregar fluxos');
+        }
+
+        flows = await response.json();
+        renderFlows();
+        
+    } catch (error) {
+        console.error('Erro ao carregar fluxos:', error);
+        // Fallback para mock data se a API falhar
         flows = [
             {
                 id: '1',
@@ -96,11 +112,8 @@ async function loadFlows() {
                 createdAt: '2024-01-16T14:30:00Z'
             }
         ];
-        
         renderFlows();
-    } catch (error) {
-        console.error('Erro ao carregar fluxos:', error);
-        showError('Erro ao carregar fluxos');
+        showError('Erro ao carregar fluxos do servidor - usando dados locais');
     }
 }
 
@@ -830,15 +843,14 @@ function editFlow(flowId) {
 async function saveFlow() {
     try {
         const formData = {
-            campaignId: document.getElementById('flow-campaign').value,
             name: document.getElementById('flow-name').value,
             targetAudience: document.getElementById('flow-audience').value,
             description: document.getElementById('flow-description').value,
             messages: []
         };
         
-        if (!formData.campaignId || !formData.name || !formData.targetAudience) {
-            showError('Preencha todos os campos obrigatórios (Campanha, Nome e Público-Alvo)');
+        if (!formData.name || !formData.targetAudience) {
+            showError('Preencha todos os campos obrigatórios (Nome e Público-Alvo)');
             return;
         }
         
@@ -851,7 +863,6 @@ async function saveFlow() {
             
             if (templateId && trigger) {
                 const message = {
-                    id: (index + 1).toString(),
                     templateId: templateId,
                     trigger: trigger,
                     order: index + 1
@@ -875,40 +886,92 @@ async function saveFlow() {
             showError('Adicione pelo menos uma mensagem ao fluxo');
             return;
         }
+
+        // Configurar triggers baseado nas mensagens
+        const triggers = [...new Set(formData.messages.map(m => m.trigger))];
+        formData.triggers = triggers;
         
-        // Mock save - em produção seria uma chamada API
+        // Status padrão
+        formData.status = 'draft';
+        
+        // Configurar agendamento (se houver mensagens com data específica)
+        const hasScheduledMessages = formData.messages.some(m => m.scheduledDate);
+        if (hasScheduledMessages) {
+            formData.scheduling = {
+                enabled: true,
+                startDate: new Date(),
+                endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 ano
+            };
+        }
+
+        // Chamar API real do backend
+        const token = getToken();
+        const response = await fetch('/api/whatsapp/flows', {
+            method: currentFlow ? 'PUT' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(currentFlow ? { ...formData, id: currentFlow } : formData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao salvar fluxo');
+        }
+
+        const savedFlow = await response.json();
+        
+        // Atualizar lista local
         if (currentFlow) {
             // Editar fluxo existente
             const index = flows.findIndex(f => f.id === currentFlow);
             if (index !== -1) {
-                flows[index] = { ...flows[index], ...formData };
+                flows[index] = savedFlow;
             }
         } else {
             // Criar novo fluxo
-            const newFlow = {
-                id: Date.now().toString(),
-                ...formData,
-                status: 'active',
-                createdAt: new Date().toISOString()
-            };
-            flows.push(newFlow);
+            flows.push(savedFlow);
         }
         
         renderFlows();
         closeFlowModal();
         showSuccess(currentFlow ? 'Fluxo atualizado com sucesso!' : 'Fluxo criado com sucesso!');
         
+        // Recarregar fluxos do backend
+        await loadFlows();
+        
     } catch (error) {
         console.error('Erro ao salvar fluxo:', error);
-        showError('Erro ao salvar fluxo');
+        showError('Erro ao salvar fluxo: ' + error.message);
     }
 }
 
-function deleteFlow(flowId) {
+async function deleteFlow(flowId) {
     if (confirm('Tem certeza que deseja excluir este fluxo?')) {
-        flows = flows.filter(f => f.id !== flowId);
-        renderFlows();
-        showSuccess('Fluxo excluído com sucesso!');
+        try {
+            const token = getToken();
+            const response = await fetch(`/api/whatsapp/flows/${flowId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Erro ao excluir fluxo');
+            }
+
+            // Remover da lista local
+            flows = flows.filter(f => f.id !== flowId);
+            renderFlows();
+            showSuccess('Fluxo excluído com sucesso!');
+            
+        } catch (error) {
+            console.error('Erro ao excluir fluxo:', error);
+            showError('Erro ao excluir fluxo: ' + error.message);
+        }
     }
 }
 
