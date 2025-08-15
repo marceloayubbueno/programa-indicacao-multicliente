@@ -1,399 +1,247 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste de Gatilhos WhatsApp - Admin</title>
-    <link rel="stylesheet" href="../css/shared-menu.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .trigger-test-container {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .trigger-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .trigger-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .trigger-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            color: white;
-            font-size: 18px;
-        }
-
-        .trigger-icon.high { background: #dc3545; }
-        .trigger-icon.medium { background: #ffc107; }
-        .trigger-icon.low { background: #28a745; }
-
-        .trigger-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .trigger-description {
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #333;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-        }
-
-        .test-button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-
-        .test-button:hover {
-            background: #0056b3;
-        }
-
-        .test-button:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-
-        .result-section {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 4px;
-            display: none;
-        }
-
-        .result-success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-
-        .result-error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-
-        .result-info {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-        }
-
-        .log-section {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 4px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-
-        .log-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .log-entry {
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
-            font-family: monospace;
-            font-size: 13px;
-        }
-
-        .log-entry:last-child {
-            border-bottom: none;
-        }
-
-        .log-timestamp {
-            color: #666;
-            margin-right: 10px;
-        }
-
-        .log-message {
-            color: #333;
-        }
-
-        .log-error {
-            color: #dc3545;
-        }
-
-        .log-success {
-            color: #28a745;
-        }
-
-        .priority-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .priority-high { background: #dc3545; color: white; }
-        .priority-medium { background: #ffc107; color: #212529; }
-        .priority-low { background: #28a745; color: white; }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-pending { background: #ffc107; color: #212529; }
-        .status-processing { background: #17a2b8; color: white; }
-        .status-completed { background: #28a745; color: white; }
-        .status-failed { background: #dc3545; color: white; }
-        .status-retry { background: #fd7e14; color: white; }
-    </style>
+    <title>Teste de Gatilhos WhatsApp - Área Administrativa</title>
+    <link rel="stylesheet" href="../../css/tailwind.output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Admin Panel</h3>
-        </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="users.html"><i class="fas fa-users"></i> Usuários</a></li>
-                <li><a href="clients.html"><i class="fas fa-building"></i> Clientes</a></li>
-                <li><a href="plans.html"><i class="fas fa-credit-card"></i> Planos</a></li>
-                <li><a href="carteira.html"><i class="fas fa-wallet"></i> Carteira</a></li>
-                <li><a href="apis.html"><i class="fas fa-code"></i> APIs</a></li>
-                <li><a href="whatsapp-config.html"><i class="fas fa-whatsapp"></i> WhatsApp</a></li>
-                <li><a href="whatsapp-queue-management.html"><i class="fas fa-list-ol"></i> Filas WhatsApp</a></li>
-                <li><a href="whatsapp-trigger-test.html" class="active"><i class="fas fa-play"></i> Teste Gatilhos</a></li>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <nav class="w-64 bg-gray-800 flex-shrink-0 flex flex-col py-6 px-4 min-h-screen text-gray-100">
+            <div class="flex items-center mb-8">
+                <span class="text-2xl font-bold text-red-400">
+                    <i class="fas fa-user-shield mr-2"></i>Admin Panel
+                </span>
+            </div>
+            <ul class="space-y-2 flex-1">
+                <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+                <li><a href="users.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-users mr-2"></i> Usuários</a></li>
+                <li><a href="clients.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-user-tie mr-2"></i> Clientes</a></li>
+                <li><a href="plans.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-layer-group mr-2"></i> Planos</a></li>
+                <li><a href="carteira.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-wallet mr-2"></i> Carteira</a></li>
+                <li><a href="apis.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-code mr-2"></i> APIs</a></li>
+                <li><a href="whatsapp-config.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-whatsapp mr-2"></i> WhatsApp</a></li>
+                <li><a href="whatsapp-templates.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-file-alt mr-2"></i> Templates WhatsApp</a></li>
+                <li><a href="whatsapp-queue-management.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-list-ol mr-2"></i> Filas WhatsApp</a></li>
+                <li><a href="whatsapp-trigger-test.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-700 text-red-400 font-semibold"><i class="fas fa-play mr-2"></i> Teste Gatilhos</a></li>
+                <li><a href="settings.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-cog mr-2"></i> Configurações</a></li>
+                <li><a href="#" onclick="handleLogout()" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"><i class="fas fa-sign-out-alt mr-2"></i> Sair</a></li>
             </ul>
         </nav>
-    </div>
-
-    <div class="main-content">
-        <div class="trigger-test-container">
-            <h1><i class="fas fa-play"></i> Teste de Gatilhos WhatsApp</h1>
-            <p class="text-muted">Teste os gatilhos dos fluxos WhatsApp e veja as mensagens sendo adicionadas às filas</p>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
+            <div class="flex-1 flex flex-col">
+                <!-- Header -->
+                <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm border-b border-gray-700">
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-3xl font-bold text-red-400">Teste de Gatilhos WhatsApp</h1>
+                        <p class="text-gray-400">Teste os gatilhos dos fluxos WhatsApp e veja as mensagens sendo adicionadas às filas</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-sm text-gray-400">Bem-vindo,</p>
+                            <p class="font-semibold text-gray-100">Administrador</p>
+                        </div>
+                        <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-shield text-white"></i>
+                        </div>
+                    </div>
+                </header>
+                
+                <!-- Main Content -->
+                <main class="flex-1 p-8">
 
             <!-- Gatilho: Novo Indicador -->
-            <div class="trigger-card">
-                <div class="trigger-header">
-                    <div class="trigger-icon high">
-                        <i class="fas fa-user-plus"></i>
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-user-plus text-white text-xl"></i>
                     </div>
                     <div>
-                        <div class="trigger-title">Novo Indicador</div>
-                        <div class="trigger-description">Testa o gatilho quando um novo indicador se junta ao sistema</div>
+                        <h2 class="text-xl font-semibold text-gray-100">Novo Indicador</h2>
+                        <p class="text-gray-400">Testa o gatilho quando um novo indicador se junta ao sistema</p>
                     </div>
                 </div>
                 
                 <form id="indicatorForm">
-                    <div class="form-group">
-                        <label class="form-label">ID do Participante (ObjectId)</label>
-                        <input type="text" class="form-input" id="indicatorParticipantId" placeholder="507f1f77bcf86cd799439011" required>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID do Participante (ObjectId)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="indicatorParticipantId" placeholder="507f1f77bcf86cd799439011" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID do Cliente (ObjectId)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="indicatorClientId" placeholder="507f1f77bcf86cd799439012" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID da Campanha (opcional)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="indicatorCampaignId" placeholder="campanha-123">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">ID do Cliente (ObjectId)</label>
-                        <input type="text" class="form-input" id="indicatorClientId" placeholder="507f1f77bcf86cd799439012" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">ID da Campanha (opcional)</label>
-                        <input type="text" class="form-input" id="indicatorCampaignId" placeholder="campanha-123">
-                    </div>
-                    <button type="submit" class="test-button" id="testIndicatorBtn">
-                        <i class="fas fa-play"></i> Testar Gatilho
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors" id="testIndicatorBtn">
+                        <i class="fas fa-play mr-2"></i> Testar Gatilho
                     </button>
                 </form>
 
-                <div class="result-section" id="indicatorResult"></div>
+                <div class="result-section mt-6" id="indicatorResult"></div>
             </div>
 
             <!-- Gatilho: Novo Lead -->
-            <div class="trigger-card">
-                <div class="trigger-header">
-                    <div class="trigger-icon high">
-                        <i class="fas fa-handshake"></i>
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-handshake text-white text-xl"></i>
                     </div>
                     <div>
-                        <div class="trigger-title">Novo Lead</div>
-                        <div class="trigger-description">Testa o gatilho quando um novo lead é indicado</div>
+                        <h2 class="text-xl font-semibold text-gray-100">Novo Lead</h2>
+                        <p class="text-gray-400">Testa o gatilho quando um novo lead é indicado</p>
                     </div>
                 </div>
                 
                 <form id="leadForm">
-                    <div class="form-group">
-                        <label class="form-label">ID da Indicação (ObjectId)</label>
-                        <input type="text" class="form-input" id="leadReferralId" placeholder="507f1f77bcf86cd799439013" required>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID da Indicação (ObjectId)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="leadReferralId" placeholder="507f1f77bcf86cd799439013" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID do Cliente (ObjectId)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="leadClientId" placeholder="507f1f77bcf86cd799439012" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID da Campanha (opcional)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="leadCampaignId" placeholder="campanha-123">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">ID do Cliente (ObjectId)</label>
-                        <input type="text" class="form-input" id="leadClientId" placeholder="507f1f77bcf86cd799439012" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">ID da Campanha (opcional)</label>
-                        <input type="text" class="form-input" id="leadCampaignId" placeholder="campanha-123">
-                    </div>
-                    <button type="submit" class="test-button" id="testLeadBtn">
-                        <i class="fas fa-play"></i> Testar Gatilho
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors" id="testLeadBtn">
+                        <i class="fas fa-play mr-2"></i> Testar Gatilho
                     </button>
                 </form>
 
-                <div class="result-section" id="leadResult"></div>
+                <div class="result-section mt-6" id="leadResult"></div>
             </div>
 
             <!-- Gatilho: Recompensa Ganha -->
-            <div class="trigger-card">
-                <div class="trigger-header">
-                    <div class="trigger-icon medium">
-                        <i class="fas fa-gift"></i>
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-gift text-white text-xl"></i>
                     </div>
                     <div>
-                        <div class="trigger-title">Recompensa Ganha</div>
-                        <div class="trigger-description">Testa o gatilho quando uma recompensa é ganha</div>
+                        <h2 class="text-xl font-semibold text-gray-100">Recompensa Ganha</h2>
+                        <p class="text-gray-400">Testa o gatilho quando uma recompensa é ganha</p>
                     </div>
                 </div>
                 
                 <form id="rewardForm">
-                    <div class="form-group">
-                        <label class="form-label">ID do Participante (ObjectId)</label>
-                        <input type="text" class="form-input" id="rewardParticipantId" placeholder="507f1f77bcf86cd799439011" required>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID do Participante (ObjectId)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="rewardParticipantId" placeholder="507f1f77bcf86cd799439011" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID do Cliente (ObjectId)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="rewardClientId" placeholder="507f1f77bcf86cd799439012" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Valor da Recompensa</label>
+                            <input type="number" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="rewardAmount" placeholder="50.00" step="0.01" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Tipo da Recompensa</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="rewardType" placeholder="Comissão" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Total de Ganhos</label>
+                            <input type="number" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="totalEarnings" placeholder="150.00" step="0.01" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">ID do Cliente (ObjectId)</label>
-                        <input type="text" class="form-input" id="rewardClientId" placeholder="507f1f77bcf86cd799439012" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Valor da Recompensa</label>
-                        <input type="number" class="form-input" id="rewardAmount" placeholder="50.00" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Tipo da Recompensa</label>
-                        <input type="text" class="form-input" id="rewardType" placeholder="Comissão" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Total de Ganhos</label>
-                        <input type="number" class="form-input" id="totalEarnings" placeholder="150.00" step="0.01" required>
-                    </div>
-                    <button type="submit" class="test-button" id="testRewardBtn">
-                        <i class="fas fa-play"></i> Testar Gatilho
+                    <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors" id="testRewardBtn">
+                        <i class="fas fa-play mr-2"></i> Testar Gatilho
                     </button>
                 </form>
 
-                <div class="result-section" id="rewardResult"></div>
+                <div class="result-section mt-6" id="rewardResult"></div>
             </div>
 
             <!-- Gatilho Genérico -->
-            <div class="trigger-card">
-                <div class="trigger-header">
-                    <div class="trigger-icon medium">
-                        <i class="fas fa-cogs"></i>
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-cogs text-white text-xl"></i>
                     </div>
                     <div>
-                        <div class="trigger-title">Gatilho Genérico</div>
-                        <div class="trigger-description">Testa qualquer tipo de gatilho com dados customizados</div>
+                        <h2 class="text-xl font-semibold text-gray-100">Gatilho Genérico</h2>
+                        <p class="text-gray-400">Testa qualquer tipo de gatilho com dados customizados</p>
                     </div>
                 </div>
                 
                 <form id="genericForm">
-                    <div class="form-group">
-                        <label class="form-label">Tipo do Gatilho</label>
-                        <select class="form-input" id="genericTriggerType" required>
-                            <option value="">Selecione um tipo</option>
-                            <option value="indicator_joined">Novo Indicador</option>
-                            <option value="lead_indicated">Novo Lead</option>
-                            <option value="reward_earned">Recompensa Ganha</option>
-                            <option value="campaign_started">Campanha Iniciada</option>
-                            <option value="participant_activated">Participante Ativado</option>
-                            <option value="referral_completed">Indicação Completada</option>
-                        </select>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Tipo do Gatilho</label>
+                            <select class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:border-red-400" id="genericTriggerType" required>
+                                <option value="">Selecione um tipo</option>
+                                <option value="indicator_joined">Novo Indicador</option>
+                                <option value="lead_indicated">Novo Lead</option>
+                                <option value="reward_earned">Recompensa Ganha</option>
+                                <option value="campaign_started">Campanha Iniciada</option>
+                                <option value="participant_activated">Participante Ativado</option>
+                                <option value="referral_completed">Indicação Completada</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID do Participante (opcional)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="genericParticipantId" placeholder="507f1f77bcf86cd799439011">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID da Indicação (opcional)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="genericReferralId" placeholder="507f1f77bcf86cd799439013">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID do Cliente (ObjectId)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="genericClientId" placeholder="507f1f77bcf86cd799439012" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID da Campanha (opcional)</label>
+                            <input type="text" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="genericCampaignId" placeholder="campanha-123">
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Dados do Evento (JSON)</label>
+                            <textarea class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-red-400" id="genericEventData" placeholder='{"customField": "valor"}' rows="3"></textarea>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">ID do Participante (opcional)</label>
-                        <input type="text" class="form-input" id="genericParticipantId" placeholder="507f1f77bcf86cd799439011">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">ID da Indicação (opcional)</label>
-                        <input type="text" class="form-input" id="genericReferralId" placeholder="507f1f77bcf86cd799439013">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">ID do Cliente (ObjectId)</label>
-                        <input type="text" class="form-input" id="genericClientId" placeholder="507f1f77bcf86cd799439012" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">ID da Campanha (opcional)</label>
-                        <input type="text" class="form-input" id="genericCampaignId" placeholder="campanha-123">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Dados do Evento (JSON)</label>
-                        <textarea class="form-input" id="genericEventData" placeholder='{"customField": "valor"}' rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="test-button" id="testGenericBtn">
-                        <i class="fas fa-play"></i> Testar Gatilho
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors" id="testGenericBtn">
+                        <i class="fas fa-play mr-2"></i> Testar Gatilho
                     </button>
                 </form>
 
-                <div class="result-section" id="genericResult"></div>
+                <div class="result-section mt-6" id="genericResult"></div>
             </div>
 
             <!-- Log de Testes -->
-            <div class="log-section">
-                <div class="log-title">
-                    <i class="fas fa-list"></i> Log de Testes
-                    <button class="test-button" style="float: right; padding: 5px 10px; font-size: 12px;" onclick="clearLogs()">
-                        <i class="fas fa-trash"></i> Limpar
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-gray-100">
+                        <i class="fas fa-list text-green-400 mr-2"></i>
+                        Log de Testes
+                    </h2>
+                    <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors text-sm" onclick="clearLogs()">
+                        <i class="fas fa-trash mr-2"></i> Limpar
                     </button>
                 </div>
-                <div id="testLogs"></div>
+                <div id="testLogs" class="bg-gray-900 rounded-lg p-4 max-h-96 overflow-y-auto"></div>
             </div>
-        </div>
+        </main>
     </div>
+</div>
 
-    <script src="../js/config.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/whatsapp-trigger-test.js"></script>
+<script src="../../js/config.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/whatsapp-trigger-test.js"></script>
 </body>
 </html>

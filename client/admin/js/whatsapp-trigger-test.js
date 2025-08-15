@@ -327,7 +327,18 @@ class WhatsAppTriggerTester {
     showResult(elementId, message, type) {
         const element = document.getElementById(elementId);
         element.innerHTML = message;
-        element.className = `result-section result-${type}`;
+        
+        // Aplicar classes Tailwind baseadas no tipo
+        let classes = 'mt-6 p-4 rounded-lg border';
+        if (type === 'success') {
+            classes += ' bg-green-900/20 border-green-500/30 text-green-400';
+        } else if (type === 'error') {
+            classes += ' bg-red-900/20 border-red-500/30 text-red-400';
+        } else {
+            classes += ' bg-blue-900/20 border-blue-500/30 text-blue-400';
+        }
+        
+        element.className = classes;
         element.style.display = 'block';
 
         // Auto-hide after 10 seconds
@@ -341,10 +352,21 @@ class WhatsAppTriggerTester {
         const timestamp = new Date().toLocaleTimeString('pt-BR');
         
         const logEntry = document.createElement('div');
-        logEntry.className = `log-entry log-${type}`;
+        
+        // Aplicar classes Tailwind baseadas no tipo
+        let classes = 'py-2 border-b border-gray-700 last:border-b-0 font-mono text-sm';
+        if (type === 'success') {
+            classes += ' text-green-400';
+        } else if (type === 'error') {
+            classes += ' text-red-400';
+        } else {
+            classes += ' text-gray-300';
+        }
+        
+        logEntry.className = classes;
         logEntry.innerHTML = `
-            <span class="log-timestamp">[${timestamp}]</span>
-            <span class="log-message">${message}</span>
+            <span class="text-gray-500 mr-3">[${timestamp}]</span>
+            <span>${message}</span>
         `;
         
         logsContainer.appendChild(logEntry);
@@ -353,7 +375,7 @@ class WhatsAppTriggerTester {
         logsContainer.scrollTop = logsContainer.scrollHeight;
         
         // Keep only last 50 logs
-        const logs = logsContainer.querySelectorAll('.log-entry');
+        const logs = logsContainer.querySelectorAll('div');
         if (logs.length > 50) {
             logs[0].remove();
         }
