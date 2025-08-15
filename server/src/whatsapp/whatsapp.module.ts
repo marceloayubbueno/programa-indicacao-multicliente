@@ -21,6 +21,8 @@ import { WhatsAppFlowModule } from './flows/whatsapp-flow.module';
 import { WhatsAppFlowController } from './flows/whatsapp-flow.controller';
 import { WhatsAppQueueModule } from './whatsapp-queue.module';
 import { WhatsAppQueue, WhatsAppQueueSchema } from './entities/whatsapp-queue.schema';
+import { WhatsAppFlowTriggerModule } from './whatsapp-flow-trigger.module';
+import { WhatsAppQueueProcessorService } from './whatsapp-queue-processor.service';
 
 
 @Module({
@@ -38,6 +40,7 @@ import { WhatsAppQueue, WhatsAppQueueSchema } from './entities/whatsapp-queue.sc
     CompanyHeaderModule,
     WhatsAppFlowModule,
     WhatsAppQueueModule,
+    WhatsAppFlowTriggerModule,
   ],
   controllers: [
     WhatsAppAdminController,
@@ -51,6 +54,7 @@ import { WhatsAppQueue, WhatsAppQueueSchema } from './entities/whatsapp-queue.sc
     WhatsAppClientService,
     WhatsAppClientTemplatesService,
     TwilioService,
+    WhatsAppQueueProcessorService,
   ],
   exports: [
     WhatsAppAdminService,
@@ -58,6 +62,7 @@ import { WhatsAppQueue, WhatsAppQueueSchema } from './entities/whatsapp-queue.sc
     WhatsAppClientTemplatesService,
     WhatsAppFlowModule,
     WhatsAppQueueModule,
+    WhatsAppFlowTriggerModule,
   ],
 })
 export class WhatsAppModule {} 

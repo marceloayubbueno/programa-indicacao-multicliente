@@ -23,6 +23,7 @@ import { EmailTemplatesModule } from './email-templates/email-templates.module';
 import { EmailConfigModule } from './email-config/email-config.module';
 import { MailModule } from './common/mail.module';
 import { WhatsAppModule } from './whatsapp/whatsapp.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module';
     EmailConfigModule,
     MailModule,
     WhatsAppModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],
