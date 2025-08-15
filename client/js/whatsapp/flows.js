@@ -83,8 +83,8 @@ async function loadFlows() {
         console.log('🔍 [DEBUG] Is Production para fluxos:', isProduction);
         console.log('🔍 [DEBUG] API Base URL para fluxos:', apiBaseUrl);
         
-        // URL COMPLETA para fluxos (igual às outras funções)
-        const fullUrl = `${apiBaseUrl}/whatsapp/flows`;
+        // URL COMPLETA para fluxos (corrigida com prefixo /api)
+        const fullUrl = `${apiBaseUrl}/api/whatsapp/flows`;
         console.log('🔍 [DEBUG] URL completa para fluxos:', fullUrl);
         
         const response = await fetch(fullUrl, {
@@ -115,57 +115,12 @@ async function loadFlows() {
         console.error('❌ [DEBUG] Erro completo em loadFlows:', error);
         console.error('❌ [DEBUG] Stack trace:', error.stack);
         
-        // Fallback para mock data se a API falhar
-        console.log('🔄 [DEBUG] Usando fallback para dados mockados');
-        flows = [
-            {
-                id: '1',
-                name: 'Fluxo de Boas-vindas Indicadores',
-                description: 'Fluxo para novos indicadores',
-                targetAudience: 'indicators',
-                messages: [
-                    {
-                        id: '1',
-                        templateId: '1',
-                        templateName: 'Boas-vindas',
-                        trigger: 'indicator_joined',
-                        delay: 0,
-                        order: 1
-                    },
-                    {
-                        id: '2',
-                        templateId: '2',
-                        templateName: 'Dicas de Indicação',
-                        trigger: 'indicator_joined',
-                        delay: 3600, // 1 hora
-                        order: 2
-                    }
-                ],
-                status: 'active',
-                createdAt: '2024-01-15T10:00:00Z'
-            },
-            {
-                id: '2',
-                name: 'Fluxo de Conversão Leads',
-                description: 'Fluxo para converter leads',
-                targetAudience: 'leads',
-                messages: [
-                    {
-                        id: '3',
-                        templateId: '3',
-                        templateName: 'Oferta Especial',
-                        trigger: 'lead_indicated',
-                        delay: 1800, // 30 minutos
-                        order: 1
-                    }
-                ],
-                status: 'active',
-                createdAt: '2024-01-16T14:30:00Z'
-            }
-        ];
+        // NÃO usar fallback - mostrar erro real
+        console.error('❌ [DEBUG] API de fluxos falhou - sem fallback');
+        flows = [];
         renderFlows();
-        showError('Erro ao carregar fluxos do servidor - usando dados locais');
-        console.log('🔄 [DEBUG] Fallback aplicado, fluxos mockados:', flows.length);
+        showError('Erro ao carregar fluxos do servidor: ' + error.message);
+        console.log('❌ [DEBUG] Fluxos vazios - API falhou');
     }
 }
 
@@ -228,29 +183,10 @@ async function loadTemplates() {
         console.error('❌ [DEBUG] Stack trace:', error.stack);
         showError('Erro ao carregar templates da API');
         
-        // Fallback para dados mockados em caso de erro
-        console.log('🔄 [DEBUG] Usando fallback para templates mockados');
-        templates = [
-            {
-                id: '1',
-                name: 'Boas-vindas',
-                category: 'marketing',
-                content: 'Olá {{name}}! Bem-vindo ao nosso programa de indicações!'
-            },
-            {
-                id: '2',
-                name: 'Dicas de Indicação',
-                category: 'utility',
-                content: 'Dica: Compartilhe seu link pessoal nas redes sociais!'
-            },
-            {
-                id: '3',
-                name: 'Oferta Especial',
-                category: 'marketing',
-                content: 'Oferta especial para você: {{discount}}% de desconto!'
-            }
-        ];
-        console.log('🔄 [DEBUG] Fallback de templates aplicado:', templates.length);
+        // NÃO usar fallback - mostrar erro real
+        console.error('❌ [DEBUG] API de templates falhou - sem fallback');
+        templates = [];
+        console.log('❌ [DEBUG] Templates vazios - API falhou');
     }
 }
 
@@ -1001,7 +937,7 @@ async function saveFlow() {
             ? 'https://programa-indicacao-multicliente-production.up.railway.app'
             : 'http://localhost:3000';
         
-        const fullUrl = `${apiBaseUrl}/whatsapp/flows`;
+        const fullUrl = `${apiBaseUrl}/api/whatsapp/flows`;
         console.log('🔍 [DEBUG] Salvando fluxo em:', fullUrl);
         
         const response = await fetch(fullUrl, {
@@ -1056,7 +992,7 @@ async function deleteFlow(flowId) {
                 ? 'https://programa-indicacao-multicliente-production.up.railway.app'
                 : 'http://localhost:3000';
             
-            const fullUrl = `${apiBaseUrl}/whatsapp/flows/${flowId}`;
+            const fullUrl = `${apiBaseUrl}/api/whatsapp/flows/${flowId}`;
             console.log('🔍 [DEBUG] Deletando fluxo em:', fullUrl);
             
             const response = await fetch(fullUrl, {
