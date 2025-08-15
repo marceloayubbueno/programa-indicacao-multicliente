@@ -50,7 +50,7 @@ function getToken() {
 async function loadFlows() {
     try {
         const token = getToken();
-        const response = await fetch('/api/whatsapp/flows', {
+        const response = await fetch('/whatsapp/flows', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -218,7 +218,7 @@ async function loadCampaigns() {
         
         // 4. EXTRAIR ARRAY DE CAMPANHAS
         campaigns = responseData.data || responseData;
-        console.log(`📋 ${campaigns.length} campanhas carregadas para fluxos`);
+        console.log(`�� ${campaigns.length} campanhas carregadas para fluxos`);
         
         // 5. POPULAR DROPDOWN DE CAMPANHAS
         populateCampaignDropdown();
@@ -906,7 +906,7 @@ async function saveFlow() {
 
         // Chamar API real do backend
         const token = getToken();
-        const response = await fetch('/api/whatsapp/flows', {
+        const response = await fetch('/whatsapp/flows', {
             method: currentFlow ? 'PUT' : 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -951,7 +951,7 @@ async function deleteFlow(flowId) {
     if (confirm('Tem certeza que deseja excluir este fluxo?')) {
         try {
             const token = getToken();
-            const response = await fetch(`/api/whatsapp/flows/${flowId}`, {
+            const response = await fetch(`/whatsapp/flows/${flowId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
