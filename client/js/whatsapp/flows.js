@@ -73,10 +73,21 @@ async function loadFlows() {
             throw new Error('Token não encontrado');
         }
         
-        console.log('🔍 [DEBUG] Fazendo fetch para /whatsapp/flows');
-        console.log('🔍 [DEBUG] URL completa:', window.location.origin + '/whatsapp/flows');
+        // CONFIGURAÇÃO DA API (igual às outras funções)
+        const isProduction = window.location.hostname === 'app.virallead.com.br';
+        const apiBaseUrl = isProduction 
+            ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+            : 'http://localhost:3000';
         
-        const response = await fetch('/whatsapp/flows', {
+        console.log('🔍 [DEBUG] Hostname para fluxos:', window.location.hostname);
+        console.log('🔍 [DEBUG] Is Production para fluxos:', isProduction);
+        console.log('🔍 [DEBUG] API Base URL para fluxos:', apiBaseUrl);
+        
+        // URL COMPLETA para fluxos (igual às outras funções)
+        const fullUrl = `${apiBaseUrl}/whatsapp/flows`;
+        console.log('🔍 [DEBUG] URL completa para fluxos:', fullUrl);
+        
+        const response = await fetch(fullUrl, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -983,7 +994,17 @@ async function saveFlow() {
 
         // Chamar API real do backend
         const token = getToken();
-        const response = await fetch('/whatsapp/flows', {
+        
+        // CONFIGURAÇÃO DA API (igual às outras funções)
+        const isProduction = window.location.hostname === 'app.virallead.com.br';
+        const apiBaseUrl = isProduction 
+            ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+            : 'http://localhost:3000';
+        
+        const fullUrl = `${apiBaseUrl}/whatsapp/flows`;
+        console.log('🔍 [DEBUG] Salvando fluxo em:', fullUrl);
+        
+        const response = await fetch(fullUrl, {
             method: currentFlow ? 'PUT' : 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1028,7 +1049,17 @@ async function deleteFlow(flowId) {
     if (confirm('Tem certeza que deseja excluir este fluxo?')) {
         try {
             const token = getToken();
-            const response = await fetch(`/whatsapp/flows/${flowId}`, {
+            
+            // CONFIGURAÇÃO DA API (igual às outras funções)
+            const isProduction = window.location.hostname === 'app.virallead.com.br';
+            const apiBaseUrl = isProduction 
+                ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+                : 'http://localhost:3000';
+            
+            const fullUrl = `${apiBaseUrl}/whatsapp/flows/${flowId}`;
+            console.log('🔍 [DEBUG] Deletando fluxo em:', fullUrl);
+            
+            const response = await fetch(fullUrl, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
