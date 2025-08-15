@@ -15,21 +15,35 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function initWhatsAppFlows() {
     try {
+        console.log('🔍 [DEBUG] ===== INICIANDO INIT WHATSAPP FLOWS =====');
+        
         // Verificar autenticação
+        console.log('🔍 [DEBUG] Verificando autenticação...');
         if (!checkAuth()) {
+            console.error('❌ [DEBUG] Autenticação falhou - saindo da inicialização');
             return;
         }
+        console.log('✅ [DEBUG] Autenticação OK');
 
         // Carregar dados iniciais
+        console.log('🔍 [DEBUG] Carregando fluxos...');
         await loadFlows();
+        
+        console.log('🔍 [DEBUG] Carregando templates...');
         await loadTemplates();
+        
+        console.log('🔍 [DEBUG] Carregando campanhas...');
         await loadCampaigns();
         
         // Configurar eventos
+        console.log('🔍 [DEBUG] Configurando event listeners...');
         setupEventListeners();
         
+        console.log('✅ [DEBUG] ===== INIT WHATSAPP FLOWS CONCLUÍDO COM SUCESSO =====');
+        
     } catch (error) {
-        console.error('Erro ao inicializar Fluxos:', error);
+        console.error('❌ [DEBUG] Erro crítico em initWhatsAppFlows:', error);
+        console.error('❌ [DEBUG] Stack trace completo:', error.stack);
         showError('Erro ao carregar fluxos');
     }
 }
@@ -49,23 +63,49 @@ function getToken() {
 
 async function loadFlows() {
     try {
+        console.log('🔍 [DEBUG] Iniciando loadFlows()');
+        
         const token = getToken();
+        console.log('🔍 [DEBUG] Token obtido:', token ? 'SIM' : 'NÃO');
+        
+        if (!token) {
+            console.error('❌ [DEBUG] Token não encontrado - redirecionando para login');
+            throw new Error('Token não encontrado');
+        }
+        
+        console.log('🔍 [DEBUG] Fazendo fetch para /whatsapp/flows');
+        console.log('🔍 [DEBUG] URL completa:', window.location.origin + '/whatsapp/flows');
+        
         const response = await fetch('/whatsapp/flows', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
-
+        
+        console.log('🔍 [DEBUG] Response status:', response.status);
+        console.log('🔍 [DEBUG] Response ok:', response.ok);
+        console.log('🔍 [DEBUG] Response headers:', Object.fromEntries(response.headers.entries()));
+        
         if (!response.ok) {
-            throw new Error('Erro ao carregar fluxos');
+            const errorText = await response.text();
+            console.error('❌ [DEBUG] Response não ok. Status:', response.status);
+            console.error('❌ [DEBUG] Response text:', errorText);
+            throw new Error(`Erro ${response.status}: ${response.statusText}`);
         }
 
-        flows = await response.json();
+        const responseData = await response.json();
+        console.log('✅ [DEBUG] Dados recebidos:', responseData);
+        
+        flows = responseData;
         renderFlows();
+        console.log('✅ [DEBUG] Fluxos carregados com sucesso:', flows.length);
         
     } catch (error) {
-        console.error('Erro ao carregar fluxos:', error);
+        console.error('❌ [DEBUG] Erro completo em loadFlows:', error);
+        console.error('❌ [DEBUG] Stack trace:', error.stack);
+        
         // Fallback para mock data se a API falhar
+        console.log('🔄 [DEBUG] Usando fallback para dados mockados');
         flows = [
             {
                 id: '1',
@@ -114,17 +154,20 @@ async function loadFlows() {
         ];
         renderFlows();
         showError('Erro ao carregar fluxos do servidor - usando dados locais');
+        console.log('🔄 [DEBUG] Fallback aplicado, fluxos mockados:', flows.length);
     }
 }
 
 async function loadTemplates() {
     try {
-        console.log('📥 Carregando templates da API para fluxos WhatsApp...');
+        console.log('🔍 [DEBUG] Iniciando loadTemplates()');
         
         // 1. OBTER CREDENCIAIS DE AUTENTICAÇÃO
         const token = getToken();
+        console.log('🔍 [DEBUG] Token para templates:', token ? 'SIM' : 'NÃO');
+        
         if (!token) {
-            console.error('❌ Token não encontrado');
+            console.error('❌ [DEBUG] Token não encontrado para templates');
             return;
         }
         
@@ -134,33 +177,48 @@ async function loadTemplates() {
             ? 'https://programa-indicacao-multicliente-production.up.railway.app'
             : 'http://localhost:3000';
         
+        console.log('🔍 [DEBUG] Hostname:', window.location.hostname);
+        console.log('🔍 [DEBUG] Is Production:', isProduction);
+        console.log('🔍 [DEBUG] API Base URL:', apiBaseUrl);
+        
         // 3. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
-        const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates`, {
+        const fullUrl = `${apiBaseUrl}/api/client/whatsapp/templates`;
+        console.log('🔍 [DEBUG] URL completa para templates:', fullUrl);
+        
+        const response = await fetch(fullUrl, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
         
+        console.log('🔍 [DEBUG] Response templates status:', response.status);
+        console.log('🔍 [DEBUG] Response templates ok:', response.ok);
+        
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ [DEBUG] Erro ao carregar templates. Status:', response.status);
+            console.error('❌ [DEBUG] Response text:', errorText);
             throw new Error(`Erro ${response.status}: ${response.statusText}`);
         }
         
         const responseData = await response.json();
-        console.log('✅ Templates carregados da API:', responseData);
+        console.log('✅ [DEBUG] Templates carregados da API:', responseData);
         
         // 4. EXTRAIR ARRAY DE TEMPLATES
         templates = responseData.data || responseData;
-        console.log(`📋 ${templates.length} templates carregados para fluxos`);
+        console.log(`📋 [DEBUG] ${templates.length} templates carregados para fluxos`);
         
         // 5. ATUALIZAR DROPDOWNS EXISTENTES
         updateTemplateDropdowns();
         
     } catch (error) {
-        console.error('❌ Erro ao carregar templates da API:', error);
+        console.error('❌ [DEBUG] Erro completo em loadTemplates:', error);
+        console.error('❌ [DEBUG] Stack trace:', error.stack);
         showError('Erro ao carregar templates da API');
         
         // Fallback para dados mockados em caso de erro
+        console.log('🔄 [DEBUG] Usando fallback para templates mockados');
         templates = [
             {
                 id: '1',
@@ -181,17 +239,20 @@ async function loadTemplates() {
                 content: 'Oferta especial para você: {{discount}}% de desconto!'
             }
         ];
+        console.log('🔄 [DEBUG] Fallback de templates aplicado:', templates.length);
     }
 }
 
 async function loadCampaigns() {
     try {
-        console.log('📥 Carregando campanhas para fluxos WhatsApp...');
+        console.log('🔍 [DEBUG] Iniciando loadCampaigns()');
         
         // 1. OBTER CREDENCIAIS DE AUTENTICAÇÃO
         const token = getToken();
+        console.log('🔍 [DEBUG] Token para campanhas:', token ? 'SIM' : 'NÃO');
+        
         if (!token) {
-            console.error('❌ Token não encontrado');
+            console.error('❌ [DEBUG] Token não encontrado para campanhas');
             return;
         }
         
@@ -201,35 +262,51 @@ async function loadCampaigns() {
             ? 'https://programa-indicacao-multicliente-production.up.railway.app'
             : 'http://localhost:3000';
         
+        console.log('🔍 [DEBUG] Hostname para campanhas:', window.location.hostname);
+        console.log('🔍 [DEBUG] Is Production para campanhas:', isProduction);
+        console.log('🔍 [DEBUG] API Base URL para campanhas:', apiBaseUrl);
+        
         // 3. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
-        const response = await fetch(`${apiBaseUrl}/api/campaigns`, {
+        const fullUrl = `${apiBaseUrl}/api/campaigns`;
+        console.log('🔍 [DEBUG] URL completa para campanhas:', fullUrl);
+        
+        const response = await fetch(fullUrl, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
         
+        console.log('🔍 [DEBUG] Response campanhas status:', response.status);
+        console.log('🔍 [DEBUG] Response campanhas ok:', response.ok);
+        
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ [DEBUG] Erro ao carregar campanhas. Status:', response.status);
+            console.error('❌ [DEBUG] Response text:', errorText);
             throw new Error(`Erro ${response.status}: ${response.statusText}`);
         }
         
         const responseData = await response.json();
-        console.log('✅ Campanhas carregadas da API:', responseData);
+        console.log('✅ [DEBUG] Campanhas carregadas da API:', responseData);
         
         // 4. EXTRAIR ARRAY DE CAMPANHAS
         campaigns = responseData.data || responseData;
-        console.log(`�� ${campaigns.length} campanhas carregadas para fluxos`);
+        console.log(`📋 [DEBUG] ${campaigns.length} campanhas carregadas para fluxos`);
         
         // 5. POPULAR DROPDOWN DE CAMPANHAS
         populateCampaignDropdown();
         
     } catch (error) {
-        console.error('❌ Erro ao carregar campanhas da API:', error);
+        console.error('❌ [DEBUG] Erro completo em loadCampaigns:', error);
+        console.error('❌ [DEBUG] Stack trace:', error.stack);
         showError('Erro ao carregar campanhas da API');
         
         // Em caso de erro, não mostrar campanhas mockadas
+        console.log('🔄 [DEBUG] Usando fallback para campanhas vazias');
         campaigns = [];
         populateCampaignDropdown();
+        console.log('🔄 [DEBUG] Fallback de campanhas aplicado:', campaigns.length);
     }
 }
 
