@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { WhatsAppFlowService } from './whatsapp-flow.service';
-import { JwtClientAuthGuard } from '../auth/guards/jwt-client-auth.guard';
+import { JwtClientAuthGuard } from '../../auth/guards/jwt-client-auth.guard';
 import { Types } from 'mongoose';
 
 @Controller('whatsapp/flows')
@@ -171,7 +171,7 @@ export class WhatsAppFlowController {
    */
   @Post('validate')
   async validateFlowData(@Body() flowData: any) {
-    const errors = [];
+    const errors: string[] = [];
 
     // Validar dados obrigatórios
     if (!flowData.name) {
@@ -186,7 +186,7 @@ export class WhatsAppFlowController {
       errors.push('Pelo menos uma mensagem deve ser configurada');
     } else {
       // Validar ordem das mensagens
-      const orders = flowData.messages.map(m => m.order).sort((a, b) => a - b);
+      const orders = flowData.messages.map((m: any) => m.order).sort((a: number, b: number) => a - b);
       for (let i = 0; i < orders.length; i++) {
         if (orders[i] !== i + 1) {
           errors.push('Ordem das mensagens deve ser sequencial (1, 2, 3...)');
