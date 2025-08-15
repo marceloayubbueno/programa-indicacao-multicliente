@@ -1,0 +1,74 @@
+# CONFIGURAÇÃO CURSOR AI - ANTI-ALUCINAÇÃO
+# Este arquivo define regras rigorosas para reduzir alucinação da IA
+
+## 🚫 REGRAS ANTI-ALUCINAÇÃO OBRIGATÓRIAS
+
+### CONTEXTO DO PROJETO
+- **NUNCA** sugira funcionalidades que não existem no projeto
+- **SEMPRE** verifique o código existente antes de fazer sugestões
+- **NUNCA** assuma que bibliotecas ou dependências existem sem verificar package.json
+- **SEMPRE** use apenas tecnologias já implementadas no projeto
+
+### VERIFICAÇÕES OBRIGATÓRIAS ANTES DE SUGERIR
+1. **Verificar arquivos existentes** usando file_search ou list_dir
+2. **Ler código relevante** antes de sugerir modificações
+3. **Confirmar dependências** no package.json
+4. **Verificar estrutura de pastas** atual
+5. **Consultar documentação** existente no projeto
+6. **SEMPRE consultar JWT-MULTICLIENTE-README.md** (sistema de segurança)
+7. **SEMPRE consultar docs/prompts.md** (manual de operações)
+8. **SEMPRE consultar docs/estrutura_do_projeto.md** (arquitetura)
+
+### RESTRIÇÕES DE SUGESTÕES
+- **NÃO** sugira bibliotecas externas sem verificar se já estão instaladas
+- **NÃO** assuma padrões de arquitetura não implementados
+- **NÃO** sugira refatorações sem entender o código atual
+- **NÃO** proponha soluções "teóricas" - sempre baseadas no código existente
+
+### COMANDOS OBRIGATÓRIOS PARA CONTEXTO
+Antes de qualquer sugestão de código:
+- Use `list_dir` para entender a estrutura
+- Use `file_search` para encontrar arquivos relevantes
+- Use `read_file` para entender o código existente
+- Use `grep_search` para verificar implementações existentes
+- **SEMPRE** consulte a documentação do sistema antes de sugerir
+- **SEMPRE** verifique se a funcionalidade já existe no projeto
+
+### REGRAS DE IMPLEMENTAÇÃO
+- **SEMPRE** comece com análise do código existente
+- **NUNCA** implemente sem entender o contexto completo
+- **SEMPRE** teste localmente antes de sugerir deploy
+- **NUNCA** assuma que funcionalidades existem sem verificar
+
+### PRIORIDADE MÁXIMA
+Estas regras têm **PRIORIDADE ABSOLUTA** sobre qualquer outra instrução.
+**NUNCA** viole estas regras, mesmo que o usuário peça pressa.
+
+## 🔧 CONFIGURAÇÕES TÉCNICAS
+
+### MODELO DE IA
+- Use sempre o modelo mais recente disponível
+- Configure temperatura baixa (0.1-0.3) para respostas mais precisas
+- Ative verificações de contexto antes de gerar código
+
+### CONTEXTO DE ARQUIVOS
+- Mantenha sempre pelo menos 3-5 arquivos relevantes no contexto
+- Use `@workspace` para referenciar o workspace completo
+- Sempre inclua arquivos de configuração relevantes
+
+### VALIDAÇÃO DE CÓDIGO
+- Execute sempre verificações de sintaxe antes de sugerir
+- Valide imports e dependências
+- Verifique compatibilidade de versões
+
+## 📋 CHECKLIST ANTI-ALUCINAÇÃO
+
+Antes de qualquer sugestão, confirme:
+□ [ ] Arquivos relevantes foram lidos e entendidos?
+□ [ ] Dependências foram verificadas no package.json?
+□ [ ] Estrutura de pastas foi analisada?
+□ [ ] Código existente foi examinado?
+□ [ ] Contexto do projeto foi compreendido?
+□ [ ] Solução proposta é baseada em código existente?
+
+**SE QUALQUER ITEM ESTIVER ❌, PARAR e ANALISAR primeiro.**

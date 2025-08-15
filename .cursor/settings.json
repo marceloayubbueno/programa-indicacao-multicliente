@@ -1,0 +1,42 @@
+{
+  "ai": {
+    "model": "claude-3.5-sonnet",
+    "temperature": 0.1,
+    "max_tokens": 4000,
+    "context_window": 200000,
+    "system_prompt": "Você é um assistente de programação especializado em NestJS e JavaScript. SEMPRE verifique o código existente antes de sugerir mudanças. NUNCA assuma funcionalidades não implementadas. Use as ferramentas de busca e leitura para entender o contexto antes de qualquer sugestão.",
+    "anti_hallucination": {
+      "enabled": true,
+      "strict_mode": true,
+      "context_verification": true,
+      "dependency_check": true,
+      "code_validation": true
+    }
+  },
+  "rules": {
+    "strict_mode": true,
+    "context_verification": true,
+    "dependency_check": true,
+    "code_validation": true,
+    "anti_duplication": true
+  },
+  "workflow": {
+    "plan_first": true,
+    "context_analysis": true,
+    "code_review": true,
+    "testing_required": true
+  },
+  "context": {
+    "min_files": 5,
+    "max_files": 15,
+    "include_configs": true,
+    "include_dependencies": true,
+    "include_architecture": true
+  },
+  "validation": {
+    "syntax_check": true,
+    "dependency_verify": true,
+    "structure_verify": true,
+    "pattern_verify": true
+  }
+}

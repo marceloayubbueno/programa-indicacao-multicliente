@@ -1,0 +1,109 @@
+# REGRAS DE CONTEXTO DO PROJETO - ANTI-ALUCINAÇÃO
+
+## 🎯 CONTEXTO OBRIGATÓRIO
+
+### SEMPRE MANTER NO CONTEXTO:
+1. **Arquivos de Configuração:**
+   - package.json (dependências)
+   - tsconfig.json (configuração TypeScript)
+   - estrutura de pastas principal
+
+2. **Arquivos de Arquitetura:**
+   - app.module.ts (NestJS)
+   - main.ts (ponto de entrada)
+   - schemas principais
+
+3. **Padrões de Código:**
+   - Estilo de nomenclatura
+   - Estrutura de pastas
+   - Convenções de código
+
+## 🔍 VERIFICAÇÕES DE CONTEXTO
+
+### ANTES DE QUALQUER AÇÃO:
+1. **Verificar Estrutura Atual:**
+   ```bash
+   list_dir relative_workspace_path="."
+   list_dir relative_workspace_path="server/src"
+   list_dir relative_workspace_path="client"
+   ```
+
+2. **Verificar Dependências:**
+   ```bash
+   read_file target_file="package.json" should_read_entire_file=false start_line_one_indexed=1 end_line_one_indexed=50
+   read_file target_file="server/package.json" should_read_entire_file=false start_line_one_indexed=1 end_line_one_indexed=50
+   ```
+
+3. **Verificar Configurações:**
+   ```bash
+   read_file target_file="server/tsconfig.json" should_read_entire_file=false start_line_one_indexed=1 end_line_one_indexed=30
+   read_file target_file="tailwind.config.js" should_read_entire_file=false start_line_one_indexed=1 end_line_one_indexed=30
+   ```
+
+## 📚 DOCUMENTAÇÃO DO PROJETO
+
+### ARQUIVOS DE REFERÊNCIA OBRIGATÓRIOS:
+- `README.md` - Visão geral do projeto
+- `docs/` - Documentação técnica
+- `.cursor/rules/` - Regras do Cursor
+- `planos.json` - Configurações de planos
+
+### SEMPRE CONSULTAR:
+- Documentação existente antes de sugerir mudanças
+- Padrões já implementados
+- Convenções estabelecidas
+
+## 🚫 RESTRIÇÕES DE CONTEXTO
+
+### NUNCA ASSUMA:
+- **Tecnologias** não listadas no package.json
+- **Padrões** não implementados no projeto
+- **Estruturas** diferentes das existentes
+- **Funcionalidades** não documentadas
+
+### SEMPRE VERIFIQUE:
+- Se a funcionalidade já existe
+- Se o padrão já foi implementado
+- Se a biblioteca está instalada
+- Se a estrutura é compatível
+
+## 🔄 MANUTENÇÃO DE CONTEXTO
+
+### DURANTE A SESSÃO:
+1. **Mantenha** pelo menos 5-10 arquivos relevantes no contexto
+2. **Atualize** o contexto conforme necessário
+3. **Verifique** sempre antes de sugerir mudanças
+4. **Documente** decisões importantes
+
+### AO MUDAR DE CONTEXTO:
+1. **Limpe** o contexto anterior
+2. **Carregue** novos arquivos relevantes
+3. **Verifique** a estrutura da nova área
+4. **Confirme** padrões existentes
+
+## 📋 CHECKLIST DE CONTEXTO
+
+### Antes de Iniciar Qualquer Tarefa:
+□ [ ] Estrutura do projeto foi analisada?
+□ [ ] Dependências foram verificadas?
+□ [ ] Padrões existentes foram identificados?
+□ [ ] Arquivos relevantes estão no contexto?
+□ [ ] Documentação foi consultada?
+
+### Durante o Desenvolvimento:
+□ [ ] Contexto está atualizado?
+□ [ ] Novos arquivos foram adicionados ao contexto?
+□ [ ] Padrões estão sendo seguidos?
+□ [ ] Mudanças são compatíveis com o projeto?
+
+## 🚨 REGRAS DE EMERGÊNCIA
+
+### SE O CONTEXTO ESTIVER INCOMPLETO:
+1. **PARE** imediatamente
+2. **Execute** verificações de contexto
+3. **Carregue** arquivos necessários
+4. **Confirme** entendimento antes de continuar
+
+### PRIORIDADE ABSOLUTA:
+Manter contexto completo tem **PRIORIDADE MÁXIMA**.
+**NUNCA** prossiga sem contexto adequado.

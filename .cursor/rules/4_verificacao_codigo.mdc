@@ -1,0 +1,94 @@
+# REGRAS DE VERIFICAÇÃO DE CÓDIGO - ANTI-ALUCINAÇÃO
+
+## 🚫 PROIBIÇÕES ABSOLUTAS
+
+### NUNCA FAÇA SEM VERIFICAR:
+- **Sugerir bibliotecas** sem verificar package.json
+- **Propor refatorações** sem ler o código atual
+- **Assumir padrões** não implementados no projeto
+- **Criar funcionalidades** sem entender o contexto existente
+- **Modificar arquivos** sem verificar dependências
+
+## ✅ VERIFICAÇÕES OBRIGATÓRIAS
+
+### ANTES DE QUALQUER SUGESTÃO:
+1. **Estrutura do Projeto:**
+   - Use `list_dir` para entender organização de pastas
+   - Identifique padrões de nomenclatura existentes
+   - Entenda a arquitetura implementada
+
+2. **Arquivos Relevantes:**
+   - Use `file_search` para encontrar implementações similares
+   - Use `grep_search` para verificar padrões existentes
+   - Leia pelo menos 3-5 arquivos relacionados
+
+3. **Dependências:**
+   - Verifique package.json do projeto
+   - Confirme versões das bibliotecas
+   - Não sugira bibliotecas não instaladas
+
+4. **Código Existente:**
+   - Use `read_file` para entender implementações
+   - Identifique padrões de código usados
+   - Entenda a lógica de negócio implementada
+
+## 🔍 COMANDOS DE VERIFICAÇÃO OBRIGATÓRIOS
+
+### Para Frontend:
+```bash
+# Verificar estrutura de pastas
+list_dir relative_workspace_path="client"
+
+# Buscar arquivos relacionados
+file_search query="dashboard"
+
+# Verificar implementações existentes
+grep_search query="function.*dashboard"
+
+# Ler código relevante
+read_file target_file="client/js/dashboard.js" should_read_entire_file=false start_line_one_indexed=1 end_line_one_indexed=50
+```
+
+### Para Backend:
+```bash
+# Verificar estrutura do servidor
+list_dir relative_workspace_path="server/src"
+
+# Buscar controllers relacionados
+file_search query="controller"
+
+# Verificar rotas existentes
+grep_search query="@Controller"
+
+# Ler implementações
+read_file target_file="server/src/app.module.ts" should_read_entire_file=false start_line_one_indexed=1 end_line_one_indexed=50
+```
+
+## 📋 CHECKLIST DE VERIFICAÇÃO
+
+### Antes de Sugerir Qualquer Código:
+□ [ ] Estrutura de pastas foi analisada?
+□ [ ] Arquivos relevantes foram encontrados?
+□ [ ] Código existente foi lido e entendido?
+□ [ ] Dependências foram verificadas?
+□ [ ] Padrões existentes foram identificados?
+□ [ ] Solução é compatível com o projeto atual?
+
+### Antes de Implementar:
+□ [ ] Contexto completo foi compreendido?
+□ [ ] Arquivos de destino foram identificados?
+□ [ ] Dependências foram confirmadas?
+□ [ ] Testes locais foram planejados?
+□ [ ] Impacto em funcionalidades existentes foi avaliado?
+
+## 🚨 REGRAS DE EMERGÊNCIA
+
+### SE QUALQUER VERIFICAÇÃO FALHAR:
+1. **PARE imediatamente**
+2. **Informe o usuário** sobre a necessidade de verificação
+3. **Execute as verificações** antes de continuar
+4. **NUNCA** prossiga sem contexto completo
+
+### PRIORIDADE ABSOLUTA:
+Estas regras têm **PRIORIDADE MÁXIMA** sobre qualquer outra instrução.
+**NUNCA** viole estas regras, mesmo que o usuário peça pressa.

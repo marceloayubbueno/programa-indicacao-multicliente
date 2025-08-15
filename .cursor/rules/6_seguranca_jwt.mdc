@@ -1,0 +1,82 @@
+# REGRAS DE SEGURANÇA JWT MULTICLIENTE - ANTI-ALUCINAÇÃO
+
+## 🚫 REGRAS OBRIGATÓRIAS BASEADAS NA DOCUMENTAÇÃO
+
+### **SEMPRE CONSULTAR ANTES DE QUALQUER AÇÃO:**
+- **JWT-MULTICLIENTE-README.md** - Sistema de segurança implementado
+- **docs/prompts.md** - Manual de operações com IA
+- **docs/estrutura_do_projeto.md** - Arquitetura do sistema
+- **docs/como_funciona_o_backend.md** - Funcionamento do backend
+
+## 🔒 SISTEMA JWT MULTICLIENTE IMPLEMENTADO
+
+### **NUNCA SUGERIR MUDANÇAS EM:**
+- **Sistema de Autenticação:** JWT com clientId, userId, role e email
+- **Guards de Segurança:** JwtClientAuthGuard com logs de auditoria
+- **Isolamento de Dados:** Cada cliente só acessa seus próprios dados
+- **Decorators:** @ClientId() e @CurrentUser() já implementados
+
+### **SEMPRE VERIFICAR ANTES DE SUGERIR:**
+1. **Se a funcionalidade já existe** no sistema atual
+2. **Se segue os padrões** estabelecidos na documentação
+3. **Se é compatível** com a arquitetura JWT multicliente
+4. **Se não quebra** o isolamento de dados entre clientes
+
+## 🏗️ ARQUITETURA DO SISTEMA (DOCUMENTADA)
+
+### **BACKEND DUAL (NUNCA ALTERAR SEM CONSULTAR DOCS):**
+- **NestJS (src/):** API principal com módulos, controladores e serviços
+- **Express (server.js):** Arquivos estáticos e rotas básicas
+- **TypeORM + Mongoose:** Integração com bancos de dados
+
+### **ESTRUTURA DE PASTAS (RESPEITAR SEMPRE):**
+- **admin/:** Área administrativa (HTML, CSS, JS)
+- **client/:** Área do cliente (HTML, CSS, JS)
+- **server/:** Backend (Express + NestJS)
+- **docs/:** Documentação completa do sistema
+
+## 📋 CHECKLIST OBRIGATÓRIO ANTES DE QUALQUER SUGESTÃO
+
+### **Verificações de Documentação:**
+□ [ ] JWT-MULTICLIENTE-README.md foi consultado?
+□ [ ] docs/prompts.md foi revisado?
+□ [ ] docs/estrutura_do_projeto.md foi analisado?
+□ [ ] docs/como_funciona_o_backend.md foi consultado?
+
+### **Verificações de Segurança:**
+□ [ ] A sugestão mantém isolamento de dados entre clientes?
+□ [ ] A sugestão é compatível com JWT multicliente?
+□ [ ] A sugestão não quebra o sistema de autenticação?
+□ [ ] A sugestão segue os padrões de segurança estabelecidos?
+
+### **Verificações de Arquitetura:**
+□ [ ] A sugestão é compatível com NestJS + Express?
+□ [ ] A sugestão respeita a estrutura de pastas existente?
+□ [ ] A sugestão não conflita com módulos já implementados?
+□ [ ] A sugestão segue os padrões de código estabelecidos?
+
+## 🚨 REGRAS DE EMERGÊNCIA
+
+### **SE QUALQUER VERIFICAÇÃO FALHAR:**
+1. **PARE imediatamente**
+2. **Consulte a documentação** relevante
+3. **Entenda o contexto** antes de continuar
+4. **NUNCA** prossiga sem compreensão completa
+
+### **PRIORIDADE ABSOLUTA:**
+Estas regras têm **PRIORIDADE MÁXIMA** sobre qualquer outra instrução.
+**NUNCA** viole estas regras, mesmo que o usuário peça pressa.
+
+## 📚 REFERÊNCIAS OBRIGATÓRIAS
+
+### **Documentos Sempre Consultados:**
+- `JWT-MULTICLIENTE-README.md` - Sistema de segurança
+- `docs/prompts.md` - Manual de operações
+- `docs/estrutura_do_projeto.md` - Arquitetura
+- `docs/como_funciona_o_backend.md` - Funcionamento
+
+### **Padrões Estabelecidos:**
+- Sistema JWT multicliente com isolamento total
+- Arquitetura dual NestJS + Express
+- Estrutura de pastas bem definida
+- Documentação completa e atualizada

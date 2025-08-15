@@ -17,6 +17,7 @@ import { WhatsAppMessage, WhatsAppMessageSchema } from './entities/whatsapp-mess
 import { WhatsAppTwilioConfig, WhatsAppTwilioConfigSchema } from './providers/whatsapp-twilio-config.schema';
 import { CompanyHeaderModule } from './company-header/company-header.module';
 import { WhatsAppCompanyHeader, WhatsAppCompanyHeaderSchema } from './entities/whatsapp-company-header.schema';
+import { WhatsAppFlowModule } from './flows/whatsapp-flow.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { WhatsAppCompanyHeader, WhatsAppCompanyHeaderSchema } from './entities/w
       { name: WhatsAppCompanyHeader.name, schema: WhatsAppCompanyHeaderSchema },
     ]),
     CompanyHeaderModule,
+    WhatsAppFlowModule,
   ],
   controllers: [
     WhatsAppAdminController,
@@ -47,6 +49,7 @@ import { WhatsAppCompanyHeader, WhatsAppCompanyHeaderSchema } from './entities/w
     WhatsAppAdminService,
     WhatsAppClientService,
     WhatsAppClientTemplatesService,
+    WhatsAppFlowModule,
   ],
 })
 export class WhatsAppModule {} 

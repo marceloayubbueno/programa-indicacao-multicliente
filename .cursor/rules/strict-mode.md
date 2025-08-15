@@ -13,21 +13,31 @@
 ### VERIFICAÇÕES TÉCNICAS OBRIGATÓRIAS
 ANTES de implementar qualquer funcionalidade, SEMPRE verificar:
 
+#### CONTEXTO OBRIGATÓRIO (ANTES DE TUDO)
+- **PRIMEIRO:** Use `list_dir` para entender a estrutura de pastas
+- **SEGUNDO:** Use `file_search` para encontrar arquivos relevantes
+- **TERCEIRO:** Use `read_file` para ler e entender o código existente
+- **QUARTO:** Use `grep_search` para verificar implementações existentes
+- **QUINTO:** Verifique package.json para dependências instaladas
+
 #### FRONTEND
 - TODOS os scripts necessários estão incluídos nas páginas HTML?
 - A ORDEM de carregamento está correta? (config.js → api-client.js → auth.js → feature.js)
 - Objetos/classes são verificados (typeof) antes de serem usados?
 - window.apiClient existe antes de chamar métodos?
+- **NUNCA** assuma que bibliotecas externas estão disponíveis
 
 #### BACKEND
 - O endpoint necessário existe e está funcionando?
 - As rotas estão registradas corretamente?
 - O controller tem o método solicitado?
+- **NUNCA** sugira padrões não implementados no projeto
 
 #### INTEGRAÇÃO
 - TESTAR localmente antes de fazer deploy
 - VERIFICAR console.error e network logs
 - CONFIRMAR que funcionalidades existentes não quebraram
+- **SEMPRE** verificar se a solução proposta é compatível com o código existente
 
 ### CHECKLIST PRÉ-IMPLEMENTAÇÃO (OBRIGATÓRIO)
 ANTES de escrever qualquer código:

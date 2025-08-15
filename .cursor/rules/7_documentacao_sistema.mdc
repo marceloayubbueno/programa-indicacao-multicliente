@@ -1,0 +1,104 @@
+# REGRAS DE CONSULTA DE DOCUMENTAÇÃO - ANTI-ALUCINAÇÃO
+
+## 📚 CONSULTA OBRIGATÓRIA ANTES DE QUALQUER AÇÃO
+
+### **DOCUMENTOS SEMPRE CONSULTADOS:**
+1. **JWT-MULTICLIENTE-README.md** - Sistema de segurança implementado
+2. **docs/prompts.md** - Manual de operações com IA
+3. **docs/estrutura_do_projeto.md** - Arquitetura do sistema
+4. **docs/como_funciona_o_backend.md** - Funcionamento do backend
+5. **docs/README-DESENVOLVIMENTO.md** - Guia de desenvolvimento
+
+## 🔍 WORKFLOW DE CONSULTA OBRIGATÓRIO
+
+### **ANTES DE QUALQUER SUGESTÃO:**
+1. **PRIMEIRO:** Consultar documentação relevante
+2. **SEGUNDO:** Entender padrões estabelecidos
+3. **TERCEIRO:** Verificar se funcionalidade já existe
+4. **QUARTO:** Propor solução compatível
+
+### **COMANDOS DE CONSULTA OBRIGATÓRIOS:**
+```bash
+# Sempre consultar antes de sugerir
+read_file target_file="JWT-MULTICLIENTE-README.md" should_read_entire_file=false start_line_one_indexed=1 end_line_one_indexed=50
+read_file target_file="docs/prompts.md" should_read_entire_file=false start_line_one_indexed=1 end_line_one_indexed=50
+read_file target_file="docs/estrutura_do_projeto.md" should_read_entire_file=false start_line_one_indexed=1 end_line_one_indexed=50
+```
+
+## 🚫 PROIBIÇÕES ABSOLUTAS
+
+### **NUNCA SUGERIR SEM CONSULTAR:**
+- **Funcionalidades** que podem já existir
+- **Mudanças** na arquitetura estabelecida
+- **Bibliotecas** não listadas na documentação
+- **Padrões** diferentes dos estabelecidos
+- **Estruturas** incompatíveis com o sistema
+
+### **NUNCA ASSUMA:**
+- Que uma funcionalidade não existe
+- Que pode alterar padrões estabelecidos
+- Que pode ignorar a documentação
+- Que pode sugerir soluções "teóricas"
+
+## ✅ VERIFICAÇÕES OBRIGATÓRIAS
+
+### **CHECKLIST DE DOCUMENTAÇÃO:**
+□ [ ] Documentação relevante foi consultada?
+□ [ ] Padrões estabelecidos foram entendidos?
+□ [ ] Funcionalidade já existe no sistema?
+□ [ ] Solução é compatível com arquitetura?
+□ [ ] Segurança JWT multicliente foi considerada?
+
+### **CHECKLIST DE COMPATIBILIDADE:**
+□ [ ] Solução respeita estrutura de pastas?
+□ [ ] Solução é compatível com NestJS + Express?
+□ [ ] Solução mantém isolamento de dados?
+□ [ ] Solução segue padrões de código?
+□ [ ] Solução não quebra funcionalidades existentes?
+
+## 🔄 WORKFLOW DE IMPLEMENTAÇÃO
+
+### **PASSO 1: CONSULTA (OBRIGATÓRIO)**
+- Ler documentação relevante
+- Entender padrões estabelecidos
+- Verificar funcionalidades existentes
+
+### **PASSO 2: ANÁLISE**
+- Identificar compatibilidade
+- Verificar impactos na segurança
+- Confirmar aderência aos padrões
+
+### **PASSO 3: IMPLEMENTAÇÃO**
+- Seguir padrões estabelecidos
+- Manter compatibilidade
+- Preservar funcionalidades existentes
+
+## 🚨 REGRAS DE EMERGÊNCIA
+
+### **SE A DOCUMENTAÇÃO NÃO FOR CONSULTADA:**
+1. **PARE imediatamente**
+2. **Execute consultas obrigatórias**
+3. **Entenda o contexto completo**
+4. **NUNCA** prossiga sem documentação
+
+### **PRIORIDADE ABSOLUTA:**
+Consulta à documentação tem **PRIORIDADE MÁXIMA**.
+**NUNCA** viole estas regras, mesmo que o usuário peça pressa.
+
+## 📋 RESUMO EXECUTIVO
+
+### **PRINCÍPIO FUNDAMENTAL:**
+**"CONSULTAR SEMPRE, ASSUMIR NUNCA"**
+
+### **OBJETIVO:**
+Garantir que todas as sugestões sejam:
+- Baseadas na documentação existente
+- Compatíveis com o sistema atual
+- Seguras para o ambiente multicliente
+- Seguindo padrões estabelecidos
+
+### **RESULTADO:**
+- Redução drástica de alucinação
+- Sugestões sempre compatíveis
+- Preservação da integridade do sistema
+- Manutenção dos padrões de qualidade
