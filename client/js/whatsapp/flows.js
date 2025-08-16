@@ -83,8 +83,8 @@ async function loadFlows() {
         console.log('🔍 [DEBUG] Is Production para fluxos:', isProduction);
         console.log('🔍 [DEBUG] API Base URL para fluxos:', apiBaseUrl);
         
-        // URL COMPLETA para fluxos (corrigida com prefixo /api)
-        const fullUrl = `${apiBaseUrl}/api/whatsapp/flows`;
+        // URL COMPLETA para fluxos (corrigida sem prefixo /api)
+        const fullUrl = `${apiBaseUrl}/whatsapp/flows`;
         console.log('🔍 [DEBUG] URL completa para fluxos:', fullUrl);
         
         const response = await fetch(fullUrl, {
@@ -148,7 +148,7 @@ async function loadTemplates() {
         console.log('🔍 [DEBUG] API Base URL:', apiBaseUrl);
         
         // 3. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
-        const fullUrl = `${apiBaseUrl}/api/client/whatsapp/templates`;
+        const fullUrl = `${apiBaseUrl}/client/whatsapp/templates`;
         console.log('🔍 [DEBUG] URL completa para templates:', fullUrl);
         
         const response = await fetch(fullUrl, {
@@ -214,7 +214,7 @@ async function loadCampaigns() {
         console.log('🔍 [DEBUG] API Base URL para campanhas:', apiBaseUrl);
         
         // 3. REQUISIÇÃO PARA API (Padrão JWT Multicliente)
-        const fullUrl = `${apiBaseUrl}/api/campaigns`;
+        const fullUrl = `${apiBaseUrl}/campaigns`;
         console.log('🔍 [DEBUG] URL completa para campanhas:', fullUrl);
         
         const response = await fetch(fullUrl, {
@@ -341,7 +341,7 @@ async function getIndicatorsCount(campaignId) {
         }
         
         // Buscar todos os participantes e filtrar por campanha e tipo
-        const response = await fetch(`${apiBaseUrl}/api/participants`, {
+        const response = await fetch(`${apiBaseUrl}/participants`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -386,7 +386,7 @@ async function getLeadsCount(campaignId) {
         }
         
         // Buscar todos os referrals e filtrar por campanha
-        const response = await fetch(`${apiBaseUrl}/api/referrals`, {
+        const response = await fetch(`${apiBaseUrl}/referrals`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -937,7 +937,7 @@ async function saveFlow() {
             ? 'https://programa-indicacao-multicliente-production.up.railway.app'
             : 'http://localhost:3000';
         
-        const fullUrl = `${apiBaseUrl}/api/whatsapp/flows`;
+        const fullUrl = `${apiBaseUrl}/whatsapp/flows`;
         console.log('🔍 [DEBUG] Salvando fluxo em:', fullUrl);
         
         const response = await fetch(fullUrl, {
@@ -992,7 +992,7 @@ async function deleteFlow(flowId) {
                 ? 'https://programa-indicacao-multicliente-production.up.railway.app'
                 : 'http://localhost:3000';
             
-            const fullUrl = `${apiBaseUrl}/api/whatsapp/flows/${flowId}`;
+            const fullUrl = `${apiBaseUrl}/whatsapp/flows/${flowId}`;
             console.log('🔍 [DEBUG] Deletando fluxo em:', fullUrl);
             
             const response = await fetch(fullUrl, {
