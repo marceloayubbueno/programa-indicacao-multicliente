@@ -76,28 +76,12 @@ async function bootstrap() {
     }
   });
 
-  // 🔧 CORREÇÃO: Restaurar prefixo global /api mas excluir APENAS autenticação
-  app.setGlobalPrefix('api', {
-    exclude: [
-      // Rotas de autenticação (SEM prefixo /api)
-      { path: 'auth', method: RequestMethod.ALL },
-      { path: 'auth/*', method: RequestMethod.ALL },
-      { path: 'indicator-auth', method: RequestMethod.ALL },
-      { path: 'indicator-auth/*', method: RequestMethod.ALL },
-      // Rotas públicas de indicação (SEM prefixo /api)
-      { path: 'indicacao', method: RequestMethod.GET },
-      { path: 'indicacao/*', method: RequestMethod.GET },
-      { path: 'indicacao/*/preview', method: RequestMethod.GET },
-      // Rota raiz e health check
-      { path: '', method: RequestMethod.GET },
-      { path: 'health', method: RequestMethod.GET },
-      // Arquivos estáticos JavaScript e CSS
-      { path: 'js/*', method: RequestMethod.GET },
-      { path: 'css/*', method: RequestMethod.GET },
-      { path: 'assets/*', method: RequestMethod.GET },
-      { path: 'favicon.ico', method: RequestMethod.GET },
-    ],
-  });
+  // 🔧 RESTAURADO: Sistema funcionando como antes, sem prefixo global
+  console.log(`[BOOT] 🛣️ SISTEMA RESTAURADO:`);
+  console.log(`[BOOT] 🛣️ - Sem prefixo global /api`);
+  console.log(`[BOOT] 🛣️ - Rotas funcionando como antes`);
+  console.log(`[BOOT] 🛣️ - Autenticação: /auth/* e /indicator-auth/*`);
+  console.log(`[BOOT] 🛣️ - Arquivos estáticos servidos de: ${clientPath} e ${publicPath}`);
   
   // Configuração global de validação
   app.useGlobalPipes(new ValidationPipe({
@@ -141,19 +125,12 @@ async function bootstrap() {
   console.log(`[BOOT] 🌐 - virallead.com.br (PERMITIDO)`);
   console.log(`[BOOT] 🌐 - Localhost (PERMITIDO)`);
 
-  // 🔧 CORREÇÃO: Sistema funcionando com prefixo global /api mas autenticação SEM prefixo
-  console.log(`[BOOT] 🛣️ CONFIGURAÇÃO CORRIGIDA:`);
-  console.log(`[BOOT] 🛣️ - Prefixo global: /api (para compatibilidade com frontend)`);
-  console.log(`[BOOT] 🛣️ - Autenticação SEM prefixo: /auth/* e /indicator-auth/*`);
-  console.log(`[BOOT] 🛣️ - Rotas públicas: /indicacao/* (sem prefixo)`);
-  console.log(`[BOOT] 🛣️ - Arquivos estáticos servidos de: ${clientPath} e ${publicPath}`);
-
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
   console.log(`\n[BOOT] 🚀 Backend rodando na porta ${port}`);
-  console.log(`[BOOT] 🌐 API disponível em: /api/ (exceto autenticação)`);
+  console.log(`[BOOT] 🌐 Sistema funcionando como antes (sem prefixo global)`);
   console.log(`[BOOT] 🔗 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`[BOOT] 🌐 CLIENT_URL: ${process.env.CLIENT_URL || 'NÃO CONFIGURADO'}`);
-  console.log(`[BOOT] 🛣️ AUTENTICAÇÃO: /auth/* (sem prefixo /api)\n`);
+  console.log(`[BOOT] 🛣️ ROTAS RESTAURADAS: funcionando como antes\n`);
 }
 bootstrap();
