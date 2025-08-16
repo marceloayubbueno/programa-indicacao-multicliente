@@ -374,7 +374,7 @@ export class PublicReferralsController {
 
                 try {
                   // 🌍 USAR URL CORRETA DA API - CORREÇÃO CRÍTICA
-                  const apiUrl = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+                  const apiUrl = 'https://programa-indicacao-multicliente-production.up.railway.app';
                   const fullUrl = \`\${apiUrl}/lp-divulgacao/submit-referral\`;
                   
                   console.log('📡 [LP-FORM] Enviando para:', fullUrl);
