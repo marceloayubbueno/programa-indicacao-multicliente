@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards, Logger, Get, Param } from '@nestjs/common';
 import { WhatsAppFlowTriggerService, TriggerType } from './whatsapp-flow-trigger.service';
-import { JwtClientAuthGuard } from '../auth/guards/jwt-client-auth.guard';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtClientAuthGuard } from '../../auth/guards/jwt-client-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 
 @Controller('whatsapp/triggers')

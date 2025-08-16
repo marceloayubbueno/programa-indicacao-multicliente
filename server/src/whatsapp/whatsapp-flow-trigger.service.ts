@@ -7,8 +7,8 @@ import { MessagePriority, QueueStatus } from './entities/whatsapp-queue.schema';
 import { CreateQueueMessageDto } from './dto/create-queue-message.dto';
 
 // Schemas para buscar dados reais
-import { Participant, ParticipantDocument } from '../clients/entities/participant.schema';
-import { Referral, ReferralDocument } from '../referrals/entities/referral.schema';
+import { Participant, ParticipantDocument } from '../../clients/entities/participant.schema';
+import { Referral, ReferralDocument } from '../../referrals/entities/referral.schema';
 import { WhatsAppTemplate, WhatsAppTemplateDocument } from './entities/whatsapp-template.schema';
 
 export enum TriggerType {
