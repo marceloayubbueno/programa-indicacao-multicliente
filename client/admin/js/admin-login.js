@@ -41,9 +41,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             try {
-                console.log('Fazendo requisição para:', `${BASE_URL}/api/auth/admin-login`);
-                // 🔧 CORRIGIDO: URL correta do backend NestJS
-                const response = await fetch(`${BASE_URL}/api/auth/admin-login`, {
+                console.log('Fazendo requisição para:', `${BASE_URL}/auth/admin-login`);
+                // 🔧 CORRIGIDO: URL correta do backend NestJS (sem /api)
+                const response = await fetch(`${BASE_URL}/auth/admin-login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
