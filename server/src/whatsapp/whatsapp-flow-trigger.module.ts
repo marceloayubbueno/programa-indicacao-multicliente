@@ -7,8 +7,8 @@ import { WhatsAppTemplate, WhatsAppTemplateSchema } from './entities/whatsapp-te
 import { WhatsAppQueueModule } from './whatsapp-queue.module';
 
 // Schemas para buscar dados reais
-import { Participant, ParticipantSchema } from '../../clients/entities/participant.schema';
-import { Referral, ReferralSchema } from '../../referrals/entities/referral.schema';
+import { Participant, ParticipantSchema } from '../clients/entities/participant.schema';
+import { Referral, ReferralSchema } from '../referrals/entities/referral.schema';
 
 @Module({
   imports: [
