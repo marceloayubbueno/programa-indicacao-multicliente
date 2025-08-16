@@ -13,12 +13,26 @@ export class WhatsAppFlowTriggerController {
   // APIs para clientes dispararem gatilhos
   @Post('indicator-joined')
   @UseGuards(JwtClientAuthGuard)
-  async triggerIndicatorJoined(@Body() body: { participantId: string; campaignId?: string; clientId: string; }) {
+  async triggerIndicatorJoined(@Body() body: { 
+    participantData: {
+      id: string;
+      name: string;
+      email: string;
+      phone: string;
+      createdAt?: string;
+      [key: string]: any;
+    }; 
+    campaignId?: string; 
+    clientId: string; 
+  }) {
     try {
-      this.logger.log(`Gatilho indicator_joined disparado para participante: ${body.participantId}`);
+      this.logger.log(`Gatilho indicator_joined disparado para participante: ${body.participantData.id}`);
       
       const result = await this.whatsappFlowTriggerService.triggerIndicatorJoined(
-        new Types.ObjectId(body.participantId),
+        {
+          ...body.participantData,
+          createdAt: body.participantData.createdAt ? new Date(body.participantData.createdAt) : new Date(),
+        },
         new Types.ObjectId(body.clientId),
         body.campaignId
       );
@@ -40,12 +54,28 @@ export class WhatsAppFlowTriggerController {
 
   @Post('lead-indicated')
   @UseGuards(JwtClientAuthGuard)
-  async triggerLeadIndicated(@Body() body: { referralId: string; campaignId?: string; clientId: string; }) {
+  async triggerLeadIndicated(@Body() body: { 
+    referralData: {
+      id: string;
+      leadName: string;
+      leadEmail: string;
+      leadPhone: string;
+      indicadorName?: string;
+      campaignName?: string;
+      createdAt?: string;
+      [key: string]: any;
+    }; 
+    campaignId?: string; 
+    clientId: string; 
+  }) {
     try {
-      this.logger.log(`Gatilho lead_indicated disparado para indicação: ${body.referralId}`);
+      this.logger.log(`Gatilho lead_indicated disparado para indicação: ${body.referralData.id}`);
       
       const result = await this.whatsappFlowTriggerService.triggerLeadIndicated(
-        new Types.ObjectId(body.referralId),
+        {
+          ...body.referralData,
+          createdAt: body.referralData.createdAt ? new Date(body.referralData.createdAt) : new Date(),
+        },
         new Types.ObjectId(body.clientId),
         body.campaignId
       );
@@ -68,17 +98,23 @@ export class WhatsAppFlowTriggerController {
   @Post('reward-earned')
   @UseGuards(JwtClientAuthGuard)
   async triggerRewardEarned(@Body() body: { 
-    participantId: string; 
+    participantData: {
+      id: string;
+      name: string;
+      email: string;
+      phone: string;
+      [key: string]: any;
+    }; 
     clientId: string; 
     rewardAmount: number; 
     rewardType: string; 
     totalEarnings: number; 
   }) {
     try {
-      this.logger.log(`Gatilho reward_earned disparado para participante: ${body.participantId}`);
+      this.logger.log(`Gatilho reward_earned disparado para participante: ${body.participantData.id}`);
       
       const result = await this.whatsappFlowTriggerService.triggerRewardEarned(
-        new Types.ObjectId(body.participantId),
+        body.participantData,
         new Types.ObjectId(body.clientId),
         body.rewardAmount,
         body.rewardType,
@@ -105,8 +141,20 @@ export class WhatsAppFlowTriggerController {
   @UseGuards(JwtClientAuthGuard)
   async triggerGeneric(@Body() body: { 
     triggerType: TriggerType; 
-    participantId?: string; 
-    referralId?: string; 
+    participantData?: {
+      id: string;
+      name: string;
+      email: string;
+      phone: string;
+      [key: string]: any;
+    }; 
+    referralData?: {
+      id: string;
+      leadName: string;
+      leadEmail: string;
+      leadPhone: string;
+      [key: string]: any;
+    }; 
     clientId: string; 
     campaignId?: string; 
     eventData?: Record<string, any>; 
@@ -117,10 +165,12 @@ export class WhatsAppFlowTriggerController {
       const result = await this.whatsappFlowTriggerService.processTrigger(
         body.triggerType,
         {
-          participantId: body.participantId ? new Types.ObjectId(body.participantId) : undefined,
-          referralId: body.referralId ? new Types.ObjectId(body.referralId) : undefined,
+          participantId: body.participantData ? new Types.ObjectId(body.participantData.id) : undefined,
+          referralId: body.referralData ? new Types.ObjectId(body.referralData.id) : undefined,
           clientId: new Types.ObjectId(body.clientId),
           campaignId: body.campaignId,
+          participantData: body.participantData,
+          referralData: body.referralData,
           eventData: body.eventData || {},
         }
       );
@@ -210,10 +260,12 @@ export class WhatsAppFlowTriggerController {
       const result = await this.whatsappFlowTriggerService.processTrigger(
         triggerType as TriggerType,
         {
-          participantId: body.participantId ? new Types.ObjectId(body.participantId) : undefined,
-          referralId: body.referralId ? new Types.ObjectId(body.referralId) : undefined,
+          participantId: body.participantData ? new Types.ObjectId(body.participantData.id) : undefined,
+          referralId: body.referralData ? new Types.ObjectId(body.referralData.id) : undefined,
           clientId: new Types.ObjectId(body.clientId),
           campaignId: body.campaignId,
+          participantData: body.participantData,
+          referralData: body.referralData,
           eventData: body.eventData || {},
         }
       );

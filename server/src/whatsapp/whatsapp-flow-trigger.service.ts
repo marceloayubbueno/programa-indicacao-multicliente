@@ -5,10 +5,6 @@ import { WhatsAppFlow, WhatsAppFlowDocument } from './entities/whatsapp-flow.sch
 import { WhatsAppQueueService } from './whatsapp-queue.service';
 import { MessagePriority, QueueStatus } from './entities/whatsapp-queue.schema';
 import { CreateQueueMessageDto } from './dto/create-queue-message.dto';
-
-// Schemas para buscar dados reais
-import { Participant } from '../clients/entities/participant.schema';
-import { Referral } from '../referrals/entities/referral.schema';
 import { WhatsAppTemplate, WhatsAppTemplateDocument } from './entities/whatsapp-template.schema';
 
 export enum TriggerType {
@@ -20,12 +16,35 @@ export enum TriggerType {
   REFERRAL_COMPLETED = 'referral_completed',
 }
 
+export interface ParticipantData {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  createdAt?: Date;
+  [key: string]: any;
+}
+
+export interface ReferralData {
+  id: string;
+  leadName: string;
+  leadEmail: string;
+  leadPhone: string;
+  indicadorName?: string;
+  campaignName?: string;
+  createdAt?: Date;
+  [key: string]: any;
+}
+
 export interface TriggerData {
   participantId?: Types.ObjectId;
   referralId?: Types.ObjectId;
   campaignId?: string;
   clientId: Types.ObjectId;
   eventData: Record<string, any>;
+  // Dados completos para evitar busca em outros módulos
+  participantData?: ParticipantData;
+  referralData?: ReferralData;
 }
 
 export interface TriggerResult {
@@ -42,8 +61,6 @@ export class WhatsAppFlowTriggerService {
 
   constructor(
     @InjectModel(WhatsAppFlow.name) private whatsappFlowModel: Model<WhatsAppFlowDocument>,
-    @InjectModel(Participant.name) private participantModel: Model<Participant>,
-    @InjectModel(Referral.name) private referralModel: Model<Referral>,
     @InjectModel(WhatsAppTemplate.name) private templateModel: Model<WhatsAppTemplateDocument>,
     private readonly whatsappQueueService: WhatsAppQueueService,
   ) {}
@@ -181,66 +198,90 @@ export class WhatsAppFlowTriggerService {
     try {
       switch (triggerType) {
         case TriggerType.INDICATOR_JOINED:
-          if (triggerData.participantId) {
-            const participant = await this.participantModel.findById(triggerData.participantId).exec();
-            if (participant && participant.phone) {
-              phoneNumber = participant.phone;
-              variables = {
-                nome: participant.name || 'Indicador',
-                email: participant.email || '',
-                telefone: participant.phone || '',
-                dataEntrada: participant.createdAt || new Date(),
-              };
-            }
+          if (triggerData.participantData) {
+            // Usar dados recebidos via parâmetros
+            phoneNumber = triggerData.participantData.phone;
+            variables = {
+              ...triggerData.participantData, // Incluir todos os dados extras
+              dataEntrada: triggerData.participantData.createdAt || new Date(),
+            };
+          } else if (triggerData.participantId) {
+            // Fallback: usar ID para buscar dados (se necessário)
+            this.logger.warn('ParticipantData não fornecido, usando dados básicos');
+            phoneNumber = 'placeholder_phone';
+            variables = {
+              nome: 'Indicador',
+              email: '',
+              telefone: '',
+              dataEntrada: new Date(),
+            };
           }
           break;
 
-                 case TriggerType.LEAD_INDICATED:
-           if (triggerData.referralId) {
-             const referral = await this.referralModel.findById(triggerData.referralId).exec();
-             if (referral && referral.leadPhone) {
-               phoneNumber = referral.leadPhone;
-               variables = {
-                 nome: referral.leadName || 'Lead',
-                 email: referral.leadEmail || '',
-                 telefone: referral.leadPhone || '',
-                 indicador: 'Indicador',
-                 campanha: 'Campanha',
-                 dataIndicacao: new Date(),
-               };
-             }
-           }
-           break;
+        case TriggerType.LEAD_INDICATED:
+          if (triggerData.referralData) {
+            // Usar dados recebidos via parâmetros
+            phoneNumber = triggerData.referralData.leadPhone;
+            variables = {
+              ...triggerData.referralData, // Incluir todos os dados extras
+              dataIndicacao: triggerData.referralData.createdAt || new Date(),
+            };
+          } else if (triggerData.referralId) {
+            // Fallback: usar ID para buscar dados (se necessário)
+            this.logger.warn('ReferralData não fornecido, usando dados básicos');
+            phoneNumber = 'placeholder_phone';
+            variables = {
+              nome: 'Lead',
+              email: '',
+              telefone: '',
+              indicador: 'Indicador',
+              campanha: 'Campanha',
+              dataIndicacao: new Date(),
+            };
+          }
+          break;
 
         case TriggerType.REWARD_EARNED:
-          if (triggerData.participantId) {
-            const participant = await this.participantModel.findById(triggerData.participantId).exec();
-            if (participant && participant.phone) {
-              phoneNumber = participant.phone;
-              variables = {
-                nome: participant.name || 'Participante',
-                email: participant.email || '',
-                telefone: participant.phone || '',
-                recompensa: triggerData.eventData?.rewardAmount || 0,
-                tipoRecompensa: triggerData.eventData?.rewardType || 'Comissão',
-                totalGanhos: triggerData.eventData?.totalEarnings || 0,
-              };
-            }
+          if (triggerData.participantData) {
+            // Usar dados recebidos via parâmetros
+            phoneNumber = triggerData.participantData.phone;
+            variables = {
+              ...triggerData.participantData, // Incluir todos os dados extras
+              recompensa: triggerData.eventData?.rewardAmount || 0,
+              tipoRecompensa: triggerData.eventData?.rewardType || 'Comissão',
+              totalGanhos: triggerData.eventData?.totalEarnings || 0,
+            };
+          } else if (triggerData.participantId) {
+            // Fallback: usar ID para buscar dados (se necessário)
+            this.logger.warn('ParticipantData não fornecido, usando dados básicos');
+            phoneNumber = 'placeholder_phone';
+            variables = {
+              nome: 'Participante',
+              email: '',
+              telefone: '',
+              recompensa: triggerData.eventData?.rewardAmount || 0,
+              tipoRecompensa: triggerData.eventData?.rewardType || 'Comissão',
+              totalGanhos: triggerData.eventData?.totalEarnings || 0,
+            };
           }
           break;
 
         default:
           // Para outros tipos de gatilho, tentar buscar dados básicos
-          if (triggerData.participantId) {
-            const participant = await this.participantModel.findById(triggerData.participantId).exec();
-            if (participant && participant.phone) {
-              phoneNumber = participant.phone;
-              variables = {
-                nome: participant.name || 'Usuário',
-                email: participant.email || '',
-                telefone: participant.phone || '',
-              };
-            }
+          if (triggerData.participantData) {
+            phoneNumber = triggerData.participantData.phone;
+            variables = {
+              ...triggerData.participantData, // Incluir todos os dados extras
+            };
+          } else if (triggerData.participantId) {
+            // Fallback: usar ID para buscar dados (se necessário)
+            this.logger.warn('ParticipantData não fornecido, usando dados básicos');
+            phoneNumber = 'placeholder_phone';
+            variables = {
+              nome: 'Usuário',
+              email: '',
+              telefone: '',
+            };
           }
           break;
       }
@@ -318,28 +359,45 @@ export class WhatsAppFlowTriggerService {
   }
 
   // Métodos públicos para disparar gatilhos específicos
-  async triggerIndicatorJoined(participantId: Types.ObjectId, clientId: Types.ObjectId, campaignId?: string): Promise<TriggerResult> {
+  async triggerIndicatorJoined(
+    participantData: ParticipantData, 
+    clientId: Types.ObjectId, 
+    campaignId?: string
+  ): Promise<TriggerResult> {
     return this.processTrigger(TriggerType.INDICATOR_JOINED, {
-      participantId,
+      participantId: new Types.ObjectId(participantData.id),
       clientId,
       campaignId,
+      participantData,
       eventData: { type: 'indicator_joined' },
     });
   }
 
-  async triggerLeadIndicated(referralId: Types.ObjectId, clientId: Types.ObjectId, campaignId?: string): Promise<TriggerResult> {
+  async triggerLeadIndicated(
+    referralData: ReferralData, 
+    clientId: Types.ObjectId, 
+    campaignId?: string
+  ): Promise<TriggerResult> {
     return this.processTrigger(TriggerType.LEAD_INDICATED, {
-      referralId,
+      referralId: new Types.ObjectId(referralData.id),
       clientId,
       campaignId,
+      referralData,
       eventData: { type: 'lead_indicated' },
     });
   }
 
-  async triggerRewardEarned(participantId: Types.ObjectId, clientId: Types.ObjectId, rewardAmount: number, rewardType: string, totalEarnings: number): Promise<TriggerResult> {
+  async triggerRewardEarned(
+    participantData: ParticipantData, 
+    clientId: Types.ObjectId, 
+    rewardAmount: number, 
+    rewardType: string, 
+    totalEarnings: number
+  ): Promise<TriggerResult> {
     return this.processTrigger(TriggerType.REWARD_EARNED, {
-      participantId,
+      participantId: new Types.ObjectId(participantData.id),
       clientId,
+      participantData,
       eventData: {
         type: 'reward_earned',
         rewardAmount,

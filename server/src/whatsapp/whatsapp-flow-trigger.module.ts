@@ -6,17 +6,11 @@ import { WhatsAppFlow, WhatsAppFlowSchema } from './entities/whatsapp-flow.schem
 import { WhatsAppTemplate, WhatsAppTemplateSchema } from './entities/whatsapp-template.schema';
 import { WhatsAppQueueModule } from './whatsapp-queue.module';
 
-// Schemas para buscar dados reais
-import { Participant, ParticipantSchema } from '../clients/entities/participant.schema';
-import { Referral, ReferralSchema } from '../referrals/entities/referral.schema';
-
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: WhatsAppFlow.name, schema: WhatsAppFlowSchema },
       { name: WhatsAppTemplate.name, schema: WhatsAppTemplateSchema },
-      { name: Participant.name, schema: ParticipantSchema },
-      { name: Referral.name, schema: ReferralSchema },
     ]),
     WhatsAppQueueModule,
   ],

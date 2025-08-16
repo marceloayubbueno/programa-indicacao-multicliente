@@ -49,7 +49,7 @@ export class WhatsAppQueueProcessorService {
         try {
           await this.processMessage(message);
         } catch (error) {
-          this.logger.error(`Erro ao processar mensagem ${message.id}: ${error.message}`);
+          this.logger.error(`Erro ao processar mensagem: ${error.message}`);
           
           // Marcar como falha e agendar retry
           await this.handleMessageFailure(message, error.message);
@@ -63,10 +63,11 @@ export class WhatsAppQueueProcessorService {
 
   // Processar mensagem individual
   private async processMessage(message: any) {
-    this.logger.log(`Processando mensagem: ${message.id} para: ${message.to}`);
+    const messageId = message._id || message.id || 'unknown';
+    this.logger.log(`Processando mensagem: ${messageId} para: ${message.to}`);
 
     // Marcar como em processamento
-    await this.whatsappQueueService.updateMessageStatus(message.id.toString(), QueueStatus.PROCESSING);
+    await this.whatsappQueueService.updateMessageStatus(messageId.toString(), QueueStatus.PROCESSING);
 
     try {
       // Enviar via Twilio
@@ -78,43 +79,44 @@ export class WhatsAppQueueProcessorService {
 
       // Marcar como completada
       await this.whatsappQueueService.updateMessageStatus(
-        message.id.toString(), 
+        messageId.toString(), 
         QueueStatus.COMPLETED,
         { twilioResponse }
       );
 
-      this.logger.log(`Mensagem ${message.id} enviada com sucesso via Twilio`);
+      this.logger.log(`Mensagem ${messageId} enviada com sucesso via Twilio`);
 
     } catch (error) {
-      this.logger.error(`Erro ao enviar mensagem ${message.id} via Twilio: ${error.message}`);
+      this.logger.error(`Erro ao enviar mensagem ${messageId} via Twilio: ${error.message}`);
       throw error;
     }
   }
 
   // Tratar falha na mensagem
   private async handleMessageFailure(message: any, errorMessage: string) {
+    const messageId = message._id || message.id || 'unknown';
     try {
       if (message.retryCount < message.maxRetries) {
         // Agendar retry
         await this.whatsappQueueService.updateMessageStatus(
-          message.id.toString(),
+          messageId.toString(),
           QueueStatus.RETRY,
           { error: errorMessage }
         );
         
-        this.logger.log(`Mensagem ${message.id} agendada para retry (${message.retryCount + 1}/${message.maxRetries})`);
+        this.logger.log(`Mensagem ${messageId} agendada para retry (${message.retryCount + 1}/${message.maxRetries})`);
       } else {
         // Máximo de tentativas atingido
         await this.whatsappQueueService.updateMessageStatus(
-          message.id.toString(),
+          messageId.toString(),
           QueueStatus.FAILED,
           { error: errorMessage, maxRetriesReached: true }
         );
         
-        this.logger.error(`Mensagem ${message.id} falhou definitivamente após ${message.maxRetries} tentativas`);
+        this.logger.error(`Mensagem ${messageId} falhou definitivamente após ${message.maxRetries} tentativas`);
       }
     } catch (updateError) {
-      this.logger.error(`Erro ao atualizar status da mensagem ${message.id}: ${updateError.message}`);
+      this.logger.error(`Erro ao atualizar status da mensagem ${messageId}: ${updateError.message}`);
     }
   }
 
