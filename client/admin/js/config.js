@@ -17,9 +17,9 @@ const ENV = {
         CLIENT_URL: 'http://localhost:5501'
     },
     production: {
-        API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/api',
-        ADMIN_URL: 'https://app.virallead.com.br/admin',
-        CLIENT_URL: 'https://app.virallead.com.br'
+        API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app',
+        CLIENT_URL: 'https://app.virallead.com.br',
+        REFERRAL_BASE_URL: 'https://lp.virallead.com.br/indicacao'
     }
 };
 
