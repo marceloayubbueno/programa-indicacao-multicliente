@@ -399,7 +399,7 @@ export class LPIndicadoresController {
   @Post('submit-form')
   @HttpCode(HttpStatus.CREATED)
   async submitForm(@Body() submitFormDto: SubmitFormLPIndicadoresDto) {
-    console.log('[LP] Recebido POST /api/lp-indicadores/submit-form');
+    console.log('[LP] Recebido POST /lp-indicadores/submit-form');
     console.log('[LP] Payload recebido:', JSON.stringify(submitFormDto));
     const indicador = await this.lpIndicadoresService.submitForm(submitFormDto);
     return {
@@ -414,7 +414,7 @@ export class LPIndicadoresController {
   @Get('success/:participantId')
   @HttpCode(HttpStatus.OK)
   async getSuccessData(@Param('participantId') participantId: string) {
-    console.log('[LP] Recebido GET /api/lp-indicadores/success/', participantId);
+    console.log('[LP] Recebido GET /lp-indicadores/success/', participantId);
     
     try {
       const successData = await this.lpIndicadoresService.getSuccessData(participantId);

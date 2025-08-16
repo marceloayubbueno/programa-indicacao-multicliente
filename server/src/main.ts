@@ -97,6 +97,7 @@ async function bootstrap() {
     origin: [
       'https://app.virallead.com.br',
       'https://virallead.com.br',
+      'https://lp.virallead.com.br',
       'http://localhost:3000',
       'http://localhost:5000',
       'http://localhost:8080',
@@ -123,6 +124,7 @@ async function bootstrap() {
   console.log(`[BOOT] 🌐 CORS configurado para domínios específicos`);
   console.log(`[BOOT] 🌐 - app.virallead.com.br (PERMITIDO)`);
   console.log(`[BOOT] 🌐 - virallead.com.br (PERMITIDO)`);
+  console.log(`[BOOT] 🌐 - lp.virallead.com.br (PERMITIDO)`);
   console.log(`[BOOT] 🌐 - Localhost (PERMITIDO)`);
 
   const port = process.env.PORT || 3000;
