@@ -7,8 +7,8 @@ import { MessagePriority, QueueStatus } from './entities/whatsapp-queue.schema';
 import { CreateQueueMessageDto } from './dto/create-queue-message.dto';
 
 // Schemas para buscar dados reais
-import { Participant, ParticipantDocument } from '../clients/entities/participant.schema';
-import { Referral, ReferralDocument } from '../referrals/entities/referral.schema';
+import { Participant } from '../clients/entities/participant.schema';
+import { Referral } from '../referrals/entities/referral.schema';
 import { WhatsAppTemplate, WhatsAppTemplateDocument } from './entities/whatsapp-template.schema';
 
 export enum TriggerType {
@@ -42,8 +42,8 @@ export class WhatsAppFlowTriggerService {
 
   constructor(
     @InjectModel(WhatsAppFlow.name) private whatsappFlowModel: Model<WhatsAppFlowDocument>,
-    @InjectModel(Participant.name) private participantModel: Model<ParticipantDocument>,
-    @InjectModel(Referral.name) private referralModel: Model<ReferralDocument>,
+    @InjectModel(Participant.name) private participantModel: Model<Participant>,
+    @InjectModel(Referral.name) private referralModel: Model<Referral>,
     @InjectModel(WhatsAppTemplate.name) private templateModel: Model<WhatsAppTemplateDocument>,
     private readonly whatsappQueueService: WhatsAppQueueService,
   ) {}
@@ -195,22 +195,22 @@ export class WhatsAppFlowTriggerService {
           }
           break;
 
-        case TriggerType.LEAD_INDICATED:
-          if (triggerData.referralId) {
-            const referral = await this.referralModel.findById(triggerData.referralId).exec();
-            if (referral && referral.phone) {
-              phoneNumber = referral.phone;
-              variables = {
-                nome: referral.name || 'Lead',
-                email: referral.email || '',
-                telefone: referral.phone || '',
-                indicador: referral.indicatorName || 'Indicador',
-                campanha: referral.campaignName || 'Campanha',
-                dataIndicacao: referral.createdAt || new Date(),
-              };
-            }
-          }
-          break;
+                 case TriggerType.LEAD_INDICATED:
+           if (triggerData.referralId) {
+             const referral = await this.referralModel.findById(triggerData.referralId).exec();
+             if (referral && referral.leadPhone) {
+               phoneNumber = referral.leadPhone;
+               variables = {
+                 nome: referral.leadName || 'Lead',
+                 email: referral.leadEmail || '',
+                 telefone: referral.leadPhone || '',
+                 indicador: 'Indicador',
+                 campanha: 'Campanha',
+                 dataIndicacao: referral.createdAt || new Date(),
+               };
+             }
+           }
+           break;
 
         case TriggerType.REWARD_EARNED:
           if (triggerData.participantId) {
