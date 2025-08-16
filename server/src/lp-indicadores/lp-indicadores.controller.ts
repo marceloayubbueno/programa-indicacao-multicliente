@@ -121,7 +121,7 @@ export class LPIndicadoresController {
         
         // Configuração de API (FORÇADA PARA PRODUÇÃO)
         window.APP_CONFIG = {
-          API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/api',
+          API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app',
           CLIENT_URL: 'https://lp.virallead.com.br'
         };
         
