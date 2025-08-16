@@ -687,7 +687,7 @@
                 
                 // Log detalhado para debugging (AGORA apiBaseUrl já está definido)
                 console.log('📥 Carregando templates via JWT Multicliente:', {
-                    apiUrl: `${apiBaseUrl}/api/client/whatsapp/templates`,
+                    apiUrl: `${apiBaseUrl}/client/whatsapp/templates`,
                     clientId: clientId,
                     hasToken: !!token,
                     tokenLength: token ? token.length : 0,
@@ -697,14 +697,14 @@
                 // 4. REQUISIÇÃO PARA API (Padrão JWT Multicliente CORRETO)
                 // SEGUINDO PADRÕES: Token JWT já contém clientId, NÃO precisa de header X-Client-ID
                 console.log('🌐 Fazendo requisição GET para API:', {
-                    url: `${apiBaseUrl}/api/client/whatsapp/templates`,
+                    url: `${apiBaseUrl}/client/whatsapp/templates`,
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token ? token.substring(0, 20) + '...' : 'NULO'}`
                     }
                 });
                 
-                const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates`, {
+                const response = await fetch(`${apiBaseUrl}/client/whatsapp/templates`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -953,13 +953,13 @@
                     tokenPreview: token ? `${token.substring(0, 20)}...` : null,
                     hasClientId: !!clientId,
                     clientId: clientId,
-                    apiUrl: `${apiBaseUrl}/api/client/whatsapp/templates`
+                    apiUrl: `${apiBaseUrl}/client/whatsapp/templates`
                 });
                 
                 // 6. REQUISIÇÃO PARA API (Padrão JWT Multicliente CORRETO)
                 // SEGUINDO PADRÕES: Token JWT já contém clientId, NÃO precisa de header X-Client-ID
                 console.log('🌐 Fazendo requisição para API:', {
-                    url: `${apiBaseUrl}/api/client/whatsapp/templates`,
+                    url: `${apiBaseUrl}/client/whatsapp/templates`,
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -967,7 +967,7 @@
                     }
                 });
                 
-                const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates`, {
+                const response = await fetch(`${apiBaseUrl}/client/whatsapp/templates`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1017,7 +1017,7 @@
                     ? 'https://programa-indicacao-multicliente-production.up.railway.app'
                     : 'http://localhost:3000';
                 
-                const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates/${templateId}`, {
+                const response = await fetch(`${apiBaseUrl}/client/whatsapp/templates/${templateId}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -1095,7 +1095,7 @@
                     ? 'https://programa-indicacao-multicliente-production.up.railway.app'
                     : 'http://localhost:3000';
                 
-                const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates/${templateId}`, {
+                const response = await fetch(`${apiBaseUrl}/client/whatsapp/templates/${templateId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1149,7 +1149,7 @@
                     ? 'https://programa-indicacao-multicliente-production.up.railway.app'
                     : 'http://localhost:3000';
                 
-                const response = await fetch(`${apiBaseUrl}/api/client/whatsapp/templates/${templateId}`, {
+                const response = await fetch(`${apiBaseUrl}/client/whatsapp/templates/${templateId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
