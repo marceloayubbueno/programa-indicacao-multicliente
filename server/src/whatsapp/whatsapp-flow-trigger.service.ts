@@ -206,7 +206,7 @@ export class WhatsAppFlowTriggerService {
                  telefone: referral.leadPhone || '',
                  indicador: 'Indicador',
                  campanha: 'Campanha',
-                 dataIndicacao: referral.createdAt || new Date(),
+                 dataIndicacao: new Date(),
                };
              }
            }
