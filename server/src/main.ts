@@ -76,23 +76,8 @@ async function bootstrap() {
     }
   });
 
-    // 🔧 CORREÇÃO: Configurar prefixo global, mas excluir rotas públicas e arquivos estáticos
-  app.setGlobalPrefix('api', {
-    exclude: [
-      // Rotas públicas de indicação
-      { path: 'indicacao', method: RequestMethod.GET },
-      { path: 'indicacao/*', method: RequestMethod.GET },
-      { path: 'indicacao/*/preview', method: RequestMethod.GET },
-      // Rota raiz e health check
-      { path: '', method: RequestMethod.GET },
-      { path: 'health', method: RequestMethod.GET },
-      // Arquivos estáticos JavaScript e CSS
-      { path: 'js/*', method: RequestMethod.GET },
-      { path: 'css/*', method: RequestMethod.GET },
-      { path: 'assets/*', method: RequestMethod.GET },
-      { path: 'favicon.ico', method: RequestMethod.GET },
-    ],
-  });
+  // 🔧 RESTAURADO: Removido prefixo global /api que estava quebrando autenticação
+  // Cada controller define seu próprio prefixo como funcionava antes
   
   // Configuração global de validação
   app.useGlobalPipes(new ValidationPipe({
@@ -103,31 +88,52 @@ async function bootstrap() {
   // Filtro global para logar qualquer erro
   app.useGlobalFilters(new GlobalExceptionLogger());
 
-  // 🔧 CORS CONFIGURAÇÃO TEMPORÁRIA - PERMISSIVA PARA RESOLVER PROBLEMA
+  // 🔧 CORS CONFIGURAÇÃO CORRIGIDA - PERMITIR DOMÍNIOS ESPECÍFICOS
   app.enableCors({
-    origin: true, // Permitir todas as origens temporariamente
+    origin: [
+      'https://app.virallead.com.br',
+      'https://virallead.com.br',
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'http://localhost:8080',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5000',
+      'http://127.0.0.1:8080',
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: [
+      'Content-Type', 
+      'Authorization', 
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+      'Access-Control-Request-Method',
+      'Access-Control-Request-Headers'
+    ],
+    exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
   
-  console.log(`[BOOT] 🌐 CORS configurado para: PERMITIR TODAS AS ORIGENS (TEMPORÁRIO)`);
+  console.log(`[BOOT] 🌐 CORS configurado para domínios específicos`);
+  console.log(`[BOOT] 🌐 - app.virallead.com.br (PERMITIDO)`);
+  console.log(`[BOOT] 🌐 - virallead.com.br (PERMITIDO)`);
+  console.log(`[BOOT] 🌐 - Localhost (PERMITIDO)`);
 
-  // 🚨 DIAGNÓSTICO: Log de configuração de rotas
-  console.log(`[BOOT] 🛣️ CONFIGURAÇÃO DE ROTAS:`);
-  console.log(`[BOOT] 🛣️ - Prefixo global: /api`);
-  console.log(`[BOOT] 🛣️ - Rotas excluídas do prefixo:`);
-  console.log(`[BOOT] 🛣️   - Indicação: /indicacao/*`);
-  console.log(`[BOOT] 🛣️   - Raiz: / e /health`);
-  console.log(`[BOOT] 🛣️   - Estáticos: /js/*, /css/*, /assets/*`);
+  // 🔧 RESTAURADO: Sistema funcionando como antes, sem prefixo global
+  console.log(`[BOOT] 🛣️ SISTEMA RESTAURADO:`);
+  console.log(`[BOOT] 🛣️ - Sem prefixo global /api`);
+  console.log(`[BOOT] 🛣️ - Rotas funcionando como antes`);
+  console.log(`[BOOT] 🛣️ - Autenticação: /auth/* e /indicator-auth/*`);
   console.log(`[BOOT] 🛣️ - Arquivos estáticos servidos de: ${clientPath} e ${publicPath}`);
 
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
   console.log(`\n[BOOT] 🚀 Backend rodando na porta ${port}`);
-  console.log(`[BOOT] 🌐 API disponível em: /api/`);
+  console.log(`[BOOT] 🌐 Sistema funcionando como antes (sem prefixo global)`);
   console.log(`[BOOT] 🔗 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`[BOOT] 🌐 CLIENT_URL: ${process.env.CLIENT_URL || 'NÃO CONFIGURADO'}`);
-  console.log(`[BOOT] 🛣️ ROTAS PÚBLICAS: /indicacao/* (excluídas do prefixo /api)\n`);
+  console.log(`[BOOT] 🛣️ ROTAS RESTAURADAS: funcionando como antes\n`);
 }
 bootstrap();
