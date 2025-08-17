@@ -507,6 +507,9 @@ function renderFlows() {
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">
+                                    <button onclick="toggleFlowStatus('${flow.id}', '${flow.status}')" class="p-2 ${flow.status === 'active' ? 'text-green-400 hover:bg-green-900/20' : 'text-yellow-400 hover:bg-yellow-900/20'} rounded-lg transition-colors" title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
+                                        <i class="fas ${flow.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
+                                    </button>
                                     <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -621,6 +624,9 @@ function renderFilteredFlows(filteredFlows) {
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">
+                                    <button onclick="toggleFlowStatus('${flow.id}', '${flow.status}')" class="p-2 ${flow.status === 'active' ? 'text-green-400 hover:bg-green-900/20' : 'text-yellow-400 hover:bg-yellow-900/20'} rounded-lg transition-colors" title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
+                                        <i class="fas ${flow.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
+                                    </button>
                                     <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -1014,8 +1020,8 @@ window.saveFlow = async function() {
         const triggers = [...new Set(formData.messages.map(m => m.trigger))];
         formData.triggers = triggers;
         
-        // Status padrão
-        formData.status = 'draft';
+        // Status padrão - ATIVO por padrão para facilitar testes
+        formData.status = 'active';
         
         // Configurar agendamento (se houver mensagens com data específica)
         const hasScheduledMessages = formData.messages.some(m => m.scheduledDate);
@@ -1115,6 +1121,60 @@ window.deleteFlow = async function(flowId) {
         } catch (error) {
             console.error('Erro ao excluir fluxo:', error);
             showError('Erro ao excluir fluxo: ' + error.message);
+        }
+    }
+}
+
+// Função global para alternar status do fluxo
+window.toggleFlowStatus = async function(flowId, currentStatus) {
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    const confirmMessage = `Tem certeza que deseja ${newStatus === 'active' ? 'ativar' : 'desativar'} este fluxo?`;
+
+    if (confirm(confirmMessage)) {
+        try {
+            const token = getToken();
+            
+            // CONFIGURAÇÃO DA API (igual às outras funções)
+            const isProduction = window.location.hostname === 'app.virallead.com.br';
+            const apiBaseUrl = isProduction 
+                ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+                : 'http://localhost:3000';
+            
+            // Usar endpoints específicos do backend
+            let fullUrl;
+            if (newStatus === 'active') {
+                fullUrl = `${apiBaseUrl}/whatsapp/flows/${flowId}/activate`;
+            } else {
+                fullUrl = `${apiBaseUrl}/whatsapp/flows/${flowId}/pause`;
+            }
+            
+            console.log('🔍 [DEBUG] Alternando status do fluxo em:', fullUrl);
+            
+            const response = await fetch(fullUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Erro ao ${newStatus === 'active' ? 'ativar' : 'desativar'} fluxo`);
+            }
+
+            const updatedFlow = await response.json();
+            
+            // Atualizar lista local
+            const index = flows.findIndex(f => f.id === flowId);
+            if (index !== -1) {
+                flows[index].status = updatedFlow.status;
+            }
+            renderFlows();
+            showSuccess(`Fluxo ${newStatus === 'active' ? 'ativado' : 'desativado'} com sucesso!`);
+            
+        } catch (error) {
+            console.error('Erro ao alternar status do fluxo:', error);
+            showError(`Erro ao alternar status do fluxo: ${error.message}`);
         }
     }
 }
