@@ -101,17 +101,12 @@ class WhatsAppQueueManager {
 
     async loadClients() {
         try {
-            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/clients`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                this.clients = await response.json();
-                this.populateClientFilter();
-            }
+            // Por enquanto, usar dados mockados até o endpoint ser implementado
+            this.clients = [
+                { _id: 'mock-1', name: 'Cliente Demo 1', email: 'cliente1@demo.com' },
+                { _id: 'mock-2', name: 'Cliente Demo 2', email: 'cliente2@demo.com' }
+            ];
+            this.populateClientFilter();
         } catch (error) {
             console.error('Error loading clients:', error);
         }
@@ -377,12 +372,13 @@ class WhatsAppQueueManager {
 
     async processQueues() {
         try {
-            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/process-queues`, {
+            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue/process`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({ limit: 10 })
             });
 
             if (response.ok) {
