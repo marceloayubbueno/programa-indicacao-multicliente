@@ -194,19 +194,18 @@ export class WhatsAppQueueService {
 
       if (status === QueueStatus.PROCESSING) {
         updateData.lastAttemptAt = new Date();
-        updateData.attemptsCount = { $inc: 1 };
+        updateData.$inc = { attemptsCount: 1 };
       } else if (status === QueueStatus.COMPLETED) {
         updateData.processedAt = new Date();
         updateData.providerResponse = metadata?.providerResponse;
       } else if (status === QueueStatus.FAILED) {
         updateData.lastAttemptAt = new Date();
-        updateData.attemptsCount = { $inc: 1 };
+        updateData.$inc = { attemptsCount: 1 };
         updateData.providerResponse = metadata?.providerResponse;
       } else if (status === QueueStatus.RETRY) {
-        updateData.retryCount = { $inc: 1 };
+        updateData.$inc = { retryCount: 1, attemptsCount: 1 };
         updateData.nextRetryAt = this.calculateNextRetryTime();
         updateData.lastAttemptAt = new Date();
-        updateData.attemptsCount = { $inc: 1 };
       }
 
       const updatedMessage = await this.whatsappQueueModel
