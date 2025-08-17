@@ -11,6 +11,7 @@ import { ParticipantsService } from './participants.service';
 import { ParticipantsController } from './participants.controller';
 import { ParticipantListsService } from './participant-lists.service';
 import { ParticipantListsController } from './participant-lists.controller';
+import { WhatsAppModule } from '../whatsapp/whatsapp.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ParticipantListsController } from './participant-lists.controller';
       signOptions: { expiresIn: '1d' },
     }),
     MailModule,
+    WhatsAppModule, // NOVO: Para permitir gatilhos WhatsApp
   ],
   controllers: [ClientsController, ParticipantsController, ParticipantListsController],
   providers: [ClientsService, ParticipantsService, ParticipantListsService],

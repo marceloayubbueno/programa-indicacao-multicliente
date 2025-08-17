@@ -8,12 +8,14 @@ import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { ImportParticipantsDto } from './dto/import-participants.dto';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcryptjs';
+import { WhatsAppFlowTriggerService } from '../whatsapp/whatsapp-flow-trigger.service';
 
 @Injectable()
 export class ParticipantsService {
   constructor(
     @InjectModel(Participant.name) private participantModel: Model<Participant>,
     @InjectModel(ParticipantList.name) private participantListModel: Model<ParticipantList>,
+    private readonly whatsappFlowTriggerService: WhatsAppFlowTriggerService, // NOVO
   ) {}
 
   async create(dto: CreateParticipantDto) {
@@ -33,6 +35,28 @@ export class ParticipantsService {
     });
     const savedParticipant = await participant.save();
     await this.autoAssociateToDefaultList(savedParticipant);
+    
+    // ✅ NOVO: Disparar gatilho WhatsApp para participantes do tipo indicador
+    if (savedParticipant.tipo === 'indicador') {
+      try {
+        await this.whatsappFlowTriggerService.triggerIndicatorJoined(
+          {
+            id: savedParticipant._id.toString(),
+            name: savedParticipant.name,
+            email: savedParticipant.email,
+            phone: savedParticipant.phone,
+            createdAt: savedParticipant.createdAt
+          },
+          new Types.ObjectId(savedParticipant.clientId),
+          savedParticipant.campaignId?.toString()
+        );
+        console.log('✅ [PARTICIPANT] Gatilho WhatsApp disparado para novo indicador:', savedParticipant.name);
+      } catch (error) {
+        console.error('❌ [PARTICIPANT] Erro ao disparar gatilho WhatsApp:', error);
+        // Não falhar a criação do participante por erro de gatilho
+      }
+    }
+    
     return savedParticipant;
   }
 

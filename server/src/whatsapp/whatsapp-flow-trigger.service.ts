@@ -70,12 +70,17 @@ export class WhatsAppFlowTriggerService {
     triggerData: TriggerData,
   ): Promise<TriggerResult> {
     try {
-      this.logger.log(`Processando gatilho: ${triggerType} para cliente: ${triggerData.clientId}`);
+      this.logger.log(`🚀 [GATILHO] Iniciando processamento do gatilho: ${triggerType}`);
+      this.logger.log(`🚀 [GATILHO] ClientId: ${triggerData.clientId}`);
+      this.logger.log(`🚀 [GATILHO] Dados do trigger: ${JSON.stringify(triggerData)}`);
 
       // Buscar fluxos ativos para este gatilho
       const activeFlows = await this.getActiveFlowsForTrigger(triggerType, triggerData.clientId);
       
+      this.logger.log(`🚀 [GATILHO] Fluxos ativos encontrados: ${activeFlows.length}`);
+      
       if (activeFlows.length === 0) {
+        this.logger.log(`⚠️ [GATILHO] Nenhum fluxo ativo encontrado para o gatilho: ${triggerType}`);
         return {
           success: true,
           message: `Nenhum fluxo ativo encontrado para o gatilho: ${triggerType}`,
@@ -90,14 +95,18 @@ export class WhatsAppFlowTriggerService {
       // Processar cada fluxo ativo
       for (const flow of activeFlows) {
         try {
+          this.logger.log(`🔄 [GATILHO] Processando fluxo: ${flow.name}`);
           await this.processFlow(flow, triggerType, triggerData);
           messagesAdded++;
+          this.logger.log(`✅ [GATILHO] Fluxo processado com sucesso: ${flow.name}`);
         } catch (error) {
           const errorMsg = `Erro ao processar fluxo ${flow.name}: ${error.message}`;
           this.logger.error(errorMsg);
           errors.push(errorMsg);
         }
       }
+
+      this.logger.log(`🎉 [GATILHO] Processamento concluído. Fluxos: ${activeFlows.length}, Mensagens: ${messagesAdded}`);
 
       return {
         success: errors.length === 0,
@@ -108,7 +117,7 @@ export class WhatsAppFlowTriggerService {
       };
 
     } catch (error) {
-      this.logger.error(`Erro ao processar gatilho: ${error.message}`);
+      this.logger.error(`❌ [GATILHO] Erro ao processar gatilho: ${error.message}`);
       throw error;
     }
   }
@@ -117,14 +126,41 @@ export class WhatsAppFlowTriggerService {
     triggerType: TriggerType,
     clientId: Types.ObjectId,
   ): Promise<WhatsAppFlowDocument[]> {
-    return this.whatsappFlowModel
-      .find({
-        clientId,
-        status: 'active',
-        triggers: triggerType,
-      })
+    this.logger.log(`🔍 [DEBUG] Buscando fluxos ativos para gatilho: ${triggerType}`);
+    this.logger.log(`🔍 [DEBUG] ClientId: ${clientId}`);
+    
+    const query = {
+      clientId,
+      status: 'active',
+      triggers: triggerType,
+    };
+    
+    this.logger.log(`🔍 [DEBUG] Query MongoDB: ${JSON.stringify(query)}`);
+    
+    const flows = await this.whatsappFlowModel
+      .find(query)
       .populate('messages.templateId')
       .exec();
+    
+    this.logger.log(`🔍 [DEBUG] Fluxos encontrados: ${flows.length}`);
+    
+    if (flows.length > 0) {
+      flows.forEach((flow, index) => {
+        this.logger.log(`🔍 [DEBUG] Fluxo ${index + 1}: ${flow.name} - Triggers: ${flow.triggers}`);
+      });
+    } else {
+      this.logger.log(`🔍 [DEBUG] Nenhum fluxo ativo encontrado para gatilho: ${triggerType}`);
+      
+      // Debug adicional: buscar todos os fluxos do cliente
+      const allFlows = await this.whatsappFlowModel.find({ clientId }).exec();
+      this.logger.log(`🔍 [DEBUG] Total de fluxos do cliente: ${allFlows.length}`);
+      
+      allFlows.forEach((flow, index) => {
+        this.logger.log(`🔍 [DEBUG] Fluxo ${index + 1}: ${flow.name} - Status: ${flow.status} - Triggers: ${flow.triggers}`);
+      });
+    }
+    
+    return flows;
   }
 
   private async processFlow(
