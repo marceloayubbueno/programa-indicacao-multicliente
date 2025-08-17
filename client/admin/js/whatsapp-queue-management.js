@@ -150,11 +150,13 @@ class WhatsAppQueueManager {
     }
 
     updateQueueStatus(status) {
-        document.getElementById('total-queued').textContent = status.totalQueued || 0;
-        document.getElementById('high-priority').textContent = status.highPriority || 0;
-        document.getElementById('medium-priority').textContent = status.mediumPriority || 0;
-        document.getElementById('low-priority').textContent = status.lowPriority || 0;
-        document.getElementById('processing').textContent = status.processing || 0;
+        // A API retorna data.data com os campos corretos
+        const data = status.data || status;
+        document.getElementById('total-queued').textContent = data.pending || 0;
+        document.getElementById('high-priority').textContent = data.high || 0;
+        document.getElementById('medium-priority').textContent = data.medium || 0;
+        document.getElementById('low-priority').textContent = data.low || 0;
+        document.getElementById('processing').textContent = data.processing || 0;
     }
 
     async loadQueueMessages() {
@@ -175,8 +177,8 @@ class WhatsAppQueueManager {
 
             if (response.ok) {
                 const data = await response.json();
-                this.queues = data.messages || [];
-                this.totalMessages = data.total || 0;
+                this.queues = data.data?.messages || data.messages || [];
+                this.totalMessages = data.data?.total || data.total || 0;
                 this.renderQueueMessages();
                 this.updatePagination();
             }
