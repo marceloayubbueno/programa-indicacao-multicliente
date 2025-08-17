@@ -1,13 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
 import { LPIndicadores, LPIndicadoresDocument } from './entities/lp-indicadores.schema';
 import { Participant } from '../clients/entities/participant.schema';
+import { ParticipantList } from '../clients/entities/participant-list.schema';
+import { Campaign } from '../campaigns/entities/campaign.schema';
+import { SubmitFormLPIndicadoresDto } from './dto/submit-form-lp-indicadores.dto';
 import { CreateLPIndicadoresDto } from './dto/create-lp-indicadores.dto';
 import { UpdateLPIndicadoresDto } from './dto/update-lp-indicadores.dto';
-import { SubmitFormLPIndicadoresDto } from './dto/submit-form-lp-indicadores.dto';
-import { Document } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
+import { WhatsAppFlowTriggerService } from '../whatsapp/whatsapp-flow-trigger.service';
 
 export type ParticipantDocument = Participant & Document;
 
@@ -16,6 +18,9 @@ export class LPIndicadoresService {
   constructor(
     @InjectModel(LPIndicadores.name) private lpIndicadoresModel: Model<LPIndicadoresDocument>,
     @InjectModel(Participant.name) private participantModel: Model<ParticipantDocument>,
+    @InjectModel(ParticipantList.name) private participantListModel: Model<ParticipantList>,
+    @InjectModel(Campaign.name) private campaignModel: Model<Campaign>,
+    private readonly whatsAppFlowTriggerService: WhatsAppFlowTriggerService,
   ) {}
 
   // === CRUD BÁSICO ===
@@ -432,6 +437,32 @@ export class LPIndicadoresService {
       const newIndicator = new this.participantModel(indicatorData);
       const savedIndicator = await newIndicator.save();
       console.log('[LP] ✅ Indicador salvo com sucesso:', savedIndicator._id);
+
+      // 🚀 NOVO: Disparar gatilho WhatsApp para novo indicador
+      try {
+        console.log('[LP] 🚀 [WHATSAPP] Iniciando gatilho para novo indicador:', savedIndicator.name);
+        
+        const result = await this.whatsAppFlowTriggerService.triggerIndicatorJoined(
+          {
+            id: savedIndicator._id.toString(),
+            name: savedIndicator.name,
+            email: savedIndicator.email,
+            phone: savedIndicator.phone,
+            createdAt: savedIndicator.createdAt
+          },
+          new Types.ObjectId(savedIndicator.clientId),
+          savedIndicator.campaignId?.toString()
+        );
+        
+        console.log('[LP] ✅ [WHATSAPP] Gatilho disparado com sucesso:', result);
+        console.log('[LP] ✅ [WHATSAPP] Fluxos processados:', result.flowsTriggered);
+        console.log('[LP] ✅ [WHATSAPP] Mensagens adicionadas:', result.messagesAdded);
+        
+      } catch (error) {
+        console.error('[LP] ❌ [WHATSAPP] Erro ao disparar gatilho:', error);
+        console.error('[LP] ❌ [WHATSAPP] Stack trace:', error.stack);
+        // Não falhar a criação do indicador por erro de gatilho
+      }
 
       // 🆕 NOVA FUNCIONALIDADE: Adicionar indicador à lista da campanha se LP estiver vinculada
       console.log('[LP] 🎯 Iniciando processo de vinculação à lista da campanha...');
