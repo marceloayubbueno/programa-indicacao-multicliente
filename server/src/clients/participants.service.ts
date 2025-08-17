@@ -38,21 +38,35 @@ export class ParticipantsService {
     
     // ✅ NOVO: Disparar gatilho WhatsApp para participantes do tipo indicador
     if (savedParticipant.tipo === 'indicador') {
+      console.log('🚀 [PARTICIPANT] Iniciando gatilho WhatsApp para indicador:', savedParticipant.name);
+      console.log('🚀 [PARTICIPANT] WhatsAppFlowTriggerService disponível:', !!this.whatsappFlowTriggerService);
+      
       try {
-        await this.whatsappFlowTriggerService.triggerIndicatorJoined(
-          {
-            id: savedParticipant._id.toString(),
-            name: savedParticipant.name,
-            email: savedParticipant.email,
-            phone: savedParticipant.phone,
-            createdAt: savedParticipant.createdAt
-          },
+        const triggerData = {
+          id: savedParticipant._id.toString(),
+          name: savedParticipant.name,
+          email: savedParticipant.email,
+          phone: savedParticipant.phone,
+          createdAt: savedParticipant.createdAt
+        };
+        
+        console.log('🚀 [PARTICIPANT] Dados para gatilho:', triggerData);
+        console.log('🚀 [PARTICIPANT] ClientId:', savedParticipant.clientId);
+        console.log('🚀 [PARTICIPANT] CampaignId:', savedParticipant.campaignId);
+        
+        const result = await this.whatsappFlowTriggerService.triggerIndicatorJoined(
+          triggerData,
           new Types.ObjectId(savedParticipant.clientId),
           savedParticipant.campaignId?.toString()
         );
-        console.log('✅ [PARTICIPANT] Gatilho WhatsApp disparado para novo indicador:', savedParticipant.name);
+        
+        console.log('✅ [PARTICIPANT] Gatilho WhatsApp disparado com sucesso:', result);
+        console.log('✅ [PARTICIPANT] Fluxos processados:', result.flowsTriggered);
+        console.log('✅ [PARTICIPANT] Mensagens adicionadas:', result.messagesAdded);
+        
       } catch (error) {
         console.error('❌ [PARTICIPANT] Erro ao disparar gatilho WhatsApp:', error);
+        console.error('❌ [PARTICIPANT] Stack trace:', error.stack);
         // Não falhar a criação do participante por erro de gatilho
       }
     }
