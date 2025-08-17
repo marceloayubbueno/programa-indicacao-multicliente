@@ -625,9 +625,25 @@ function renderFilteredFlows(filteredFlows) {
 }
 
 function openCreateFlowModal() {
+    console.log('🔍 [DEBUG] openCreateFlowModal chamado');
     currentFlow = null;
-    document.getElementById('modal-title').textContent = 'Novo Fluxo';
-    document.getElementById('flow-modal').classList.remove('hidden');
+    
+    const modalTitle = document.getElementById('modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = 'Novo Fluxo';
+        console.log('✅ [DEBUG] Título do modal atualizado para "Novo Fluxo"');
+    } else {
+        console.error('❌ [DEBUG] Título do modal não encontrado');
+    }
+    
+    const modal = document.getElementById('flow-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        console.log('✅ [DEBUG] Modal aberto com sucesso');
+    } else {
+        console.error('❌ [DEBUG] Modal não encontrado');
+    }
+    
     resetForm();
 }
 
@@ -824,20 +840,74 @@ function toggleSendOptions(messageId) {
 }
 
 function editFlow(flowId) {
+    console.log('🔍 [DEBUG] editFlow chamado com ID:', flowId);
+    
     const flow = flows.find(f => f.id === flowId);
-    if (!flow) return;
+    if (!flow) {
+        console.error('❌ [DEBUG] Fluxo não encontrado com ID:', flowId);
+        console.log('🔍 [DEBUG] Fluxos disponíveis:', flows);
+        return;
+    }
+    
+    console.log('✅ [DEBUG] Fluxo encontrado:', flow);
     
     currentFlow = flowId;
-    document.getElementById('modal-title').textContent = 'Editar Fluxo';
+    
+    // Verificar se o modal existe
+    const modal = document.getElementById('flow-modal');
+    if (!modal) {
+        console.error('❌ [DEBUG] Modal não encontrado');
+        return;
+    }
+    
+    // Verificar se o título existe
+    const modalTitle = document.getElementById('modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = 'Editar Fluxo';
+        console.log('✅ [DEBUG] Título do modal atualizado');
+    } else {
+        console.error('❌ [DEBUG] Título do modal não encontrado');
+    }
     
     // Preencher formulário
-    if (flow.campaignId) {
-        document.getElementById('flow-campaign').value = flow.campaignId;
+    console.log('🔍 [DEBUG] Preenchendo formulário...');
+    
+    // Campo de campanha
+    const campaignField = document.getElementById('flow-campaign');
+    if (campaignField && flow.campaignId) {
+        campaignField.value = flow.campaignId;
+        console.log('✅ [DEBUG] Campo de campanha preenchido:', flow.campaignId);
         updateAudienceOptions(); // Atualizar opções de público-alvo
+    } else {
+        console.warn('⚠️ [DEBUG] Campo de campanha não encontrado ou sem campaignId');
     }
-    document.getElementById('flow-name').value = flow.name;
-    document.getElementById('flow-audience').value = flow.targetAudience;
-    document.getElementById('flow-description').value = flow.description || '';
+    
+    // Campo de nome
+    const nameField = document.getElementById('flow-name');
+    if (nameField) {
+        nameField.value = flow.name;
+        console.log('✅ [DEBUG] Campo de nome preenchido:', flow.name);
+    } else {
+        console.error('❌ [DEBUG] Campo de nome não encontrado');
+    }
+    
+    // Campo de público-alvo
+    const audienceField = document.getElementById('flow-audience');
+    if (audienceField) {
+        audienceField.value = flow.targetAudience;
+        console.log('✅ [DEBUG] Campo de público-alvo preenchido:', flow.targetAudience);
+    } else {
+        console.error('❌ [DEBUG] Campo de público-alvo não encontrado');
+    }
+    
+    // Campo de descrição
+    const descriptionField = document.getElementById('flow-description');
+    if (descriptionField) {
+        descriptionField.value = flow.description || '';
+        console.log('✅ [DEBUG] Campo de descrição preenchido:', flow.description);
+    } else {
+        console.warn('⚠️ [DEBUG] Campo de descrição não encontrado');
+    }
     
     // Limpar e recriar mensagens
     const container = document.getElementById('messages-container');
@@ -861,7 +931,15 @@ function editFlow(flowId) {
         }
     });
     
-    document.getElementById('flow-modal').classList.remove('hidden');
+    // Abrir modal
+    console.log('🔍 [DEBUG] Tentando abrir modal...');
+    const modal = document.getElementById('flow-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        console.log('✅ [DEBUG] Modal aberto com sucesso');
+    } else {
+        console.error('❌ [DEBUG] Modal não encontrado para abrir');
+    }
 }
 
 async function saveFlow() {
