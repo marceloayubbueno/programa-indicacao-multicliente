@@ -107,7 +107,13 @@ async function loadFlows() {
         const responseData = await response.json();
         console.log('✅ [DEBUG] Dados recebidos:', responseData);
         
-        flows = responseData;
+        // Normalizar IDs dos fluxos (MongoDB usa _id, mas precisamos de id)
+        flows = responseData.map(flow => ({
+            ...flow,
+            id: flow._id || flow.id // Garantir que sempre tenha 'id'
+        }));
+        
+        console.log('🔍 [DEBUG] Fluxos normalizados:', flows);
         renderFlows();
         console.log('✅ [DEBUG] Fluxos carregados com sucesso:', flows.length);
         
@@ -172,7 +178,14 @@ async function loadTemplates() {
         console.log('✅ [DEBUG] Templates carregados da API:', responseData);
         
         // 4. EXTRAIR ARRAY DE TEMPLATES
-        templates = responseData.data || responseData;
+        let templatesData = responseData.data || responseData;
+        
+        // Normalizar IDs dos templates (MongoDB usa _id, mas precisamos de id)
+        templates = templatesData.map(template => ({
+            ...template,
+            id: template._id || template.id // Garantir que sempre tenha 'id'
+        }));
+        
         console.log(`📋 [DEBUG] ${templates.length} templates carregados para fluxos`);
         
         // 5. ATUALIZAR DROPDOWNS EXISTENTES
