@@ -250,6 +250,70 @@ export class WhatsAppQueueController {
   }
 
   /**
+   * Obtém configurações da fila
+   */
+  @Get('settings')
+  async getQueueSettings() {
+    try {
+      // Configurações padrão da fila
+      const settings = {
+        rateLimitPerMinute: 30,
+        delayBetweenMessages: 2000,
+        sendTimeStart: '08:00',
+        sendTimeEnd: '20:00',
+        autoProcess: true,
+        enableRetries: true,
+        logAllMessages: false
+      };
+      
+      return {
+        success: true,
+        data: settings,
+      };
+    } catch (error) {
+      this.logger.error(`Erro ao obter configurações da fila: ${error.message}`);
+      return {
+        success: false,
+        message: 'Erro ao obter configurações da fila',
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * Salva configurações da fila
+   */
+  @Post('settings')
+  async saveQueueSettings(@Body() settings: {
+    rateLimitPerMinute?: number;
+    delayBetweenMessages?: number;
+    sendTimeStart?: string;
+    sendTimeEnd?: string;
+    autoProcess?: boolean;
+    enableRetries?: boolean;
+    logAllMessages?: boolean;
+  }) {
+    try {
+      // Aqui você pode implementar a lógica para salvar as configurações
+      // Por enquanto, apenas retorna sucesso
+      this.logger.log(`Configurações da fila atualizadas: ${JSON.stringify(settings)}`);
+      
+      return {
+        success: true,
+        message: 'Configurações da fila salvas com sucesso',
+        data: settings,
+      };
+    } catch (error) {
+      this.logger.error(`Erro ao salvar configurações da fila: ${error.message}`);
+      return {
+        success: false,
+        message: 'Erro ao salvar configurações da fila',
+        error: error.message,
+      };
+    }
+  }
+
+  /**
    * Processa filas em lote
    */
   @Post('process')

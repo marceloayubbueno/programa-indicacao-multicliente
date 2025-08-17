@@ -51,7 +51,7 @@ class WhatsAppQueueManager {
 
     async loadSettings() {
         try {
-            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue-settings`, {
+            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue/settings`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                     'Content-Type': 'application/json'
@@ -131,7 +131,7 @@ class WhatsAppQueueManager {
 
     async loadQueueStatus() {
         try {
-            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue-status`, {
+            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue/status`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                     'Content-Type': 'application/json'
@@ -171,7 +171,7 @@ class WhatsAppQueueManager {
                 ...filters
             });
 
-            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue-messages?${queryParams}`, {
+            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue/messages?${queryParams}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                     'Content-Type': 'application/json'
@@ -411,7 +411,7 @@ class WhatsAppQueueManager {
                 logAllMessages: document.getElementById('log-all-messages').checked
             };
 
-            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue-settings`, {
+            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue/settings`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
@@ -463,7 +463,7 @@ class WhatsAppQueueManager {
 
     async viewMessage(messageId) {
         try {
-            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue-messages/${messageId}`, {
+            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue/messages/${messageId}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                     'Content-Type': 'application/json'
@@ -487,7 +487,7 @@ class WhatsAppQueueManager {
 
     async retryMessage(messageId) {
         try {
-            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue-messages/${messageId}/retry`, {
+            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue/messages/${messageId}/retry`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
@@ -515,7 +515,7 @@ class WhatsAppQueueManager {
         }
 
         try {
-            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue-messages/${messageId}`, {
+            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue/messages/${messageId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
