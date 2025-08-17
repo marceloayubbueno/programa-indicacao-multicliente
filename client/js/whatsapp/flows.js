@@ -628,17 +628,17 @@ function openCreateFlowModal() {
     console.log('🔍 [DEBUG] openCreateFlowModal chamado');
     currentFlow = null;
     
-    const modalTitle = document.getElementById('modal-title');
-    if (modalTitle) {
-        modalTitle.textContent = 'Novo Fluxo';
+    const createModalTitle = document.getElementById('modal-title');
+    if (createModalTitle) {
+        createModalTitle.textContent = 'Novo Fluxo';
         console.log('✅ [DEBUG] Título do modal atualizado para "Novo Fluxo"');
     } else {
         console.error('❌ [DEBUG] Título do modal não encontrado');
     }
     
-    const modal = document.getElementById('flow-modal');
-    if (modal) {
-        modal.classList.remove('hidden');
+    const createModal = document.getElementById('flow-modal');
+    if (createModal) {
+        createModal.classList.remove('hidden');
         console.log('✅ [DEBUG] Modal aberto com sucesso');
     } else {
         console.error('❌ [DEBUG] Modal não encontrado');
@@ -854,16 +854,16 @@ function editFlow(flowId) {
     currentFlow = flowId;
     
     // Verificar se o modal existe
-    const modal = document.getElementById('flow-modal');
-    if (!modal) {
+    const editModal = document.getElementById('flow-modal');
+    if (!editModal) {
         console.error('❌ [DEBUG] Modal não encontrado');
         return;
     }
     
     // Verificar se o título existe
-    const modalTitle = document.getElementById('modal-title');
-    if (modalTitle) {
-        modalTitle.textContent = 'Editar Fluxo';
+    const editModalTitle = document.getElementById('modal-title');
+    if (editModalTitle) {
+        editModalTitle.textContent = 'Editar Fluxo';
         console.log('✅ [DEBUG] Título do modal atualizado');
     } else {
         console.error('❌ [DEBUG] Título do modal não encontrado');
@@ -933,9 +933,9 @@ function editFlow(flowId) {
     
     // Abrir modal
     console.log('🔍 [DEBUG] Tentando abrir modal...');
-    const modal = document.getElementById('flow-modal');
-    if (modal) {
-        modal.classList.remove('hidden');
+    const editModalFinal = document.getElementById('flow-modal');
+    if (editModalFinal) {
+        editModalFinal.classList.remove('hidden');
         console.log('✅ [DEBUG] Modal aberto com sucesso');
     } else {
         console.error('❌ [DEBUG] Modal não encontrado para abrir');
