@@ -624,7 +624,8 @@ function renderFilteredFlows(filteredFlows) {
     `;
 }
 
-function openCreateFlowModal() {
+// Função global para abrir modal de criação
+window.openCreateFlowModal = function() {
     console.log('🔍 [DEBUG] openCreateFlowModal chamado');
     currentFlow = null;
     
@@ -647,7 +648,8 @@ function openCreateFlowModal() {
     resetForm();
 }
 
-function closeFlowModal() {
+// Função global para fechar modal
+window.closeFlowModal = function() {
     document.getElementById('flow-modal').classList.add('hidden');
     currentFlow = null;
     resetForm();
@@ -673,7 +675,8 @@ function resetForm() {
     messageCounter = 1;
 }
 
-function addMessage() {
+// Função global para adicionar mensagem
+window.addMessage = function() {
     const container = document.getElementById('messages-container');
     if (!container) return;
     
@@ -740,7 +743,8 @@ function addMessage() {
     messageCounter++;
 }
 
-function removeMessage(messageId) {
+// Função global para remover mensagem
+window.removeMessage = function(messageId) {
     const messageDiv = document.getElementById(`message-${messageId}`);
     if (messageDiv) {
         messageDiv.remove();
@@ -748,7 +752,8 @@ function removeMessage(messageId) {
 }
 
 // Função para mostrar preview do template selecionado
-function showTemplatePreview(messageId) {
+// Função global para mostrar preview do template
+window.showTemplatePreview = function(messageId) {
     const select = document.querySelector(`#message-${messageId} select[name="templateId"]`);
     const previewDiv = document.getElementById(`template-preview-${messageId}`);
     
@@ -822,7 +827,8 @@ function updateTemplateDropdowns() {
     });
 }
 
-function toggleSendOptions(messageId) {
+// Função global para alternar opções de envio
+window.toggleSendOptions = function(messageId) {
     const sendType = document.querySelector(`#message-${messageId} select[name="sendType"]`).value;
     const optionsDiv = document.getElementById(`sendOptions-${messageId}`);
     
@@ -839,7 +845,8 @@ function toggleSendOptions(messageId) {
     }
 }
 
-function editFlow(flowId) {
+// Função global para editar fluxo
+window.editFlow = function(flowId) {
     console.log('🔍 [DEBUG] editFlow chamado com ID:', flowId);
     
     const flow = flows.find(f => f.id === flowId);
@@ -942,7 +949,8 @@ function editFlow(flowId) {
     }
 }
 
-async function saveFlow() {
+// Função global para salvar fluxo
+window.saveFlow = async function() {
     try {
         const formData = {
             name: document.getElementById('flow-name').value,
@@ -1059,7 +1067,8 @@ async function saveFlow() {
     }
 }
 
-async function deleteFlow(flowId) {
+// Função global para deletar fluxo
+window.deleteFlow = async function(flowId) {
     if (confirm('Tem certeza que deseja excluir este fluxo?')) {
         try {
             const token = getToken();
