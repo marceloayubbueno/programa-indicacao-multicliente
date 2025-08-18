@@ -7,7 +7,7 @@
 const API_BASE_URL = 'https://programa-indicacao-multicliente-production.up.railway.app';
 
 // Endpoints da API
-const API_URL = `${API_BASE_URL}/api/planos`;
+const API_URL = `${API_BASE_URL}/planos`;
 let editingPlanId = null;
 
 const DEFAULT_PLANS = [

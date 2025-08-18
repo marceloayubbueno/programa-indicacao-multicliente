@@ -8,11 +8,11 @@ let clientesMap = {};
 
 async function carregarSaldo() {
   try {
-    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+    const apiUrl = 'https://programa-indicacao-multicliente-production.up.railway.app';
     const token = localStorage.getItem('adminToken');
     const headers = { 'Authorization': `Bearer ${token}` };
     console.log('[CarteiraAdmin] Buscando saldo...', apiUrl);
-    const res = await fetch(`${apiUrl}/admin/api/carteira/saldo`, { headers });
+    const res = await fetch(`${apiUrl}/admin/carteira/saldo`, { headers });
     const text = await res.clone().text();
     console.log('[CarteiraAdmin] Status resposta saldo:', res.status, text);
     const data = JSON.parse(text);
@@ -30,11 +30,11 @@ async function carregarSaldo() {
 
 async function carregarClientesESaldos() {
   try {
-    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+    const apiUrl = 'https://programa-indicacao-multicliente-production.up.railway.app';
     const token = localStorage.getItem('adminToken');
     const headers = { 'Authorization': `Bearer ${token}` };
     console.log('[CarteiraAdmin] Buscando clientes...', apiUrl);
-    const resClientes = await fetch(`${apiUrl}/admin/api/carteira/clientes`, { headers });
+    const resClientes = await fetch(`${apiUrl}/admin/carteira/clientes`, { headers });
     const textClientes = await resClientes.clone().text();
     console.log('[CarteiraAdmin] Status resposta clientes:', resClientes.status, textClientes);
     const listaClientes = JSON.parse(textClientes);
@@ -43,7 +43,7 @@ async function carregarClientesESaldos() {
     listaClientes.forEach(c => { clientesMap[c._id] = c.companyName; });
 
     console.log('[CarteiraAdmin] Buscando extrato...', apiUrl);
-    const resExtrato = await fetch(`${apiUrl}/admin/api/carteira/extrato`, { headers });
+    const resExtrato = await fetch(`${apiUrl}/admin/carteira/extrato`, { headers });
     const textExtrato = await resExtrato.clone().text();
     console.log('[CarteiraAdmin] Status resposta extrato:', resExtrato.status, textExtrato);
     const extrato = JSON.parse(textExtrato);
@@ -93,10 +93,10 @@ async function carregarExtratoCliente(clientId) {
   const tbody = document.querySelector('#modalDetalheCliente tbody');
   tbody.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
   try {
-    const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+    const apiUrl = 'https://programa-indicacao-multicliente-production.up.railway.app';
     const token = localStorage.getItem('adminToken');
     const headers = { 'Authorization': `Bearer ${token}` };
-    const res = await fetch(`${apiUrl}/admin/api/carteira/extrato?clientId=${clientId}`, { headers });
+    const res = await fetch(`${apiUrl}/admin/carteira/extrato?clientId=${clientId}`, { headers });
     const text = await res.clone().text();
     console.log('[CarteiraAdmin] Status resposta extrato cliente:', res.status, text);
     const extrato = JSON.parse(text);

@@ -4,13 +4,9 @@ let clients = [];
 let currentPage = 1;
 let totalPages = 1;
 
-// API URLs
-// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
-const BASE_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL.replace('/api', '') : 
-                (window.location.hostname === 'localhost' ? 
-                 'http://localhost:3000' : 
-                 'https://programa-indicacao-multicliente-production.up.railway.app');
-const API_URL = `${BASE_URL}/api/clients`;
+// 🔧 CONFIGURAÇÃO DA API - COMO ESTAVA FUNCIONANDO ANTES
+const API_BASE_URL = 'https://programa-indicacao-multicliente-production.up.railway.app';
+const API_URL = `${API_BASE_URL}/clients`;
 
 // Utilitário para obter token do localStorage
 function getToken() {
@@ -141,7 +137,7 @@ async function loadClients(page = 1, search = '') {
 // Função para carregar os planos
 async function loadPlans() {
     try {
-        const response = await fetch(`${BASE_URL}/api/planos`);
+        const response = await fetch(`${API_BASE_URL}/planos`);
         if (!response.ok) {
             throw new Error('Erro ao carregar planos');
         }
