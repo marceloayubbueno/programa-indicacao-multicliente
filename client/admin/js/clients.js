@@ -103,15 +103,37 @@ async function loadClients(page = 1, search = '') {
         }
 
         const data = await response.json();
-        clients = data.clients || [];
-        currentPage = data.page || 1;
-        totalPages = data.totalPages || 1;
+        
+        // 🔧 CORREÇÃO: Verificar estrutura de dados
+        if (data && data.success === false) {
+            throw new Error(data.message || 'Erro no servidor');
+        }
+        
+        // Extrair dados da resposta
+        if (data && data.clients && Array.isArray(data.clients)) {
+            clients = data.clients;
+            currentPage = data.page || 1;
+            totalPages = data.totalPages || 1;
+        } else if (data && Array.isArray(data)) {
+            clients = data;
+            currentPage = 1;
+            totalPages = 1;
+        } else {
+            console.warn('Estrutura de dados inesperada:', data);
+            clients = [];
+            currentPage = 1;
+            totalPages = 1;
+        }
         
         renderClientsTable();
         updatePagination();
         updateClientsCount();
     } catch (error) {
         console.error('Erro ao carregar clientes:', error);
+        clients = []; // Garantir que clients seja array
+        renderClientsTable();
+        updatePagination();
+        updateClientsCount();
         showError('Erro ao carregar os clientes. Tente novamente.');
     }
 }

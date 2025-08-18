@@ -98,14 +98,38 @@ function fetchAdmins() {
   fetch(API_LIST_ADMINS, {
     headers: { 'Authorization': 'Bearer ' + token }
   })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    })
     .then(data => {
-      admins = data;
+      // 🔧 CORREÇÃO: Verificar estrutura de dados
+      if (data && data.success === false) {
+        throw new Error(data.message || 'Erro no servidor');
+      }
+      
+      // Extrair array de admins da resposta
+      if (data && Array.isArray(data)) {
+        admins = data;
+      } else if (data && data.data && Array.isArray(data.data)) {
+        admins = data.data;
+      } else if (data && data.admins && Array.isArray(data.admins)) {
+        admins = data.admins;
+      } else {
+        console.warn('Estrutura de dados inesperada:', data);
+        admins = [];
+      }
+      
       renderAdminsTable();
       updateStatistics();
     })
     .catch(error => {
       console.error('Erro ao carregar administradores:', error);
+      admins = []; // Garantir que admins seja array
+      renderAdminsTable();
+      updateStatistics();
       alert('Erro ao carregar administradores: ' + error.message);
     });
 }

@@ -11,7 +11,7 @@
 class WhatsAppAdmin {
     constructor() {
         this.config = {
-            apiBaseUrl: window.API_BASE_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api',
+            apiBaseUrl: window.APP_CONFIG?.API_URL || 'http://localhost:3000/api',
             endpoints: {
                 twilioConfig: '/admin/whatsapp/twilio/config',
                 twilioTestConnection: '/admin/whatsapp/twilio/test-connection',
@@ -615,11 +615,25 @@ class WhatsAppAdmin {
             url: response.url
         });
         
+        // 🔧 CORREÇÃO: Tratar erros HTTP antes de tentar parse JSON
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error(`Endpoint não encontrado: ${endpoint}`);
+            } else if (response.status === 401) {
+                throw new Error('Não autorizado. Faça login novamente.');
+            } else if (response.status === 500) {
+                throw new Error('Erro interno do servidor');
+            } else {
+                throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+            }
+        }
+        
         const result = await response.json();
         console.log('📄 Dados da resposta:', result);
         
-        if (!response.ok) {
-            throw new Error(result.message || 'Erro na requisição');
+        // 🔧 CORREÇÃO: Verificar estrutura de dados
+        if (result && result.success === false) {
+            throw new Error(result.message || 'Erro no servidor');
         }
         
         return result;
