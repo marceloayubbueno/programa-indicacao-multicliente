@@ -9,7 +9,7 @@
  */
 
 // 🔧 CONFIGURAÇÃO DA API - COMO ESTAVA FUNCIONANDO ANTES
-const API_BASE_URL = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+const API_BASE_URL = 'https://programa-indicacao-multicliente-production.up.railway.app';
 
 class WhatsAppAdmin {
     constructor() {

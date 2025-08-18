@@ -4,11 +4,11 @@
  */
 
 // 🔧 CONFIGURAÇÃO DA API - COMO ESTAVA FUNCIONANDO ANTES
-const API_BASE_URL = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+const API_BASE_URL = 'https://programa-indicacao-multicliente-production.up.railway.app';
 
 // Endpoints da API
-const API_LIST_ADMINS = `${API_BASE_URL}/auth/admins`;
-const API_CRUD_ADMINS = `${API_BASE_URL}/admins`;
+const API_LIST_ADMINS = `${API_BASE_URL}/api/auth/admins`;
+const API_CRUD_ADMINS = `${API_BASE_URL}/api/admins`;
 let admins = [];
 let editingAdminId = null;
 
