@@ -63,6 +63,7 @@ import { WhatsAppQueueProcessorService } from './whatsapp-queue-processor.servic
     WhatsAppFlowModule,
     WhatsAppQueueModule,
     WhatsAppFlowTriggerModule,
+    WhatsAppQueueProcessorService,
   ],
 })
 export class WhatsAppModule {} 
