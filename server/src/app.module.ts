@@ -25,6 +25,18 @@ import { EmailConfigModule } from './email-config/email-config.module';
 import { MailModule } from './common/mail.module';
 import { WhatsAppModule } from './whatsapp/whatsapp.module';
 
+// 🆕 NOVO: Função UUID customizada para resolver problema do ScheduleModule
+function generateUUID(): `${string}-${string}-${string}-${string}-${string}` {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  }) as `${string}-${string}-${string}-${string}-${string}`;
+}
+
+// 🆕 NOVO: Configurar global crypto para ScheduleModule funcionar
+(global as any).crypto = { randomUUID: generateUUID };
+
 @Module({
   imports: [
     ConfigModule.forRoot({
