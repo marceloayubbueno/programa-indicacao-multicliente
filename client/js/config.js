@@ -1,5 +1,5 @@
 /**
- * 🔧 CONFIGURAÇÃO CENTRALIZADA DO FRONTEND
+ * 🔧 CONFIGURAÇÃO CENTRALIZADA DO CLIENT
  * Arquivo que centraliza todas as configurações do sistema
  * 
  * Este arquivo é responsável por:
@@ -12,12 +12,12 @@
 // 🌍 Configuração de ambiente
 const ENV = {
     development: {
-        API_URL: 'http://localhost:3000/api',
+        API_URL: 'http://localhost:3000',
         CLIENT_URL: 'http://localhost:5501',
         REFERRAL_BASE_URL: 'http://localhost:3000/indicacao'
     },
     production: {
-        API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/api',
+        API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app',
         CLIENT_URL: 'https://app.virallead.com.br',
         REFERRAL_BASE_URL: 'https://lp.virallead.com.br/indicacao'
     }
