@@ -24,6 +24,7 @@ class WhatsAppQueueManager {
         // Botões principais
         document.getElementById('refresh-queues').addEventListener('click', () => this.refreshQueues());
         document.getElementById('process-queues').addEventListener('click', () => this.processQueues());
+        document.getElementById('reset-failed-messages').addEventListener('click', () => this.resetFailedMessages()); // 🆕 NOVO: Botão resetar mensagens falhadas
         document.getElementById('save-queue-settings').addEventListener('click', () => this.saveSettings());
 
         // Filtros
@@ -532,6 +533,50 @@ class WhatsAppQueueManager {
         } catch (error) {
             console.error('Error deleting message:', error);
             this.showNotification('Erro ao remover mensagem', 'error');
+        }
+    }
+
+    /**
+     * 🆕 NOVO: Resetar mensagens que falharam para reprocessamento
+     * Útil para mensagens que atingiram maxRetries mas precisam ser reenviadas
+     */
+    async resetFailedMessages() {
+        try {
+            // Confirmar ação do usuário
+            if (!confirm('Tem certeza que deseja resetar todas as mensagens falhadas? Isso permitirá que sejam reprocessadas.')) {
+                return;
+            }
+
+            this.showNotification('Resetando mensagens falhadas...', 'info');
+            this.addLog('Iniciando reset de mensagens falhadas...');
+
+            const response = await fetch(`${window.ADMIN_CONFIG.API_URL}/admin/whatsapp/queue/messages/reset-failed`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({}) // Resetar todas as mensagens falhadas
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                this.showNotification(`✅ ${result.message}`, 'success');
+                this.addLog(`Resetadas ${result.data.reset} mensagens para reprocessamento`);
+                
+                // Recarregar status e mensagens
+                await this.refreshQueues();
+                await this.loadQueueStatus();
+                await this.loadQueueMessages();
+            } else {
+                const error = await response.json();
+                this.showNotification(`❌ Erro ao resetar: ${error.message}`, 'error');
+                this.addLog(`Erro ao resetar mensagens: ${error.message}`);
+            }
+        } catch (error) {
+            console.error('Error resetting failed messages:', error);
+            this.showNotification('❌ Erro ao resetar mensagens falhadas', 'error');
+            this.addLog(`Erro ao resetar mensagens: ${error.message}`);
         }
     }
 
