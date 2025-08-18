@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { WhatsAppQueue, WhatsAppQueueDocument, MessagePriority, QueueStatus } from './entities/whatsapp-queue.schema';
 import { CreateQueueMessageDto } from './dto/create-queue-message.dto';
 import { UpdateQueueMessageDto } from './dto/update-queue-message.dto';
+import { PhoneFormatterUtil } from './utils/phone-formatter.util'; // 🆕 NOVO: Importar formatação
 
 @Injectable()
 export class WhatsAppQueueService {
@@ -18,6 +19,17 @@ export class WhatsAppQueueService {
    */
   async addToQueue(createQueueMessageDto: CreateQueueMessageDto): Promise<WhatsAppQueue> {
     try {
+      // 🆕 NOVO: Formatar número do destinatário automaticamente
+      const formattedTo = PhoneFormatterUtil.formatPhoneNumber(createQueueMessageDto.to);
+      
+      // 🆕 NOVO: Log para debug da formatação
+      this.logger.log(`🔧 [DEBUG] Formatação ao salvar: "${createQueueMessageDto.to}" → "${formattedTo}"`);
+      
+      // 🆕 NOVO: Validar se o número está correto para Twilio
+      if (!PhoneFormatterUtil.isValidForTwilio(formattedTo)) {
+        throw new Error(`Número de telefone inválido após formatação: ${formattedTo}`);
+      }
+
       // Garantir que priority não seja undefined
       const priority = createQueueMessageDto.priority || MessagePriority.MEDIUM;
       
@@ -26,6 +38,7 @@ export class WhatsAppQueueService {
       
       const queueMessage = new this.whatsappQueueModel({
         ...createQueueMessageDto,
+        to: formattedTo, // 🆕 NOVO: Salvar número formatado
         priority,
         queuePosition,
         status: QueueStatus.PENDING,

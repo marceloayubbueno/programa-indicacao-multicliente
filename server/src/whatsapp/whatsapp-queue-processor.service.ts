@@ -3,6 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { WhatsAppQueueService } from './whatsapp-queue.service';
 import { TwilioService } from './providers/twilio.service';
 import { QueueStatus, MessagePriority } from './entities/whatsapp-queue.schema';
+import { PhoneFormatterUtil } from './utils/phone-formatter.util'; // 🆕 NOVO: Importar formatação
 
 @Injectable()
 export class WhatsAppQueueProcessorService {
@@ -117,9 +118,20 @@ export class WhatsAppQueueProcessorService {
     await this.whatsappQueueService.updateMessageStatus(messageId.toString(), QueueStatus.PROCESSING);
 
     try {
+      // 🆕 NOVO: Formatar número do destinatário automaticamente
+      const formattedTo = PhoneFormatterUtil.formatPhoneNumber(message.to);
+      
+      // 🆕 NOVO: Log para debug da formatação
+      this.logger.log(`🔧 [DEBUG] Formatação de número: "${message.to}" → "${formattedTo}"`);
+      
+      // 🆕 NOVO: Validar se o número está correto para Twilio
+      if (!PhoneFormatterUtil.isValidForTwilio(formattedTo)) {
+        throw new Error(`Número de telefone inválido após formatação: ${formattedTo}`);
+      }
+
       // Enviar via Twilio
       const twilioResponse = await this.twilioService.sendTestMessage({
-        to: message.to,
+        to: formattedTo, // 🆕 NOVO: Usar número formatado
         message: message.content.body,
         // Adicionar outros campos se necessário (header, footer, buttons)
       });

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { WhatsAppTwilioConfig, WhatsAppTwilioConfigDocument } from './whatsapp-twilio-config.schema';
 import { CreateTwilioConfigDto, UpdateTwilioConfigDto, TestTwilioMessageDto } from './twilio-config.dto';
 import * as twilio from 'twilio';
+import { PhoneFormatterUtil } from '../utils/phone-formatter.util'; // 🆕 NOVO: Importar formatação
 
 @Injectable()
 export class TwilioService {
@@ -112,6 +113,17 @@ export class TwilioService {
     }
 
     try {
+      // 🆕 NOVO: Formatar número do destinatário automaticamente
+      const formattedTo = PhoneFormatterUtil.formatPhoneNumber(testDto.to);
+      
+      // 🆕 NOVO: Log para debug da formatação
+      console.log(`🔧 [DEBUG] Formatação de número: "${testDto.to}" → "${formattedTo}"`);
+      
+      // 🆕 NOVO: Validar se o número está correto para Twilio
+      if (!PhoneFormatterUtil.isValidForTwilio(formattedTo)) {
+        throw new BadRequestException(`Número de telefone inválido após formatação: ${formattedTo}`);
+      }
+
       // Criar cliente Twilio se não existir
       if (!this.client) {
         this.client = twilio(config.accountSid, config.authToken);
@@ -121,7 +133,7 @@ export class TwilioService {
       const message = await this.client.messages.create({
         body: testDto.message,
         from: `whatsapp:${config.phoneNumber}`,  // ✅ COM 'whatsapp:' prefix para WhatsApp
-        to: `whatsapp:${testDto.to}`             // ✅ COM 'whatsapp:' prefix para WhatsApp
+        to: `whatsapp:${formattedTo}`             // 🆕 NOVO: Usar número formatado
       });
 
       // Atualizar estatísticas
