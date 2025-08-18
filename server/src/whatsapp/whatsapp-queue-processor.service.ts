@@ -62,6 +62,21 @@ export class WhatsAppQueueProcessorService {
       }, {});
       this.logger.log(`🔍 [DEBUG] Status das mensagens:`, statusCounts);
       
+      // 🆕 NOVO: Verificar mensagens PENDING especificamente
+      const pendingMessages = allMessages.filter(msg => msg.status === 'pending');
+      this.logger.log(`🔍 [DEBUG] Mensagens PENDING encontradas: ${pendingMessages.length}`);
+      if (pendingMessages.length > 0) {
+        this.logger.log(`🔍 [DEBUG] IDs das mensagens PENDING:`, pendingMessages.map(m => (m as any)._id));
+      }
+      
+      // 🆕 NOVO: Verificar mensagens RETRY especificamente
+      const retryMessages = allMessages.filter(msg => msg.status === 'retry');
+      this.logger.log(`🔍 [DEBUG] Mensagens RETRY encontradas: ${retryMessages.length}`);
+      if (retryMessages.length > 0) {
+        this.logger.log(`🔍 [DEBUG] IDs das mensagens RETRY:`, retryMessages.map(m => (m as any)._id));
+        this.logger.log(`🔍 [DEBUG] nextRetryAt das mensagens RETRY:`, retryMessages.map(m => ({ id: (m as any)._id, nextRetryAt: m.nextRetryAt, now: new Date() })));
+      }
+      
       // Buscar mensagens prontas para processamento (máximo 10 por vez)
       const messages = await this.whatsappQueueService.getMessagesForProcessing(10);
       
