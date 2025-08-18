@@ -11,7 +11,7 @@
 class WhatsAppAdmin {
     constructor() {
         this.config = {
-            apiBaseUrl: window.APP_CONFIG?.API_URL || 'http://localhost:3000/api',
+            apiBaseUrl: window.APP_CONFIG?.API_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api',
             endpoints: {
                 twilioConfig: '/admin/whatsapp/twilio/config',
                 twilioTestConnection: '/admin/whatsapp/twilio/test-connection',
@@ -26,9 +26,21 @@ class WhatsAppAdmin {
         
         // ✅ INICIALIZAR PROPRIEDADES PARA ARMAZENAR CONFIGURAÇÕES
         this.twilioConfig = null;
-
         this.pricingConfig = null;
-        this.currentProvider = 'twilio'; // Provider padrão
+        this.currentProvider = null;
+        this.statistics = null;
+        this.globalSettings = null;
+        
+        // 🔧 VALIDAR CONFIGURAÇÃO
+        if (!this.config.apiBaseUrl) {
+            console.error('❌ API_BASE_URL não configurado!');
+            throw new Error('Configuração da API não encontrada');
+        }
+        
+        console.log('🔧 WhatsApp Admin configurado com:', {
+            apiBaseUrl: this.config.apiBaseUrl,
+            environment: window.APP_CONFIG?.ENVIRONMENT || 'unknown'
+        });
         
         this.init();
     }
