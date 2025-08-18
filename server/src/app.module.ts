@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule'; // 🆕 NOVO: Para ativar cron jobs
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -37,6 +38,7 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module';
       retryWrites: true,
       w: 'majority'
     }),
+    ScheduleModule.forRoot(), // 🆕 NOVO: ATIVA PROCESSAMENTO AUTOMÁTICO DAS FILAS WHATSAPP
     AuthModule,
     UsersModule,
     CampaignsModule,
