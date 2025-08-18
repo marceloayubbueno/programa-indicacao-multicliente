@@ -289,6 +289,24 @@ export class WhatsAppQueueService {
   }
 
   /**
+   * 🆕 NOVO: Busca todas as mensagens da fila para debug
+   */
+  async getAllMessages(): Promise<WhatsAppQueue[]> {
+    try {
+      const messages = await this.whatsappQueueModel
+        .find({})
+        .sort({ createdAt: -1 })
+        .limit(100) // Limitar a 100 para não sobrecarregar
+        .exec();
+
+      return messages;
+    } catch (error) {
+      this.logger.error(`Erro ao buscar todas as mensagens: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
    * Limpa mensagens antigas da fila
    */
   async cleanupOldMessages(daysOld: number = 30): Promise<number> {

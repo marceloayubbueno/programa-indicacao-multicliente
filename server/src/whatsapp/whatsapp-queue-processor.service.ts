@@ -51,6 +51,17 @@ export class WhatsAppQueueProcessorService {
       // 🆕 NOVO: Log de debug para identificar execução
       this.logger.log('🔍 [DEBUG] processPendingMessages() - Iniciando...');
       
+      // 🆕 NOVO: Verificar mensagens existentes na fila
+      const allMessages = await this.whatsappQueueService.getAllMessages();
+      this.logger.log(`🔍 [DEBUG] Total de mensagens na fila: ${allMessages.length}`);
+      
+      // 🆕 NOVO: Verificar status das mensagens
+      const statusCounts = allMessages.reduce((acc, msg) => {
+        acc[msg.status] = (acc[msg.status] || 0) + 1;
+        return acc;
+      }, {});
+      this.logger.log(`🔍 [DEBUG] Status das mensagens:`, statusCounts);
+      
       // Buscar mensagens prontas para processamento (máximo 10 por vez)
       const messages = await this.whatsappQueueService.getMessagesForProcessing(10);
       
