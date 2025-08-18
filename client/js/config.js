@@ -17,7 +17,7 @@ const ENV = {
         REFERRAL_BASE_URL: 'http://localhost:3000/indicacao'
     },
     production: {
-        API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app',
+        API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/api',
         CLIENT_URL: 'https://app.virallead.com.br',
         REFERRAL_BASE_URL: 'https://lp.virallead.com.br/indicacao'
     }
@@ -97,20 +97,19 @@ window.successLog = function(message, data = null) {
     }
 };
 
+// 🔧 Função helper para obter URL da API (compatibilidade)
+window.getApiUrl = function(endpoint = '') {
+    return window.APP_CONFIG.API_URL + (endpoint.startsWith('/') ? endpoint : '/' + endpoint);
+};
+
+// 🔧 Função helper para obter URL de indicação (compatibilidade)
+window.getReferralUrl = function(endpoint = '') {
+    return window.APP_CONFIG.REFERRAL_BASE_URL + (endpoint.startsWith('/') ? endpoint : '/' + endpoint);
+};
+
 // 📋 Mostrar configuração atual no console (apenas em desenvolvimento)
-if (CURRENT_ENV === 'development') {
-    console.log('🔧 Configuração do Frontend:', {
-        environment: CURRENT_ENV,
-        api_url: config.API_URL,
-        client_url: config.CLIENT_URL,
-        debug_mode: true
-    });
-}
-
-// 🔄 Compatibilidade com arquivos existentes
-// Exporta API_URL para compatibilidade com arquivos antigos que ainda usam window.API_URL
-window.API_URL = config.API_URL;
-
-// 📡 Compatibilidade com módulos WhatsApp
-// Exporta API_BASE_URL para os módulos WhatsApp
-window.API_BASE_URL = config.API_URL; 
+if (window.APP_CONFIG.DEBUG_MODE) {
+    console.log('🔧 APP_CONFIG carregado:', window.APP_CONFIG);
+    console.log('🌍 Ambiente detectado:', window.APP_CONFIG.ENVIRONMENT);
+    console.log('🚀 API URL:', window.APP_CONFIG.API_URL);
+} 
