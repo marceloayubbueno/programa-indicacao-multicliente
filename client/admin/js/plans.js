@@ -1,8 +1,12 @@
-// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
-const API_BASE_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                    (window.location.hostname === 'localhost' ? 
-                     'http://localhost:3000/api' : 
-                     'https://programa-indicacao-multicliente-production.up.railway.app/api');
+/**
+ * Plans Management JavaScript
+ * Gerenciamento de planos
+ */
+
+// 🔧 CONFIGURAÇÃO DA API - COMO ESTAVA FUNCIONANDO ANTES
+const API_BASE_URL = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+
+// Endpoints da API
 const API_URL = `${API_BASE_URL}/planos`;
 let editingPlanId = null;
 

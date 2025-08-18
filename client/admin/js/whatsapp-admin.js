@@ -8,10 +8,13 @@
  * - Validações e testes
  */
 
+// 🔧 CONFIGURAÇÃO DA API - COMO ESTAVA FUNCIONANDO ANTES
+const API_BASE_URL = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
+
 class WhatsAppAdmin {
     constructor() {
         this.config = {
-            apiBaseUrl: window.APP_CONFIG?.API_URL || 'https://programa-indicacao-multicliente-production.up.railway.app/api',
+            apiBaseUrl: API_BASE_URL,
             endpoints: {
                 twilioConfig: '/admin/whatsapp/twilio/config',
                 twilioTestConnection: '/admin/whatsapp/twilio/test-connection',
@@ -27,20 +30,7 @@ class WhatsAppAdmin {
         // ✅ INICIALIZAR PROPRIEDADES PARA ARMAZENAR CONFIGURAÇÕES
         this.twilioConfig = null;
         this.pricingConfig = null;
-        this.currentProvider = null;
-        this.statistics = null;
-        this.globalSettings = null;
-        
-        // 🔧 VALIDAR CONFIGURAÇÃO
-        if (!this.config.apiBaseUrl) {
-            console.error('❌ API_BASE_URL não configurado!');
-            throw new Error('Configuração da API não encontrada');
-        }
-        
-        console.log('🔧 WhatsApp Admin configurado com:', {
-            apiBaseUrl: this.config.apiBaseUrl,
-            environment: window.APP_CONFIG?.ENVIRONMENT || 'unknown'
-        });
+        this.currentProvider = 'twilio'; // Provider padrão
         
         this.init();
     }

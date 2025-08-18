@@ -1,14 +1,13 @@
-// users.js - Lógica da página de gerenciamento de administradores
+/**
+ * Users Management JavaScript
+ * Gerenciamento de usuários administradores
+ */
 
-// 🌍 CONFIGURAÇÃO DINÂMICA: usar config.js quando disponível
-const API_BASE_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                    (window.location.hostname === 'localhost' ? 
-                     'http://localhost:3000/api' : 
-                     'https://programa-indicacao-multicliente-production.up.railway.app/api');
+// 🔧 CONFIGURAÇÃO DA API - COMO ESTAVA FUNCIONANDO ANTES
+const API_BASE_URL = 'https://programa-indicacao-multicliente-production.up.railway.app/api';
 
-// URL para listagem de admins (NestJS)
+// Endpoints da API
 const API_LIST_ADMINS = `${API_BASE_URL}/auth/admins`;
-// URL base para operações CRUD de admins (NestJS)
 const API_CRUD_ADMINS = `${API_BASE_URL}/admins`;
 let admins = [];
 let editingAdminId = null;
