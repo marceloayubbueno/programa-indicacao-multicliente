@@ -19,8 +19,8 @@ async function loadLeadsFromBackend() {
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA
         const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                       (window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/api' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+                       'http://localhost:3000' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app');
         
         // Preparar headers de autenticação
         const headers = {
@@ -251,8 +251,8 @@ async function confirmConversion() {
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA  
         const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                       (window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/api' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+                       'http://localhost:3000' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app');
         const response = await fetch(`${apiUrl}/referrals/${leadId}/mark-conversion`, {
             method: 'POST',
             headers: {
@@ -310,8 +310,8 @@ async function updateLeadStatus(leadId, newStatus) {
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA
         const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                       (window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/api' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+                       'http://localhost:3000' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app');
         const response = await fetch(`${apiUrl}/referrals/${leadId}/status`, {
             method: 'PATCH',
             headers: {
