@@ -12,11 +12,18 @@ export class WhatsAppQueueProcessorService {
   constructor(
     private readonly whatsappQueueService: WhatsAppQueueService,
     private readonly twilioService: TwilioService,
-  ) {}
+  ) {
+    // 🆕 NOVO: Log de inicialização para debug
+    this.logger.log('🚀 WhatsAppQueueProcessorService inicializado!');
+    this.logger.log('⏰ Cron job configurado para rodar a cada 30 segundos');
+  }
 
   // Processar filas a cada 30 segundos
   @Cron(CronExpression.EVERY_30_SECONDS)
   async processQueues() {
+    // 🆕 NOVO: Log de execução do cron job
+    this.logger.log('⏰ Cron job executando: processQueues()');
+    
     if (this.isProcessing) {
       this.logger.debug('Processamento já em andamento, pulando...');
       return;

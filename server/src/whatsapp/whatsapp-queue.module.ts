@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { WhatsAppQueueService } from './whatsapp-queue.service';
 import { WhatsAppQueueController } from './whatsapp-queue.controller';
 import { WhatsAppQueue, WhatsAppQueueSchema } from './entities/whatsapp-queue.schema';
+import { WhatsAppQueueProcessorService } from './whatsapp-queue-processor.service';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { WhatsAppQueue, WhatsAppQueueSchema } from './entities/whatsapp-queue.sc
     ]),
   ],
   controllers: [WhatsAppQueueController],
-  providers: [WhatsAppQueueService],
-  exports: [WhatsAppQueueService],
+  providers: [WhatsAppQueueService, WhatsAppQueueProcessorService],
+  exports: [WhatsAppQueueService, WhatsAppQueueProcessorService],
 })
 export class WhatsAppQueueModule {}

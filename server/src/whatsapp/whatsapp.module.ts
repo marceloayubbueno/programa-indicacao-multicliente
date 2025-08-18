@@ -54,7 +54,6 @@ import { WhatsAppQueueProcessorService } from './whatsapp-queue-processor.servic
     WhatsAppClientService,
     WhatsAppClientTemplatesService,
     TwilioService,
-    WhatsAppQueueProcessorService,
   ],
   exports: [
     WhatsAppAdminService,
@@ -63,7 +62,6 @@ import { WhatsAppQueueProcessorService } from './whatsapp-queue-processor.servic
     WhatsAppFlowModule,
     WhatsAppQueueModule,
     WhatsAppFlowTriggerModule,
-    WhatsAppQueueProcessorService,
   ],
 })
 export class WhatsAppModule {} 
