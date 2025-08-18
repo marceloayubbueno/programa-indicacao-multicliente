@@ -13,6 +13,11 @@ export class WhatsAppQueueProcessorService {
     private readonly whatsappQueueService: WhatsAppQueueService,
     private readonly twilioService: TwilioService,
   ) {
+    // 🆕 NOVO: Logs de debug para identificar instanciação
+    console.log('🚀 [DEBUG] WhatsAppQueueProcessorService constructor chamado!');
+    console.log('🔧 [DEBUG] whatsappQueueService injetado:', !!this.whatsappQueueService);
+    console.log('🔧 [DEBUG] twilioService injetado:', !!this.twilioService);
+    
     // 🆕 NOVO: Log de inicialização para debug
     this.logger.log('🚀 WhatsAppQueueProcessorService inicializado!');
     this.logger.log('⏰ Cron job configurado para rodar a cada 30 segundos');
@@ -43,10 +48,17 @@ export class WhatsAppQueueProcessorService {
   // Processar mensagens pendentes
   private async processPendingMessages() {
     try {
+      // 🆕 NOVO: Log de debug para identificar execução
+      this.logger.log('🔍 [DEBUG] processPendingMessages() - Iniciando...');
+      
       // Buscar mensagens prontas para processamento (máximo 10 por vez)
       const messages = await this.whatsappQueueService.getMessagesForProcessing(10);
       
+      // 🆕 NOVO: Log de debug para identificar resultado da busca
+      this.logger.log(`🔍 [DEBUG] Mensagens encontradas para processamento: ${messages.length}`);
+      
       if (messages.length === 0) {
+        this.logger.log('🔍 [DEBUG] Nenhuma mensagem para processar');
         return;
       }
 
@@ -64,7 +76,9 @@ export class WhatsAppQueueProcessorService {
       }
 
     } catch (error) {
-      this.logger.error(`Erro ao buscar mensagens para processamento: ${error.message}`);
+      // 🆕 NOVO: Log de debug para identificar erro
+      this.logger.error(`🔍 [DEBUG] Erro em processPendingMessages(): ${error.message}`);
+      this.logger.error(`🔍 [DEBUG] Stack trace: ${error.stack}`);
     }
   }
 
