@@ -363,4 +363,28 @@ export class WhatsAppQueueController {
       };
     }
   }
+
+  /**
+   * 🆕 NOVO: Resetar mensagens que falharam para reprocessamento
+   * Útil para mensagens que atingiram maxRetries mas precisam ser reenviadas
+   */
+  @Post('messages/reset-failed')
+  async resetFailedMessages(@Body() body: { messageIds?: string[] }) {
+    try {
+      const result = await this.whatsappQueueService.resetFailedMessages(body.messageIds);
+      
+      return {
+        success: true,
+        message: `Resetadas ${result.reset} mensagens para reprocessamento`,
+        data: result,
+      };
+    } catch (error) {
+      this.logger.error(`Erro ao resetar mensagens falhadas: ${error.message}`);
+      return {
+        success: false,
+        message: 'Erro ao resetar mensagens falhadas',
+        error: error.message,
+      };
+    }
+  }
 }
