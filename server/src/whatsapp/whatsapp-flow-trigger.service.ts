@@ -428,6 +428,15 @@ export class WhatsAppFlowTriggerService {
           // Verificar se a mensagem deve ser enviada para este gatilho
           // Como o schema não tem campo trigger, vamos usar o trigger do fluxo
           if (flow.triggers.includes(triggerType)) {
+            // 🆕 NOVO: Buscar o template real
+            const template = await this.templateModel.findById(message.templateId).exec();
+            if (!template) {
+              this.logger.warn(`❌ [GATILHO] Template não encontrado: ${message.templateId}`);
+              continue;
+            }
+            
+            this.logger.log(`🔍 [GATILHO] Template encontrado: ${template.name}`);
+            
             // Preparar dados da mensagem
             const messageData: CreateQueueMessageDto = {
               to: referralData.leadPhone,
@@ -438,7 +447,7 @@ export class WhatsAppFlowTriggerService {
               flowId: flow._id.toString(),
               trigger: triggerType, // Campo correto do DTO
               content: {
-                body: `Olá ${referralData.leadName}, você foi indicado!` // Campo obrigatório
+                body: template.content?.body || `Olá ${referralData.leadName}, você foi indicado!` // 🆕 NOVO: Usar template real
               },
               triggerData: {
                 referralId: referralData.id,
@@ -451,6 +460,7 @@ export class WhatsAppFlowTriggerService {
             messagesAdded++;
             
             this.logger.log(`✅ [GATILHO] Mensagem ${message.order} adicionada à fila para ${referralData.leadPhone}`);
+            this.logger.log(`✅ [GATILHO] Template usado: ${template.name}`);
           }
         } catch (error) {
           this.logger.error(`❌ [GATILHO] Erro ao processar mensagem ${message.order}: ${error.message}`);
