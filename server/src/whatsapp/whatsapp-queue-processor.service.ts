@@ -112,29 +112,69 @@ export class WhatsAppQueueProcessorService {
   // Processar mensagem individual
   private async processMessage(message: any) {
     const messageId = message._id || message.id || 'unknown';
+    
+    // 🔍 LOG ESTRATÉGICO: Início do processamento da mensagem
+    this.logger.log(`🔍 [FILA-TWILIO] ===== INICIANDO PROCESSAMENTO DA MENSAGEM =====`);
+    this.logger.log(`🔍 [FILA-TWILIO] ID da mensagem: ${messageId}`);
+    this.logger.log(`🔍 [FILA-TWILIO] Para: ${message.to}`);
+    this.logger.log(`🔍 [FILA-TWILIO] Trigger: ${message.trigger}`);
+    this.logger.log(`🔍 [FILA-TWILIO] Status atual: ${message.status}`);
+    this.logger.log(`🔍 [FILA-TWILIO] Retry: ${message.retryCount}/${message.maxRetries}`);
+    
     this.logger.log(`Processando mensagem: ${messageId} para: ${message.to}`);
+
+    // 🔍 LOG ESTRATÉGICO: Antes de marcar como PROCESSING
+    this.logger.log(`🔍 [FILA-TWILIO] Marcando mensagem ${messageId} como PROCESSING...`);
 
     // Marcar como em processamento
     await this.whatsappQueueService.updateMessageStatus(messageId.toString(), QueueStatus.PROCESSING);
+    
+    // 🔍 LOG ESTRATÉGICO: Após marcar como PROCESSING
+    this.logger.log(`🔍 [FILA-TWILIO] Mensagem ${messageId} marcada como PROCESSING com sucesso`);
 
     try {
-      // 🆕 NOVO: Formatar número do destinatário automaticamente
+      // 🔍 LOG ESTRATÉGICO: Antes da formatação do número
+      this.logger.log(`🔍 [FILA-TWILIO] Formatando número: "${message.to}"`);
+      
+      // Formatar número do destinatário automaticamente
       const formattedTo = PhoneFormatterUtil.formatPhoneNumber(message.to);
       
-      // 🆕 NOVO: Log para debug da formatação
+      // 🔍 LOG ESTRATÉGICO: Após formatação
+      this.logger.log(`🔍 [FILA-TWILIO] Número formatado: "${formattedTo}"`);
+      
+      // Log para debug da formatação
       this.logger.log(`🔧 [DEBUG] Formatação de número: "${message.to}" → "${formattedTo}"`);
       
-      // 🆕 NOVO: Validar se o número está correto para Twilio
+      // 🔍 LOG ESTRATÉGICO: Antes da validação
+      this.logger.log(`🔍 [FILA-TWILIO] Validando número para Twilio...`);
+      
+      // Validar se o número está correto para Twilio
       if (!PhoneFormatterUtil.isValidForTwilio(formattedTo)) {
         throw new Error(`Número de telefone inválido após formatação: ${formattedTo}`);
       }
+      
+      // 🔍 LOG ESTRATÉGICO: Número validado
+      this.logger.log(`🔍 [FILA-TWILIO] Número validado com sucesso para Twilio`);
 
+      // 🔍 LOG ESTRATÉGICO: ANTES de chamar Twilio
+      this.logger.log(`🔍 [FILA-TWILIO] ===== CHAMANDO TWILIO =====`);
+      this.logger.log(`🔍 [FILA-TWILIO] Enviando mensagem ${messageId} via Twilio para: ${formattedTo}`);
+      this.logger.log(`🔍 [FILA-TWILIO] Conteúdo da mensagem: ${message.content.body.substring(0, 100)}...`);
+      
       // Enviar via Twilio
       const twilioResponse = await this.twilioService.sendTestMessage({
-        to: formattedTo, // 🆕 NOVO: Usar número formatado
+        to: formattedTo,
         message: message.content.body,
-        // Adicionar outros campos se necessário (header, footer, buttons)
       });
+      
+      // 🔍 LOG ESTRATÉGICO: RESPOSTA DO TWILIO
+      this.logger.log(`🔍 [FILA-TWILIO] ===== RESPOSTA DO TWILIO RECEBIDA =====`);
+      this.logger.log(`🔍 [FILA-TWILIO] Message ID: ${twilioResponse.sid || 'N/A'}`);
+      this.logger.log(`🔍 [FILA-TWILIO] Success: ${twilioResponse.success || 'N/A'}`);
+      this.logger.log(`🔍 [FILA-TWILIO] Resposta completa:`, twilioResponse);
+
+      // 🔍 LOG ESTRATÉGICO: ANTES de marcar como COMPLETED
+      this.logger.log(`🔍 [FILA-TWILIO] Marcando mensagem ${messageId} como COMPLETED...`);
 
       // Marcar como completada
       await this.whatsappQueueService.updateMessageStatus(
@@ -142,11 +182,18 @@ export class WhatsAppQueueProcessorService {
         QueueStatus.COMPLETED,
         { twilioResponse }
       );
+      
+      // 🔍 LOG ESTRATÉGICO: Após marcar como COMPLETED
+      this.logger.log(`🔍 [FILA-TWILIO] Mensagem ${messageId} marcada como COMPLETED com sucesso`);
+      this.logger.log(`🔍 [FILA-TWILIO] ===== PROCESSAMENTO CONCLUÍDO COM SUCESSO =====`);
 
       this.logger.log(`Mensagem ${messageId} enviada com sucesso via Twilio`);
 
     } catch (error) {
-      this.logger.error(`Erro ao enviar mensagem ${messageId} via Twilio: ${error.message}`);
+      // 🔍 LOG ESTRATÉGICO: ERRO DETALHADO
+      this.logger.error(`🔍 [FILA-TWILIO] ===== ERRO NO PROCESSAMENTO =====`);
+      this.logger.error(`🔍 [FILA-TWILIO] Mensagem ${messageId}: ${error.message}`);
+      this.logger.error(`🔍 [FILA-TWILIO] Stack trace: ${error.stack}`);
       throw error;
     }
   }
