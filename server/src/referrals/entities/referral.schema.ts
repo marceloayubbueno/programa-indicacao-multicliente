@@ -128,7 +128,7 @@ ReferralSchema.post('save', async function(doc) {
       // Chamar o service para disparar mensagem para o lead
       const result = await global.whatsAppFlowTriggerService.triggerLeadIndicated(
         referralData,
-        doc.clientId,
+        doc.clientId.toString(), // 🆕 CORRIGIDO: Converter ObjectId para string
         doc.campaignId?.toString()
       );
       

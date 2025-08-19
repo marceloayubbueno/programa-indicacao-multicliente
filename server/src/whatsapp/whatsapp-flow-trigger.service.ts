@@ -122,7 +122,7 @@ export class WhatsAppFlowTriggerService {
     }
   }
 
-  private async getActiveFlowsForTrigger(triggerType: TriggerType, clientId: Types.ObjectId): Promise<WhatsAppFlowDocument[]> {
+  private async getActiveFlowsForTrigger(triggerType: string, clientId: Types.ObjectId): Promise<WhatsAppFlowDocument[]> {
     try {
       this.logger.log(`🔍 [DEBUG] Buscando fluxos ativos para gatilho: ${triggerType}`);
       this.logger.log(`🔍 [DEBUG] ClientId: ${clientId}`);
@@ -413,6 +413,69 @@ export class WhatsAppFlowTriggerService {
     return result;
   }
 
+  // 🆕 NOVO: Método para processar mensagens de um fluxo
+  private async processFlowMessages(
+    flow: WhatsAppFlowDocument, 
+    referralData: any, 
+    triggerType: string
+  ): Promise<number> {
+    try {
+      let messagesAdded = 0;
+      
+      // Processar cada mensagem do fluxo
+      for (const message of flow.messages) {
+        try {
+          // Verificar se a mensagem deve ser enviada para este gatilho
+          // Como o schema não tem campo trigger, vamos usar o trigger do fluxo
+          if (flow.triggers.includes(triggerType)) {
+            // Preparar dados da mensagem
+            const messageData: CreateQueueMessageDto = {
+              to: referralData.leadPhone,
+              from: 'admin', // Campo obrigatório
+              templateId: message.templateId.toString(), // Converter ObjectId para string
+              variables: this.extractVariablesFromTemplate(message.templateId.toString(), referralData),
+              clientId: flow.clientId.toString(),
+              flowId: flow._id.toString(),
+              trigger: triggerType, // Campo correto do DTO
+              content: {
+                body: `Olá ${referralData.leadName}, você foi indicado!` // Campo obrigatório
+              },
+              triggerData: {
+                referralId: referralData.id,
+                campaignId: referralData.campaignId
+              }
+            };
+            
+            // Adicionar à fila WhatsApp usando o método correto
+            await this.whatsappQueueService.addToQueue(messageData);
+            messagesAdded++;
+            
+            this.logger.log(`✅ [GATILHO] Mensagem ${message.order} adicionada à fila para ${referralData.leadPhone}`);
+          }
+        } catch (error) {
+          this.logger.error(`❌ [GATILHO] Erro ao processar mensagem ${message.order}: ${error.message}`);
+        }
+      }
+      
+      return messagesAdded;
+    } catch (error) {
+      this.logger.error(`❌ [GATILHO] Erro ao processar fluxo: ${error.message}`);
+      return 0;
+    }
+  }
+
+  // 🆕 NOVO: Método para extrair variáveis do template
+  private extractVariablesFromTemplate(templateId: string, referralData: any): Record<string, string> {
+    // Por enquanto, retorna variáveis básicas
+    // TODO: Implementar extração dinâmica baseada no template
+    return {
+      leadName: referralData.leadName || 'Lead',
+      leadEmail: referralData.leadEmail || '',
+      leadPhone: referralData.leadPhone || '',
+      referralDate: new Date().toLocaleDateString('pt-BR')
+    };
+  }
+
   // Métodos públicos para disparar gatilhos específicos
   async triggerIndicatorJoined(
     participantData: ParticipantData, 
@@ -429,17 +492,76 @@ export class WhatsAppFlowTriggerService {
   }
 
   async triggerLeadIndicated(
-    referralData: ReferralData, 
-    clientId: Types.ObjectId, 
+    referralData: any, 
+    clientId: string | Types.ObjectId, // 🆕 CORRIGIDO: Aceitar string ou ObjectId
     campaignId?: string
   ): Promise<TriggerResult> {
-    return this.processTrigger(TriggerType.LEAD_INDICATED, {
-      referralId: new Types.ObjectId(referralData.id),
-      clientId,
-      campaignId,
-      referralData,
-      eventData: { type: 'lead_indicated' },
-    });
+    try {
+      this.logger.log(`🚀 [GATILHO] Iniciando processamento do gatilho: lead_indicated`);
+      
+      // 🆕 CORRIGIDO: Converter string para ObjectId se necessário
+      const clientIdObj = typeof clientId === 'string' ? new Types.ObjectId(clientId) : clientId;
+      
+      this.logger.log(`🚀 [GATILHO] ClientId: ${clientIdObj}`);
+      this.logger.log(`🚀 [GATILHO] Dados do trigger:`, {
+        referralId: referralData.id,
+        clientId: clientIdObj.toString(),
+        campaignId,
+        referralData,
+        eventData: { type: 'lead_indicated' }
+      });
+
+      // Buscar fluxos ativos para este gatilho
+      const activeFlows = await this.getActiveFlowsForTrigger('lead_indicated', clientIdObj);
+      
+      if (activeFlows.length === 0) {
+        return {
+          success: true,
+          message: 'Nenhum fluxo ativo encontrado para o gatilho: lead_indicated',
+          flowsTriggered: 0,
+          messagesAdded: 0
+        };
+      }
+
+      this.logger.log(`🚀 [GATILHO] Fluxos ativos encontrados: ${activeFlows.length}`);
+
+      let totalMessagesAdded = 0;
+      const triggeredFlows: string[] = [];
+
+      // Processar cada fluxo ativo
+      for (const flow of activeFlows) {
+        try {
+          this.logger.log(`🔄 [GATILHO] Processando fluxo: ${flow.name}`);
+          
+          // Processar mensagens do fluxo
+          const messagesAdded = await this.processFlowMessages(flow, referralData, 'lead_indicated');
+          
+          if (messagesAdded > 0) {
+            totalMessagesAdded += messagesAdded;
+            triggeredFlows.push(flow.name);
+            this.logger.log(`✅ [GATILHO] Mensagem adicionada à fila WhatsApp`);
+          }
+        } catch (error) {
+          this.logger.error(`❌ [GATILHO] Erro ao processar fluxo ${flow.name}: ${error.message}`);
+        }
+      }
+
+      return {
+        success: true,
+        message: `Processamento concluído: ${triggeredFlows.length} fluxos acionados`,
+        flowsTriggered: triggeredFlows.length,
+        messagesAdded: totalMessagesAdded
+      };
+
+    } catch (error) {
+      this.logger.error(`❌ [GATILHO] Erro ao processar gatilho lead_indicated: ${error.message}`);
+      return {
+        success: false,
+        message: `Erro ao processar gatilho: ${error.message}`,
+        flowsTriggered: 0,
+        messagesAdded: 0
+      };
+    }
   }
 
   async triggerRewardEarned(
