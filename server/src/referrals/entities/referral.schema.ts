@@ -115,8 +115,10 @@ ReferralSchema.post('save', async function(doc) {
       console.log('⚠️ [REFERRAL-HOOK] Lead já foi processado, pulando...');
       return;
     }
-    if (this.isNew === false) {
-      console.log('⚠️ [REFERRAL-HOOK] Não é uma inserção nova, pulando...');
+    
+    // Verificar se é a primeira execução (não processado ainda)
+    if (doc.whatsappProcessed !== false) {
+      console.log('⚠️ [REFERRAL-HOOK] Lead já foi processado ou status indefinido, pulando...');
       return;
     }
     
