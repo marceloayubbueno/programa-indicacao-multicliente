@@ -542,14 +542,17 @@ export class WhatsAppFlowTriggerService {
       for (const flow of activeFlows) {
         try {
           this.logger.log(`🔄 [GATILHO] Processando fluxo: ${flow.name}`);
+          this.logger.log(`🔍 [GATILHO] Total de mensagens no fluxo: ${flow.messages.length}`);
           
           // Processar mensagens do fluxo
           const messagesAdded = await this.processFlowMessages(flow, referralData, 'lead_indicated');
           
+          this.logger.log(`📊 [GATILHO] Mensagens processadas no fluxo ${flow.name}: ${messagesAdded}`);
+          
           if (messagesAdded > 0) {
             totalMessagesAdded += messagesAdded;
             triggeredFlows.push(flow.name);
-            this.logger.log(`✅ [GATILHO] Mensagem adicionada à fila WhatsApp`);
+            this.logger.log(`✅ [GATILHO] Fluxo ${flow.name} processado com sucesso`);
           }
         } catch (error) {
           this.logger.error(`❌ [GATILHO] Erro ao processar fluxo ${flow.name}: ${error.message}`);

@@ -92,6 +92,10 @@ export class Referral extends Document {
 
   @Prop({ default: Date.now })
   updatedAt?: Date;
+
+  // === NOVO CAMPO PARA MARCAR O PROCESSAMENTO DO WHATSAPP ===
+  @Prop({ default: false })
+  whatsappProcessed?: boolean;
 }
 
 export const ReferralSchema = SchemaFactory.createForClass(Referral);
@@ -104,6 +108,15 @@ ReferralSchema.index({ rewardStatus: 1 });
 // === HOOK PARA DISPARAR MENSAGENS WHATSAPP QUANDO LEAD FOR INDICADO ===
 ReferralSchema.post('save', async function(doc) {
   try {
+    // 🆕 NOVO: Verificar se já foi processado para evitar duplicatas
+    if ((doc as any).__whatsappProcessed) {
+      console.log('⚠️ [REFERRAL-HOOK] Hook já executado, pulando...');
+      return;
+    }
+    
+    // Marcar como processado
+    (doc as any).__whatsappProcessed = true;
+    
     // Verificar se o WhatsAppFlowTriggerService está disponível globalmente
     if (global.whatsAppFlowTriggerService) {
       console.log('🚀 [REFERRAL-HOOK] Novo lead indicado, disparando mensagem WhatsApp...');
