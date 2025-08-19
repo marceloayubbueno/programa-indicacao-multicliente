@@ -126,6 +126,12 @@ ReferralSchema.post('save', async function(doc) {
       };
       
       // Chamar o service para disparar mensagem para o lead
+      // 🆕 NOVO: Verificar se clientId existe antes de chamar
+      if (!doc.clientId) {
+        console.log('⚠️ [REFERRAL-HOOK] ClientId não encontrado, pulando disparo de WhatsApp');
+        return;
+      }
+      
       const result = await global.whatsAppFlowTriggerService.triggerLeadIndicated(
         referralData,
         doc.clientId.toString(), // 🆕 CORRIGIDO: Converter ObjectId para string
