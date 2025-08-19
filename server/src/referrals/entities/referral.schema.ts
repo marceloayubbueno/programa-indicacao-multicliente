@@ -108,58 +108,51 @@ ReferralSchema.index({ rewardStatus: 1 });
 // === HOOK PARA DISPARAR MENSAGENS WHATSAPP QUANDO LEAD FOR INDICADO ===
 ReferralSchema.post('save', async function(doc) {
   try {
-    // 🆕 NOVO: Verificar se já foi processado para evitar duplicatas
-    if ((doc as any).__whatsappProcessed) {
-      console.log('⚠️ [REFERRAL-HOOK] Hook já executado, pulando...');
+    // 🔍 LOG SIMPLES: Hook sendo executado
+    console.log('🔍 [REFERRAL-HOOK] Hook executado para:', doc._id);
+    
+    if (doc.whatsappProcessed === true) {
+      console.log('⚠️ [REFERRAL-HOOK] Lead já foi processado, pulando...');
+      return;
+    }
+    if (this.isNew === false) {
+      console.log('⚠️ [REFERRAL-HOOK] Não é uma inserção nova, pulando...');
       return;
     }
     
-    // Marcar como processado
-    (doc as any).__whatsappProcessed = true;
+    console.log('✅ [REFERRAL-HOOK] Lead novo detectado, processando...');
     
-    // Verificar se o WhatsAppFlowTriggerService está disponível globalmente
-    if (global.whatsAppFlowTriggerService) {
-      console.log('🚀 [REFERRAL-HOOK] Novo lead indicado, disparando mensagem WhatsApp...');
-      console.log('🔍 [REFERRAL-HOOK] Dados do lead:', {
-        id: doc._id,
-        leadName: doc.leadName,
-        leadEmail: doc.leadEmail,
-        leadPhone: doc.leadPhone,
-        clientId: doc.clientId,
-        campaignId: doc.campaignId
-      });
-      
-      // Preparar dados do referral para o service
-      const referralData = {
-        id: doc._id.toString(),
-        leadName: doc.leadName,
-        leadEmail: doc.leadEmail,
-        leadPhone: doc.leadPhone,
-        createdAt: doc.createdAt
-      };
-      
-      // Chamar o service para disparar mensagem para o lead
-      // 🆕 NOVO: Verificar se clientId existe antes de chamar
-      if (!doc.clientId) {
-        console.log('⚠️ [REFERRAL-HOOK] ClientId não encontrado, pulando disparo de WhatsApp');
-        return;
+    // Preparar dados do referral
+    const referralData = {
+      _id: doc._id,
+      name: doc.leadName,
+      email: doc.leadEmail,
+      phone: doc.leadPhone,
+      clientId: doc.clientId,
+      campaignId: doc.campaignId,
+      createdAt: doc.createdAt
+    };
+    
+    // Chamar o serviço de trigger
+    const result = await global.whatsAppFlowTriggerService.triggerLeadIndicated(
+      referralData,
+      doc.clientId!.toString(),
+      doc.campaignId?.toString()
+    );
+    
+    console.log('🔍 [REFERRAL-HOOK] Resultado:', result);
+    
+    if (result.success) {
+      try {
+        doc.whatsappProcessed = true;
+        console.log('✅ [REFERRAL-HOOK] Lead marcado como processado');
+      } catch (updateError) {
+        console.error('⚠️ [REFERRAL-HOOK] Erro ao marcar como processado:', updateError.message);
       }
-      
-      const result = await global.whatsAppFlowTriggerService.triggerLeadIndicated(
-        referralData,
-        doc.clientId!.toString(), // 🆕 CORRIGIDO: Usar ! para assertão não-nula
-        doc.campaignId?.toString()
-      );
-      
-      console.log('✅ [REFERRAL-HOOK] Mensagem WhatsApp disparada com sucesso para o lead');
-      console.log('📊 [REFERRAL-HOOK] Resultado:', result);
-    } else {
-      console.log('⚠️ [REFERRAL-HOOK] WhatsAppFlowTriggerService não disponível globalmente');
     }
+    
   } catch (error) {
-    console.error('❌ [REFERRAL-HOOK] Erro ao disparar mensagem WhatsApp:', error.message);
-    console.error('❌ [REFERRAL-HOOK] Stack trace:', error.stack);
-    // Não rejeitar a operação de save se houver erro no WhatsApp
+    console.error('❌ [REFERRAL-HOOK] Erro no hook:', error.message);
   }
 });
 

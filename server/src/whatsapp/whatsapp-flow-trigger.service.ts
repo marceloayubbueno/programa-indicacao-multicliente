@@ -473,42 +473,46 @@ export class WhatsAppFlowTriggerService {
     });
   }
 
+  // Disparar gatilho para lead indicado
   async triggerLeadIndicated(
-    referralData: any, 
-    clientId: string | Types.ObjectId, // 🆕 CORRIGIDO: Aceitar string ou ObjectId
+    referralData: ReferralData,
+    clientId: string,
     campaignId?: string
   ): Promise<TriggerResult> {
     try {
-      this.logger.log(`🚀 [GATILHO] Iniciando processamento do gatilho: lead_indicated`);
+      // 🔍 LOG SIMPLES: Trigger sendo executado
+      console.log('🔍 [FLOW-TRIGGER] triggerLeadIndicated executado para:', referralData._id);
       
-      // 🆕 CORRIGIDO: Converter string para ObjectId se necessário
-      const clientIdObj = typeof clientId === 'string' ? new Types.ObjectId(clientId) : clientId;
+      const triggerData: TriggerData = {
+        referralId: new Types.ObjectId(referralData._id),
+        campaignId,
+        clientId: new Types.ObjectId(clientId),
+        eventData: {
+          leadName: referralData.leadName,
+          leadEmail: referralData.leadEmail,
+          leadPhone: referralData.leadPhone,
+          indicadorName: referralData.indicadorName,
+          campaignName: referralData.campaignName,
+          createdAt: referralData.createdAt
+        },
+        referralData
+      };
+
+      console.log('🔍 [FLOW-TRIGGER] Dados do trigger preparados');
       
-      this.logger.log(`🚀 [GATILHO] ClientId: ${clientIdObj}`);
-      this.logger.log(`🚀 [GATILHO] Dados do trigger:`, {
-        referralId: referralData.id,
-        clientId: clientIdObj.toString(),
-        campaignId,
-        referralData,
-        eventData: { type: 'lead_indicated' }
-      });
-
-      // 🆕 NOVO: Usar o método unificado processTrigger em vez de lógica duplicada
-      return await this.processTrigger(TriggerType.LEAD_INDICATED, {
-        referralId: new Types.ObjectId(referralData.id),
-        clientId: clientIdObj,
-        campaignId,
-        referralData,
-        eventData: { type: 'lead_indicated' },
-      });
-
+      const result = await this.processTrigger(TriggerType.LEAD_INDICATED, triggerData);
+      
+      console.log('🔍 [FLOW-TRIGGER] Resultado:', result);
+      
+      return result;
     } catch (error) {
-      this.logger.error(`❌ [GATILHO] Erro ao processar gatilho lead_indicated: ${error.message}`);
+      console.error('❌ [FLOW-TRIGGER] Erro em triggerLeadIndicated:', error.message);
       return {
         success: false,
-        message: `Erro ao processar gatilho: ${error.message}`,
+        message: `Erro ao disparar gatilho: ${error.message}`,
         flowsTriggered: 0,
-        messagesAdded: 0
+        messagesAdded: 0,
+        errors: [error.message]
       };
     }
   }
