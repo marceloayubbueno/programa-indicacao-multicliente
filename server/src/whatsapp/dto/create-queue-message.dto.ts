@@ -1,4 +1,4 @@
-import { IsString, IsOptional, ValidateNested, IsObject, IsEnum, IsArray, IsDateString } from 'class-validator';
+import { IsString, IsOptional, ValidateNested, IsObject, IsEnum, IsArray, IsDateString, IsNumber, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 import { MessagePriority } from '../entities/whatsapp-queue.schema';
 
@@ -62,6 +62,19 @@ class MetadataDto {
   @IsDateString()
   @IsOptional()
   estimatedSendTime?: string;
+
+  // 🆕 NOVO: Campos para fluxos sequenciais
+  @IsNumber()
+  @IsOptional()
+  messageOrder?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isSequential?: boolean;
+
+  @IsDateString()
+  @IsOptional()
+  scheduledFor?: string;
 }
 
 export class CreateQueueMessageDto {

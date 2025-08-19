@@ -279,6 +279,7 @@ export class WhatsAppQueueService {
     try {
       const now = new Date();
       
+      // 🆕 NOVO: Buscar mensagens com lógica de fallback sequencial
       const messages = await this.whatsappQueueModel
         .find({
           $or: [
@@ -291,13 +292,85 @@ export class WhatsAppQueueService {
           retryCount: { $lt: 3 }, // Máximo de 3 tentativas
         })
         .sort({ priority: 1, queuePosition: 1, createdAt: 1 })
-        .limit(limit)
+        .limit(limit * 2) // Buscar mais mensagens para aplicar lógica de fallback
         .exec();
 
-      return messages;
+      // 🆕 NOVO: Aplicar lógica de fallback sequencial
+      const processedMessages = this.applySequentialFallbackLogic(messages, limit);
+      
+      return processedMessages;
     } catch (error) {
       this.logger.error(`Erro ao buscar mensagens para processamento: ${error.message}`);
       throw error;
+    }
+  }
+
+  // 🆕 NOVO: Método para aplicar lógica de fallback sequencial
+  private applySequentialFallbackLogic(messages: WhatsAppQueue[], limit: number): WhatsAppQueue[] {
+    try {
+      const now = new Date();
+      const result: WhatsAppQueue[] = [];
+      const processedFlows = new Set<string>(); // Controlar fluxos já processados
+
+      // Agrupar mensagens por fluxo e destinatário
+      const flowGroups = new Map<string, WhatsAppQueue[]>();
+      
+      for (const message of messages) {
+        const flowKey = `${message.flowId?.toString() || 'no-flow'}-${message.to}`;
+        
+        if (!flowGroups.has(flowKey)) {
+          flowGroups.set(flowKey, []);
+        }
+        flowGroups.get(flowKey)!.push(message);
+      }
+
+      // Processar cada grupo de fluxo
+      for (const [flowKey, flowMessages] of flowGroups) {
+        if (result.length >= limit) break; // Limite atingido
+        
+        // Ordenar mensagens do fluxo por ordem (1, 2, 3...)
+        const sortedMessages = flowMessages.sort((a, b) => {
+          const orderA = (a.metadata as any)?.messageOrder || 0;
+          const orderB = (b.metadata as any)?.messageOrder || 0;
+          return orderA - orderB;
+        });
+
+        // Verificar se há mensagem agendada para agora
+        let messageToProcess: WhatsAppQueue | null = null;
+        
+        for (const message of sortedMessages) {
+          // Verificar se a mensagem está agendada para agora
+          const scheduledFor = (message.metadata as any)?.scheduledFor;
+          if (scheduledFor) {
+            const scheduledTime = new Date(scheduledFor);
+            if (scheduledTime <= now) {
+              messageToProcess = message;
+              break;
+            }
+          } else {
+            // Mensagem sem agendamento, processar imediatamente
+            messageToProcess = message;
+            break;
+          }
+        }
+
+        if (messageToProcess) {
+          // Verificar se não excedeu o limite de tentativas
+          if (messageToProcess.retryCount < (messageToProcess.maxRetries || 3)) {
+            result.push(messageToProcess);
+            processedFlows.add(flowKey);
+            this.logger.log(`🔄 [FALLBACK] Mensagem selecionada para processamento: ${(messageToProcess as any)._id} (Ordem: ${(messageToProcess.metadata as any)?.messageOrder || 'N/A'})`);
+          }
+        }
+      }
+
+      this.logger.log(`🔄 [FALLBACK] ${result.length} mensagens selecionadas para processamento com lógica de fallback`);
+      return result;
+
+    } catch (error) {
+      this.logger.error(`Erro ao aplicar lógica de fallback: ${error.message}`);
+      // Em caso de erro, retornar mensagens originais limitadas
+      return messages.slice(0, limit);
     }
   }
 

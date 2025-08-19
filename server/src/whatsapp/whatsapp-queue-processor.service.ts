@@ -165,17 +165,96 @@ export class WhatsAppQueueProcessorService {
         
         this.logger.log(`Mensagem ${messageId} agendada para retry (${message.retryCount + 1}/${message.maxRetries})`);
       } else {
-        // Máximo de tentativas atingido
-        await this.whatsappQueueService.updateMessageStatus(
-          messageId.toString(),
-          QueueStatus.FAILED,
-          { error: errorMessage, maxRetriesReached: true }
-        );
-        
-        this.logger.error(`Mensagem ${messageId} falhou definitivamente após ${message.maxRetries} tentativas`);
+        // 🆕 NOVO: Máximo de tentativas atingido - tentar próxima mensagem do fluxo
+        await this.handleSequentialFallback(message, errorMessage);
       }
     } catch (updateError) {
       this.logger.error(`Erro ao atualizar status da mensagem ${messageId}: ${updateError.message}`);
+    }
+  }
+
+  // 🆕 NOVO: Método para implementar fallback sequencial
+  private async handleSequentialFallback(failedMessage: any, errorMessage: string) {
+    try {
+      const messageId = failedMessage._id || failedMessage.id || 'unknown';
+      this.logger.log(`🔄 [FALLBACK] Mensagem ${messageId} falhou definitivamente, tentando fallback sequencial...`);
+
+      // Marcar mensagem atual como falhada
+      await this.whatsappQueueService.updateMessageStatus(
+        messageId.toString(),
+        QueueStatus.FAILED,
+        { error: errorMessage, maxRetriesReached: true }
+      );
+
+      // Verificar se há próxima mensagem no fluxo para fallback
+      if (failedMessage.flowId && failedMessage.to) {
+        const nextMessage = await this.findNextMessageInFlow(failedMessage.flowId, failedMessage.to, failedMessage.metadata?.messageOrder);
+        
+        if (nextMessage) {
+          this.logger.log(`🔄 [FALLBACK] Próxima mensagem encontrada para fallback: ${nextMessage._id}`);
+          
+          // Resetar próxima mensagem para processamento
+          await this.whatsappQueueService.updateMessageStatus(
+            nextMessage._id.toString(),
+            QueueStatus.PENDING,
+            { 
+              error: null,
+              retryCount: 0,
+              attemptsCount: 0,
+              lastAttemptAt: null,
+              nextRetryAt: null,
+              fallbackFrom: messageId // Marcar como fallback
+            }
+          );
+          
+          this.logger.log(`✅ [FALLBACK] Próxima mensagem ${nextMessage._id} marcada para processamento como fallback`);
+        } else {
+          this.logger.log(`⚠️ [FALLBACK] Nenhuma próxima mensagem encontrada para fallback no fluxo ${failedMessage.flowId}`);
+        }
+      } else {
+        this.logger.log(`⚠️ [FALLBACK] Mensagem ${messageId} não possui fluxo ou destinatário para fallback`);
+      }
+
+    } catch (error) {
+      this.logger.error(`❌ [FALLBACK] Erro ao processar fallback sequencial: ${error.message}`);
+    }
+  }
+
+  // 🆕 NOVO: Método para encontrar próxima mensagem no fluxo
+  private async findNextMessageInFlow(flowId: string, to: string, currentOrder: number): Promise<any> {
+    try {
+      // Buscar próxima mensagem do mesmo fluxo e destinatário usando o service
+      const allMessages = await this.whatsappQueueService.getAllMessages();
+      
+      const nextMessage = allMessages.find(msg => 
+        msg.flowId?.toString() === flowId &&
+        msg.to === to &&
+        ['pending', 'retry'].includes(msg.status) &&
+        (msg.metadata as any)?.messageOrder > (currentOrder || 0)
+      );
+
+      if (nextMessage) {
+        // Ordenar por ordem da mensagem e pegar a primeira
+        const nextMessages = allMessages
+          .filter(msg => 
+            msg.flowId?.toString() === flowId &&
+            msg.to === to &&
+            ['pending', 'retry'].includes(msg.status) &&
+            (msg.metadata as any)?.messageOrder > (currentOrder || 0)
+          )
+          .sort((a, b) => {
+            const orderA = (a.metadata as any)?.messageOrder || 0;
+            const orderB = (b.metadata as any)?.messageOrder || 0;
+            return orderA - orderB;
+          });
+
+        return nextMessages[0];
+      }
+
+      return null;
+    } catch (error) {
+      this.logger.error(`Erro ao buscar próxima mensagem no fluxo: ${error.message}`);
+      return null;
     }
   }
 
