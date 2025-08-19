@@ -100,16 +100,39 @@ ReferralSchema.post('save', async function(doc) {
     // Verificar se o WhatsAppFlowTriggerService está disponível globalmente
     if (global.whatsAppFlowTriggerService) {
       console.log('🚀 [REFERRAL-HOOK] Novo lead indicado, disparando mensagem WhatsApp...');
+      console.log('🔍 [REFERRAL-HOOK] Dados do lead:', {
+        id: doc._id,
+        leadName: doc.leadName,
+        leadEmail: doc.leadEmail,
+        leadPhone: doc.leadPhone,
+        clientId: doc.clientId,
+        campaignId: doc.campaignId
+      });
+      
+      // Preparar dados do referral para o service
+      const referralData = {
+        id: doc._id.toString(),
+        leadName: doc.leadName,
+        leadEmail: doc.leadEmail,
+        leadPhone: doc.leadPhone,
+        createdAt: doc.createdAt
+      };
       
       // Chamar o service para disparar mensagem para o lead
-      await global.whatsAppFlowTriggerService.triggerLeadIndicated(doc);
+      const result = await global.whatsAppFlowTriggerService.triggerLeadIndicated(
+        referralData,
+        doc.clientId,
+        doc.campaignId?.toString()
+      );
       
       console.log('✅ [REFERRAL-HOOK] Mensagem WhatsApp disparada com sucesso para o lead');
+      console.log('📊 [REFERRAL-HOOK] Resultado:', result);
     } else {
       console.log('⚠️ [REFERRAL-HOOK] WhatsAppFlowTriggerService não disponível globalmente');
     }
   } catch (error) {
     console.error('❌ [REFERRAL-HOOK] Erro ao disparar mensagem WhatsApp:', error.message);
+    console.error('❌ [REFERRAL-HOOK] Stack trace:', error.stack);
     // Não rejeitar a operação de save se houver erro no WhatsApp
   }
 });
