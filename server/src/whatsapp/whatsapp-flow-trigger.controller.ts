@@ -76,7 +76,7 @@ export class WhatsAppFlowTriggerController {
           ...body.referralData,
           createdAt: body.referralData.createdAt ? new Date(body.referralData.createdAt) : new Date(),
         },
-        new Types.ObjectId(body.clientId),
+        body.clientId,
         body.campaignId
       );
 

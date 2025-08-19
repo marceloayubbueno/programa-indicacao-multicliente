@@ -13,25 +13,12 @@ export class WhatsAppQueueProcessorService {
   constructor(
     private readonly whatsappQueueService: WhatsAppQueueService,
     private readonly twilioService: TwilioService,
-  ) {
-    // 🆕 NOVO: Logs de debug para identificar instanciação
-    console.log('🚀 [DEBUG] WhatsAppQueueProcessorService constructor chamado!');
-    console.log('🔧 [DEBUG] whatsappQueueService injetado:', !!this.whatsappQueueService);
-    console.log('🔧 [DEBUG] twilioService injetado:', !!this.twilioService);
-    
-    // 🆕 NOVO: Log de inicialização para debug
-    this.logger.log('🚀 WhatsAppQueueProcessorService inicializado!');
-    this.logger.log('⏰ Cron job configurado para rodar a cada 30 segundos');
-  }
+  ) {}
 
   // Processar filas a cada 30 segundos
   @Cron(CronExpression.EVERY_30_SECONDS)
   async processQueues() {
-    // 🆕 NOVO: Log de execução do cron job
-    this.logger.log('⏰ Cron job executando: processQueues()');
-    
     if (this.isProcessing) {
-      this.logger.debug('Processamento já em andamento, pulando...');
       return;
     }
 
@@ -49,47 +36,11 @@ export class WhatsAppQueueProcessorService {
   // Processar mensagens pendentes
   private async processPendingMessages() {
     try {
-      // 🆕 NOVO: Log de debug para identificar execução
-      this.logger.log('🔍 [DEBUG] processPendingMessages() - Iniciando...');
-      
-      // 🆕 NOVO: Verificar mensagens existentes na fila
-      const allMessages = await this.whatsappQueueService.getAllMessages();
-      this.logger.log(`🔍 [DEBUG] Total de mensagens na fila: ${allMessages.length}`);
-      
-      // 🆕 NOVO: Verificar status das mensagens
-      const statusCounts = allMessages.reduce((acc, msg) => {
-        acc[msg.status] = (acc[msg.status] || 0) + 1;
-        return acc;
-      }, {});
-      this.logger.log(`🔍 [DEBUG] Status das mensagens:`, statusCounts);
-      
-      // 🆕 NOVO: Verificar mensagens PENDING especificamente
-      const pendingMessages = allMessages.filter(msg => msg.status === 'pending');
-      this.logger.log(`🔍 [DEBUG] Mensagens PENDING encontradas: ${pendingMessages.length}`);
-      if (pendingMessages.length > 0) {
-        this.logger.log(`🔍 [DEBUG] IDs das mensagens PENDING:`, pendingMessages.map(m => (m as any)._id));
-      }
-      
-      // 🆕 NOVO: Verificar mensagens RETRY especificamente
-      const retryMessages = allMessages.filter(msg => msg.status === 'retry');
-      this.logger.log(`🔍 [DEBUG] Mensagens RETRY encontradas: ${retryMessages.length}`);
-      if (retryMessages.length > 0) {
-        this.logger.log(`🔍 [DEBUG] IDs das mensagens RETRY:`, retryMessages.map(m => (m as any)._id));
-        this.logger.log(`🔍 [DEBUG] nextRetryAt das mensagens RETRY:`, retryMessages.map(m => ({ id: (m as any)._id, nextRetryAt: m.nextRetryAt, now: new Date() })));
-      }
-      
-      // Buscar mensagens prontas para processamento (máximo 10 por vez)
       const messages = await this.whatsappQueueService.getMessagesForProcessing(10);
       
-      // 🆕 NOVO: Log de debug para identificar resultado da busca
-      this.logger.log(`🔍 [DEBUG] Mensagens encontradas para processamento: ${messages.length}`);
-      
       if (messages.length === 0) {
-        this.logger.log('🔍 [DEBUG] Nenhuma mensagem para processar');
         return;
       }
-
-      this.logger.log(`Processando ${messages.length} mensagens da fila`);
 
       for (const message of messages) {
         try {
@@ -238,9 +189,6 @@ export class WhatsAppQueueProcessorService {
         const nextMessage = await this.findNextMessageInFlow(failedMessage.flowId, failedMessage.to, failedMessage.metadata?.messageOrder);
         
         if (nextMessage) {
-          this.logger.log(`🔄 [FALLBACK] Próxima mensagem encontrada para fallback: ${nextMessage._id}`);
-          
-          // Resetar próxima mensagem para processamento
           await this.whatsappQueueService.updateMessageStatus(
             nextMessage._id.toString(),
             QueueStatus.PENDING,
@@ -250,24 +198,17 @@ export class WhatsAppQueueProcessorService {
               attemptsCount: 0,
               lastAttemptAt: null,
               nextRetryAt: null,
-              fallbackFrom: messageId // Marcar como fallback
+              fallbackFrom: messageId
             }
           );
-          
-          this.logger.log(`✅ [FALLBACK] Próxima mensagem ${nextMessage._id} marcada para processamento como fallback`);
-        } else {
-          this.logger.log(`⚠️ [FALLBACK] Nenhuma próxima mensagem encontrada para fallback no fluxo ${failedMessage.flowId}`);
         }
-      } else {
-        this.logger.log(`⚠️ [FALLBACK] Mensagem ${messageId} não possui fluxo ou destinatário para fallback`);
       }
 
     } catch (error) {
-      this.logger.error(`❌ [FALLBACK] Erro ao processar fallback sequencial: ${error.message}`);
+      this.logger.error(`Erro ao processar fallback sequencial: ${error.message}`);
     }
   }
 
-  // 🆕 NOVO: Método para encontrar próxima mensagem no fluxo
   private async findNextMessageInFlow(flowId: string, to: string, currentOrder: number): Promise<any> {
     try {
       // Buscar próxima mensagem do mesmo fluxo e destinatário usando o service

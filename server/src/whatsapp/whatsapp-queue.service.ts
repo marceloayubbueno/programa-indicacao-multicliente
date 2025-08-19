@@ -23,7 +23,7 @@ export class WhatsAppQueueService {
       const formattedTo = PhoneFormatterUtil.formatPhoneNumber(createQueueMessageDto.to);
       
       // 🆕 NOVO: Log para debug da formatação
-      this.logger.log(`🔧 [DEBUG] Formatação ao salvar: "${createQueueMessageDto.to}" → "${formattedTo}"`);
+
       
       // 🆕 NOVO: Validar se o número está correto para Twilio
       if (!PhoneFormatterUtil.isValidForTwilio(formattedTo)) {

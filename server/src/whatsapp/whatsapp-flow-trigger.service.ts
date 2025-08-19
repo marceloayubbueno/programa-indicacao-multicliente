@@ -70,14 +70,9 @@ export class WhatsAppFlowTriggerService {
     triggerData: TriggerData,
   ): Promise<TriggerResult> {
     try {
-      this.logger.log(`🚀 [GATILHO] Processando gatilho: ${triggerType}`);
-      this.logger.log(`🔍 [GATILHO] Dados do trigger:`, triggerData);
-
-      // Buscar fluxos ativos para este gatilho
       const activeFlows = await this.getActiveFlowsForTrigger(triggerType, triggerData.clientId);
       
       if (activeFlows.length === 0) {
-        this.logger.log(`ℹ️ [GATILHO] Nenhum fluxo ativo encontrado para o gatilho: ${triggerType}`);
         return {
           success: true,
           message: 'Nenhum fluxo ativo encontrado',
@@ -86,11 +81,7 @@ export class WhatsAppFlowTriggerService {
         };
       }
 
-      this.logger.log(`📋 [GATILHO] ${activeFlows.length} fluxos ativos encontrados para o gatilho: ${triggerType}`);
-
-      // 🆕 NOVO: Processar apenas o PRIMEIRO fluxo para evitar múltiplas mensagens
       const flowToProcess = activeFlows[0];
-      this.logger.log(`🎯 [GATILHO] Processando apenas o primeiro fluxo: ${flowToProcess.name}`);
 
       let messagesAdded = 0;
       const errors: string[] = [];
@@ -98,85 +89,38 @@ export class WhatsAppFlowTriggerService {
       try {
         await this.processFlow(flowToProcess, triggerType, triggerData);
         messagesAdded++;
-        this.logger.log(`✅ [GATILHO] Fluxo processado com sucesso: ${flowToProcess.name}`);
       } catch (error) {
         const errorMsg = `Erro ao processar fluxo ${flowToProcess.name}: ${error.message}`;
         this.logger.error(errorMsg);
         errors.push(errorMsg);
       }
 
-      this.logger.log(`🎉 [GATILHO] Processamento concluído. Fluxos: 1, Mensagens: ${messagesAdded}`);
-
       return {
         success: errors.length === 0,
         message: `Gatilho processado com sucesso. Fluxos: 1, Mensagens: ${messagesAdded}`,
-        flowsTriggered: 1, // 🆕 NOVO: Sempre 1 fluxo processado
+        flowsTriggered: 1,
         messagesAdded,
         errors: errors.length > 0 ? errors : undefined,
       };
 
     } catch (error) {
-      this.logger.error(`❌ [GATILHO] Erro ao processar gatilho: ${error.message}`);
+      this.logger.error(`Erro ao processar gatilho: ${error.message}`);
       throw error;
     }
   }
 
   private async getActiveFlowsForTrigger(triggerType: string, clientId: Types.ObjectId): Promise<WhatsAppFlowDocument[]> {
     try {
-      this.logger.log(`🔍 [DEBUG] Buscando fluxos ativos para gatilho: ${triggerType}`);
-      this.logger.log(`🔍 [DEBUG] ClientId: ${clientId}`);
-      
-      // 🆕 NOVO: Log do tipo de dados
-      this.logger.log(`🔍 [DEBUG] Tipo do clientId: ${typeof clientId}`);
-      this.logger.log(`🔍 [DEBUG] ClientId é ObjectId: ${clientId instanceof Types.ObjectId}`);
-      this.logger.log(`🔍 [DEBUG] ClientId toString: ${clientId.toString()}`);
-      
-      // 🆕 NOVO: Log da query completa
       const query = {
         clientId: clientId,
         status: 'active',
-        triggers: { $in: [triggerType] } // 🆕 CORRIGIDO: Usar $in para buscar em array
+        triggers: { $in: [triggerType] }
       };
-      this.logger.log(`🔍 [DEBUG] Query MongoDB: ${JSON.stringify(query)}`);
       
-      // 🆕 NOVO: Log antes da execução da query
-      this.logger.log(`🔍 [DEBUG] Executando query no modelo: ${this.whatsappFlowModel.modelName}`);
-      this.logger.log(`🔍 [DEBUG] Modelo disponível: ${!!this.whatsappFlowModel}`);
-      
-      // 🆕 NOVO: Buscar TODOS os fluxos do cliente primeiro (para debug)
-      const allClientFlows = await this.whatsappFlowModel.find({ clientId: clientId }).exec();
-      this.logger.log(`🔍 [DEBUG] Total de fluxos do cliente (sem filtros): ${allClientFlows.length}`);
-      
-      if (allClientFlows.length > 0) {
-        this.logger.log(`🔍 [DEBUG] Dados dos fluxos encontrados:`);
-        allClientFlows.forEach((flow, index) => {
-          this.logger.log(`🔍 [DEBUG] Fluxo ${index + 1}:`, {
-            id: flow._id,
-            name: flow.name,
-            status: flow.status,
-            triggers: flow.triggers,
-            clientId: flow.clientId,
-            clientIdType: typeof flow.clientId,
-            clientIdIsObjectId: flow.clientId instanceof Types.ObjectId
-          });
-        });
-      }
-      
-      // 🆕 NOVO: Buscar fluxos com cada filtro separadamente
-      const flowsByStatus = await this.whatsappFlowModel.find({ clientId: clientId, status: 'active' }).exec();
-      this.logger.log(`🔍 [DEBUG] Fluxos com status 'active': ${flowsByStatus.length}`);
-      
-      const flowsByTrigger = await this.whatsappFlowModel.find({ clientId: clientId, triggers: triggerType }).exec();
-      this.logger.log(`🔍 [DEBUG] Fluxos com trigger '${triggerType}': ${flowsByTrigger.length}`);
-      
-      // Query original
       const activeFlows = await this.whatsappFlowModel.find(query).exec();
-      this.logger.log(`🔍 [DEBUG] Fluxos encontrados: ${activeFlows.length}`);
-      
       return activeFlows;
     } catch (error) {
-      this.logger.error(`❌ [DEBUG] Erro ao buscar fluxos: ${error.message}`);
-      this.logger.error(`❌ [DEBUG] Stack trace: ${error.stack}`);
+      this.logger.error(`Erro ao buscar fluxos: ${error.message}`);
       return [];
     }
   }
@@ -186,20 +130,15 @@ export class WhatsAppFlowTriggerService {
     triggerType: TriggerType,
     triggerData: TriggerData,
   ): Promise<void> {
-    this.logger.log(`Processando fluxo: ${flow.name}`);
-
-    // Extrair dados do destinatário
     const recipientData = await this.extractRecipientData(flow, triggerType, triggerData);
     
     if (!recipientData) {
       throw new Error('Não foi possível identificar dados do destinatário');
     }
 
-    // 🆕 NOVO: Processar mensagens sequencialmente com fallback inteligente
     await this.processFlowSequentially(flow, triggerType, triggerData, recipientData);
   }
 
-  // 🆕 NOVO: Método para processar fluxo sequencialmente com fallback
   private async processFlowSequentially(
     flow: WhatsAppFlowDocument,
     triggerType: TriggerType,
@@ -207,7 +146,6 @@ export class WhatsAppFlowTriggerService {
     recipientData: { phoneNumber: string; variables: Record<string, any> }
   ): Promise<void> {
     try {
-      // Ordenar mensagens por ordem (1, 2, 3...)
       const sortedMessages = (flow.messages || []).sort((a, b) => (a.order || 0) - (b.order || 0));
       
       if (sortedMessages.length === 0) {
@@ -215,9 +153,7 @@ export class WhatsAppFlowTriggerService {
         return;
       }
 
-      // 🆕 CORRIGIDO: Processar apenas a PRIMEIRA mensagem do fluxo
       const firstMessage = sortedMessages[0];
-      this.logger.log(`🎯 [FLUXO] Processando apenas a PRIMEIRA mensagem (ordem: ${firstMessage.order}) para: ${recipientData.phoneNumber}`);
 
       if (!firstMessage.templateId) {
         this.logger.warn(`Primeira mensagem sem template, fluxo não pode ser processado`);
@@ -225,17 +161,13 @@ export class WhatsAppFlowTriggerService {
       }
 
       try {
-        // Buscar template
         const template = await this.templateModel.findById(firstMessage.templateId).exec();
         if (!template) {
           this.logger.warn(`Template não encontrado: ${firstMessage.templateId}`);
           return;
         }
 
-        // Preparar conteúdo da mensagem
         const messageContent = await this.prepareMessageContent(template, recipientData, triggerData, triggerType);
-
-        // Determinar prioridade
         const priority = this.determinePriority(triggerType);
 
         // Adicionar na fila do admin
@@ -259,30 +191,25 @@ export class WhatsAppFlowTriggerService {
             campaignId: triggerData.campaignId,
             userId: flow._id.toString(),
             tags: [triggerType, 'auto-triggered', flow.name],
-            messageOrder: firstMessage.order, // 🆕 NOVO: Adicionar ordem da mensagem
-            isSequential: false, // 🆕 CORRIGIDO: Não é mais sequencial, é única
+            messageOrder: firstMessage.order,
+            isSequential: false,
           },
         };
 
-        // 🆕 CORRIGIDO: Adicionar delay se configurado
         if (firstMessage.delay && firstMessage.delay > 0) {
           queueMessage.metadata = queueMessage.metadata || {};
           (queueMessage.metadata as any).scheduledFor = new Date(Date.now() + (firstMessage.delay * 1000));
-          this.logger.log(`⏰ [FLUXO] Mensagem agendada para: ${(queueMessage.metadata as any).scheduledFor}`);
         }
 
         await this.whatsappQueueService.addToQueue(queueMessage);
-        this.logger.log(`✅ [FLUXO] PRIMEIRA mensagem adicionada à fila para: ${recipientData.phoneNumber}`);
 
       } catch (error) {
-        this.logger.error(`❌ [FLUXO] Erro ao processar primeira mensagem: ${error.message}`);
+        this.logger.error(`Erro ao processar primeira mensagem: ${error.message}`);
         throw new Error(`Erro ao processar mensagem do fluxo ${flow.name}: ${error.message}`);
       }
 
-      this.logger.log(`🎉 [FLUXO] Fluxo ${flow.name} processado com sucesso (1 mensagem)`);
-
     } catch (error) {
-      this.logger.error(`❌ [FLUXO] Erro ao processar fluxo ${flow.name}: ${error.message}`);
+      this.logger.error(`Erro ao processar fluxo ${flow.name}: ${error.message}`);
       throw error;
     }
   }
@@ -306,8 +233,7 @@ export class WhatsAppFlowTriggerService {
               dataEntrada: triggerData.participantData.createdAt || new Date(),
             };
           } else if (triggerData.participantId) {
-            // Fallback: usar ID para buscar dados (se necessário)
-            this.logger.warn('ParticipantData não fornecido, usando dados básicos');
+
             phoneNumber = 'placeholder_phone';
             variables = {
               nome: 'Indicador',
@@ -327,8 +253,7 @@ export class WhatsAppFlowTriggerService {
               dataIndicacao: triggerData.referralData.createdAt || new Date(),
             };
           } else if (triggerData.referralId) {
-            // Fallback: usar ID para buscar dados (se necessário)
-            this.logger.warn('ReferralData não fornecido, usando dados básicos');
+
             phoneNumber = 'placeholder_phone';
             variables = {
               nome: 'Lead',
@@ -352,8 +277,7 @@ export class WhatsAppFlowTriggerService {
               totalGanhos: triggerData.eventData?.totalEarnings || 0,
             };
           } else if (triggerData.participantId) {
-            // Fallback: usar ID para buscar dados (se necessário)
-            this.logger.warn('ParticipantData não fornecido, usando dados básicos');
+
             phoneNumber = 'placeholder_phone';
             variables = {
               nome: 'Participante',
@@ -374,8 +298,7 @@ export class WhatsAppFlowTriggerService {
               ...triggerData.participantData, // Incluir todos os dados extras
             };
           } else if (triggerData.participantId) {
-            // Fallback: usar ID para buscar dados (se necessário)
-            this.logger.warn('ParticipantData não fornecido, usando dados básicos');
+
             phoneNumber = 'placeholder_phone';
             variables = {
               nome: 'Usuário',
@@ -387,14 +310,12 @@ export class WhatsAppFlowTriggerService {
       }
 
       if (!phoneNumber) {
-        this.logger.warn(`Número de telefone não encontrado para gatilho: ${triggerType}`);
         return null;
       }
 
       return { phoneNumber, variables };
 
     } catch (error) {
-      this.logger.error(`Erro ao extrair dados do destinatário: ${error.message}`);
       return null;
     }
   }
@@ -480,9 +401,6 @@ export class WhatsAppFlowTriggerService {
     campaignId?: string
   ): Promise<TriggerResult> {
     try {
-      // 🔍 LOG SIMPLES: Trigger sendo executado
-      console.log('🔍 [FLOW-TRIGGER] triggerLeadIndicated executado para:', referralData.id);
-      
       const triggerData: TriggerData = {
         referralId: new Types.ObjectId(referralData.id),
         campaignId,
@@ -498,15 +416,9 @@ export class WhatsAppFlowTriggerService {
         referralData
       };
 
-      console.log('🔍 [FLOW-TRIGGER] Dados do trigger preparados');
-      
       const result = await this.processTrigger(TriggerType.LEAD_INDICATED, triggerData);
-      
-      console.log('🔍 [FLOW-TRIGGER] Resultado:', result);
-      
       return result;
     } catch (error) {
-      console.error('❌ [FLOW-TRIGGER] Erro em triggerLeadIndicated:', error.message);
       return {
         success: false,
         message: `Erro ao disparar gatilho: ${error.message}`,
