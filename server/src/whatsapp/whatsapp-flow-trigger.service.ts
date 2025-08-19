@@ -70,48 +70,47 @@ export class WhatsAppFlowTriggerService {
     triggerData: TriggerData,
   ): Promise<TriggerResult> {
     try {
-      this.logger.log(`🚀 [GATILHO] Iniciando processamento do gatilho: ${triggerType}`);
-      this.logger.log(`🚀 [GATILHO] ClientId: ${triggerData.clientId}`);
-      this.logger.log(`🚀 [GATILHO] Dados do trigger: ${JSON.stringify(triggerData)}`);
+      this.logger.log(`🚀 [GATILHO] Processando gatilho: ${triggerType}`);
+      this.logger.log(`🔍 [GATILHO] Dados do trigger:`, triggerData);
 
       // Buscar fluxos ativos para este gatilho
       const activeFlows = await this.getActiveFlowsForTrigger(triggerType, triggerData.clientId);
       
-      this.logger.log(`🚀 [GATILHO] Fluxos ativos encontrados: ${activeFlows.length}`);
-      
       if (activeFlows.length === 0) {
-        this.logger.log(`⚠️ [GATILHO] Nenhum fluxo ativo encontrado para o gatilho: ${triggerType}`);
+        this.logger.log(`ℹ️ [GATILHO] Nenhum fluxo ativo encontrado para o gatilho: ${triggerType}`);
         return {
           success: true,
-          message: `Nenhum fluxo ativo encontrado para o gatilho: ${triggerType}`,
+          message: 'Nenhum fluxo ativo encontrado',
           flowsTriggered: 0,
           messagesAdded: 0,
         };
       }
 
+      this.logger.log(`📋 [GATILHO] ${activeFlows.length} fluxos ativos encontrados para o gatilho: ${triggerType}`);
+
+      // 🆕 NOVO: Processar apenas o PRIMEIRO fluxo para evitar múltiplas mensagens
+      const flowToProcess = activeFlows[0];
+      this.logger.log(`🎯 [GATILHO] Processando apenas o primeiro fluxo: ${flowToProcess.name}`);
+
       let messagesAdded = 0;
       const errors: string[] = [];
 
-      // Processar cada fluxo ativo
-      for (const flow of activeFlows) {
-        try {
-          this.logger.log(`🔄 [GATILHO] Processando fluxo: ${flow.name}`);
-          await this.processFlow(flow, triggerType, triggerData);
-          messagesAdded++;
-          this.logger.log(`✅ [GATILHO] Fluxo processado com sucesso: ${flow.name}`);
-        } catch (error) {
-          const errorMsg = `Erro ao processar fluxo ${flow.name}: ${error.message}`;
-          this.logger.error(errorMsg);
-          errors.push(errorMsg);
-        }
+      try {
+        await this.processFlow(flowToProcess, triggerType, triggerData);
+        messagesAdded++;
+        this.logger.log(`✅ [GATILHO] Fluxo processado com sucesso: ${flowToProcess.name}`);
+      } catch (error) {
+        const errorMsg = `Erro ao processar fluxo ${flowToProcess.name}: ${error.message}`;
+        this.logger.error(errorMsg);
+        errors.push(errorMsg);
       }
 
-      this.logger.log(`🎉 [GATILHO] Processamento concluído. Fluxos: ${activeFlows.length}, Mensagens: ${messagesAdded}`);
+      this.logger.log(`🎉 [GATILHO] Processamento concluído. Fluxos: 1, Mensagens: ${messagesAdded}`);
 
       return {
         success: errors.length === 0,
-        message: `Gatilho processado com sucesso. Fluxos: ${activeFlows.length}, Mensagens: ${messagesAdded}`,
-        flowsTriggered: activeFlows.length,
+        message: `Gatilho processado com sucesso. Fluxos: 1, Mensagens: ${messagesAdded}`,
+        flowsTriggered: 1, // 🆕 NOVO: Sempre 1 fluxo processado
         messagesAdded,
         errors: errors.length > 0 ? errors : undefined,
       };
@@ -216,86 +215,71 @@ export class WhatsAppFlowTriggerService {
         return;
       }
 
-      this.logger.log(`🔄 [FLUXO] Processando ${sortedMessages.length} mensagens sequencialmente para: ${recipientData.phoneNumber}`);
+      // 🆕 CORRIGIDO: Processar apenas a PRIMEIRA mensagem do fluxo
+      const firstMessage = sortedMessages[0];
+      this.logger.log(`🎯 [FLUXO] Processando apenas a PRIMEIRA mensagem (ordem: ${firstMessage.order}) para: ${recipientData.phoneNumber}`);
 
-      // Processar mensagens em sequência com fallback
-      for (let i = 0; i < sortedMessages.length; i++) {
-        const messageConfig = sortedMessages[i];
-        
-        if (!messageConfig.templateId) {
-          this.logger.warn(`Mensagem ${messageConfig.order} sem template, pulando...`);
-          continue;
-        }
-
-        try {
-          // Buscar template
-          const template = await this.templateModel.findById(messageConfig.templateId).exec();
-          if (!template) {
-            this.logger.warn(`Template não encontrado: ${messageConfig.templateId}`);
-            continue;
-          }
-
-          // Preparar conteúdo da mensagem
-          const messageContent = await this.prepareMessageContent(template, recipientData, triggerData, triggerType);
-
-          // Determinar prioridade
-          const priority = this.determinePriority(triggerType);
-
-          // Adicionar na fila do admin
-          const queueMessage: CreateQueueMessageDto = {
-            clientId: triggerData.clientId.toString(),
-            flowId: flow._id.toString(),
-            templateId: template._id.toString(),
-            to: recipientData.phoneNumber,
-            from: 'admin', // Número do admin
-            content: messageContent,
-            variables: recipientData.variables,
-            priority,
-            trigger: triggerType,
-            triggerData: {
-              participantId: triggerData.participantId?.toString(),
-              referralId: triggerData.referralId?.toString(),
-              campaignId: triggerData.campaignId,
-              eventData: triggerData.eventData,
-            },
-            metadata: {
-              campaignId: triggerData.campaignId,
-              userId: flow._id.toString(),
-              tags: [triggerType, 'auto-triggered', flow.name],
-              messageOrder: messageConfig.order, // 🆕 NOVO: Adicionar ordem da mensagem
-              isSequential: true, // 🆕 NOVO: Marcar como sequencial
-            },
-          };
-
-          // 🆕 NOVO: Adicionar delay baseado na ordem da mensagem
-          if (messageConfig.delay && messageConfig.delay > 0) {
-            queueMessage.metadata = queueMessage.metadata || {};
-            (queueMessage.metadata as any).scheduledFor = new Date(Date.now() + (messageConfig.delay * 1000));
-            this.logger.log(`⏰ [FLUXO] Mensagem ${messageConfig.order} agendada para: ${(queueMessage.metadata as any).scheduledFor}`);
-          }
-
-          await this.whatsappQueueService.addToQueue(queueMessage);
-          this.logger.log(`✅ [FLUXO] Mensagem ${messageConfig.order} adicionada à fila para: ${recipientData.phoneNumber}`);
-
-          // 🆕 NOVO: Se esta mensagem foi enviada com sucesso, parar aqui (fallback inteligente)
-          // As próximas mensagens só serão enviadas se esta falhar
-          break;
-
-        } catch (error) {
-          this.logger.error(`❌ [FLUXO] Erro ao processar mensagem ${messageConfig.order}: ${error.message}`);
-          
-          // Se não for a última mensagem, continuar para próxima (fallback)
-          if (i < sortedMessages.length - 1) {
-            this.logger.log(`🔄 [FLUXO] Tentando próxima mensagem como fallback...`);
-            continue;
-          } else {
-            // Última mensagem falhou, fluxo falhou completamente
-            throw new Error(`Todas as mensagens do fluxo ${flow.name} falharam`);
-          }
-        }
+      if (!firstMessage.templateId) {
+        this.logger.warn(`Primeira mensagem sem template, fluxo não pode ser processado`);
+        return;
       }
 
-      this.logger.log(`🎉 [FLUXO] Fluxo ${flow.name} processado com sucesso`);
+      try {
+        // Buscar template
+        const template = await this.templateModel.findById(firstMessage.templateId).exec();
+        if (!template) {
+          this.logger.warn(`Template não encontrado: ${firstMessage.templateId}`);
+          return;
+        }
+
+        // Preparar conteúdo da mensagem
+        const messageContent = await this.prepareMessageContent(template, recipientData, triggerData, triggerType);
+
+        // Determinar prioridade
+        const priority = this.determinePriority(triggerType);
+
+        // Adicionar na fila do admin
+        const queueMessage: CreateQueueMessageDto = {
+          clientId: triggerData.clientId.toString(),
+          flowId: flow._id.toString(),
+          templateId: template._id.toString(),
+          to: recipientData.phoneNumber,
+          from: 'admin', // Número do admin
+          content: messageContent,
+          variables: recipientData.variables,
+          priority,
+          trigger: triggerType,
+          triggerData: {
+            participantId: triggerData.participantId?.toString(),
+            referralId: triggerData.referralId?.toString(),
+            campaignId: triggerData.campaignId,
+            eventData: triggerData.eventData,
+          },
+          metadata: {
+            campaignId: triggerData.campaignId,
+            userId: flow._id.toString(),
+            tags: [triggerType, 'auto-triggered', flow.name],
+            messageOrder: firstMessage.order, // 🆕 NOVO: Adicionar ordem da mensagem
+            isSequential: false, // 🆕 CORRIGIDO: Não é mais sequencial, é única
+          },
+        };
+
+        // 🆕 CORRIGIDO: Adicionar delay se configurado
+        if (firstMessage.delay && firstMessage.delay > 0) {
+          queueMessage.metadata = queueMessage.metadata || {};
+          (queueMessage.metadata as any).scheduledFor = new Date(Date.now() + (firstMessage.delay * 1000));
+          this.logger.log(`⏰ [FLUXO] Mensagem agendada para: ${(queueMessage.metadata as any).scheduledFor}`);
+        }
+
+        await this.whatsappQueueService.addToQueue(queueMessage);
+        this.logger.log(`✅ [FLUXO] PRIMEIRA mensagem adicionada à fila para: ${recipientData.phoneNumber}`);
+
+      } catch (error) {
+        this.logger.error(`❌ [FLUXO] Erro ao processar primeira mensagem: ${error.message}`);
+        throw new Error(`Erro ao processar mensagem do fluxo ${flow.name}: ${error.message}`);
+      }
+
+      this.logger.log(`🎉 [FLUXO] Fluxo ${flow.name} processado com sucesso (1 mensagem)`);
 
     } catch (error) {
       this.logger.error(`❌ [FLUXO] Erro ao processar fluxo ${flow.name}: ${error.message}`);
