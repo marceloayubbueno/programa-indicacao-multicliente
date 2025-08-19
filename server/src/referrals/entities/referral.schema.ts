@@ -94,4 +94,24 @@ ReferralSchema.index({ indicatorReferralCode: 1 });
 ReferralSchema.index({ referralSource: 1 });
 ReferralSchema.index({ rewardStatus: 1 });
 
+// === HOOK PARA DISPARAR MENSAGENS WHATSAPP QUANDO LEAD FOR INDICADO ===
+ReferralSchema.post('save', async function(doc) {
+  try {
+    // Verificar se o WhatsAppFlowTriggerService está disponível globalmente
+    if (global.whatsAppFlowTriggerService) {
+      console.log('🚀 [REFERRAL-HOOK] Novo lead indicado, disparando mensagem WhatsApp...');
+      
+      // Chamar o service para disparar mensagem para o lead
+      await global.whatsAppFlowTriggerService.triggerLeadIndicated(doc);
+      
+      console.log('✅ [REFERRAL-HOOK] Mensagem WhatsApp disparada com sucesso para o lead');
+    } else {
+      console.log('⚠️ [REFERRAL-HOOK] WhatsAppFlowTriggerService não disponível globalmente');
+    }
+  } catch (error) {
+    console.error('❌ [REFERRAL-HOOK] Erro ao disparar mensagem WhatsApp:', error.message);
+    // Não rejeitar a operação de save se houver erro no WhatsApp
+  }
+});
+
 export type ReferralDocument = Referral & Document; 
