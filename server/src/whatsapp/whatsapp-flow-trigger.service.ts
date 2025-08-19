@@ -117,7 +117,13 @@ export class WhatsAppFlowTriggerService {
         triggers: { $in: [triggerType] }
       };
       
+      console.log('🔍 [FLOW-TRIGGER] Buscando fluxos com query:', query);
+      
       const activeFlows = await this.whatsappFlowModel.find(query).exec();
+      
+      console.log('🔍 [FLOW-TRIGGER] Fluxos encontrados:', activeFlows.length);
+      console.log('🔍 [FLOW-TRIGGER] Fluxos:', activeFlows.map(f => ({ id: f._id, name: f.name, triggers: f.triggers })));
+      
       return activeFlows;
     } catch (error) {
       this.logger.error(`Erro ao buscar fluxos: ${error.message}`);
@@ -247,11 +253,17 @@ export class WhatsAppFlowTriggerService {
         case TriggerType.LEAD_INDICATED:
           if (triggerData.referralData) {
             // Usar dados recebidos via parâmetros
+            console.log('🔍 [FLOW-TRIGGER] referralData recebido:', triggerData.referralData);
+            console.log('🔍 [FLOW-TRIGGER] leadPhone:', triggerData.referralData.leadPhone);
+            
             phoneNumber = triggerData.referralData.leadPhone;
             variables = {
               ...triggerData.referralData, // Incluir todos os dados extras
               dataIndicacao: triggerData.referralData.createdAt || new Date(),
             };
+            
+            console.log('🔍 [FLOW-TRIGGER] phoneNumber extraído:', phoneNumber);
+            console.log('🔍 [FLOW-TRIGGER] variables preparadas:', variables);
           } else if (triggerData.referralId) {
 
             phoneNumber = 'placeholder_phone';

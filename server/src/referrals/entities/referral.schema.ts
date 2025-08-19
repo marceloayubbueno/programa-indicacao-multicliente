@@ -124,14 +124,18 @@ ReferralSchema.post('save', async function(doc) {
     
     // Preparar dados do referral
     const referralData = {
-      _id: doc._id,
-      name: doc.leadName,
-      email: doc.leadEmail,
+      id: doc._id.toString(),
+      leadName: doc.leadName,
+      leadEmail: doc.leadEmail,
       leadPhone: doc.leadPhone,
-      clientId: doc.clientId,
-      campaignId: doc.campaignId,
+      indicadorName: 'Indicador',
+      campaignName: 'Campanha',
       createdAt: doc.createdAt
     };
+    
+    console.log('🔍 [REFERRAL-HOOK] Dados preparados:', referralData);
+    console.log('🔍 [REFERRAL-HOOK] leadPhone:', doc.leadPhone);
+    console.log('🔍 [REFERRAL-HOOK] clientId:', doc.clientId);
     
     // Chamar o serviço de trigger
     const result = await global.whatsAppFlowTriggerService.triggerLeadIndicated(
