@@ -481,10 +481,10 @@ export class WhatsAppFlowTriggerService {
   ): Promise<TriggerResult> {
     try {
       // 🔍 LOG SIMPLES: Trigger sendo executado
-      console.log('🔍 [FLOW-TRIGGER] triggerLeadIndicated executado para:', referralData._id);
+      console.log('🔍 [FLOW-TRIGGER] triggerLeadIndicated executado para:', referralData.id);
       
       const triggerData: TriggerData = {
-        referralId: new Types.ObjectId(referralData._id),
+        referralId: new Types.ObjectId(referralData.id),
         campaignId,
         clientId: new Types.ObjectId(clientId),
         eventData: {
