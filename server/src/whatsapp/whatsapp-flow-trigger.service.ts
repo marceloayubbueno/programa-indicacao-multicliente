@@ -122,45 +122,64 @@ export class WhatsAppFlowTriggerService {
     }
   }
 
-  private async getActiveFlowsForTrigger(
-    triggerType: TriggerType,
-    clientId: Types.ObjectId,
-  ): Promise<WhatsAppFlowDocument[]> {
-    this.logger.log(`🔍 [DEBUG] Buscando fluxos ativos para gatilho: ${triggerType}`);
-    this.logger.log(`🔍 [DEBUG] ClientId: ${clientId}`);
-    
-    const query = {
-      clientId,
-      status: 'active',
-      triggers: triggerType,
-    };
-    
-    this.logger.log(`🔍 [DEBUG] Query MongoDB: ${JSON.stringify(query)}`);
-    
-    const flows = await this.whatsappFlowModel
-      .find(query)
-      .populate('messages.templateId')
-      .exec();
-    
-    this.logger.log(`🔍 [DEBUG] Fluxos encontrados: ${flows.length}`);
-    
-    if (flows.length > 0) {
-      flows.forEach((flow, index) => {
-        this.logger.log(`🔍 [DEBUG] Fluxo ${index + 1}: ${flow.name} - Triggers: ${flow.triggers}`);
-      });
-    } else {
-      this.logger.log(`🔍 [DEBUG] Nenhum fluxo ativo encontrado para gatilho: ${triggerType}`);
+  private async getActiveFlowsForTrigger(triggerType: TriggerType, clientId: Types.ObjectId): Promise<WhatsAppFlowDocument[]> {
+    try {
+      this.logger.log(`🔍 [DEBUG] Buscando fluxos ativos para gatilho: ${triggerType}`);
+      this.logger.log(`🔍 [DEBUG] ClientId: ${clientId}`);
       
-      // Debug adicional: buscar todos os fluxos do cliente
-      const allFlows = await this.whatsappFlowModel.find({ clientId }).exec();
-      this.logger.log(`🔍 [DEBUG] Total de fluxos do cliente: ${allFlows.length}`);
+      // 🆕 NOVO: Log do tipo de dados
+      this.logger.log(`🔍 [DEBUG] Tipo do clientId: ${typeof clientId}`);
+      this.logger.log(`🔍 [DEBUG] ClientId é ObjectId: ${clientId instanceof Types.ObjectId}`);
+      this.logger.log(`🔍 [DEBUG] ClientId toString: ${clientId.toString()}`);
       
-      allFlows.forEach((flow, index) => {
-        this.logger.log(`🔍 [DEBUG] Fluxo ${index + 1}: ${flow.name} - Status: ${flow.status} - Triggers: ${flow.triggers}`);
-      });
+      // 🆕 NOVO: Log da query completa
+      const query = {
+        clientId: clientId,
+        status: 'active',
+        triggers: triggerType
+      };
+      this.logger.log(`🔍 [DEBUG] Query MongoDB: ${JSON.stringify(query)}`);
+      
+      // 🆕 NOVO: Log antes da execução da query
+      this.logger.log(`🔍 [DEBUG] Executando query no modelo: ${this.whatsappFlowModel.modelName}`);
+      this.logger.log(`🔍 [DEBUG] Modelo disponível: ${!!this.whatsappFlowModel}`);
+      
+      // 🆕 NOVO: Buscar TODOS os fluxos do cliente primeiro (para debug)
+      const allClientFlows = await this.whatsappFlowModel.find({ clientId: clientId }).exec();
+      this.logger.log(`🔍 [DEBUG] Total de fluxos do cliente (sem filtros): ${allClientFlows.length}`);
+      
+      if (allClientFlows.length > 0) {
+        this.logger.log(`🔍 [DEBUG] Dados dos fluxos encontrados:`);
+        allClientFlows.forEach((flow, index) => {
+          this.logger.log(`🔍 [DEBUG] Fluxo ${index + 1}:`, {
+            id: flow._id,
+            name: flow.name,
+            status: flow.status,
+            triggers: flow.triggers,
+            clientId: flow.clientId,
+            clientIdType: typeof flow.clientId,
+            clientIdIsObjectId: flow.clientId instanceof Types.ObjectId
+          });
+        });
+      }
+      
+      // 🆕 NOVO: Buscar fluxos com cada filtro separadamente
+      const flowsByStatus = await this.whatsappFlowModel.find({ clientId: clientId, status: 'active' }).exec();
+      this.logger.log(`🔍 [DEBUG] Fluxos com status 'active': ${flowsByStatus.length}`);
+      
+      const flowsByTrigger = await this.whatsappFlowModel.find({ clientId: clientId, triggers: triggerType }).exec();
+      this.logger.log(`🔍 [DEBUG] Fluxos com trigger '${triggerType}': ${flowsByTrigger.length}`);
+      
+      // Query original
+      const activeFlows = await this.whatsappFlowModel.find(query).exec();
+      this.logger.log(`🔍 [DEBUG] Fluxos encontrados: ${activeFlows.length}`);
+      
+      return activeFlows;
+    } catch (error) {
+      this.logger.error(`❌ [DEBUG] Erro ao buscar fluxos: ${error.message}`);
+      this.logger.error(`❌ [DEBUG] Stack trace: ${error.stack}`);
+      return [];
     }
-    
-    return flows;
   }
 
   private async processFlow(
