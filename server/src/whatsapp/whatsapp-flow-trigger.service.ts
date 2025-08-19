@@ -247,7 +247,7 @@ export class WhatsAppFlowTriggerService {
         case TriggerType.LEAD_INDICATED:
           if (triggerData.referralData) {
             // Usar dados recebidos via parâmetros
-            phoneNumber = triggerData.referralData.phone;
+            phoneNumber = triggerData.referralData.leadPhone;
             variables = {
               ...triggerData.referralData, // Incluir todos os dados extras
               dataIndicacao: triggerData.referralData.createdAt || new Date(),

@@ -127,7 +127,7 @@ ReferralSchema.post('save', async function(doc) {
       _id: doc._id,
       name: doc.leadName,
       email: doc.leadEmail,
-      phone: doc.leadPhone,
+      leadPhone: doc.leadPhone,
       clientId: doc.clientId,
       campaignId: doc.campaignId,
       createdAt: doc.createdAt
