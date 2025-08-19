@@ -20,15 +20,31 @@ import { initializeWhatsAppFlowTrigger, cleanupWhatsAppFlowTrigger } from './wha
   exports: [WhatsAppFlowTriggerService],
 })
 export class WhatsAppFlowTriggerModule implements OnModuleInit, OnModuleDestroy {
-  constructor(private readonly whatsAppFlowTriggerService: WhatsAppFlowTriggerService) {}
+  constructor(private readonly whatsAppFlowTriggerService: WhatsAppFlowTriggerService) {
+    console.log('🚀 [MODULE-DEBUG] WhatsAppFlowTriggerModule constructor chamado!');
+    console.log('🔧 [MODULE-DEBUG] whatsAppFlowTriggerService injetado:', !!this.whatsAppFlowTriggerService);
+  }
 
   onModuleInit() {
-    // Inicializar o service globalmente para os hooks do Mongoose
-    initializeWhatsAppFlowTrigger(this.whatsAppFlowTriggerService);
+    console.log('🚀 [MODULE-DEBUG] WhatsAppFlowTriggerModule onModuleInit() chamado!');
+    try {
+      // Inicializar o service globalmente para os hooks do Mongoose
+      initializeWhatsAppFlowTrigger(this.whatsAppFlowTriggerService);
+      console.log('✅ [MODULE-DEBUG] WhatsAppFlowTriggerModule inicializado com sucesso!');
+    } catch (error) {
+      console.error('❌ [MODULE-DEBUG] Erro ao inicializar WhatsAppFlowTriggerModule:', error);
+      console.error('❌ [MODULE-DEBUG] Stack trace:', error.stack);
+    }
   }
 
   onModuleDestroy() {
-    // Limpar referência global
-    cleanupWhatsAppFlowTrigger();
+    console.log('🧹 [MODULE-DEBUG] WhatsAppFlowTriggerModule onModuleDestroy() chamado!');
+    try {
+      // Limpar referência global
+      cleanupWhatsAppFlowTrigger();
+      console.log('✅ [MODULE-DEBUG] WhatsAppFlowTriggerModule limpo com sucesso!');
+    } catch (error) {
+      console.error('❌ [MODULE-DEBUG] Erro ao limpar WhatsAppFlowTriggerModule:', error);
+    }
   }
 }
