@@ -7,6 +7,7 @@ import { MessagePriority, QueueStatus } from './entities/whatsapp-queue.schema';
 import { CreateQueueMessageDto } from './dto/create-queue-message.dto';
 import { WhatsAppTemplate, WhatsAppTemplateDocument } from './entities/whatsapp-template.schema';
 
+
 export enum TriggerType {
   INDICATOR_JOINED = 'indicator_joined',
   LEAD_INDICATED = 'lead_indicated',
@@ -58,7 +59,6 @@ export interface TriggerResult {
 @Injectable()
 export class WhatsAppFlowTriggerService {
   private readonly logger = new Logger(WhatsAppFlowTriggerService.name);
-
   constructor(
     @InjectModel(WhatsAppFlow.name) private whatsappFlowModel: Model<WhatsAppFlowDocument>,
     @InjectModel(WhatsAppTemplate.name) private templateModel: Model<WhatsAppTemplateDocument>,
@@ -70,6 +70,14 @@ export class WhatsAppFlowTriggerService {
     triggerData: TriggerData,
   ): Promise<TriggerResult> {
     try {
+      // 🔍 LOG DE INVESTIGAÇÃO: Iniciando processamento do gatilho
+      this.logger.log(`🔍 [INVESTIGAÇÃO] ===== PROCESSANDO GATILHO =====`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Tipo: ${triggerType}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Client ID: ${triggerData.clientId}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Participant ID: ${triggerData.participantId}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Referral ID: ${triggerData.referralId}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] ===== FIM PROCESSANDO GATILHO =====`);
+
       const activeFlows = await this.getActiveFlowsForTrigger(triggerType, triggerData.clientId);
       
       if (activeFlows.length === 0) {
@@ -207,6 +215,15 @@ export class WhatsAppFlowTriggerService {
           (queueMessage.metadata as any).scheduledFor = new Date(Date.now() + (firstMessage.delay * 1000));
         }
 
+        // 🔍 LOG DE INVESTIGAÇÃO: Antes de adicionar na fila
+        this.logger.log(`🔍 [INVESTIGAÇÃO] ===== ADICIONANDO MENSAGEM NA FILA =====`);
+        this.logger.log(`🔍 [INVESTIGAÇÃO] Flow: ${flow.name} (${flow._id})`);
+        this.logger.log(`🔍 [INVESTIGAÇÃO] Template: ${template.name || template._id}`);
+        this.logger.log(`🔍 [INVESTIGAÇÃO] Para: ${recipientData.phoneNumber}`);
+        this.logger.log(`🔍 [INVESTIGAÇÃO] Trigger: ${triggerType}`);
+        this.logger.log(`🔍 [INVESTIGAÇÃO] Client ID: ${triggerData.clientId}`);
+        this.logger.log(`🔍 [INVESTIGAÇÃO] ===== FIM ADICIONANDO NA FILA =====`);
+        
         await this.whatsappQueueService.addToQueue(queueMessage);
 
       } catch (error) {

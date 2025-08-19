@@ -49,6 +49,18 @@ export class WhatsAppQueueService {
       });
 
       const savedMessage = await queueMessage.save();
+      
+      // 🔍 LOG DE INVESTIGAÇÃO: Mensagem criada na fila
+      this.logger.log(`🔍 [INVESTIGAÇÃO] ===== MENSAGEM CRIADA NA FILA =====`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] ID: ${savedMessage._id}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Para: ${savedMessage.to}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Trigger: ${savedMessage.trigger}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Prioridade: ${savedMessage.priority}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Client ID: ${savedMessage.clientId}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Flow ID: ${savedMessage.flowId}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Template ID: ${savedMessage.templateId}`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] ===== FIM MENSAGEM CRIADA =====`);
+      
       this.logger.log(`Mensagem adicionada à fila: ${savedMessage._id} - Prioridade: ${savedMessage.priority}`);
       
       return savedMessage;

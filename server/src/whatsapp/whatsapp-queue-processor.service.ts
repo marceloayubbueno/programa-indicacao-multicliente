@@ -38,20 +38,47 @@ export class WhatsAppQueueProcessorService {
     try {
       const messages = await this.whatsappQueueService.getMessagesForProcessing(10);
       
+      // 🔍 LOG DE INVESTIGAÇÃO: Quantas mensagens foram encontradas
+      this.logger.log(`🔍 [INVESTIGAÇÃO] ===== INICIANDO PROCESSAMENTO DA FILA =====`);
+      this.logger.log(`🔍 [INVESTIGAÇÃO] Mensagens encontradas para processamento: ${messages.length}`);
+      
       if (messages.length === 0) {
+        this.logger.log(`🔍 [INVESTIGAÇÃO] Nenhuma mensagem para processar`);
         return;
       }
 
+      // 🔍 LOG DE INVESTIGAÇÃO: Detalhes de cada mensagem
+      messages.forEach((msg, index) => {
+        const msgDoc = msg as any; // Cast para acessar propriedades do Document
+        this.logger.log(`🔍 [INVESTIGAÇÃO] Mensagem ${index + 1}: ID=${msgDoc._id}, Para=${msg.to}, Trigger=${msg.trigger}, Status=${msg.status}`);
+      });
+
       for (const message of messages) {
         try {
+          // 🔍 LOG DE INVESTIGAÇÃO: Antes de processar cada mensagem
+          const msgDoc = message as any; // Cast para acessar propriedades do Document
+          const messageId = msgDoc._id || 'unknown';
+          this.logger.log(`🔍 [INVESTIGAÇÃO] ===== PROCESSANDO MENSAGEM ${messageId} =====`);
+          this.logger.log(`🔍 [INVESTIGAÇÃO] Status antes do processamento: ${message.status}`);
+          this.logger.log(`🔍 [INVESTIGAÇÃO] Retry count: ${message.retryCount}/${message.maxRetries}`);
+          
           await this.processMessage(message);
+          
+          // 🔍 LOG DE INVESTIGAÇÃO: Após processar com sucesso
+          this.logger.log(`🔍 [INVESTIGAÇÃO] Mensagem ${messageId} processada com sucesso`);
+          
         } catch (error) {
-          this.logger.error(`Erro ao processar mensagem: ${error.message}`);
+          const msgDoc = message as any; // Cast para acessar propriedades do Document
+          const messageId = msgDoc._id || 'unknown';
+          this.logger.error(`🔍 [INVESTIGAÇÃO] Erro ao processar mensagem ${messageId}: ${error.message}`);
           
           // Marcar como falha e agendar retry
           await this.handleMessageFailure(message, error.message);
         }
       }
+
+      // 🔍 LOG DE INVESTIGAÇÃO: Após processar todas as mensagens
+      this.logger.log(`🔍 [INVESTIGAÇÃO] ===== PROCESSAMENTO DA FILA CONCLUÍDO =====`);
 
     } catch (error) {
       // 🆕 NOVO: Log de debug para identificar erro
