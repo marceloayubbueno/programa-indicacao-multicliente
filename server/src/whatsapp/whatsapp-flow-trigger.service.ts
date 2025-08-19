@@ -136,7 +136,7 @@ export class WhatsAppFlowTriggerService {
       const query = {
         clientId: clientId,
         status: 'active',
-        triggers: triggerType
+        triggers: { $in: [triggerType] } // 🆕 CORRIGIDO: Usar $in para buscar em array
       };
       this.logger.log(`🔍 [DEBUG] Query MongoDB: ${JSON.stringify(query)}`);
       
