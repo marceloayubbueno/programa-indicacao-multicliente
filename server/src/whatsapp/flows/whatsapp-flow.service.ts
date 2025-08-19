@@ -21,6 +21,11 @@ export class WhatsAppFlowService {
         throw new BadRequestException('Nome, audiência alvo e mensagens são obrigatórios');
       }
 
+      // 🆕 NOVO: Validar campo triggers
+      if (!createFlowDto.triggers || !Array.isArray(createFlowDto.triggers) || createFlowDto.triggers.length === 0) {
+        throw new BadRequestException('Pelo menos um gatilho deve ser configurado');
+      }
+
       // Validar mensagens
       if (!Array.isArray(createFlowDto.messages) || createFlowDto.messages.length === 0) {
         throw new BadRequestException('Pelo menos uma mensagem deve ser configurada');
@@ -34,6 +39,14 @@ export class WhatsAppFlowService {
         }
       }
 
+      // 🆕 NOVO: Log para debug
+      console.log('🔍 [DEBUG] Dados recebidos para criar fluxo:', {
+        name: createFlowDto.name,
+        targetAudience: createFlowDto.targetAudience,
+        triggers: createFlowDto.triggers,
+        messagesCount: createFlowDto.messages.length
+      });
+
       // Criar fluxo
       const flow = new this.flowModel({
         ...createFlowDto,
@@ -45,6 +58,9 @@ export class WhatsAppFlowService {
           totalFailed: 0,
         },
       });
+
+      // 🆕 NOVO: Log para debug
+      console.log('🔍 [DEBUG] Fluxo criado com triggers:', flow.triggers);
 
       return await flow.save();
     } catch (error) {
