@@ -85,6 +85,13 @@ export class Referral extends Document {
   @Prop({ required: false })
   convertedAt?: Date;
   // === FIM DOS NOVOS CAMPOS ===
+
+  // === CAMPOS DE TIMESTAMP (IGUAL AO PARTICIPANTSCHEMA) ===
+  @Prop({ default: Date.now })
+  createdAt?: Date;
+
+  @Prop({ default: Date.now })
+  updatedAt?: Date;
 }
 
 export const ReferralSchema = SchemaFactory.createForClass(Referral);
