@@ -133,7 +133,7 @@ export class WhatsAppQueueService {
       const [messages, total] = await Promise.all([
         this.whatsappQueueModel
           .find(query)
-          .sort({ priority: 1, queuePosition: 1, createdAt: 1 })
+          .sort({ priority: 1, queuePosition: 1, createdAt: -1 })
           .skip(skip)
           .limit(limit)
           .populate('clientId', 'name')
