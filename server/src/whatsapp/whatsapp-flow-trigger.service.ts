@@ -250,6 +250,30 @@ export class WhatsAppFlowTriggerService {
     }
   }
 
+  // 🆕 MÉTODO PARA BUSCAR DADOS DO CLIENTE
+  private async getClientData(clientId: Types.ObjectId): Promise<any> {
+    try {
+      // 🔍 LOG: Buscando dados do cliente
+      console.log('🔍 [CLIENT-DATA] ===== BUSCANDO DADOS DO CLIENTE =====');
+      console.log('🔍 [CLIENT-DATA] Client ID:', clientId);
+      
+      // TODO: Implementar busca real dos dados do cliente
+      // Por enquanto, retornar dados mock para teste
+      const clientData = {
+        companyName: 'Empresa Teste',
+        // Adicionar outros campos conforme necessário
+      };
+      
+      console.log('🔍 [CLIENT-DATA] Dados do cliente encontrados:', clientData);
+      console.log('🔍 [CLIENT-DATA] ===== FIM BUSCA CLIENTE =====');
+      
+      return clientData;
+    } catch (error) {
+      console.error('🔍 [CLIENT-DATA] ❌ Erro ao buscar dados do cliente:', error);
+      return null;
+    }
+  }
+
   private async extractRecipientData(
     flow: WhatsAppFlowDocument,
     triggerType: TriggerType,
@@ -271,14 +295,24 @@ export class WhatsAppFlowTriggerService {
           if (triggerData.participantData) {
             // Usar dados recebidos via parâmetros
             phoneNumber = triggerData.participantData.phone;
+            
+            // 🆕 BUSCAR DADOS DO CLIENTE
+            const clientData = await this.getClientData(triggerData.clientId);
+            
             variables = {
               ...triggerData.participantData, // Incluir todos os dados extras
               dataEntrada: triggerData.participantData.createdAt || new Date(),
+              
+              // 🆕 NOVAS TAGS AVANÇADAS
+              companyName: clientData?.companyName || 'Empresa',           // {{nomedaempresa}}
+              uniqueReferralCode: triggerData.participantData.uniqueReferralCode || 'Link não disponível', // {{linkunico}}
+              plainPassword: triggerData.participantData.plainPassword || 'Senha não disponível',           // {{senhaindicador}}
             };
             
             // 🔍 LOG DE DIAGNÓSTICO: Dados extraídos para indicador
             console.log('🔍 [EXTRACT-DATA] ✅ Dados extraídos para INDICATOR_JOINED:');
             console.log('🔍 [EXTRACT-DATA] Phone Number:', phoneNumber);
+            console.log('🔍 [EXTRACT-DATA] Client Data:', clientData);
             console.log('🔍 [EXTRACT-DATA] Variables:', JSON.stringify(variables, null, 2));
           } else if (triggerData.participantId) {
 
@@ -304,14 +338,28 @@ export class WhatsAppFlowTriggerService {
             console.log('🔍 [FLOW-TRIGGER] leadPhone:', triggerData.referralData.leadPhone);
             
             phoneNumber = triggerData.referralData.leadPhone;
+            
+            // 🆕 BUSCAR DADOS DO CLIENTE
+            const clientData = await this.getClientData(triggerData.clientId);
+            
             variables = {
               ...triggerData.referralData, // Incluir todos os dados extras
               dataIndicacao: triggerData.referralData.createdAt || new Date(),
+              
+              // 🆕 DADOS DA EMPRESA
+              companyName: clientData?.companyName || 'Empresa',           // {{nomedaempresa}}
+              
+              // 🆕 DADOS DO INDICADOR (quem fez a indicação)
+              name: triggerData.participantData?.name || 'Indicador',      // {{nome}}
+              email: triggerData.participantData?.email || 'Email não disponível', // {{email}}
+              phone: triggerData.participantData?.phone || 'Telefone não disponível', // {{telefone}}
             };
             
             // 🔍 LOG DE DIAGNÓSTICO: Dados extraídos para lead
             console.log('🔍 [EXTRACT-DATA] ✅ Dados extraídos para LEAD_INDICATED:');
             console.log('🔍 [EXTRACT-DATA] Phone Number:', phoneNumber);
+            console.log('🔍 [EXTRACT-DATA] Client Data:', clientData);
+            console.log('🔍 [EXTRACT-DATA] Participant Data:', triggerData.participantData);
             console.log('🔍 [EXTRACT-DATA] Variables:', JSON.stringify(variables, null, 2));
             
             console.log('🔍 [FLOW-TRIGGER] phoneNumber extraído:', phoneNumber);
@@ -339,16 +387,30 @@ export class WhatsAppFlowTriggerService {
           if (triggerData.participantData) {
             // Usar dados recebidos via parâmetros
             phoneNumber = triggerData.participantData.phone;
+            
+            // 🆕 BUSCAR DADOS DO CLIENTE
+            const clientData = await this.getClientData(triggerData.clientId);
+            
             variables = {
               ...triggerData.participantData, // Incluir todos os dados extras
-              recompensa: triggerData.eventData?.rewardAmount || 0,
-              tipoRecompensa: triggerData.eventData?.rewardType || 'Comissão',
-              totalGanhos: triggerData.eventData?.totalEarnings || 0,
+              
+              // 🆕 DADOS DA EMPRESA
+              companyName: clientData?.companyName || 'Empresa',           // {{nomedaempresa}}
+              
+              // 🆕 TAGS AVANÇADAS DO INDICADOR
+              uniqueReferralCode: triggerData.participantData.uniqueReferralCode || 'Link não disponível', // {{linkunico}}
+              plainPassword: triggerData.participantData.plainPassword || 'Senha não disponível',           // {{senhaindicador}}
+              
+              // 🆕 TAGS DE RECOMPENSA (corrigidas)
+              rewardAmount: triggerData.eventData?.rewardAmount || 0,      // {{valorRecompensa}}
+              rewardType: triggerData.eventData?.rewardType || 'Comissão', // {{tipoRecompensa}}
+              totalEarnings: triggerData.eventData?.totalEarnings || 0,   // {{totalGanhos}}
             };
             
             // 🔍 LOG DE DIAGNÓSTICO: Dados extraídos para recompensa
             console.log('🔍 [EXTRACT-DATA] ✅ Dados extraídos para REWARD_EARNED:');
             console.log('🔍 [EXTRACT-DATA] Phone Number:', phoneNumber);
+            console.log('🔍 [EXTRACT-DATA] Client Data:', clientData);
             console.log('🔍 [EXTRACT-DATA] Variables:', JSON.stringify(variables, null, 2));
           } else if (triggerData.participantId) {
 
@@ -498,16 +560,26 @@ export class WhatsAppFlowTriggerService {
     
     // 🆕 MAPEAMENTO CORRETO: Chaves em inglês para tags em português
     const variableMapping = {
+      // ✅ TAGS BÁSICAS DO INDICADOR
       'name': 'nome',
       'email': 'email', 
       'phone': 'telefone',
       'createdAt': 'dataEntrada',
+      
+      // ✅ TAGS DO LEAD
       'leadPhone': 'telefoneLead',
       'leadName': 'nomeLead',
       'campaignName': 'nomeCampanha',
+      
+      // ✅ TAGS DE RECOMPENSA
       'rewardAmount': 'valorRecompensa',
       'rewardType': 'tipoRecompensa',
-      'totalEarnings': 'totalGanhos'
+      'totalEarnings': 'totalGanhos',
+      
+      // 🆕 NOVAS TAGS AVANÇADAS
+      'companyName': 'nomedaempresa',        // Nome da empresa
+      'uniqueReferralCode': 'linkunico',     // Link único de compartilhamento
+      'plainPassword': 'senhaindicador'      // Senha de acesso do indicador
     };
     
     for (const [key, value] of Object.entries(variables)) {

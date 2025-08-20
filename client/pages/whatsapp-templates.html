@@ -299,7 +299,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-2">Corpo da Mensagem *</label>
                                 <textarea id="template-body" rows="6" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Digite o conteúdo da mensagem. Use {{variavel}} para variáveis dinâmicas."></textarea>
-                                <p class="text-gray-400 text-xs mt-1">Variáveis disponíveis: {{nome}}, {{empresa}}, {{link}}, {{recompensa}}, etc.</p>
+                                <p class="text-gray-400 text-xs mt-1">Variáveis disponíveis: {{nome}}, {{nomedaempresa}}, {{linkunico}}, {{valorRecompensa}}, {{nomeLead}}, etc.</p>
                             </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -309,7 +309,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-400 mb-2">Variáveis (Opcional)</label>
-                                    <input type="text" id="template-variables" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="nome,empresa,link,recompensa">
+                                    <input type="text" id="template-variables" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="nome,nomedaempresa,linkunico,valorRecompensa,nomeLead">
                                     <p class="text-gray-400 text-xs mt-1">Separe as variáveis por vírgula</p>
                                 </div>
                             </div>
@@ -397,26 +397,35 @@
             if (!container) return;
             
             const commonVariables = [
+                // 🏷️ TAGS BÁSICAS DO INDICADOR
                 { name: 'nome', description: 'Nome do indicador', icon: '👤' },
-                { name: 'empresa', description: 'Nome da empresa', icon: '🏢' },
-                { name: 'link', description: 'Link de indicação', icon: '🔗' },
-                { name: 'recompensa', description: 'Valor da recompensa', icon: '💰' },
-                { name: 'data_limite', description: 'Data limite', icon: '📅' },
-                { name: 'total_indicacoes', description: 'Total de indicações', icon: '📊' },
-                { name: 'ganhos', description: 'Ganhos totais', icon: '💵' },
-                { name: 'posicao', description: 'Posição no ranking', icon: '🏆' },
-                { name: 'meta', description: 'Meta atingida', icon: '🎯' },
-                { name: 'conquista', description: 'Conquista desbloqueada', icon: '🏅' },
-                { name: 'bonus', description: 'Bônus adicional', icon: '🎁' },
-                { name: 'acao', description: 'Ação a ser realizada', icon: '⚡' },
-                { name: 'prazo', description: 'Prazo para ação', icon: '⏰' },
-                { name: 'email', description: 'Email de contato', icon: '📧' },
-                { name: 'whatsapp', description: 'WhatsApp de contato', icon: '📱' },
-                { name: 'site', description: 'Site da empresa', icon: '🌐' },
-                { name: 'horario', description: 'Horário de atendimento', icon: '🕒' },
-                { name: 'oferta_especial', description: 'Oferta especial', icon: '🎉' },
-                { name: 'tempo_restante', description: 'Tempo restante', icon: '⏳' },
-                { name: 'link_acao', description: 'Link para ação', icon: '🔗' }
+                { name: 'email', description: 'Email do indicador', icon: '📧' },
+                { name: 'telefone', description: 'Telefone do indicador', icon: '📱' },
+                { name: 'dataEntrada', description: 'Data de cadastro', icon: '📅' },
+                
+                // 🏷️ TAGS AVANÇADAS DO INDICADOR
+                { name: 'nomedaempresa', description: 'Nome da empresa', icon: '🏢' },
+                { name: 'linkunico', description: 'Link único de compartilhamento', icon: '🔗' },
+                { name: 'senhaindicador', description: 'Senha de acesso do indicador', icon: '🔑' },
+                
+                // 🏷️ TAGS DE RECOMPENSA
+                { name: 'valorRecompensa', description: 'Valor da recompensa', icon: '💰' },
+                { name: 'tipoRecompensa', description: 'Tipo da recompensa', icon: '🏆' },
+                { name: 'totalGanhos', description: 'Total de ganhos', icon: '💵' },
+                
+                // 🏷️ TAGS DO LEAD
+                { name: 'nomeLead', description: 'Nome do lead', icon: '👥' },
+                { name: 'emailLead', description: 'Email do lead', icon: '📨' },
+                { name: 'telefoneLead', description: 'Telefone do lead', icon: '📞' },
+                { name: 'dataIndicacao', description: 'Data da indicação', icon: '📆' },
+                
+                // 🏷️ TAGS DE CAMPANHA
+                { name: 'nomeCampanha', description: 'Nome da campanha', icon: '🚀' },
+                
+                // 🏷️ TAGS LEGACY (mantidas para compatibilidade)
+                { name: 'empresa', description: 'Nome da empresa (legacy)', icon: '🏢' },
+                { name: 'link', description: 'Link de indicação (legacy)', icon: '🔗' },
+                { name: 'recompensa', description: 'Valor da recompensa (legacy)', icon: '💰' }
             ];
             
             const variablesHTML = commonVariables.map(variable => `
