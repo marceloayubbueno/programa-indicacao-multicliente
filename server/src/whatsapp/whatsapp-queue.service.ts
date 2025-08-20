@@ -61,6 +61,14 @@ export class WhatsAppQueueService {
       this.logger.log(`🔍 [INVESTIGAÇÃO] Template ID: ${savedMessage.templateId}`);
       this.logger.log(`🔍 [INVESTIGAÇÃO] ===== FIM MENSAGEM CRIADA =====`);
       
+      // 🔍 LOG DETALHADO: Conteúdo da mensagem criada
+      console.log('🔍 [QUEUE-CREATE] ===== CONTEÚDO DA MENSAGEM CRIADA =====');
+      console.log('🔍 [QUEUE-CREATE] Content Body:', savedMessage.content?.body);
+      console.log('🔍 [QUEUE-CREATE] Content Header:', savedMessage.content?.header);
+      console.log('🔍 [QUEUE-CREATE] Content Footer:', savedMessage.content?.footer);
+      console.log('🔍 [QUEUE-CREATE] Variables:', JSON.stringify(savedMessage.variables, null, 2));
+      console.log('🔍 [QUEUE-CREATE] ===== FIM DO CONTEÚDO =====');
+      
       // 🆕 LOG SIMPLES E VISÍVEL PARA RASTREAR
       console.log(`🚀 [CRIAÇÃO] MENSAGEM CRIADA: ID=${savedMessage._id}, Para=${savedMessage.to}, Trigger=${savedMessage.trigger}`);
       

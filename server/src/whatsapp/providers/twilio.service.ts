@@ -129,6 +129,13 @@ export class TwilioService {
         this.client = twilio(config.accountSid, config.authToken);
       }
 
+      // 🔍 LOG DE DIAGNÓSTICO: Antes de enviar mensagem
+      console.log('🔍 [TWILIO-SEND] ===== ENVIANDO MENSAGEM VIA TWILIO =====');
+      console.log('🔍 [TWILIO-SEND] Body da mensagem:', testDto.message);
+      console.log('🔍 [TWILIO-SEND] From:', `whatsapp:${config.phoneNumber}`);
+      console.log('🔍 [TWILIO-SEND] To:', `whatsapp:${formattedTo}`);
+      console.log('🔍 [TWILIO-SEND] ===== FIM DOS DADOS =====');
+      
       // Enviar mensagem via WhatsApp
       const message = await this.client.messages.create({
         body: testDto.message,

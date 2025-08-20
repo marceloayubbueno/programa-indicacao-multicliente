@@ -51,6 +51,15 @@ export class WhatsAppQueueProcessorService {
       messages.forEach((msg, index) => {
         const msgDoc = msg as any; // Cast para acessar propriedades do Document
         this.logger.log(`🔍 [INVESTIGAÇÃO] Mensagem ${index + 1}: ID=${msgDoc._id}, Para=${msg.to}, Trigger=${msg.trigger}, Status=${msg.status}`);
+        
+        // 🔍 LOG DETALHADO: Conteúdo de cada mensagem
+        console.log(`🔍 [QUEUE-PROCESS] ===== MENSAGEM ${index + 1} =====`);
+        console.log(`🔍 [QUEUE-PROCESS] ID: ${msgDoc._id}`);
+        console.log(`🔍 [QUEUE-PROCESS] Para: ${msg.to}`);
+        console.log(`🔍 [QUEUE-PROCESS] Trigger: ${msg.trigger}`);
+        console.log(`🔍 [QUEUE-PROCESS] Content Body: ${msg.content?.body}`);
+        console.log(`🔍 [QUEUE-PROCESS] Variables: ${JSON.stringify(msg.variables, null, 2)}`);
+        console.log(`🔍 [QUEUE-PROCESS] ===== FIM MENSAGEM ${index + 1} =====`);
       });
 
       for (const message of messages) {

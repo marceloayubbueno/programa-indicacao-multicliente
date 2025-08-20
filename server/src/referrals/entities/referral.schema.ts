@@ -139,6 +139,13 @@ ReferralSchema.post('save', async function(doc) {
     console.log('🔍 [REFERRAL-HOOK] leadPhone:', doc.leadPhone);
     console.log('🔍 [REFERRAL-HOOK] clientId:', doc.clientId);
     
+    // 🔍 LOG DE DIAGNÓSTICO: Antes de chamar o serviço de trigger
+    console.log('🔍 [REFERRAL-HOOK] ===== CHAMANDO SERVIÇO DE TRIGGER =====');
+    console.log('🔍 [REFERRAL-HOOK] Referral Data:', JSON.stringify(referralData, null, 2));
+    console.log('🔍 [REFERRAL-HOOK] Client ID:', doc.clientId!.toString());
+    console.log('🔍 [REFERRAL-HOOK] Campaign ID:', doc.campaignId?.toString());
+    console.log('🔍 [REFERRAL-HOOK] ===== FIM DOS DADOS =====');
+    
     // Chamar o serviço de trigger
     const result = await global.whatsAppFlowTriggerService.triggerLeadIndicated(
       referralData,
