@@ -61,6 +61,9 @@ export class WhatsAppQueueService {
       this.logger.log(`🔍 [INVESTIGAÇÃO] Template ID: ${savedMessage.templateId}`);
       this.logger.log(`🔍 [INVESTIGAÇÃO] ===== FIM MENSAGEM CRIADA =====`);
       
+      // 🆕 LOG SIMPLES E VISÍVEL PARA RASTREAR
+      console.log(`🚀 [CRIAÇÃO] MENSAGEM CRIADA: ID=${savedMessage._id}, Para=${savedMessage.to}, Trigger=${savedMessage.trigger}`);
+      
       this.logger.log(`Mensagem adicionada à fila: ${savedMessage._id} - Prioridade: ${savedMessage.priority}`);
       
       return savedMessage;
