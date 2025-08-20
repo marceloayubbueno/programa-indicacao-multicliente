@@ -47,7 +47,10 @@ export class ParticipantsService {
           name: savedParticipant.name,
           email: savedParticipant.email,
           phone: savedParticipant.phone,
-          createdAt: savedParticipant.createdAt
+          createdAt: savedParticipant.createdAt,
+          // ✅ CORREÇÃO: Incluir campos essenciais que estavam faltando
+          uniqueReferralCode: savedParticipant.uniqueReferralCode,
+          plainPassword: savedParticipant.plainPassword
         };
         
         console.log('🚀 [PARTICIPANT] Dados para gatilho:', triggerData);

@@ -23,6 +23,9 @@ export interface ParticipantData {
   email: string;
   phone: string;
   createdAt?: Date;
+  // ✅ CORREÇÃO: Adicionar campos essenciais que estavam faltando
+  uniqueReferralCode?: string;  // Link único de compartilhamento
+  plainPassword?: string;        // Senha do indicador
   [key: string]: any;
 }
 
@@ -250,6 +253,38 @@ export class WhatsAppFlowTriggerService {
     }
   }
 
+  // 🆕 MÉTODO PARA BUSCAR DADOS DO PARTICIPANTE
+  private async getParticipantData(participantId: Types.ObjectId): Promise<any> {
+    try {
+      // 🔍 LOG: Buscando dados do participante
+      console.log('🔍 [PARTICIPANT-DATA] ===== BUSCANDO DADOS DO PARTICIPANTE =====');
+      console.log('🔍 [PARTICIPANT-DATA] Participant ID:', participantId);
+      
+      // ✅ CORREÇÃO: Implementar busca real dos dados do participante
+      const Participant = this.whatsappFlowModel.db.models.Participant || this.whatsappFlowModel.db.model('Participant');
+      
+      if (!Participant) {
+        console.error('🔍 [PARTICIPANT-DATA] ❌ Modelo Participant não encontrado');
+        return null;
+      }
+      
+      const participantData = await Participant.findById(participantId).select('uniqueReferralCode plainPassword campaignId').exec();
+      
+      if (!participantData) {
+        console.error('🔍 [PARTICIPANT-DATA] ❌ Participante não encontrado no banco');
+        return null;
+      }
+      
+      console.log('🔍 [PARTICIPANT-DATA] Dados do participante encontrados:', participantData);
+      console.log('🔍 [PARTICIPANT-DATA] ===== FIM BUSCA PARTICIPANTE =====');
+      
+      return participantData;
+    } catch (error) {
+      console.error('🔍 [PARTICIPANT-DATA] ❌ Erro ao buscar dados do participante:', error);
+      return null;
+    }
+  }
+
   // 🆕 MÉTODO PARA BUSCAR DADOS DO CLIENTE
   private async getClientData(clientId: Types.ObjectId): Promise<any> {
     try {
@@ -340,6 +375,10 @@ export class WhatsAppFlowTriggerService {
             // Usar dados recebidos via parâmetros
             phoneNumber = triggerData.participantData.phone;
             
+            // 🆕 BUSCAR DADOS REAIS DO PARTICIPANTE NO BANCO
+            const participantDataFromDB = triggerData.participantId ? 
+              await this.getParticipantData(triggerData.participantId) : null;
+            
             // 🆕 BUSCAR DADOS DO CLIENTE
             const clientData = await this.getClientData(triggerData.clientId);
             
@@ -353,12 +392,14 @@ export class WhatsAppFlowTriggerService {
               // ✅ CORREÇÃO: Dados reais da empresa
               companyName: clientData?.companyName || 'Viral Lead',           // {{nomedaempresa}}
               
-              // ✅ CORREÇÃO: Link único real ou gerar um
-              uniqueReferralCode: triggerData.participantData.uniqueReferralCode || 
+              // ✅ CORREÇÃO: Link único real do banco de dados
+              uniqueReferralCode: participantDataFromDB?.uniqueReferralCode || 
+                triggerData.participantData.uniqueReferralCode || 
                 (triggerData.participantData.id ? `REF${triggerData.participantData.id.slice(-8).toUpperCase()}` : 'REF' + Math.random().toString(36).substr(2, 8).toUpperCase()), // {{linkunico}}
               
-              // ✅ CORREÇÃO: Senha real ou gerar uma
-              plainPassword: triggerData.participantData.plainPassword || 
+              // ✅ CORREÇÃO: Senha real do banco de dados
+              plainPassword: participantDataFromDB?.plainPassword || 
+                triggerData.participantData.plainPassword || 
                 Math.random().toString(36).substr(2, 6).toUpperCase(),           // {{senhaindicador}}
               
               // 🆕 NOVO: Nome da campanha real
@@ -368,10 +409,19 @@ export class WhatsAppFlowTriggerService {
             // 🔍 LOG DE DIAGNÓSTICO: Dados extraídos para indicador
             console.log('🔍 [EXTRACT-DATA] ✅ Dados extraídos para INDICATOR_JOINED:');
             console.log('🔍 [EXTRACT-DATA] Phone Number:', phoneNumber);
+            console.log('🔍 [EXTRACT-DATA] Participant Data from DB:', participantDataFromDB);
             console.log('🔍 [EXTRACT-DATA] Client Data:', clientData);
             console.log('🔍 [EXTRACT-DATA] Campaign Data:', campaignData);
             console.log('🔍 [EXTRACT-DATA] Variables:', JSON.stringify(variables, null, 2));
           } else if (triggerData.participantId) {
+            // ✅ CORREÇÃO: Buscar dados reais do participante no banco
+            const participantDataFromDB = await this.getParticipantData(triggerData.participantId);
+            
+            // ✅ CORREÇÃO: Buscar dados do cliente
+            const clientData = await this.getClientData(triggerData.clientId);
+            
+            // ✅ CORREÇÃO: Buscar dados da campanha
+            const campaignData = await this.getCampaignData(triggerData.campaignId);
 
             phoneNumber = 'placeholder_phone';
             variables = {
@@ -379,11 +429,26 @@ export class WhatsAppFlowTriggerService {
               email: '',
               telefone: '',
               dataEntrada: new Date(),
+              
+              // ✅ CORREÇÃO: Dados reais da empresa
+              companyName: clientData?.companyName || 'Viral Lead',           // {{nomedaempresa}}
+              
+              // ✅ CORREÇÃO: Link único real do banco de dados
+              uniqueReferralCode: participantDataFromDB?.uniqueReferralCode || 'Link não disponível', // {{linkunico}}
+              
+              // ✅ CORREÇÃO: Senha real do banco de dados
+              plainPassword: participantDataFromDB?.plainPassword || 'Senha não disponível',           // {{senhaindicador}}
+              
+              // 🆕 NOVO: Nome da campanha real
+              campaignName: campaignData?.name || 'Campanha Viral Lead'        // {{nomeCampanha}}
             };
             
             // 🔍 LOG DE DIAGNÓSTICO: Dados placeholder
             console.log('🔍 [EXTRACT-DATA] ⚠️ Usando dados placeholder para INDICATOR_JOINED');
             console.log('🔍 [EXTRACT-DATA] Phone Number:', phoneNumber);
+            console.log('🔍 [EXTRACT-DATA] Participant Data from DB:', participantDataFromDB);
+            console.log('🔍 [EXTRACT-DATA] Client Data:', clientData);
+            console.log('🔍 [EXTRACT-DATA] Campaign Data:', campaignData);
             console.log('🔍 [EXTRACT-DATA] Variables:', JSON.stringify(variables, null, 2));
           }
           break;

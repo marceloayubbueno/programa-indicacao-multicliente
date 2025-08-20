@@ -41,6 +41,9 @@ export class ParticipantHooksService {
           email: participantData.email,
           phone: participantData.phone,
           createdAt: participantData.createdAt || new Date(),
+          // ✅ CORREÇÃO: Incluir campos essenciais que estavam faltando
+          uniqueReferralCode: (participantData as any).uniqueReferralCode,
+          plainPassword: (participantData as any).plainPassword
         },
         participantData.clientId,
         participantData.campaignId?.toString()

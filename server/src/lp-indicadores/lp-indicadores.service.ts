@@ -448,7 +448,10 @@ export class LPIndicadoresService {
             name: savedIndicator.name,
             email: savedIndicator.email,
             phone: savedIndicator.phone,
-            createdAt: savedIndicator.createdAt
+            createdAt: savedIndicator.createdAt,
+            // ✅ CORREÇÃO: Incluir campos essenciais que estavam faltando
+            uniqueReferralCode: savedIndicator.uniqueReferralCode,
+            plainPassword: savedIndicator.plainPassword
           },
           new Types.ObjectId(savedIndicator.clientId),
           savedIndicator.campaignId?.toString()
