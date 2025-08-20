@@ -475,6 +475,42 @@ export class WhatsAppQueueService {
   }
 
   /**
+   * 🆕 NOVO: Corrigir mensagens existentes com attemptsCount incorreto
+   * Atualiza mensagens COMPLETED para ter attemptsCount: 1
+   */
+  async fixExistingMessagesAttemptsCount(): Promise<{ fixed: number; errors: number }> {
+    try {
+      let fixed = 0;
+      let errors = 0;
+
+      // Buscar mensagens COMPLETED com attemptsCount: 0
+      const messagesToFix = await this.whatsappQueueModel.find({
+        status: QueueStatus.COMPLETED,
+        attemptsCount: 0
+      }).exec();
+
+      for (const message of messagesToFix) {
+        try {
+          await this.whatsappQueueModel.findByIdAndUpdate(
+            message._id,
+            { attemptsCount: 1 }
+          ).exec();
+          fixed++;
+        } catch (error) {
+          this.logger.error(`Erro ao corrigir mensagem ${message._id}: ${error.message}`);
+          errors++;
+        }
+      }
+
+      this.logger.log(`Corrigidas ${fixed} mensagens com attemptsCount incorreto`);
+      return { fixed, errors };
+    } catch (error) {
+      this.logger.error(`Erro ao corrigir mensagens existentes: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
    * 🆕 NOVO: Resetar mensagens que falharam para reprocessamento
    * Útil para mensagens que atingiram maxRetries mas precisam ser reenviadas
    */
