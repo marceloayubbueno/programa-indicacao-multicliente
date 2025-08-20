@@ -54,15 +54,18 @@ export class ParticipantsService {
         console.log('🚀 [PARTICIPANT] ClientId:', savedParticipant.clientId);
         console.log('🚀 [PARTICIPANT] CampaignId:', savedParticipant.campaignId);
         
-        const result = await this.whatsappFlowTriggerService.triggerIndicatorJoined(
-          triggerData,
-          new Types.ObjectId(savedParticipant.clientId),
-          savedParticipant.campaignId?.toString()
-        );
+        // 🔒 [TESTE] GATILHO COMENTADO PARA TESTE DE DEDUPLICAÇÃO
+        // const result = await this.whatsappFlowTriggerService.triggerIndicatorJoined(
+        //   triggerData,
+        //   new Types.ObjectId(savedParticipant.clientId),
+        //   savedParticipant.campaignId?.toString()
+        // );
         
-        console.log('✅ [PARTICIPANT] Gatilho WhatsApp disparado com sucesso:', result);
-        console.log('✅ [PARTICIPANT] Fluxos processados:', result.flowsTriggered);
-        console.log('✅ [PARTICIPANT] Mensagens adicionadas:', result.messagesAdded);
+        // console.log('✅ [PARTICIPANT] Gatilho WhatsApp disparado com sucesso:', result);
+        // console.log('✅ [PARTICIPANT] Fluxos processados:', result.flowsTriggered);
+        // console.log('✅ [PARTICIPANT] Mensagens adicionadas:', result.messagesAdded);
+        
+        console.log('🔒 [TESTE] Gatilho WhatsApp comentado para teste de deduplicação');
         
       } catch (error) {
         console.error('❌ [PARTICIPANT] Erro ao disparar gatilho WhatsApp:', error);
