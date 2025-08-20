@@ -434,7 +434,7 @@
                      draggable="true" 
                      ondragstart="handleVariableDragStart(event, '${variable.name}')"
                      ondragend="handleVariableDragEnd(event)"
-                     onclick="insertVariable('${variable.name}')">
+                     onclick="handleVariableClick('${variable.name}', event)">
                     <div class="text-center">
                         <span class="text-lg block mb-1">${variable.icon}</span>
                         <div class="text-xs text-gray-100 font-medium mb-1">{{${variable.name}}}</div>
@@ -473,10 +473,36 @@
             event.target.classList.remove('opacity-50', 'scale-95', 'transform', 'dragging');
         }
 
+        // Função para lidar com clique nas variáveis (prevenir duplicação)
+        function handleVariableClick(variableName, event) {
+            // Prevenir clique duplo
+            if (event.target.dataset.clicked === 'true') {
+                console.log('Clique já processado, ignorando...');
+                return;
+            }
+            
+            // Marcar como clicado
+            event.target.dataset.clicked = 'true';
+            
+            // Inserir variável
+            insertVariable(variableName);
+            
+            // Limpar flag após delay
+            setTimeout(() => {
+                event.target.dataset.clicked = 'false';
+            }, 300);
+        }
+
         // Função para inserir variável no campo de texto
         function insertVariable(variableName) {
             const textarea = document.getElementById('template-body');
             if (!textarea) return;
+            
+            // Prevenir inserção duplicada
+            if (textarea.dataset.lastInserted === variableName) {
+                console.log('Prevenindo inserção duplicada da variável:', variableName);
+                return;
+            }
             
             const variable = `{{${variableName}}}`;
             const start = textarea.selectionStart;
@@ -491,11 +517,19 @@
             textarea.selectionStart = start + variable.length;
             textarea.selectionEnd = start + variable.length;
             
+            // Marcar como última variável inserida para prevenir duplicação
+            textarea.dataset.lastInserted = variableName;
+            
             // Focar no textarea
             textarea.focus();
             
             // Mostrar feedback visual
             showSuccess(`Variável ${variable} inserida!`);
+            
+            // Limpar flag após um delay para permitir inserções futuras
+            setTimeout(() => {
+                textarea.dataset.lastInserted = '';
+            }, 100);
         }
 
         // Função para usar bloco (drag & drop ou clique)
@@ -590,7 +624,16 @@
             const data = event.dataTransfer.getData('text/plain');
             const type = event.dataTransfer.getData('type');
             
+            // Prevenir processamento duplicado
+            if (event.target.dataset.processingDrop === 'true') {
+                console.log('Drop já sendo processado, ignorando...');
+                return;
+            }
+            
             if (data) {
+                // Marcar como processando
+                event.target.dataset.processingDrop = 'true';
+                
                 if (type === 'block') {
                     useTemplateBlock(data);
                     console.log('Bloco arrastado e solto:', data);
@@ -598,6 +641,11 @@
                     insertVariable(data);
                     console.log('Variável arrastada e solta:', data);
                 }
+                
+                // Limpar flag após processamento
+                setTimeout(() => {
+                    event.target.dataset.processingDrop = 'false';
+                }, 200);
             }
         }
 
