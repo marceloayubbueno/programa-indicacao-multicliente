@@ -226,6 +226,8 @@ export class WhatsAppQueueService {
       } else if (status === QueueStatus.COMPLETED) {
         updateData.processedAt = new Date();
         updateData.providerResponse = metadata?.providerResponse;
+        // 🆕 CORREÇÃO: Incrementar attemptsCount também quando completar
+        updateData.$inc = { attemptsCount: 1 };
       } else if (status === QueueStatus.FAILED) {
         updateData.lastAttemptAt = new Date();
         updateData.$inc = { attemptsCount: 1 };

@@ -77,6 +77,9 @@ export class WhatsAppFlowTriggerService {
       this.logger.log(`🔍 [INVESTIGAÇÃO] Participant ID: ${triggerData.participantId}`);
       this.logger.log(`🔍 [INVESTIGAÇÃO] Referral ID: ${triggerData.referralId}`);
       this.logger.log(`🔍 [INVESTIGAÇÃO] ===== FIM PROCESSANDO GATILHO =====`);
+      
+      // 🆕 LOG SIMPLES E VISÍVEL PARA RASTREAR GATILHOS
+      console.log(`🚀 [GATILHO] DISPARADO: ${triggerType} - Client: ${triggerData.clientId} - Participant: ${triggerData.participantId}`);
 
       const activeFlows = await this.getActiveFlowsForTrigger(triggerType, triggerData.clientId);
       
@@ -223,6 +226,9 @@ export class WhatsAppFlowTriggerService {
         this.logger.log(`🔍 [INVESTIGAÇÃO] Trigger: ${triggerType}`);
         this.logger.log(`🔍 [INVESTIGAÇÃO] Client ID: ${triggerData.clientId}`);
         this.logger.log(`🔍 [INVESTIGAÇÃO] ===== FIM ADICIONANDO NA FILA =====`);
+        
+        // 🆕 LOG SIMPLES E VISÍVEL PARA RASTREAR CRIAÇÃO
+        console.log(`🚀 [CRIANDO] MENSAGEM NA FILA: ${triggerType} - Para: ${recipientData.phoneNumber} - Flow: ${flow.name}`);
         
         await this.whatsappQueueService.addToQueue(queueMessage);
 
