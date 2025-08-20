@@ -43,7 +43,7 @@ export class WhatsAppQueueService {
         queuePosition,
         status: QueueStatus.PENDING,
         retryCount: 0,
-        maxRetries: 3,
+        maxRetries: 1,
         attemptsCount: 0,
         createdAt: new Date(),
       });
@@ -306,7 +306,7 @@ export class WhatsAppQueueService {
               nextRetryAt: { $lte: now },
             },
           ],
-          retryCount: { $lt: 3 }, // Máximo de 3 tentativas
+          retryCount: { $lt: 1 }, // Máximo de 1 tentativa
         })
         .sort({ priority: 1, queuePosition: 1, createdAt: 1 })
         .limit(limit * 2) // Buscar mais mensagens para aplicar lógica de fallback
@@ -373,7 +373,7 @@ export class WhatsAppQueueService {
 
         if (messageToProcess) {
           // Verificar se não excedeu o limite de tentativas
-          if (messageToProcess.retryCount < (messageToProcess.maxRetries || 3)) {
+          if (messageToProcess.retryCount < (messageToProcess.maxRetries || 1)) {
             result.push(messageToProcess);
             processedFlows.add(flowKey);
             this.logger.log(`🔄 [FALLBACK] Mensagem selecionada para processamento: ${(messageToProcess as any)._id} (Ordem: ${(messageToProcess.metadata as any)?.messageOrder || 'N/A'})`);
@@ -511,7 +511,7 @@ export class WhatsAppQueueService {
           {
             $or: [
               { status: QueueStatus.FAILED },
-              { retryCount: { $gte: 3 } }
+              { retryCount: { $gte: 1 } }
             ]
           },
           {
