@@ -545,6 +545,9 @@
                 
                 console.log('Bloco encontrado:', block);
                 
+                // ✅ CORREÇÃO: Limpar formulário antes de preencher para evitar duplicação
+                resetTemplateForm();
+                
                 // Preencher formulário com dados do bloco
                 const nameField = document.getElementById('template-name');
                 const categoryField = document.getElementById('template-category');
@@ -574,6 +577,26 @@
                 console.error('TemplateBlocks não está disponível');
                 showError('Erro ao carregar bloco de template');
             }
+        }
+
+        // ✅ NOVA FUNÇÃO: Resetar formulário de template
+        function resetTemplateForm() {
+            const nameField = document.getElementById('template-name');
+            const categoryField = document.getElementById('template-category');
+            const bodyField = document.getElementById('template-body');
+            const footerField = document.getElementById('template-footer');
+            const variablesField = document.getElementById('template-variables');
+            
+            if (nameField) nameField.value = '';
+            if (categoryField) categoryField.value = '';
+            if (bodyField) bodyField.value = '';
+            if (footerField) footerField.value = '';
+            if (variablesField) variablesField.value = '';
+            
+            // Limpar flags de duplicação
+            if (bodyField) bodyField.dataset.lastInserted = '';
+            
+            console.log('Formulário de template resetado com sucesso');
         }
 
         function handleDragEnd(event) {
