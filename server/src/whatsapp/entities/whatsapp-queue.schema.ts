@@ -87,7 +87,7 @@ export class WhatsAppQueue {
   @Prop({ type: Number, default: 0 })
   retryCount: number;
 
-  @Prop({ type: Number, default: 3 })
+  @Prop({ type: Number, default: 1 })
   maxRetries: number;
 
   @Prop()
