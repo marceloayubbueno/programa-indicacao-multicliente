@@ -404,6 +404,10 @@ export class WhatsAppFlowTriggerService {
   private replaceVariables(text: string, variables: Record<string, any>): string {
     let result = text;
     
+    // 🔍 LOG SIMPLES: Ver o que está chegando
+    console.log('🔍 [REPLACE-VARIABLES] Texto original:', text);
+    console.log('🔍 [REPLACE-VARIABLES] Variáveis recebidas:', variables);
+    
     for (const [key, value] of Object.entries(variables)) {
       const placeholder = `{${key}}`;
       if (typeof value === 'string' || typeof value === 'number') {
@@ -411,6 +415,7 @@ export class WhatsAppFlowTriggerService {
       }
     }
     
+    console.log('🔍 [REPLACE-VARIABLES] Texto final:', result);
     return result;
   }
 
