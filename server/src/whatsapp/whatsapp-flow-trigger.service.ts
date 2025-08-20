@@ -444,7 +444,7 @@ export class WhatsAppFlowTriggerService {
     console.log('🔍 [PREPARE-CONTENT] Trigger Type:', triggerType);
     
     // Usar conteúdo do template
-    let body = template.content?.body || 'Mensagem automática';
+    let body = template.content?.body || 'Olá {{nome}}! Bem-vindo ao nosso programa de indicação. Você está pronto para começar sua jornada de sucesso? 🚀';
     console.log('🔍 [PREPARE-CONTENT] Body original do template:', body);
     
     // Aplicar variáveis dinâmicas
@@ -455,13 +455,13 @@ export class WhatsAppFlowTriggerService {
     // Adicionar informações específicas do gatilho
     switch (triggerType) {
       case TriggerType.INDICATOR_JOINED:
-        body += '\n\n🎉 Bem-vindo ao nosso programa de indicações!';
+        body += '\n\n🎉 Bem-vindo ao nosso programa de indicações, {{nome}}!';
         break;
       case TriggerType.LEAD_INDICATED:
-        body += '\n\n👋 Obrigado pela indicação!';
+        body += '\n\n👋 Obrigado pela indicação, {{nome_indicador}}!';
         break;
       case TriggerType.REWARD_EARNED:
-        body += '\n\n💰 Parabéns pela recompensa!';
+        body += '\n\n💰 Parabéns pela recompensa, {{nome}}!';
         break;
     }
     
@@ -496,13 +496,30 @@ export class WhatsAppFlowTriggerService {
     
     let replacementsMade = 0;
     
+    // 🆕 MAPEAMENTO CORRETO: Chaves em inglês para tags em português
+    const variableMapping = {
+      'name': 'nome',
+      'email': 'email', 
+      'phone': 'telefone',
+      'createdAt': 'dataEntrada',
+      'leadPhone': 'telefoneLead',
+      'leadName': 'nomeLead',
+      'campaignName': 'nomeCampanha',
+      'rewardAmount': 'valorRecompensa',
+      'rewardType': 'tipoRecompensa',
+      'totalEarnings': 'totalGanhos'
+    };
+    
     for (const [key, value] of Object.entries(variables)) {
       // 🔍 LOG: Processando cada variável
       console.log(`🔍 [REPLACE-VARIABLES] Processando variável: ${key} = ${value} (tipo: ${typeof value})`);
       
+      // 🔧 CORREÇÃO: Mapear chave em inglês para tag em português
+      const portugueseKey = variableMapping[key] || key;
+      
       // 🔧 CORREÇÃO: Usar formato {{key}} em vez de {key}
-      const placeholder = `{{${key}}}`;
-      const oldPlaceholder = `{${key}}`;
+      const placeholder = `{{${portugueseKey}}}`;
+      const oldPlaceholder = `{${portugueseKey}}`;
       
       // 🔍 LOG: Verificar se a tag existe no texto
       const hasNewFormat = text.includes(placeholder);
