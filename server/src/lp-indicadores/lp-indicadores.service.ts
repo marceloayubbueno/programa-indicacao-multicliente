@@ -438,34 +438,31 @@ export class LPIndicadoresService {
       const savedIndicator = await newIndicator.save();
       console.log('[LP] ✅ Indicador salvo com sucesso:', savedIndicator._id);
 
-      // 🔒 [TESTE] GATILHO COMENTADO PARA TESTE DE DEDUPLICAÇÃO
       // 🚀 NOVO: Disparar gatilho WhatsApp para novo indicador
-      // try {
-      //   console.log('[LP] 🚀 [WHATSAPP] Iniciando gatilho para novo indicador:', savedIndicator.name);
-      //   
-      //   const result = await this.whatsAppFlowTriggerService.triggerIndicatorJoined(
-      //     {
-      //       id: savedIndicator._id.toString(),
-      //       name: savedIndicator.name,
-      //       email: savedIndicator.phone,
-      //       phone: savedIndicator.phone,
-      //       createdAt: savedIndicator.createdAt
-      //     },
-      //     new Types.ObjectId(savedIndicator.clientId),
-      //     savedIndicator.campaignId?.toString()
-      //   );
-      //   
-      //   console.log('[LP] ✅ [WHATSAPP] Gatilho disparado com sucesso:', result);
-      //   console.log('[LP] ✅ [WHATSAPP] Fluxos processados:', result.flowsTriggered);
-      //   console.log('[LP] ✅ [WHATSAPP] Mensagens adicionadas:', result.messagesAdded);
-      //   
-      // } catch (error) {
-      //   console.error('[LP] ❌ [WHATSAPP] Erro ao disparar gatilho:', error);
-      //   console.error('[LP] ❌ [WHATSAPP] Stack trace:', error.stack);
-      //   // Não falhar a criação do indicador por erro de gatilho
-      // }
-      
-      console.log('[LP] 🔒 [TESTE] Gatilho WhatsApp comentado para teste de deduplicação');
+      try {
+        console.log('[LP] 🚀 [WHATSAPP] Iniciando gatilho para novo indicador:', savedIndicator.name);
+        
+        const result = await this.whatsAppFlowTriggerService.triggerIndicatorJoined(
+          {
+            id: savedIndicator._id.toString(),
+            name: savedIndicator.name,
+            email: savedIndicator.email,
+            phone: savedIndicator.phone,
+            createdAt: savedIndicator.createdAt
+          },
+          new Types.ObjectId(savedIndicator.clientId),
+          savedIndicator.campaignId?.toString()
+        );
+        
+        console.log('[LP] ✅ [WHATSAPP] Gatilho disparado com sucesso:', result);
+        console.log('[LP] ✅ [WHATSAPP] Fluxos processados:', result.flowsTriggered);
+        console.log('[LP] ✅ [WHATSAPP] Mensagens adicionadas:', result.messagesAdded);
+        
+      } catch (error) {
+        console.error('[LP] ❌ [WHATSAPP] Erro ao disparar gatilho:', error);
+        console.error('[LP] ❌ [WHATSAPP] Stack trace:', error.stack);
+        // Não falhar a criação do indicador por erro de gatilho
+      }
 
       // 🆕 NOVA FUNCIONALIDADE: Adicionar indicador à lista da campanha se LP estiver vinculada
       console.log('[LP] 🎯 Iniciando processo de vinculação à lista da campanha...');
