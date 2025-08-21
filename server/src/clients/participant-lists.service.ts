@@ -382,14 +382,14 @@ export class ParticipantListsService {
           
           console.log('🔄 [H2] REAL-DUPLICATION - Duplicando participante:', originalParticipant.name);
           
-          // ✅ CORREÇÃO: Usar o serviço correto que gera senhas automaticamente
-          const participantData = {
-            name: originalParticipant.name,
-            email: originalParticipant.email,
-            phone: originalParticipant.phone,
-            company: originalParticipant.company,
-            clientId: originalParticipant.clientId,
-            status: originalParticipant.status || 'ativo',
+                     // ✅ CORREÇÃO: Usar o serviço correto que gera senhas automaticamente
+           const participantData = {
+             name: originalParticipant.name,
+             email: originalParticipant.email,
+             phone: originalParticipant.phone,
+             company: originalParticipant.company,
+             clientId: String(originalParticipant.clientId), // ✅ CONVERTER ObjectId para string
+             status: originalParticipant.status || 'ativo',
             
             // Dados específicos da campanha
             tipo: 'indicador',
