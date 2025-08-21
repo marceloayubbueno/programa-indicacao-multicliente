@@ -392,10 +392,10 @@ export class WhatsAppFlowTriggerService {
               // ✅ CORREÇÃO: Dados reais da empresa
               companyName: clientData?.companyName || 'Viral Lead',           // {{nomedaempresa}}
               
-              // ✅ CORREÇÃO: Link único real do banco de dados
-              uniqueReferralCode: participantDataFromDB?.uniqueReferralCode || 
+              // ✅ CORREÇÃO: Link único real do banco de dados (LINK COMPLETO)
+              uniqueReferralCode: `https://lp.virallead.com.br/indicacao/${participantDataFromDB?.uniqueReferralCode || 
                 triggerData.participantData.uniqueReferralCode || 
-                (triggerData.participantData.id ? `REF${triggerData.participantData.id.slice(-8).toUpperCase()}` : 'REF' + Math.random().toString(36).substr(2, 8).toUpperCase()), // {{linkunico}}
+                (triggerData.participantData.id ? `REF${triggerData.participantData.id.slice(-8).toUpperCase()}` : 'REF' + Math.random().toString(36).substr(2, 8).toUpperCase())}`, // {{linkunico}}
               
               // ✅ CORREÇÃO: Senha real do banco de dados
               plainPassword: participantDataFromDB?.plainPassword || 
@@ -433,8 +433,8 @@ export class WhatsAppFlowTriggerService {
               // ✅ CORREÇÃO: Dados reais da empresa
               companyName: clientData?.companyName || 'Viral Lead',           // {{nomedaempresa}}
               
-              // ✅ CORREÇÃO: Link único real do banco de dados
-              uniqueReferralCode: participantDataFromDB?.uniqueReferralCode || 'Link não disponível', // {{linkunico}}
+              // ✅ CORREÇÃO: Link único real do banco de dados (LINK COMPLETO)
+              uniqueReferralCode: `https://lp.virallead.com.br/indicacao/${participantDataFromDB?.uniqueReferralCode || 'Link não disponível'}`, // {{linkunico}}
               
               // ✅ CORREÇÃO: Senha real do banco de dados
               plainPassword: participantDataFromDB?.plainPassword || 'Senha não disponível',           // {{senhaindicador}}
@@ -532,9 +532,9 @@ export class WhatsAppFlowTriggerService {
               // ✅ CORREÇÃO: Nome da campanha real
               campaignName: campaignData?.name || 'Campanha Viral Lead',        // {{nomeCampanha}}
               
-              // ✅ CORREÇÃO: TAGS AVANÇADAS DO INDICADOR
-              uniqueReferralCode: triggerData.participantData.uniqueReferralCode || 
-                (triggerData.participantData.id ? `REF${triggerData.participantData.id.slice(-8).toUpperCase()}` : 'REF' + Math.random().toString(36).substr(2, 8).toUpperCase()), // {{linkunico}}
+              // ✅ CORREÇÃO: TAGS AVANÇADAS DO INDICADOR (LINK COMPLETO)
+              uniqueReferralCode: `https://lp.virallead.com.br/indicacao/${triggerData.participantData.uniqueReferralCode || 
+                (triggerData.participantData.id ? `REF${triggerData.participantData.id.slice(-8).toUpperCase()}` : 'REF' + Math.random().toString(36).substr(2, 8).toUpperCase())}`, // {{linkunico}}
               plainPassword: triggerData.participantData.plainPassword || 
                 Math.random().toString(36).substr(2, 6).toUpperCase(),           // {{senhaindicador}}
               
