@@ -35,6 +35,8 @@ export interface ReferralData {
   leadEmail: string;
   leadPhone: string;
   indicadorName?: string;
+  indicadorEmail?: string;
+  indicadorPhone?: string;
   campaignName?: string;
   createdAt?: Date;
   [key: string]: any;
@@ -395,10 +397,10 @@ export class WhatsAppFlowTriggerService {
               // ✅ CORREÇÃO: Nome da campanha real
               campaignName: campaignData?.name || triggerData.referralData.campaignName || 'Campanha Viral Lead', // {{nomeCampanha}}
               
-              // 🆕 DADOS DO INDICADOR (quem fez a indicação)
-              name: triggerData.participantData?.name || 'Indicador',      // {{nome}}
-              email: triggerData.participantData?.email || 'Email não disponível', // {{email}}
-              phone: triggerData.participantData?.phone || 'Telefone não disponível', // {{telefone}}
+              // ✅ CORREÇÃO: DADOS DO INDICADOR (quem fez a indicação) - para tag {{nome}}
+              name: triggerData.referralData.indicadorName || 'Indicador',      // {{nome}}
+              email: triggerData.referralData.indicadorEmail || 'Email não disponível', // {{email}}
+              phone: triggerData.referralData.indicadorPhone || 'Telefone não disponível', // {{telefone}}
             };
           } else if (triggerData.referralId) {
 
@@ -623,6 +625,8 @@ export class WhatsAppFlowTriggerService {
           leadEmail: referralData.leadEmail,
           leadPhone: referralData.leadPhone,
           indicadorName: referralData.indicadorName,
+          indicadorEmail: referralData.indicadorEmail,
+          indicadorPhone: referralData.indicadorPhone,
           campaignName: referralData.campaignName,
           createdAt: referralData.createdAt
         },

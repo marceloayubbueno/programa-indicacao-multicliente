@@ -117,13 +117,37 @@ ReferralSchema.post('save', async function(doc) {
       return;
     }
     
-    // Preparar dados do referral
+    // ✅ CORREÇÃO: Buscar dados reais do indicador
+    let indicadorName = 'Indicador';
+    let indicadorEmail = '';
+    let indicadorPhone = '';
+    
+    if (doc.indicatorId) {
+      try {
+        // Buscar dados do indicador no banco
+        const Participant = this.db.models.Participant || this.db.model('Participant');
+        if (Participant) {
+          const indicador = await Participant.findById(doc.indicatorId).select('name email phone').exec();
+          if (indicador) {
+            indicadorName = indicador.name || 'Indicador';
+            indicadorEmail = indicador.email || '';
+            indicadorPhone = indicador.phone || '';
+          }
+        }
+      } catch (error) {
+        console.error('⚠️ [REFERRAL-HOOK] Erro ao buscar dados do indicador:', error.message);
+      }
+    }
+    
+    // Preparar dados do referral com dados reais do indicador
     const referralData = {
       id: doc._id.toString(),
       leadName: doc.leadName,
       leadEmail: doc.leadEmail,
       leadPhone: doc.leadPhone,
-      indicadorName: 'Indicador',
+      indicadorName: indicadorName,
+      indicadorEmail: indicadorEmail,
+      indicadorPhone: indicadorPhone,
       campaignName: 'Campanha',
       createdAt: doc.createdAt
     };
