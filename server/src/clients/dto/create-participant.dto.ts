@@ -44,8 +44,8 @@ export class CreateParticipantDto {
 
   @ValidateIf(o => o.tipo === 'indicador')
   @IsString()
-  @IsNotEmpty()
-  plainPassword: string;
+  @IsOptional()
+  plainPassword?: string;
 
   @IsString()
   @IsOptional()
