@@ -392,7 +392,7 @@ export class ParticipantListsService {
              status: originalParticipant.status || 'ativo',
             
             // Dados específicos da campanha
-            tipo: 'indicador',
+            tipo: 'indicador' as const,
             campaignId: campaignId,
             campaignName: campaignName,
             canIndicate: true,
