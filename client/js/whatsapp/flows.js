@@ -513,6 +513,9 @@ function renderFlows() {
                                     <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <button onclick="triggerManualFlow('${flow.id}')" class="p-2 text-purple-400 hover:bg-purple-900/20 rounded-lg transition-colors" title="Disparar Manualmente">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
                                     <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -629,6 +632,9 @@ function renderFilteredFlows(filteredFlows) {
                                     </button>
                                     <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
                                         <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="triggerManualFlow('${flow.id}')" class="p-2 text-purple-400 hover:bg-purple-900/20 rounded-lg transition-colors" title="Disparar Manualmente">
+                                        <i class="fas fa-paper-plane"></i>
                                     </button>
                                     <button onclick="deleteFlow('${flow.id}')" class="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors" title="Excluir">
                                         <i class="fas fa-trash"></i>
@@ -1176,6 +1182,85 @@ window.toggleFlowStatus = async function(flowId, currentStatus) {
             console.error('Erro ao alternar status do fluxo:', error);
             showError(`Erro ao alternar status do fluxo: ${error.message}`);
         }
+    }
+}
+
+// Função global para disparar fluxo manualmente
+window.triggerManualFlow = async function(flowId) {
+    try {
+        // Buscar o fluxo para validações
+        const flow = flows.find(f => f.id === flowId);
+        if (!flow) {
+            showError('Fluxo não encontrado');
+            return;
+        }
+
+        // Verificar se o fluxo está ativo
+        if (flow.status !== 'active') {
+            showError('Apenas fluxos ativos podem ser disparados manualmente');
+            return;
+        }
+
+        // Verificar se o fluxo tem mensagens
+        if (!flow.messages || flow.messages.length === 0) {
+            showError('Este fluxo não possui mensagens para disparar');
+            return;
+        }
+
+        // Confirmação do usuário
+        const confirmMessage = `Tem certeza que deseja disparar o fluxo "${flow.name}" manualmente?\n\nEste fluxo será enviado para todos os participantes elegíveis.`;
+        if (!confirm(confirmMessage)) {
+            return;
+        }
+
+        // Mostrar indicador de carregamento
+        showSuccess('Disparando fluxo manualmente...');
+
+        const token = getToken();
+        if (!token) {
+            showError('Token de autenticação não encontrado');
+            return;
+        }
+        
+        // CONFIGURAÇÃO DA API (igual às outras funções)
+        const isProduction = window.location.hostname === 'app.virallead.com.br';
+        const apiBaseUrl = isProduction 
+            ? 'https://programa-indicacao-multicliente-production.up.railway.app'
+            : 'http://localhost:3000';
+        
+        const fullUrl = `${apiBaseUrl}/whatsapp/flows/${flowId}/trigger`;
+        console.log('🔍 [DEBUG] Disparando fluxo manualmente em:', fullUrl);
+        console.log('🔍 [DEBUG] Dados do fluxo:', flow);
+        
+        const response = await fetch(fullUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                flowId: flowId,
+                manualTrigger: true,
+                targetAudience: flow.targetAudience,
+                campaignId: flow.campaignId
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ [DEBUG] Fluxo manualmente disparado com sucesso:', result);
+        
+        // Mostrar resultado detalhado
+        const message = `Fluxo "${flow.name}" disparado manualmente com sucesso!\n\nMensagens enviadas: ${result.messagesSent || 'N/A'}\nParticipantes elegíveis: ${result.eligibleParticipants || 'N/A'}`;
+        showSuccess(message);
+        
+    } catch (error) {
+        console.error('❌ [DEBUG] Erro ao disparar fluxo manualmente:', error);
+        showError('Erro ao disparar fluxo manualmente: ' + error.message);
     }
 }
 
