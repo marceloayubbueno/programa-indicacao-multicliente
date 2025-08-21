@@ -6,12 +6,14 @@ import { ParticipantList } from './entities/participant-list.schema';
 import { CreateParticipantListDto } from './dto/create-participant-list.dto';
 import { UpdateParticipantListDto } from './dto/update-participant-list.dto';
 import { Participant } from './entities/participant.schema';
+import { ParticipantsService } from './participants.service';
 
 @Injectable()
 export class ParticipantListsService {
   constructor(
     @InjectModel(ParticipantList.name) private participantListModel: Model<ParticipantList>,
     @InjectModel(Participant.name) private participantModel: Model<Participant>,
+    private readonly participantsService: ParticipantsService,
   ) {}
 
   async create(dto: CreateParticipantListDto) {
@@ -380,9 +382,8 @@ export class ParticipantListsService {
           
           console.log('🔄 [H2] REAL-DUPLICATION - Duplicando participante:', originalParticipant.name);
           
-          // Criar novo participante indicador
-          const newParticipant = new this.participantModel({
-            // Dados copiados do original
+          // ✅ CORREÇÃO: Usar o serviço correto que gera senhas automaticamente
+          const participantData = {
             name: originalParticipant.name,
             email: originalParticipant.email,
             phone: originalParticipant.phone,
@@ -392,13 +393,12 @@ export class ParticipantListsService {
             
             // Dados específicos da campanha
             tipo: 'indicador',
-            campaignId: new Types.ObjectId(campaignId),
+            campaignId: campaignId,
             campaignName: campaignName,
             canIndicate: true,
             
             // Novos identificadores únicos
             participantId: uuidv4(),
-            // uniqueReferralCode será gerado automaticamente pelo hook pre('save')
             
             // Origem e rastreamento
             originSource: 'campaign-duplication',
@@ -418,20 +418,20 @@ export class ParticipantListsService {
             
             // Listas será definida após salvar
             lists: []
+          };
+          
+          console.log('[DEBUG] 💾 Criando participante via serviço...');
+          console.log('[DEBUG] Dados para criação:', {
+            name: participantData.name,
+            email: participantData.email,
+            tipo: participantData.tipo,
+            campaignId: participantData.campaignId,
+            campaignName: participantData.campaignName,
+            originalParticipantId: participantData.originalParticipantId
           });
           
-          console.log('[DEBUG] 💾 Salvando novo participante...');
-          console.log('[DEBUG] Dados antes do save:', {
-            name: newParticipant.name,
-            email: newParticipant.email,
-            tipo: newParticipant.tipo,
-            campaignId: newParticipant.campaignId,
-            campaignName: newParticipant.campaignName,
-            originalParticipantId: newParticipant.originalParticipantId
-          });
-          
-          // Salvar novo participante (hook gerará uniqueReferralCode)
-          const savedParticipant = await newParticipant.save();
+          // ✅ USAR O SERVIÇO CORRETO que gera senhas automaticamente
+          const savedParticipant = await this.participantsService.create(participantData);
           newParticipantIds.push(savedParticipant._id);
           
           console.log('🎉 [H2] REAL-DUPLICATION - ✅ Participante duplicado COM SUCESSO!');
