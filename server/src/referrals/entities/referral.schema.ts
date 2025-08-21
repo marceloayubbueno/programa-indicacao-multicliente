@@ -108,21 +108,14 @@ ReferralSchema.index({ rewardStatus: 1 });
 // === HOOK PARA DISPARAR MENSAGENS WHATSAPP QUANDO LEAD FOR INDICADO ===
 ReferralSchema.post('save', async function(doc) {
   try {
-    // 🔍 LOG SIMPLES: Hook sendo executado
-    console.log('🔍 [REFERRAL-HOOK] Hook executado para:', doc._id);
-    
     if (doc.whatsappProcessed === true) {
-      console.log('⚠️ [REFERRAL-HOOK] Lead já foi processado, pulando...');
       return;
     }
     
     // Verificar se é a primeira execução (não processado ainda)
     if (doc.whatsappProcessed !== false) {
-      console.log('⚠️ [REFERRAL-HOOK] Lead já foi processado ou status indefinido, pulando...');
       return;
     }
-    
-    console.log('✅ [REFERRAL-HOOK] Lead novo detectado, processando...');
     
     // Preparar dados do referral
     const referralData = {
@@ -135,17 +128,6 @@ ReferralSchema.post('save', async function(doc) {
       createdAt: doc.createdAt
     };
     
-    console.log('🔍 [REFERRAL-HOOK] Dados preparados:', referralData);
-    console.log('🔍 [REFERRAL-HOOK] leadPhone:', doc.leadPhone);
-    console.log('🔍 [REFERRAL-HOOK] clientId:', doc.clientId);
-    
-    // 🔍 LOG DE DIAGNÓSTICO: Antes de chamar o serviço de trigger
-    console.log('🔍 [REFERRAL-HOOK] ===== CHAMANDO SERVIÇO DE TRIGGER =====');
-    console.log('🔍 [REFERRAL-HOOK] Referral Data:', JSON.stringify(referralData, null, 2));
-    console.log('🔍 [REFERRAL-HOOK] Client ID:', doc.clientId!.toString());
-    console.log('🔍 [REFERRAL-HOOK] Campaign ID:', doc.campaignId?.toString());
-    console.log('🔍 [REFERRAL-HOOK] ===== FIM DOS DADOS =====');
-    
     // Chamar o serviço de trigger
     const result = await global.whatsAppFlowTriggerService.triggerLeadIndicated(
       referralData,
@@ -153,12 +135,9 @@ ReferralSchema.post('save', async function(doc) {
       doc.campaignId?.toString()
     );
     
-    console.log('🔍 [REFERRAL-HOOK] Resultado:', result);
-    
     if (result.success) {
       try {
         doc.whatsappProcessed = true;
-        console.log('✅ [REFERRAL-HOOK] Lead marcado como processado');
       } catch (updateError) {
         console.error('⚠️ [REFERRAL-HOOK] Erro ao marcar como processado:', updateError.message);
       }

@@ -173,20 +173,6 @@ ParticipantSchema.post('save', async function(doc) {
   try {
     // Só disparar gatilho para participantes do tipo indicador
     if (doc.tipo === 'indicador') {
-      console.log('🚀 [HOOK] Participante tipo indicador criado, disparando gatilho WhatsApp...');
-      console.log('🚀 [HOOK] Dados:', {
-        id: doc._id,
-        name: doc.name,
-        email: doc.email,
-        tipo: doc.tipo,
-        clientId: doc.clientId,
-        campaignId: doc.campaignId
-      });
-
-      // Emitir evento global para ser capturado pelo service
-      // O service será responsável por disparar o gatilho
-      console.log('✅ [HOOK] Evento emitido - gatilho será processado pelo service');
-      
       // Disparar evento global para ser capturado pelo ParticipantHooksService
       if (global.participantHooksService) {
         await global.participantHooksService.handleNewIndicator({
@@ -199,12 +185,7 @@ ParticipantSchema.post('save', async function(doc) {
           campaignId: doc.campaignId,
           createdAt: doc.createdAt
         });
-      } else {
-        console.log('⚠️ [HOOK] ParticipantHooksService não disponível globalmente');
       }
-      
-    } else {
-      console.log('ℹ️ [HOOK] Participante não é indicador, gatilho não disparado:', doc.tipo);
     }
   } catch (error) {
     console.error('❌ [HOOK] Erro no hook:', error);
