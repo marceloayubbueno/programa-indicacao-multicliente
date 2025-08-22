@@ -2806,19 +2806,147 @@
         `);
       }
 
-      // Salvar estrutura (simulação)
-      window.saveGrapesLP = function() {
-        const html = editor.getHtml();
-        const css = editor.getCss();
-        // Salva um wrapper para garantir preview correto
-        const wrappedHtml = `<div class='gjs-lp-wrapper'>${html}</div>`;
-        localStorage.setItem('grapesLPHtml', wrappedHtml);
-        localStorage.setItem('grapesLPCss', css);
-        // Salva data de criação se não existir
-        if (!localStorage.getItem('grapesLPCreatedAt')) {
-          localStorage.setItem('grapesLPCreatedAt', new Date().toLocaleString('pt-BR'));
+      // 🔧 CORREÇÃO: Função única para salvar LP
+      window.saveLP = async function() {
+        try {
+          // Verificar se editor existe
+          if (!window.editor) {
+            alert('Erro: Editor não inicializado. Recarregue a página.');
+            return;
+          }
+          
+          const html = editor.getHtml();
+          const css = editor.getCss();
+          
+          // Buscar nome da LP de forma mais robusta
+          let name = 'LP de Indicadores';
+          const nameInput = document.getElementById('nomeLP') || document.getElementById('lpNameInput');
+          if (nameInput && nameInput.value.trim()) {
+            name = nameInput.value.trim();
+          }
+          
+          // Detectar modo edição
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get('id');
+          const isEdit = !!id;
+          let slug;
+          let status = 'draft';
+          let clientId = localStorage.getItem('clientId');
+          
+          if (isEdit) {
+            // Em edição, manter o slug e status originais
+            slug = window.currentSlug;
+            status = window.currentStatus || 'draft';
+            clientId = window.currentClientId || clientId;
+          } else {
+            // Função para gerar slug
+            function generateSlug(name) {
+              return name
+                .toLowerCase()
+                .normalize('NFD').replace(/\u0300-\u036f/g, '') // Remove acentos corretamente
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)+/g, '');
+            }
+            slug = generateSlug(name);
+          }
+          
+          console.log('[saveLP] isEdit:', isEdit, 'slug:', slug, 'status:', status, 'clientId:', clientId);
+          
+          if (!slug) {
+            alert('Erro ao gerar o slug da LP. Verifique o nome informado.');
+            return;
+          }
+          
+          if (!clientId) {
+            alert('Erro: clientId não encontrado. Faça login novamente.');
+            return;
+          }
+          
+          // Montar payload conforme backend espera
+          const payload = {
+            name,
+            slug,
+            clientId,
+            grapesData: { 
+              components: editor.getComponents().map(c => c.toJSON()), 
+              styles: [], 
+              assets: [] 
+            },
+            compiledOutput: { html, css },
+            metadata: { blocksUsed: [], version: '1.0' },
+            status
+          };
+          
+          if (isEdit) {
+            payload._id = id;
+          }
+          
+          // URL da API usando config.js
+          const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                        (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
+                         'https://programa-indicacao-multicliente-production.up.railway.app');
+          
+          const endpoint = isEdit
+            ? `${apiUrl}/lp-indicadores/${id}`
+            : `${apiUrl}/lp-indicadores`;
+          
+          const method = isEdit ? 'PATCH' : 'POST';
+          const token = localStorage.getItem('clientToken');
+          
+          const response = await fetch(endpoint, {
+            method,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok && result.success) {
+            alert('LP salva com sucesso no sistema!');
+            
+            // Se for uma nova LP, redirecionar para a lista
+            if (!isEdit) {
+              window.location.href = 'external-form.html';
+            }
+          } else {
+            alert('Erro ao salvar LP: ' + (result.message || 'Erro desconhecido'));
+          }
+        } catch (error) {
+          alert('Erro ao salvar LP: ' + error.message);
+          console.error('[saveLP] Erro:', error);
         }
-        alert('LP salva localmente! (Simulação)');
+      };
+
+      // 🔧 CORREÇÃO: Função de backup local para desenvolvimento
+      window.saveGrapesLP = function() {
+        try {
+          if (!window.editor) {
+            alert('Erro: Editor não inicializado.');
+            return;
+          }
+          
+          const html = editor.getHtml();
+          const css = editor.getCss();
+          
+          // Salva um wrapper para garantir preview correto
+          const wrappedHtml = `<div class='gjs-lp-wrapper'>${html}</div>`;
+          localStorage.setItem('grapesLPHtml', wrappedHtml);
+          localStorage.setItem('grapesLPCss', css);
+          
+          // Salva data de criação se não existir
+          if (!localStorage.getItem('grapesLPCreatedAt')) {
+            localStorage.setItem('grapesLPCreatedAt', new Date().toLocaleString('pt-BR'));
+          }
+          
+          alert('LP salva localmente! (Desenvolvimento)');
+          console.log('[saveGrapesLP] Dados salvos no localStorage');
+        } catch (error) {
+          alert('Erro ao salvar localmente: ' + error.message);
+          console.error('[saveGrapesLP] Erro:', error);
+        }
       };
 
       console.log('[GrapesJS Debug] Configuração completa!');
@@ -3184,10 +3312,33 @@
                 
 
                 
-                // Opcional: preencher o editor com os dados da LP
+                // 🔧 CORREÇÃO CONSERVADORA: Melhor carregamento mantendo compatibilidade
                 if (window.editor && lp.compiledOutput) {
                   window.editor.setComponents(lp.compiledOutput.html || '');
                   window.editor.setStyle(lp.compiledOutput.css || '');
+                  console.log('[LP-EDITOR] ✅ Dados do compiledOutput carregados!');
+                } else if (window.editor && lp.grapesData && lp.grapesData.components) {
+                  // Fallback para grapesData se compiledOutput não existir
+                  console.log('[LP-EDITOR] Carregando dados do GrapesJS...');
+                  try {
+                    window.editor.loadProjectData(lp.grapesData);
+                    console.log('[LP-EDITOR] ✅ Dados do GrapesJS carregados!');
+                  } catch (error) {
+                    console.error('[LP-EDITOR] Erro ao carregar grapesData:', error);
+                    // Fallback simples
+                    window.editor.setComponents('<div style="padding: 20px; text-align: center;"><h2>LP Carregada</h2><p>Edite conforme necessário.</p></div>');
+                  }
+                } else if (window.editor) {
+                  // Conteúdo padrão se nenhum dado existir
+                  console.log('[LP-EDITOR] Criando conteúdo padrão...');
+                  window.editor.setComponents(`
+                    <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center;">
+                      <div style="max-width: 800px; margin: 0 auto;">
+                        <h1 style="font-size: 3rem; margin-bottom: 20px; font-weight: bold;">${lp.name || 'LP de Indicadores'}</h1>
+                        <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9;">Use os blocos da barra lateral para personalizar esta LP.</p>
+                      </div>
+                    </section>
+                  `);
                 }
               }
             } else {
