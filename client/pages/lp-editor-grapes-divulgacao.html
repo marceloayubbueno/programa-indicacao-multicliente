@@ -513,6 +513,12 @@
     // Função para salvar LP no backend
     async function saveLP() {
       try {
+        // 🔧 CORREÇÃO: Verificar se editor existe
+        if (!window.editor) {
+          alert('Erro: Editor não inicializado. Recarregue a página.');
+          return;
+        }
+        
         const html = editor.getHtml();
         const css = editor.getCss();
         const grapesData = editor.getProjectData();
@@ -567,11 +573,15 @@
         
         // Detectar se é edição
         const lpId = getUrlParam('id');
-        let url = window.APP_CONFIG.API_URL + '/lp-divulgacao';
+        let url = (window.APP_CONFIG ? window.APP_CONFIG.API_URL + '/api' : 
+                   (window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : 
+                    'https://programa-indicacao-multicliente-production.up.railway.app/api')) + '/lp-divulgacao';
         let method = 'POST';
         if (lpId) {
           // 🔧 CORREÇÃO: URL dinâmica para edição
-          url = window.APP_CONFIG.API_URL + `/lp-divulgacao/${lpId}`;
+          url = (window.APP_CONFIG ? window.APP_CONFIG.API_URL + '/api' : 
+                 (window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : 
+                  'https://programa-indicacao-multicliente-production.up.railway.app/api')) + `/lp-divulgacao/${lpId}`;
           method = 'PUT';
         }
         // Enviar para o backend
@@ -1441,7 +1451,9 @@
       if (lpId) {
         try {
           // 🔧 CORREÇÃO: URL dinâmica para busca de dados
-          const correctApiUrl = window.APP_CONFIG.API_URL + '/lp-divulgacao';
+          const correctApiUrl = (window.APP_CONFIG ? window.APP_CONFIG.API_URL + '/api' : 
+                                (window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : 
+                                 'https://programa-indicacao-multicliente-production.up.railway.app/api')) + '/lp-divulgacao';
           
           const res = await fetch(`${correctApiUrl}/${lpId}`);
           const data = await res.json();
