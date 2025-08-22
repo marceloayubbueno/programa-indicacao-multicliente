@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="../js/config.js"></script>
+  <script src="../js/lp-divulgacao.js"></script>
   <style>
     body { 
       background: #f5f6fa; 
@@ -571,11 +572,11 @@
         
         // Detectar se é edição
         const lpId = getUrlParam('id');
-        let url = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api' + "/lp-divulgacao";
+        let url = window.getApiUrl('/lp-divulgacao');
         let method = 'POST';
         if (lpId) {
           // 🔧 CORREÇÃO: URL dinâmica para edição
-          const correctUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api' + `/lp-divulgacao/${lpId}`;
+          const correctUrl = window.getApiUrl(`/lp-divulgacao/${lpId}`);
           
           url = correctUrl;
           method = 'PUT';
@@ -1466,9 +1467,9 @@
       if (lpId) {
         try {
           // 🔧 CORREÇÃO: URL dinâmica para busca de dados
-          const correctApiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+          const correctApiUrl = window.getApiUrl('/lp-divulgacao');
           
-          const res = await fetch(`${correctApiUrl}/lp-divulgacao/${lpId}`);
+          const res = await fetch(`${correctApiUrl}/${lpId}`);
           const data = await res.json();
           if (data.success && data.data && data.data.name) {
             document.getElementById('lpNameInput').value = data.data.name;
