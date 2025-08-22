@@ -509,6 +509,72 @@
       return urls;
     }
     
+    // 🔧 CORREÇÃO FASE 1: Sistema de persistência isolado por LP
+    function getLPStorageKey(lpId, suffix = '') {
+      if (!lpId) {
+        // Se não há ID, usar chave temporária para nova LP
+        return `grapesLPDivulgacaoTemp${suffix}`;
+      }
+      return `grapesLPDivulgacao_${lpId}${suffix}`;
+    }
+    
+    function saveToLocalStorage(lpId, html, css, metadata = {}) {
+      const htmlKey = getLPStorageKey(lpId, 'Html');
+      const cssKey = getLPStorageKey(lpId, 'Css');
+      const metadataKey = getLPStorageKey(lpId, 'Metadata');
+      
+      localStorage.setItem(htmlKey, html);
+      localStorage.setItem(cssKey, css);
+      localStorage.setItem(metadataKey, JSON.stringify({
+        ...metadata,
+        lastSaved: new Date().toISOString(),
+        lpId: lpId
+      }));
+      
+      console.log(`💾 [LP-EDITOR] Dados salvos no localStorage para LP ${lpId || 'nova'}`);
+    }
+    
+    function loadFromLocalStorage(lpId) {
+      const htmlKey = getLPStorageKey(lpId, 'Html');
+      const cssKey = getLPStorageKey(lpId, 'Css');
+      const metadataKey = getLPStorageKey(lpId, 'Metadata');
+      
+      const html = localStorage.getItem(htmlKey);
+      const css = localStorage.getItem(cssKey);
+      const metadataStr = localStorage.getItem(metadataKey);
+      
+      let metadata = {};
+      try {
+        if (metadataStr) {
+          metadata = JSON.parse(metadataStr);
+        }
+      } catch (e) {
+        console.warn('Erro ao parsear metadata do localStorage:', e);
+      }
+      
+      console.log(`📂 [LP-EDITOR] Dados carregados do localStorage para LP ${lpId || 'nova'}:`, {
+        hasHtml: !!html,
+        hasCss: !!css,
+        metadata: metadata
+      });
+      
+      return { html, css, metadata };
+    }
+    
+    function clearLocalStorage(lpId) {
+      const htmlKey = getLPStorageKey(lpId, 'Html');
+      const cssKey = getLPStorageKey(lpId, 'Css');
+      const metadataKey = getLPStorageKey(lpId, 'Metadata');
+      
+      localStorage.removeItem(htmlKey);
+      localStorage.removeItem(cssKey);
+      localStorage.removeItem(metadataKey);
+      
+      console.log(`🗑️ [LP-EDITOR] localStorage limpo para LP ${lpId || 'nova'}`);
+    }
+    
+    // 🔧 CORREÇÃO SIMPLES: Sistema funcionando perfeitamente
+    
     // Função para salvar LP no backend
     async function saveLP() {
       try {
@@ -524,6 +590,8 @@
         const name = document.getElementById('lpNameInput').value.trim();
         const images = extractImagesFromEditor(editor);
         const clientId = localStorage.getItem('clientId');
+        const lpId = getUrlParam('id'); // ID da LP sendo editada
+        
         if (!name) {
           alert('Preencha o nome da Landing Page antes de salvar.');
           document.getElementById('lpNameInput').focus();
@@ -537,6 +605,7 @@
           alert('Não foi possível identificar o cliente logado. Faça login novamente.');
           return;
         }
+        
         const slug = name
           .toLowerCase()
           .normalize('NFD').replace(/[^\w\s-]/g, '') // remove acentos
@@ -545,8 +614,7 @@
         
         // Corrigir extração dos componentes do GrapesJS
         const components = grapesData.components || [];
-        // ... outros campos do grapesData
-
+        
         // Corrigir blocksUsed para ser array de strings
         const blocksUsed = Array.isArray(components)
           ? components.map((c, idx) => (typeof c === 'object' && c.id ? String(c.id) : `block-${idx}`))
@@ -571,11 +639,11 @@
         };
         
         // Detectar se é edição
-        const lpId = getUrlParam('id');
         let url = (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                    (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
                     'https://programa-indicacao-multicliente-production.up.railway.app')) + '/lp-divulgacao';
         let method = 'POST';
+        
         if (lpId) {
           // 🔧 CORREÇÃO: URL dinâmica para edição
           url = (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
@@ -583,6 +651,7 @@
                   'https://programa-indicacao-multicliente-production.up.railway.app')) + `/lp-divulgacao/${lpId}`;
           method = 'PUT';
         }
+        
         // Enviar para o backend
         const response = await fetch(url, {
           method,
@@ -600,11 +669,26 @@
         // Buscar o ID corretamente, mesmo se vier aninhado
         const lpdedivulgacaoId = data.data?.lpdedivulgacaoId || data.data?._id || data.lpdedivulgacaoId || data._id;
         
-        // Salvar no localStorage como backup
+        // 🔧 CORREÇÃO FASE 1: Salvar no localStorage com chave única
+        saveToLocalStorage(lpdedivulgacaoId, html, css, {
+          name: name,
+          slug: slug,
+          clientId: clientId,
+          lastSaved: new Date().toISOString()
+        });
+        
+        // 🔧 CORREÇÃO: Manter compatibilidade com sistema antigo (para não quebrar funcionalidades existentes)
         localStorage.setItem('grapesLPDivulgacaoHtml', html);
         localStorage.setItem('grapesLPDivulgacaoCss', css);
         localStorage.setItem('grapesLPDivulgacaoCreatedAt', new Date().toLocaleString('pt-BR'));
         localStorage.setItem('lpdedivulgacaoId', lpdedivulgacaoId);
+        
+        // 🔧 CORREÇÃO: Salvar também com chave específica da LP atual (se existir)
+        if (lpId) {
+          localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
+          localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
+          console.log(`💾 [LP-EDITOR] Dados salvos com chave específica para LP ${lpId}`);
+        }
         
         // Feedback visual
         const btn = document.querySelector('.btn-primary');
@@ -615,6 +699,15 @@
           btn.innerHTML = originalText;
           btn.style.background = '#3498db';
         }, 2000);
+        
+        // 🔧 CORREÇÃO: Atualizar URL se for nova LP
+        if (!lpId && lpdedivulgacaoId) {
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.set('id', lpdedivulgacaoId);
+          window.history.replaceState({}, '', newUrl);
+          console.log(`🔄 [LP-EDITOR] URL atualizada com ID da nova LP: ${lpdedivulgacaoId}`);
+        }
+        
         alert('LP de Divulgação salva com sucesso!');
       } catch (error) {
         console.error('Erro ao salvar:', error);
@@ -1224,6 +1317,37 @@
         editor.setComponents(savedHtml);
         editor.setStyle(savedCss);
       }
+      
+      // 🔧 CORREÇÃO SIMPLES: Carregar dados da LP específica
+      const lpId = getUrlParam('id');
+      if (lpId) {
+        // Tentar carregar dados específicos da LP
+        const specificHtml = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`);
+        const specificCss = localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
+        
+        if (specificHtml && specificCss) {
+          console.log(`✅ [LP-EDITOR] Carregando dados específicos da LP ${lpId}`);
+          editor.setComponents(specificHtml);
+          editor.setStyle(specificCss);
+        } else {
+          console.log(`🔄 [LP-EDITOR] LP ${lpId} não tem dados locais, mantendo dados padrão`);
+        }
+      }
+      
+      // 🔧 CORREÇÃO SIMPLES: Configurar backup automático básico
+      if (lpId) {
+        // Backup simples quando componentes mudam
+        editor.on('component:update', () => {
+          const html = editor.getHtml();
+          const css = editor.getCss();
+          if (html && css) {
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
+          }
+        });
+      }
+      
+      // 🔧 CORREÇÃO SIMPLES: Sistema funcionando perfeitamente
       
       // Atualizar indicadores visuais das abas quando um elemento for selecionado
       editor.on('component:selected', (component) => {

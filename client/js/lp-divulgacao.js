@@ -1,5 +1,11 @@
 // MVP: Listagem de LPs de Divulgação salvas pelo GrapesJS (apenas 1 por enquanto)
 
+// 🔧 CORREÇÃO: Função para obter parâmetros da URL
+function getUrlParam(name) {
+  const url = new URL(window.location.href);
+  return url.searchParams.get(name);
+}
+
 // 🔧 CORREÇÃO: Função para obter API_URL de forma segura (similar ao rewards.js)
 function getApiUrl() {
     return window.API_URL ||
@@ -211,12 +217,32 @@ function renderLPList() {
 }
 
 window.viewLPDivulgacao = function() {
-  const html = localStorage.getItem('grapesLPDivulgacaoHtml');
-  const css = localStorage.getItem('grapesLPDivulgacaoCss');
+  // 🔧 CORREÇÃO FASE 1: Usar sistema de persistência isolado
+  const lpId = localStorage.getItem('lpdedivulgacaoId');
+  
+  if (!lpId) {
+    alert('Nenhuma LP selecionada para visualizar. Salve uma LP no editor primeiro.');
+    return;
+  }
+  
+  // Tentar carregar do localStorage isolado primeiro
+  const htmlKey = `grapesLPDivulgacao_${lpId}Html`;
+  const cssKey = `grapesLPDivulgacao_${lpId}Css`;
+  
+  let html = localStorage.getItem(htmlKey);
+  let css = localStorage.getItem(cssKey);
+  
+  // Fallback para sistema antigo se necessário
+  if (!html || !css) {
+    html = localStorage.getItem('grapesLPDivulgacaoHtml');
+    css = localStorage.getItem('grapesLPDivulgacaoCss');
+  }
+  
   if (!html || html.trim() === '') {
     alert('Nenhum conteúdo salvo na LP. Crie e salve uma LP no editor antes de visualizar.');
     return;
   }
+  
   const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html><html><head><title>Preview LP de Divulgação</title>
     <link rel='stylesheet' href='https://unpkg.com/grapesjs/dist/css/grapes.min.css'>
@@ -225,7 +251,7 @@ window.viewLPDivulgacao = function() {
 };
 
 window.editLPDivulgacao = function(id) {
-  // Redireciona para o editor com o id da LP
+  // 🔧 CORREÇÃO: Redirecionar para o editor com o id da LP e modo de edição
   window.location.href = `lp-editor-grapes-divulgacao.html?id=${id}&edit=true`;
 };
 
@@ -259,9 +285,27 @@ window.deleteLPDivulgacao = function(id) {
   }
 };
 
-window.showEmbedCodeDivulgacao = function() {
-  const html = localStorage.getItem('grapesLPDivulgacaoHtml');
-  if (!html) return;
+window.showEmbedCodeDivulgacao = function(lpId) {
+  // 🔧 CORREÇÃO FASE 1: Usar sistema de persistência isolado
+  if (!lpId) {
+    alert('ID da LP não fornecido.');
+    return;
+  }
+  
+  // Tentar carregar do localStorage isolado primeiro
+  const htmlKey = `grapesLPDivulgacao_${lpId}Html`;
+  let html = localStorage.getItem(htmlKey);
+  
+  // Fallback para sistema antigo se necessário
+  if (!html) {
+    html = localStorage.getItem('grapesLPDivulgacaoHtml');
+  }
+  
+  if (!html) {
+    alert('Conteúdo da LP não encontrado. Salve a LP no editor primeiro.');
+    return;
+  }
+  
   const code = `<iframe srcdoc='${html.replace(/'/g, "&apos;")}' width="100%" height="600" frameborder="0"></iframe>`;
   document.getElementById('embedCodeViewDivulgacao').value = code;
   document.getElementById('embedCodeModalDivulgacao').style.display = 'block';
@@ -274,7 +318,7 @@ window.closeEmbedCodeModalDivulgacao = function() {
 window.copyEmbedCodeViewDivulgacao = function() {
   const textarea = document.getElementById('embedCodeViewDivulgacao');
   textarea.select();
-    document.execCommand('copy');
+  document.execCommand('copy');
   alert('Código copiado!');
 };
 
