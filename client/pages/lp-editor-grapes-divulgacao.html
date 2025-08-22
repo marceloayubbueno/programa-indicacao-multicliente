@@ -576,13 +576,14 @@
         let method = 'POST';
         if (lpId) {
           // 🔧 CORREÇÃO: URL dinâmica para edição
-          const correctUrl = window.APP_CONFIG.API_URL + `/lp-divulgacao/${lpId}`;
-          
-          url = correctUrl;
+          url = window.APP_CONFIG.API_URL + `/lp-divulgacao/${lpId}`;
           method = 'PUT';
         }
         // Enviar para o backend
         console.log('[DEBUG] URL que será usada no fetch:', url);
+        console.log('[DEBUG] Método HTTP:', method);
+        console.log('[DEBUG] lpId:', lpId);
+        console.log('[DEBUG] window.APP_CONFIG.API_URL:', window.APP_CONFIG.API_URL);
         const response = await fetch(url, {
           method,
           headers: {
