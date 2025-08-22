@@ -1584,7 +1584,7 @@
         }
       });
       
-      // 🔧 CORREÇÃO: Carregamento de dados da API integrado no script principal
+      // 🔧 CORREÇÃO CRÍTICA: Carregamento de dados da API integrado no script principal
       document.addEventListener('DOMContentLoaded', async function() {
         if (lpId) {
           try {
@@ -1606,14 +1606,51 @@
             const data = await res.json();
             console.log(`📊 [LP-EDITOR] Dados da API recebidos:`, data);
             
-            if (data.success && data.data && data.data.name) {
-              document.getElementById('lpNameInput').value = data.data.name;
-              console.log(`✅ [LP-EDITOR] Nome da LP carregado: ${data.data.name}`);
+            if (data.success && data.data) {
+              const lpData = data.data;
+              
+              // ✅ CARREGAR NOME
+              if (lpData.name) {
+                document.getElementById('lpNameInput').value = lpData.name;
+                console.log(`✅ [LP-EDITOR] Nome da LP carregado: ${lpData.name}`);
+              }
+              
+              // ✅ CARREGAR DADOS DO GRAPES (HTML/CSS) DO BANCO
+              if (lpData.grapesData) {
+                console.log(`📊 [LP-EDITOR] Dados do GrapesJS encontrados no banco, carregando...`);
+                
+                // Aguardar o editor estar pronto
+                setTimeout(() => {
+                  if (window.editor) {
+                    try {
+                      // Carregar dados do GrapesJS do banco
+                      editor.loadProjectData(lpData.grapesData);
+                      console.log(`✅ [LP-EDITOR] Dados do GrapesJS carregados do banco com sucesso!`);
+                      
+                      // Salvar uma cópia local para backup
+                      const html = editor.getHtml();
+                      const css = editor.getCss();
+                      if (html && css) {
+                        localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
+                        localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
+                        console.log(`💾 [LP-EDITOR] Backup local criado para LP ${lpId}`);
+                      }
+                    } catch (error) {
+                      console.error(`❌ [LP-EDITOR] Erro ao carregar dados do GrapesJS:`, error);
+                      // Fallback para localStorage
+                      console.log(`🔄 [LP-EDITOR] Usando fallback do localStorage...`);
+                    }
+                  }
+                }, 1000);
+              } else {
+                console.log(`📝 [LP-EDITOR] Nenhum dado do GrapesJS no banco, usando localStorage...`);
+              }
             } else {
               console.warn(`⚠️ [LP-EDITOR] Dados da LP não encontrados ou inválidos:`, data);
             }
           } catch (err) {
             console.error(`❌ [LP-EDITOR] Erro ao buscar dados da LP ${lpId}:`, err);
+            console.log(`🔄 [LP-EDITOR] Erro na API, usando dados locais como fallback...`);
           }
         } else {
           console.log(`🆕 [LP-EDITOR] Nova LP detectada (sem ID)`);

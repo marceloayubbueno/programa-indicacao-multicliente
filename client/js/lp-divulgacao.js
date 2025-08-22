@@ -129,6 +129,8 @@ function renderLPDivulgacaoList() {
 // 🆕 FUNÇÃO RENDERIZAR LISTA (que estava faltando)
 function renderLPList() {
   console.log(`🎨 [LP-DIV] Renderizando ${lpDivulgacaoList.length} LPs na tabela`);
+  console.log(`🔍 [LP-DIV] Dados completos das LPs:`, JSON.stringify(lpDivulgacaoList, null, 2));
+  
   const tbody = document.getElementById('formsListBodyDivulgacao');
   
   if (!lpDivulgacaoList || lpDivulgacaoList.length === 0) {
@@ -139,6 +141,7 @@ function renderLPList() {
   
   tbody.innerHTML = lpDivulgacaoList.map((lp, index) => {
     console.log(`🔍 [LP-DIV] LP ${index}:`, lp);
+    console.log(`🔍 [LP-DIV] LP ${index} - ID: ${lp._id || lp.id}, Nome: ${lp.name || lp.title}`);
     
     // Status toggle button - CORRIGIDO para usar status backend correto
     const statusToggle = `
@@ -251,8 +254,15 @@ window.viewLPDivulgacao = function() {
 };
 
 window.editLPDivulgacao = function(id) {
+  console.log(`🔧 [LP-DIV] EDITANDO LP - ID recebido: ${id}`);
+  console.log(`🔧 [LP-DIV] Tipo do ID: ${typeof id}`);
+  console.log(`🔧 [LP-DIV] ID é válido: ${id && id !== 'undefined' && id !== 'null'}`);
+  
   // 🔧 CORREÇÃO: Redirecionar para o editor com o id da LP e modo de edição
-  window.location.href = `lp-editor-grapes-divulgacao.html?id=${id}&edit=true`;
+  const editorUrl = `lp-editor-grapes-divulgacao.html?id=${id}&edit=true`;
+  console.log(`🔧 [LP-DIV] URL do editor: ${editorUrl}`);
+  
+  window.location.href = editorUrl;
 };
 
 window.deleteLPDivulgacao = function(id) {
