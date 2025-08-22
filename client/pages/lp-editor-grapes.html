@@ -3167,9 +3167,9 @@
         if (token) {
           try {
             // 🔧 CORREÇÃO: URL da API usando config.js
-            const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL + '/api' : 
-                          (window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : 
-                           'https://programa-indicacao-multicliente-production.up.railway.app/api');
+            const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                          (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
+                           'https://programa-indicacao-multicliente-production.up.railway.app');
             const response = await fetch(`${apiUrl}/lp-indicadores/${id}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -3264,9 +3264,9 @@
           payload._id = id;
         }
         // 🔧 CORREÇÃO: URL da API usando config.js
-        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL + '/api' : 
-                      (window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app');
         const endpoint = isEdit
           ? `${apiUrl}/lp-indicadores/${id}`
           : `${apiUrl}/lp-indicadores`;
