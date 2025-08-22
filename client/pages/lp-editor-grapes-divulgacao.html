@@ -1617,12 +1617,14 @@
               
               // ✅ CARREGAR DADOS DO GRAPES (HTML/CSS) DO BANCO
               if (lpData.grapesData) {
-                console.log(`📊 [LP-EDITOR] Dados do GrapesJS encontrados no banco, carregando...`);
+                console.log(`📊 [LP-EDITOR] Dados do GrapesJS encontrados no banco, aguardando editor...`);
                 
-                // Aguardar o editor estar pronto
-                setTimeout(() => {
-                  if (window.editor) {
+                // 🔧 CORREÇÃO: Aguardar o editor estar completamente pronto
+                const waitForEditor = () => {
+                  if (window.editor && window.editor.isReady) {
                     try {
+                      console.log(`🎯 [LP-EDITOR] Editor pronto, carregando dados do banco...`);
+                      
                       // Carregar dados do GrapesJS do banco
                       editor.loadProjectData(lpData.grapesData);
                       console.log(`✅ [LP-EDITOR] Dados do GrapesJS carregados do banco com sucesso!`);
@@ -1640,8 +1642,14 @@
                       // Fallback para localStorage
                       console.log(`🔄 [LP-EDITOR] Usando fallback do localStorage...`);
                     }
+                  } else {
+                    console.log(`⏳ [LP-EDITOR] Editor ainda não está pronto, aguardando...`);
+                    setTimeout(waitForEditor, 500);
                   }
-                }, 1000);
+                };
+                
+                // Iniciar verificação
+                waitForEditor();
               } else {
                 console.log(`📝 [LP-EDITOR] Nenhum dado do GrapesJS no banco, usando localStorage...`);
               }
