@@ -178,8 +178,17 @@
                 </div>
                 
                 <form id="flow-form" class="p-6 space-y-6">
-                    <!-- NOVO: Seleção de Campanha -->
+                    <!-- 🆕 NOVO: Seleção de Escopo -->
                     <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Escopo do Fluxo *</label>
+                        <select id="flow-scope" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="toggleCampaignField()">
+                            <option value="campaign">Campanha Específica</option>
+                            <option value="global">Todas as Campanhas (Global)</option>
+                        </select>
+                    </div>
+
+                    <!-- NOVO: Seleção de Campanha -->
+                    <div id="campaign-field">
                         <label class="block text-sm font-medium text-gray-400 mb-2">Campanha *</label>
                         <select id="flow-campaign" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateAudienceOptions()">
                             <option value="">Selecione uma campanha</option>

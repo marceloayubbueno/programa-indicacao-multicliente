@@ -26,6 +26,21 @@ export class WhatsAppFlowService {
         throw new BadRequestException('Pelo menos um gatilho deve ser configurado');
       }
 
+      // 🆕 NOVO: Validar campo scope
+      if (!createFlowDto.scope || !['global', 'campaign'].includes(createFlowDto.scope)) {
+        throw new BadRequestException('Escopo deve ser "global" ou "campaign"');
+      }
+
+      // 🆕 NOVO: Validar campaignId quando scope for 'campaign'
+      if (createFlowDto.scope === 'campaign' && !createFlowDto.campaignId) {
+        throw new BadRequestException('Campanha é obrigatória para fluxos de campanha específica');
+      }
+
+      // 🆕 NOVO: Limpar campaignId quando scope for 'global'
+      if (createFlowDto.scope === 'global') {
+        createFlowDto.campaignId = undefined;
+      }
+
       // Validar mensagens
       if (!Array.isArray(createFlowDto.messages) || createFlowDto.messages.length === 0) {
         throw new BadRequestException('Pelo menos uma mensagem deve ser configurada');
@@ -43,6 +58,8 @@ export class WhatsAppFlowService {
       console.log('🔍 [DEBUG] Dados recebidos para criar fluxo:', {
         name: createFlowDto.name,
         targetAudience: createFlowDto.targetAudience,
+        scope: createFlowDto.scope,
+        campaignId: createFlowDto.campaignId,
         triggers: createFlowDto.triggers,
         messagesCount: createFlowDto.messages.length
       });
@@ -60,7 +77,7 @@ export class WhatsAppFlowService {
       });
 
       // 🆕 NOVO: Log para debug
-      console.log('🔍 [DEBUG] Fluxo criado com triggers:', flow.triggers);
+      console.log('🔍 [DEBUG] Fluxo criado com scope:', flow.scope, 'e campaignId:', flow.campaignId);
 
       return await flow.save();
     } catch (error) {

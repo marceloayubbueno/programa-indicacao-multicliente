@@ -476,6 +476,7 @@ function renderFlows() {
                 <thead class="bg-gray-750 border-b border-gray-700">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fluxo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Escopo</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Público-Alvo</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mensagens</th>
@@ -488,6 +489,11 @@ function renderFlows() {
                         <tr class="hover:bg-gray-750 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="text-sm font-medium text-gray-100">${flow.name}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium ${getScopeColor(flow.scope)}">
+                                    ${getScopeText(flow.scope)}
+                                </span>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
@@ -507,7 +513,7 @@ function renderFlows() {
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">
-                                    <button onclick="toggleFlowStatus('${flow.id}', '${flow.status}')" class="p-2 ${flow.status === 'active' ? 'text-green-400 hover:bg-green-900/20' : 'text-yellow-400 hover:bg-yellow-900/20'} rounded-lg transition-colors" title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
+                                    <button onclick="toggleFlowStatus('${flow.id}', '${flow.status}')" class="p-2 ${flow.status === 'active' ? 'text-green-400 hover:bg-green-900/20' : 'text-yellow-400 hover:bg-green-900/20'} rounded-lg transition-colors" title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
                                         <i class="fas ${flow.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
                                     </button>
                                     <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
@@ -554,6 +560,24 @@ function getStatusText(status) {
     }
 }
 
+// 🆕 NOVO: Função para obter cor do escopo
+function getScopeColor(scope) {
+    switch(scope) {
+        case 'global': return 'bg-purple-900 text-purple-300';
+        case 'campaign': return 'bg-blue-900 text-blue-300';
+        default: return 'bg-gray-700 text-gray-300';
+    }
+}
+
+// 🆕 NOVO: Função para obter texto do escopo
+function getScopeText(scope) {
+    switch(scope) {
+        case 'global': return 'Global';
+        case 'campaign': return 'Campanha';
+        default: return scope || 'N/A';
+    }
+}
+
 function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString('pt-BR');
 }
@@ -596,6 +620,7 @@ function renderFilteredFlows(filteredFlows) {
                 <thead class="bg-gray-750 border-b border-gray-700">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fluxo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Escopo</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Público-Alvo</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mensagens</th>
@@ -608,6 +633,11 @@ function renderFilteredFlows(filteredFlows) {
                         <tr class="hover:bg-gray-750 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="text-sm font-medium text-gray-100">${flow.name}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium ${getScopeColor(flow.scope)}">
+                                    ${getScopeText(flow.scope)}
+                                </span>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs font-medium bg-blue-900 text-blue-300 rounded-full">
@@ -627,7 +657,7 @@ function renderFilteredFlows(filteredFlows) {
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">
-                                    <button onclick="toggleFlowStatus('${flow.id}', '${flow.status}')" class="p-2 ${flow.status === 'active' ? 'text-green-400 hover:bg-green-900/20' : 'text-yellow-400 hover:bg-yellow-900/20'} rounded-lg transition-colors" title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
+                                    <button onclick="toggleFlowStatus('${flow.id}', '${flow.status}')" class="p-2 ${flow.status === 'active' ? 'text-green-400 hover:bg-green-900/20' : 'text-yellow-400 hover:bg-green-900/20'} rounded-lg transition-colors" title="${flow.status === 'active' ? 'Desativar' : 'Ativar'}">
                                         <i class="fas ${flow.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
                                     </button>
                                     <button onclick="editFlow('${flow.id}')" class="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar">
@@ -673,6 +703,42 @@ window.openCreateFlowModal = function() {
     resetForm();
 }
 
+// Função global para alternar campo de campanha baseado no escopo
+window.toggleCampaignField = function() {
+    const scope = document.getElementById('flow-scope').value;
+    const campaignField = document.getElementById('campaign-field');
+    const campaignSelect = document.getElementById('flow-campaign');
+    const audienceSelect = document.getElementById('flow-audience');
+    
+    if (scope === 'global') {
+        // Escopo global: ocultar campo de campanha e habilitar público-alvo
+        campaignField.classList.add('hidden');
+        campaignSelect.removeAttribute('required');
+        campaignSelect.value = '';
+        
+        // Habilitar público-alvo para fluxos globais
+        audienceSelect.disabled = false;
+        audienceSelect.innerHTML = `
+            <option value="">Selecione o público-alvo</option>
+            <option value="indicators">Indicadores (Todas as Campanhas)</option>
+            <option value="leads">Leads (Todas as Campanhas)</option>
+            <option value="mixed">Indicadores e Leads (Todas as Campanhas)</option>
+        `;
+        
+        console.log('✅ Campo de campanha ocultado - fluxo global configurado');
+    } else {
+        // Escopo de campanha: mostrar campo de campanha
+        campaignField.classList.remove('hidden');
+        campaignSelect.setAttribute('required', 'required');
+        
+        // Desabilitar público-alvo até campanha ser selecionada
+        audienceSelect.disabled = true;
+        audienceSelect.innerHTML = '<option value="">Primeiro selecione uma campanha</option>';
+        
+        console.log('✅ Campo de campanha exibido - fluxo de campanha específica');
+    }
+}
+
 // Função global para fechar modal
 window.closeFlowModal = function() {
     document.getElementById('flow-modal').classList.add('hidden');
@@ -683,6 +749,10 @@ window.closeFlowModal = function() {
 function resetForm() {
     document.getElementById('flow-form').reset();
     
+    // Resetar campo de escopo
+    const scopeSelect = document.getElementById('flow-scope');
+    if (scopeSelect) scopeSelect.value = 'campaign';
+    
     // Resetar campo de campanha e público-alvo
     const campaignSelect = document.getElementById('flow-campaign');
     const audienceSelect = document.getElementById('flow-audience');
@@ -692,6 +762,10 @@ function resetForm() {
         audienceSelect.disabled = true;
         audienceSelect.innerHTML = '<option value="">Primeiro selecione uma campanha</option>';
     }
+    
+    // Mostrar campo de campanha por padrão
+    const campaignField = document.getElementById('campaign-field');
+    if (campaignField) campaignField.classList.remove('hidden');
     
     const container = document.getElementById('messages-container');
     if (container) {
@@ -904,6 +978,20 @@ window.editFlow = function(flowId) {
     // Preencher formulário
     console.log('🔍 [DEBUG] Preenchendo formulário...');
     
+    // 🆕 NOVO: Campo de escopo
+    const scopeField = document.getElementById('flow-scope');
+    if (scopeField) {
+        // Determinar escopo baseado na presença de campaignId
+        const scope = flow.campaignId ? 'campaign' : 'global';
+        scopeField.value = scope;
+        console.log('✅ [DEBUG] Campo de escopo preenchido:', scope);
+        
+        // Aplicar lógica de exibição do campo de campanha
+        toggleCampaignField();
+    } else {
+        console.error('❌ [DEBUG] Campo de escopo não encontrado');
+    }
+    
     // Campo de campanha
     const campaignField = document.getElementById('flow-campaign');
     if (campaignField && flow.campaignId) {
@@ -979,10 +1067,24 @@ window.saveFlow = async function() {
     try {
         const formData = {
             name: document.getElementById('flow-name').value,
+            scope: document.getElementById('flow-scope').value,
+            campaignId: document.getElementById('flow-scope').value === 'campaign' ? document.getElementById('flow-campaign').value : undefined,
             targetAudience: document.getElementById('flow-audience').value,
             description: document.getElementById('flow-description').value,
             messages: []
         };
+        
+        // 🆕 NOVO: Validar escopo
+        if (!formData.scope) {
+            showError('Selecione o escopo do fluxo');
+            return;
+        }
+
+        // 🆕 NOVO: Validar campanha quando escopo for 'campaign'
+        if (formData.scope === 'campaign' && !formData.campaignId) {
+            showError('Selecione uma campanha para fluxos de campanha específica');
+            return;
+        }
         
         if (!formData.name || !formData.targetAudience) {
             showError('Preencha todos os campos obrigatórios (Nome e Público-Alvo)');

@@ -14,6 +14,14 @@ export class WhatsAppFlow {
   @Prop({ required: true, enum: ['indicators', 'leads', 'mixed'] })
   targetAudience: string;
 
+  // 🆕 NOVO: Campo de escopo (global ou campanha específica)
+  @Prop({ type: String, enum: ['global', 'campaign'], default: 'campaign' })
+  scope: string;
+
+  // 🆕 NOVO: Campo de campanha (opcional para fluxos globais)
+  @Prop({ type: Types.ObjectId, ref: 'Campaign', required: false })
+  campaignId?: Types.ObjectId;
+
   @Prop({ type: Object })
   filters: {
     // Para indicadores
