@@ -496,6 +496,12 @@
 
   <script src="https://unpkg.com/grapesjs@0.20.4/dist/grapes.min.js"></script>
   <script>
+    // 🔧 CORREÇÃO: Função utilitária movida para o início para evitar erro de referência
+    function getUrlParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+    
     // Função para extrair imagens do editor
     function extractImagesFromEditor(editor) {
       const html = editor.getHtml();
@@ -509,71 +515,7 @@
       return urls;
     }
     
-    // 🔧 CORREÇÃO FASE 1: Sistema de persistência isolado por LP
-    function getLPStorageKey(lpId, suffix = '') {
-      if (!lpId) {
-        // Se não há ID, usar chave temporária para nova LP
-        return `grapesLPDivulgacaoTemp${suffix}`;
-      }
-      return `grapesLPDivulgacao_${lpId}${suffix}`;
-    }
-    
-    function saveToLocalStorage(lpId, html, css, metadata = {}) {
-      const htmlKey = getLPStorageKey(lpId, 'Html');
-      const cssKey = getLPStorageKey(lpId, 'Css');
-      const metadataKey = getLPStorageKey(lpId, 'Metadata');
-      
-      localStorage.setItem(htmlKey, html);
-      localStorage.setItem(cssKey, css);
-      localStorage.setItem(metadataKey, JSON.stringify({
-        ...metadata,
-        lastSaved: new Date().toISOString(),
-        lpId: lpId
-      }));
-      
-      console.log(`💾 [LP-EDITOR] Dados salvos no localStorage para LP ${lpId || 'nova'}`);
-    }
-    
-    function loadFromLocalStorage(lpId) {
-      const htmlKey = getLPStorageKey(lpId, 'Html');
-      const cssKey = getLPStorageKey(lpId, 'Css');
-      const metadataKey = getLPStorageKey(lpId, 'Metadata');
-      
-      const html = localStorage.getItem(htmlKey);
-      const css = localStorage.getItem(cssKey);
-      const metadataStr = localStorage.getItem(metadataKey);
-      
-      let metadata = {};
-      try {
-        if (metadataStr) {
-          metadata = JSON.parse(metadataStr);
-        }
-      } catch (e) {
-        console.warn('Erro ao parsear metadata do localStorage:', e);
-      }
-      
-      console.log(`📂 [LP-EDITOR] Dados carregados do localStorage para LP ${lpId || 'nova'}:`, {
-        hasHtml: !!html,
-        hasCss: !!css,
-        metadata: metadata
-      });
-      
-      return { html, css, metadata };
-    }
-    
-    function clearLocalStorage(lpId) {
-      const htmlKey = getLPStorageKey(lpId, 'Html');
-      const cssKey = getLPStorageKey(lpId, 'Css');
-      const metadataKey = getLPStorageKey(lpId, 'Metadata');
-      
-      localStorage.removeItem(htmlKey);
-      localStorage.removeItem(cssKey);
-      localStorage.removeItem(metadataKey);
-      
-      console.log(`🗑️ [LP-EDITOR] localStorage limpo para LP ${lpId || 'nova'}`);
-    }
-    
-    // 🔧 CORREÇÃO SIMPLES: Sistema funcionando perfeitamente
+    // 🔧 CORREÇÃO: Sistema de persistência simplificado e otimizado
     
     // Função para salvar LP no backend
     async function saveLP() {
@@ -669,26 +611,50 @@
         // Buscar o ID corretamente, mesmo se vier aninhado
         const lpdedivulgacaoId = data.data?.lpdedivulgacaoId || data.data?._id || data.lpdedivulgacaoId || data._id;
         
-        // 🔧 CORREÇÃO FASE 1: Salvar no localStorage com chave única
-        saveToLocalStorage(lpdedivulgacaoId, html, css, {
-          name: name,
-          slug: slug,
-          clientId: clientId,
-          lastSaved: new Date().toISOString()
-        });
-        
-        // 🔧 CORREÇÃO: Manter compatibilidade com sistema antigo (para não quebrar funcionalidades existentes)
-        localStorage.setItem('grapesLPDivulgacaoHtml', html);
-        localStorage.setItem('grapesLPDivulgacaoCss', css);
-        localStorage.setItem('grapesLPDivulgacaoCreatedAt', new Date().toLocaleString('pt-BR'));
-        localStorage.setItem('lpdedivulgacaoId', lpdedivulgacaoId);
-        
-        // 🔧 CORREÇÃO: Salvar também com chave específica da LP atual (se existir)
-        if (lpId) {
-          localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
-          localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
-          console.log(`💾 [LP-EDITOR] Dados salvos com chave específica para LP ${lpId}`);
+        // 🔧 CORREÇÃO CRÍTICA: Sistema de persistência simplificado e isolado por LP
+        if (lpdedivulgacaoId) {
+          console.log(`💾 [LP-EDITOR] Salvando dados para LP ${lpdedivulgacaoId}...`);
+          
+          // ✅ Salvar APENAS no sistema específico da LP
+          localStorage.setItem(`grapesLPDivulgacao_${lpdedivulgacaoId}Html`, html);
+          localStorage.setItem(`grapesLPDivulgacao_${lpdedivulgacaoId}Css`, css);
+          localStorage.setItem(`grapesLPDivulgacao_${lpdedivulgacaoId}Metadata`, JSON.stringify({
+            name: name,
+            slug: slug,
+            clientId: clientId,
+            lastSaved: new Date().toISOString()
+          }));
+          
+          console.log(`✅ [LP-EDITOR] Dados salvos com chave específica para LP ${lpdedivulgacaoId}`);
+          
+          // 🔧 CORREÇÃO: Manter compatibilidade com sistema antigo APENAS para nova LP
+          if (!lpId) {
+            localStorage.setItem('grapesLPDivulgacaoHtml', html);
+            localStorage.setItem('grapesLPDivulgacaoCss', css);
+            localStorage.setItem('grapesLPDivulgacaoCreatedAt', new Date().toLocaleString('pt-BR'));
+            localStorage.setItem('lpdedivulgacaoId', lpdedivulgacaoId);
+            console.log(`💾 [LP-EDITOR] Compatibilidade com sistema antigo mantida para nova LP`);
+          }
+          
+          // 🔧 CORREÇÃO: Se for edição, salvar também com o ID original para manter consistência
+          if (lpId && lpId !== lpdedivulgacaoId) {
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
+            console.log(`💾 [LP-EDITOR] Dados salvos também com ID original ${lpId} para consistência`);
+          }
+          
+          // 🔧 CORREÇÃO: Log de diagnóstico após salvamento
+          console.log(`🔍 [LP-EDITOR] Diagnóstico após salvamento:`);
+          const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
+          console.log(`📋 [LP-EDITOR] Chaves no localStorage:`, allKeys);
+          
+        } else {
+          console.error(`❌ [LP-EDITOR] Erro: ID da LP não retornado pelo backend`);
         }
+        
+        // 🔧 CORREÇÃO: Sistema antigo removido para evitar conflito (funcionalidades preservadas via sistema específico)
+        
+        // 🔧 CORREÇÃO: Sistema de persistência otimizado - sem duplicação
         
         // Feedback visual
         const btn = document.querySelector('.btn-primary');
@@ -1309,45 +1275,105 @@
         }
       });
       
-      // Carregar conteúdo salvo anteriormente (se existir)
-      const savedHtml = localStorage.getItem('grapesLPDivulgacaoHtml');
-      const savedCss = localStorage.getItem('grapesLPDivulgacaoCss');
-      
-      if (savedHtml && savedCss) {
-        editor.setComponents(savedHtml);
-        editor.setStyle(savedCss);
-      }
-      
-      // 🔧 CORREÇÃO SIMPLES: Carregar dados da LP específica
+      // 🔧 CORREÇÃO CRÍTICA: Ordem de carregamento corrigida para resolver bug de persistência
+      // ✅ PRIMEIRO: Carregar dados específicos da LP (se existir)
       const lpId = getUrlParam('id');
       if (lpId) {
+        console.log(`🔍 [LP-EDITOR] Tentando carregar dados da LP ${lpId}...`);
+        
         // Tentar carregar dados específicos da LP
         const specificHtml = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`);
         const specificCss = localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
         
         if (specificHtml && specificCss) {
-          console.log(`✅ [LP-EDITOR] Carregando dados específicos da LP ${lpId}`);
+          console.log(`✅ [LP-EDITOR] Dados específicos encontrados para LP ${lpId}, carregando...`);
           editor.setComponents(specificHtml);
           editor.setStyle(specificCss);
+          console.log(`✅ [LP-EDITOR] Dados da LP ${lpId} carregados com sucesso!`);
         } else {
-          console.log(`🔄 [LP-EDITOR] LP ${lpId} não tem dados locais, mantendo dados padrão`);
+          console.log(`🔄 [LP-EDITOR] LP ${lpId} não tem dados locais, tentando sistema antigo como fallback`);
+          // 🔧 CORREÇÃO: Sistema antigo como fallback apenas se não houver dados específicos
+          const savedHtml = localStorage.getItem('grapesLPDivulgacaoHtml');
+          const savedCss = localStorage.getItem('grapesLPDivulgacaoCss');
+          
+          if (savedHtml && savedCss) {
+            console.log(`🔄 [LP-EDITOR] Usando dados do sistema antigo como fallback`);
+            editor.setComponents(savedHtml);
+            editor.setStyle(savedCss);
+            console.log(`🔄 [LP-EDITOR] Fallback carregado com sucesso`);
+          } else {
+            console.log(`📝 [LP-EDITOR] Nenhum dado encontrado, editor iniciará vazio`);
+          }
+        }
+      } else {
+        // 🔧 CORREÇÃO: Se não há ID (nova LP), usar sistema antigo
+        console.log(`🆕 [LP-EDITOR] Nova LP detectada, usando sistema antigo se disponível`);
+        const savedHtml = localStorage.getItem('grapesLPDivulgacaoHtml');
+        const savedCss = localStorage.getItem('grapesLPDivulgacaoCss');
+        
+        if (savedHtml && savedCss) {
+          console.log(`🔄 [LP-EDITOR] Carregando dados do sistema antigo para nova LP`);
+          editor.setComponents(savedHtml);
+          editor.setStyle(savedCss);
+          console.log(`🔄 [LP-EDITOR] Dados do sistema antigo carregados para nova LP`);
+        } else {
+          console.log(`📝 [LP-EDITOR] Editor iniciará vazio para nova LP`);
         }
       }
       
-      // 🔧 CORREÇÃO SIMPLES: Configurar backup automático básico
+      // 🔧 CORREÇÃO: Configurar backup automático apenas no sistema específico
       if (lpId) {
-        // Backup simples quando componentes mudam
+        console.log(`💾 [LP-EDITOR] Configurando backup automático para LP ${lpId}`);
+        
+        // Backup automático quando componentes mudam
         editor.on('component:update', () => {
           const html = editor.getHtml();
           const css = editor.getCss();
           if (html && css) {
             localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
             localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
+            console.log(`💾 [LP-EDITOR] Backup automático de componentes salvo para LP ${lpId}`);
           }
         });
+        
+        // Backup automático quando estilos mudam
+        editor.on('style:update', () => {
+          const html = editor.getHtml();
+          const css = editor.getCss();
+          if (html && css) {
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
+            console.log(`💾 [LP-EDITOR] Backup automático de estilos salvo para LP ${lpId}`);
+          }
+        });
+        
+        // Backup automático quando componentes são adicionados/removidos
+        editor.on('component:add', () => {
+          const html = editor.getHtml();
+          const css = editor.getCss();
+          if (html && css) {
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
+            console.log(`💾 [LP-EDITOR] Backup automático após adição de componente para LP ${lpId}`);
+          }
+        });
+        
+        editor.on('component:remove', () => {
+          const html = editor.getHtml();
+          const css = editor.getCss();
+          if (html && css) {
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
+            localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
+            console.log(`💾 [LP-EDITOR] Backup automático após remoção de componente para LP ${lpId}`);
+          }
+        });
+        
+        console.log(`✅ [LP-EDITOR] Sistema de backup automático configurado para LP ${lpId}`);
+      } else {
+        console.log(`🆕 [LP-EDITOR] Nova LP detectada, backup automático não configurado`);
       }
       
-      // 🔧 CORREÇÃO SIMPLES: Sistema funcionando perfeitamente
+      // 🔧 CORREÇÃO: Sistema de carregamento otimizado
       
       // Atualizar indicadores visuais das abas quando um elemento for selecionado
       editor.on('component:selected', (component) => {
@@ -1563,29 +1589,51 @@
     }
   </script>
   <script>
-    // Função utilitária para obter parâmetros da URL
-    function getUrlParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
-
     document.addEventListener('DOMContentLoaded', async function() {
       const lpId = getUrlParam('id');
       if (lpId) {
         try {
+          console.log(`🔍 [LP-EDITOR] Carregando dados da LP ${lpId} da API...`);
+          
           // 🔧 CORREÇÃO: URL dinâmica para busca de dados
           const correctApiUrl = (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                                 (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
                                  'https://programa-indicacao-multicliente-production.up.railway.app')) + '/lp-divulgacao';
           
+          console.log(`🌐 [LP-EDITOR] Fazendo requisição para: ${correctApiUrl}/${lpId}`);
+          
           const res = await fetch(`${correctApiUrl}/${lpId}`);
+          
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          }
+          
           const data = await res.json();
+          console.log(`📊 [LP-EDITOR] Dados da API recebidos:`, data);
+          
           if (data.success && data.data && data.data.name) {
             document.getElementById('lpNameInput').value = data.data.name;
+            console.log(`✅ [LP-EDITOR] Nome da LP carregado: ${data.data.name}`);
+          } else {
+            console.warn(`⚠️ [LP-EDITOR] Dados da LP não encontrados ou inválidos:`, data);
           }
         } catch (err) {
-          console.warn('Erro ao buscar dados da LP para edição:', err);
+          console.error(`❌ [LP-EDITOR] Erro ao buscar dados da LP ${lpId}:`, err);
+          // Não mostrar alerta para não interromper o usuário
         }
+      } else {
+        console.log(`🆕 [LP-EDITOR] Nova LP detectada (sem ID)`);
+      }
+      
+      // 🔧 CORREÇÃO: Log de diagnóstico para verificar estado do localStorage
+      console.log(`🔍 [LP-EDITOR] Diagnóstico do localStorage:`);
+      const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
+      console.log(`📋 [LP-EDITOR] Chaves encontradas:`, allKeys);
+      
+      if (lpId) {
+        const hasSpecificData = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`) && 
+                               localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
+        console.log(`🔍 [LP-EDITOR] LP ${lpId} tem dados específicos:`, hasSpecificData);
       }
     });
   </script>
