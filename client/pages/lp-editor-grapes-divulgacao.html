@@ -1587,55 +1587,57 @@
     } catch (error) {
       console.error('ERRO na inicialização:', error);
     }
-  </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-      const lpId = getUrlParam('id');
-      if (lpId) {
-        try {
-          console.log(`🔍 [LP-EDITOR] Carregando dados da LP ${lpId} da API...`);
-          
-          // 🔧 CORREÇÃO: URL dinâmica para busca de dados
-          const correctApiUrl = (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                                (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
-                                 'https://programa-indicacao-multicliente-production.up.railway.app')) + '/lp-divulgacao';
-          
-          console.log(`🌐 [LP-EDITOR] Fazendo requisição para: ${correctApiUrl}/${lpId}`);
-          
-          const res = await fetch(`${correctApiUrl}/${lpId}`);
-          
-          if (!res.ok) {
-            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      
+      // 🔧 CORREÇÃO: Carregamento de dados da API integrado no script principal
+      document.addEventListener('DOMContentLoaded', async function() {
+        if (lpId) {
+          try {
+            console.log(`🔍 [LP-EDITOR] Carregando dados da LP ${lpId} da API...`);
+            
+            // 🔧 CORREÇÃO: URL dinâmica para busca de dados
+            const correctApiUrl = (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                                  (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
+                                   'https://programa-indicacao-multicliente-production.up.railway.app')) + '/lp-divulgacao';
+            
+            console.log(`🌐 [LP-EDITOR] Fazendo requisição para: ${correctApiUrl}/${lpId}`);
+            
+            const res = await fetch(`${correctApiUrl}/${lpId}`);
+            
+            if (!res.ok) {
+              throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            
+            const data = await res.json();
+            console.log(`📊 [LP-EDITOR] Dados da API recebidos:`, data);
+            
+            if (data.success && data.data && data.data.name) {
+              document.getElementById('lpNameInput').value = data.data.name;
+              console.log(`✅ [LP-EDITOR] Nome da LP carregado: ${data.data.name}`);
+            } else {
+              console.warn(`⚠️ [LP-EDITOR] Dados da LP não encontrados ou inválidos:`, data);
+            }
+          } catch (err) {
+            console.error(`❌ [LP-EDITOR] Erro ao buscar dados da LP ${lpId}:`, err);
           }
-          
-          const data = await res.json();
-          console.log(`📊 [LP-EDITOR] Dados da API recebidos:`, data);
-          
-          if (data.success && data.data && data.data.name) {
-            document.getElementById('lpNameInput').value = data.data.name;
-            console.log(`✅ [LP-EDITOR] Nome da LP carregado: ${data.data.name}`);
-          } else {
-            console.warn(`⚠️ [LP-EDITOR] Dados da LP não encontrados ou inválidos:`, data);
-          }
-        } catch (err) {
-          console.error(`❌ [LP-EDITOR] Erro ao buscar dados da LP ${lpId}:`, err);
-          // Não mostrar alerta para não interromper o usuário
+        } else {
+          console.log(`🆕 [LP-EDITOR] Nova LP detectada (sem ID)`);
         }
-      } else {
-        console.log(`🆕 [LP-EDITOR] Nova LP detectada (sem ID)`);
-      }
+        
+        // 🔧 CORREÇÃO: Log de diagnóstico para verificar estado do localStorage
+        console.log(`🔍 [LP-EDITOR] Diagnóstico do localStorage:`);
+        const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
+        console.log(`📋 [LP-EDITOR] Chaves encontradas:`, allKeys);
+        
+        if (lpId) {
+          const hasSpecificData = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`) && 
+                                 localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
+          console.log(`🔍 [LP-EDITOR] LP ${lpId} tem dados específicos:`, hasSpecificData);
+        }
+      });
       
-      // 🔧 CORREÇÃO: Log de diagnóstico para verificar estado do localStorage
-      console.log(`🔍 [LP-EDITOR] Diagnóstico do localStorage:`);
-      const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
-      console.log(`📋 [LP-EDITOR] Chaves encontradas:`, allKeys);
-      
-      if (lpId) {
-        const hasSpecificData = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`) && 
-                               localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
-        console.log(`🔍 [LP-EDITOR] LP ${lpId} tem dados específicos:`, hasSpecificData);
-      }
-    });
+    } catch (error) {
+      console.error('ERRO na inicialização:', error);
+    }
   </script>
 </body>
 </html> 
