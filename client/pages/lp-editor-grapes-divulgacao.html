@@ -582,6 +582,8 @@
           method = 'PUT';
         }
         // Enviar para o backend
+        console.log('[DEBUG] URL que será usada no fetch:', url);
+        console.log('[DEBUG] window.getApiUrl("/lp-divulgacao"):', window.getApiUrl('/lp-divulgacao'));
         const response = await fetch(url, {
           method,
           headers: {
@@ -1456,6 +1458,16 @@
     }
   </script>
   <script>
+    // 🔍 INTERCEPTOR GLOBAL PARA DEBUG - CAPTURAR TODOS OS FETCH
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      const url = args[0];
+      console.log('[FETCH INTERCEPTOR] URL:', url);
+      console.log('[FETCH INTERCEPTOR] Args:', args);
+      console.trace('[FETCH INTERCEPTOR] Stack trace');
+      return originalFetch.apply(this, args);
+    };
+    
     // Função utilitária para obter parâmetros da URL
     function getUrlParam(name) {
       const url = new URL(window.location.href);
