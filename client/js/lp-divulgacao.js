@@ -6,19 +6,35 @@ function getUrlParam(name) {
   return url.searchParams.get(name);
 }
 
-// 🔧 CORREÇÃO: Função para obter API_URL de forma segura (similar ao rewards.js)
-function getApiUrl() {
-    return window.API_URL ||
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
-           'http://localhost:3000/api');
-}
-
 // 🔧 CORREÇÃO: Variável global para armazenar lista de LPs
 let lpDivulgacaoList = [];
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('📊 [LP-DIV] Página carregada, inicializando...');
-  renderLPDivulgacaoList();
+  
+  // 🔍 [DEBUG] Verificar se config.js foi carregado
+  console.log('🔍 [DEBUG] Verificando configurações:');
+  console.log('🔍 [DEBUG] window.APP_CONFIG:', window.APP_CONFIG);
+  console.log('🔍 [DEBUG] window.getApiUrl:', window.getApiUrl);
+  console.log('🔍 [DEBUG] window.API_URL:', window.API_URL);
+  
+  // 🔧 CORREÇÃO: Aguardar config.js carregar antes de executar
+  if (window.APP_CONFIG && window.getApiUrl) {
+    console.log('✅ [LP-DIV] Configurações carregadas, executando renderLPDivulgacaoList');
+    renderLPDivulgacaoList();
+  } else {
+    console.log('⏳ [LP-DIV] Aguardando config.js carregar...');
+    // Tentar novamente em 100ms
+    setTimeout(() => {
+      if (window.APP_CONFIG && window.getApiUrl) {
+        console.log('✅ [LP-DIV] Configurações carregadas após delay, executando renderLPDivulgacaoList');
+        renderLPDivulgacaoList();
+      } else {
+        console.error('❌ [LP-DIV] Config.js não carregou após delay');
+      }
+    }, 100);
+  }
+  
   // Seleciona todos os formulários do bloco Hero c/ Cadastro
   document.querySelectorAll('form').forEach(function(form) {
     // Heurística: checa se o form tem campos name, email, phone (Hero c/ Cadastro)
@@ -40,7 +56,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       try {
-        const API_URL = getApiUrl(); // 🔧 CORREÇÃO: usar função getApiUrl()
+        const API_URL = window.getApiUrl ? window.getApiUrl() :
+           window.API_URL ||
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
+           'http://localhost:3000/api');
         const token = localStorage.getItem('clientToken'); // 🔧 CORREÇÃO: clientToken
         const referrerEmail = localStorage.getItem('referrerEmail') || '';
         const campaign = localStorage.getItem('campaign') || '';
@@ -98,7 +117,10 @@ function renderLPDivulgacaoList() {
     return;
   }
   
-  const API_URL = getApiUrl(); // 🔧 CORREÇÃO: usar função getApiUrl()
+  const API_URL = window.getApiUrl ? window.getApiUrl() :
+           window.API_URL ||
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
+           'http://localhost:3000/api');
   console.log(`🔗 [LP-DIV] Fazendo requisição para: ${API_URL}/lp-divulgacao?clientId=${clientId}`);
   
   fetch(`${API_URL}/lp-divulgacao?clientId=${clientId}`, {
@@ -304,7 +326,10 @@ window.editLPDivulgacao = function(id) {
 
 window.deleteLPDivulgacao = function(id) {
   if (confirm('Tem certeza que deseja excluir esta LP?')) {
-    const API_URL = getApiUrl(); // 🔧 CORREÇÃO: usar função getApiUrl()
+    const API_URL = window.getApiUrl ? window.getApiUrl() :
+           window.API_URL ||
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
+           'http://localhost:3000/api');
     const token = localStorage.getItem('clientToken'); // 🔧 CORREÇÃO: clientToken
     
     console.log(`🗑️ [LP-DIV] Excluindo LP: ${id}`);
@@ -386,7 +411,10 @@ window.copyEmbedCodeViewDivulgacao = function() {
 // Função para alternar status da LP (Ativo/Inativo) - NOVO ENDPOINT
 window.toggleLPStatus = async function(lpId, currentStatus) {
   try {
-    const API_URL = getApiUrl();
+    const API_URL = window.getApiUrl ? window.getApiUrl() :
+           window.API_URL ||
+           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
+           'http://localhost:3000/api');
     const token = localStorage.getItem('clientToken');
     
     console.log(`🔄 [LP-DIV] Alterando status da LP ${lpId}: ${currentStatus}`);
