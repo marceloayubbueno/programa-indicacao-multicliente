@@ -538,7 +538,7 @@
         
         const html = editor.getHtml();
         const css = editor.getCss();
-        const grapesData = editor.getProjectData();
+        let grapesData = editor.getProjectData(); // 🔧 CORREÇÃO: Mudou de const para let
         const name = document.getElementById('lpNameInput').value.trim();
         const images = extractImagesFromEditor(editor);
         const clientId = localStorage.getItem('clientId');
