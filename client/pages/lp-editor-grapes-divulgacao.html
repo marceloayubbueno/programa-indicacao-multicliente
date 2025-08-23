@@ -74,68 +74,7 @@
       border: none;
     }
     
-    /* 🔧 CORREÇÃO: Estilos para lista de LPs existentes */
-    .existing-lps-list {
-      background: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .existing-lps-list h3 {
-      margin: 0 0 15px 0;
-      color: #495057;
-      font-size: 1.2rem;
-    }
-    
-    .lp-items {
-      display: grid;
-      gap: 10px;
-    }
-    
-    .lp-item {
-      background: white;
-      border: 1px solid #dee2e6;
-      border-radius: 6px;
-      padding: 15px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .lp-item:hover {
-      background: #e9ecef;
-      border-color: #adb5bd;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .lp-status {
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    
-    .lp-status.draft {
-      background: #fff3cd;
-      color: #856404;
-    }
-    
-    .lp-status.published {
-      background: #d4edda;
-      color: #155724;
-    }
-    
-    .lp-status.inactive {
-      background: #f8d7da;
-      color: #721c24;
-    }
+
     
     .panel__right { 
       width: 320px; 
@@ -621,12 +560,14 @@
         
 
         
-        // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1 e 5
+        // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - SALVAMENTO
         console.log(`🔍 [DEBUG] ===== INÍCIO DO SALVAMENTO =====`);
         console.log(`🔍 [DEBUG] ID da URL: ${getUrlParam('id')}`);
         console.log(`🔍 [DEBUG] ID da variável lpId: ${lpId}`);
         console.log(`🔍 [DEBUG] ClientId: ${clientId}`);
-        console.log(`🔍 [DEBUG] Nome da LP: ${name}`);
+        console.log(`🔍 [DEBUG] Nome da LP: "${name}"`);
+        console.log(`🔍 [DEBUG] Elemento input:`, document.getElementById('lpNameInput'));
+        console.log(`🔍 [DEBUG] Valor do input:`, document.getElementById('lpNameInput')?.value);
         
         // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1
         const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
@@ -636,9 +577,23 @@
           console.log(`🔍 [DEBUG] Conteúdo da chave genérica:`, localStorage.getItem('grapesLPDivulgacaoHtml')?.substring(0, 200));
         }
         
-        // 🔧 CORREÇÃO: Validações simplificadas
-        if (!name) {
+        // 🔧 CORREÇÃO: Validações do nome da LP
+        if (!name || name.trim() === '') {
           alert('Preencha o nome da Landing Page antes de salvar.');
+          const nameInput = document.getElementById('lpNameInput');
+          if (nameInput) {
+            nameInput.focus();
+            nameInput.style.borderColor = '#e74c3c';
+            setTimeout(() => {
+              nameInput.style.borderColor = '';
+            }, 3000);
+          }
+          return;
+        }
+        
+        // 🔧 CORREÇÃO: Validar se o nome não é muito curto
+        if (name.trim().length < 3) {
+          alert('O nome da Landing Page deve ter pelo menos 3 caracteres.');
           document.getElementById('lpNameInput').focus();
           return;
         }
@@ -1685,23 +1640,11 @@
       
       // 🔧 CORREÇÃO: Carregamento da API simplificado
       document.addEventListener('DOMContentLoaded', async function() {
-        // 🔧 CORREÇÃO: Carregar LPs existentes sempre
-        await loadExistingLPs();
-        
         if (lpId) {
           try {
             console.log(`🔍 [LP-EDITOR] Carregando dados da LP ${lpId} da API...`);
             
-            // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4
-            console.log(`🔍 [DEBUG] ===== INÍCIO DO CARREGAMENTO DA API =====`);
-            console.log(`🔍 [DEBUG] LP ID para API: ${lpId}`);
-            
-            // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4 (dados locais antes da API)
-            const localHtmlBefore = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`);
-            const localCssBefore = localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
-            console.log(`🔍 [DEBUG] Dados locais ANTES da API:`);
-            console.log(`🔍 [DEBUG] HTML local:`, localHtmlBefore ? localHtmlBefore.substring(0, 200) : 'NÃO ENCONTRADO');
-            console.log(`🔍 [DEBUG] CSS local:`, localCssBefore ? localCssBefore.substring(0, 200) : 'NÃO ENCONTRADO');
+            console.log(`🔍 [LP-EDITOR] Carregando LP ${lpId} da API...`);
             
             const apiUrl = (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                            (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
@@ -1727,92 +1670,35 @@
                   }
                 }
                 
-                // 🔧 CORREÇÃO: Carregar dados do GrapesJS se existirem
-                if (lpData.grapesData && window.editor) {
-                  try {
-                    console.log(`🔍 [DEBUG] Tentando carregar dados GrapesJS da API...`);
-                    
-                    // 🔧 CORREÇÃO CRÍTICA: Verificar se dados locais são mais completos
-                    const localHtml = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`);
-                    const localCss = localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
-                    
-                    // 🔍 [DEBUG] Comparação de dados
-                    console.log(`🔍 [DEBUG] Comparando dados locais vs API:`);
-                    console.log(`🔍 [DEBUG] HTML local length:`, localHtml ? localHtml.length : 0);
-                    console.log(`🔍 [DEBUG] HTML API length:`, lpData.grapesData ? JSON.stringify(lpData.grapesData).length : 0);
-                    
-                    // 🔧 CORREÇÃO CRÍTICA: SEMPRE carregar dados do BANCO primeiro
-                    if (lpData.grapesData && Object.keys(lpData.grapesData).length > 0) {
-                      try {
-                        console.log(`✅ [DEBUG] Carregando dados do BANCO (fonte da verdade)`);
-                        console.log(`🔍 [DEBUG] Dados GrapesJS do banco:`, lpData.grapesData);
-                        
-                        // ✅ CARREGAR DADOS DO BANCO (fonte da verdade)
-                        editor.loadProjectData(lpData.grapesData);
-                        
-                        console.log(`✅ [DEBUG] Dados do BANCO carregados com sucesso`);
-                        
-                        // 🔧 Salvar no localStorage como backup
-                        const currentHtml = editor.getHtml();
-                        const currentCss = editor.getCss();
-                        if (currentHtml && currentCss) {
-                          localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, currentHtml);
-                          localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, currentCss);
-                          console.log(`💾 [DEBUG] Dados do banco salvos no localStorage como backup`);
-                        }
-                        
-                      } catch (error) {
-                        console.error(`❌ [DEBUG] Erro ao carregar dados GrapesJS do banco:`, error);
-                        
-                        // 🔄 FALLBACK: Se banco falhar, usar localStorage
-                        console.log(`🔄 [DEBUG] Fallback: tentando carregar do localStorage...`);
-                        if (localHtml && localCss) {
-                          editor.setHtml(localHtml);
-                          editor.setCss(localCss);
-                          console.log(`✅ [DEBUG] Dados carregados do localStorage como fallback`);
-                        }
-                      }
-                    } else {
-                      // 🔄 Se não há dados no banco, tentar localStorage
-                      console.log(`🔄 [DEBUG] Nenhum dado no banco, tentando localStorage...`);
-                      if (localHtml && localCss) {
-                        editor.setHtml(localHtml);
-                        editor.setCss(localCss);
-                        console.log(`✅ [DEBUG] Dados carregados do localStorage`);
-                      } else {
-                        console.log(`⚠️ [DEBUG] Nenhum dado encontrado - LP vazia`);
-                      }
-                    }
-                    
-                    // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4 (dados após carregamento da API)
-                    console.log(`🔍 [DEBUG] Dados no editor APÓS carregamento da API:`);
-                    console.log(`🔍 [DEBUG] HTML no editor:`, editor.getHtml().substring(0, 200));
-                    console.log(`🔍 [DEBUG] CSS no editor:`, editor.getCss().substring(0, 200));
-                    
-                  } catch (error) {
-                    console.log(`📝 [LP-EDITOR] Erro ao carregar dados da API:`, error);
-                    console.log(`🔍 [DEBUG] Mantendo dados locais após erro na API`);
-                  }
-                }
+                        // 🔧 CORREÇÃO: Carregar dados do GrapesJS se existirem
+        if (lpData.grapesData && window.editor) {
+          try {
+            console.log(`🔍 [DEBUG] Carregando dados GrapesJS da API...`);
+            
+            // 🔧 CORREÇÃO: Carregar dados do banco diretamente
+            if (lpData.grapesData && Object.keys(lpData.grapesData).length > 0) {
+              try {
+                console.log(`✅ [DEBUG] Carregando dados do banco...`);
+                editor.loadProjectData(lpData.grapesData);
+                console.log(`✅ [DEBUG] Dados carregados com sucesso`);
+              } catch (error) {
+                console.error(`❌ [DEBUG] Erro ao carregar dados:`, error);
+                alert('Erro ao carregar dados da LP. Recarregue a página.');
+              }
+            } else {
+              console.log(`⚠️ [DEBUG] Nenhum dado encontrado - LP vazia`);
+            }
+          } catch (error) {
+            console.log(`📝 [LP-EDITOR] Erro ao carregar dados:`, error);
+          }
+        }
                 
-                // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4 (dados locais após a API)
-                const localHtmlAfter = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`);
-                const localCssAfter = localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
-                console.log(`🔍 [DEBUG] Dados locais APÓS a API:`);
-                console.log(`🔍 [DEBUG] HTML local:`, localHtmlAfter ? localHtmlAfter.substring(0, 200) : 'NÃO ENCONTRADO');
-                console.log(`🔍 [DEBUG] CSS local:`, localCssAfter ? localCssAfter.substring(0, 200) : 'NÃO ENCONTRADO');
-                
-                // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4 (verificar se API sobrescreveu dados locais)
-                if (localHtmlBefore && localHtmlAfter && localHtmlBefore !== localHtmlAfter) {
-                  console.log(`⚠️ [DEBUG] ATENÇÃO: API sobrescreveu dados locais!`);
-                  console.log(`🔍 [DEBUG] HTML local ANTES:`, localHtmlBefore.substring(0, 200));
-                  console.log(`🔍 [DEBUG] HTML local DEPOIS:`, localHtmlAfter.substring(0, 200));
-                }
+
                 
               }
             }
             
-            console.log(`🔍 [DEBUG] ===== FIM DO CARREGAMENTO DA API =====`);
+
             
           } catch (err) {
             console.log(`📝 [LP-EDITOR] Erro na API:`, err);
@@ -1824,120 +1710,7 @@
       console.error('ERRO na inicialização:', error);
     }
 
-    // 🔧 CORREÇÃO: Função para carregar LPs existentes do banco
-    async function loadExistingLPs() {
-      try {
-        const clientId = localStorage.getItem('clientId');
-        if (!clientId) {
-          console.log('🔍 [LP-EDITOR] Cliente não logado, pulando carregamento de LPs');
-          return;
-        }
 
-        console.log('🔍 [LP-EDITOR] Carregando LPs existentes...');
-        
-        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                       (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
-                        'https://programa-indicacao-multicliente-production.up.railway.app');
-        
-        const token = localStorage.getItem('clientToken');
-        if (!token) {
-          console.log('🔍 [LP-EDITOR] Token não encontrado, pulando carregamento');
-          return;
-        }
-
-        const response = await fetch(`${apiUrl}/lp-divulgacao?clientId=${clientId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log('🔍 [LP-EDITOR] LPs carregadas:', data);
-          
-          if (data.success && data.data && data.data.length > 0) {
-            // Criar lista de LPs existentes
-            const lpList = document.createElement('div');
-            lpList.className = 'existing-lps-list';
-            lpList.innerHTML = `
-              <h3>📋 Landing Pages Existentes</h3>
-              <div class="lp-items">
-                ${data.data.map(lp => `
-                  <div class="lp-item" onclick="loadLP('${lp.lpdedivulgacaoId}')">
-                    <strong>${lp.name}</strong>
-                    <span class="lp-status ${lp.status}">${lp.status}</span>
-                    <small>${new Date(lp.createdAt).toLocaleDateString()}</small>
-                  </div>
-                `).join('')}
-              </div>
-            `;
-            
-            // Inserir antes do editor
-            const editorContainer = document.getElementById('gjs');
-            if (editorContainer && editorContainer.parentNode) {
-              editorContainer.parentNode.insertBefore(lpList, editorContainer);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('❌ [LP-EDITOR] Erro ao carregar LPs:', error);
-      }
-    }
-
-    // 🔧 CORREÇÃO: Função para carregar uma LP específica
-    async function loadLP(lpId) {
-      try {
-        console.log(`🔍 [LP-EDITOR] Carregando LP ${lpId}...`);
-        
-        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-                       (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
-                        'https://programa-indicacao-multicliente-production.up.railway.app');
-        
-        const token = localStorage.getItem('clientToken');
-        if (!token) {
-          alert('Token de autenticação não encontrado. Faça login novamente.');
-          return;
-        }
-
-        const response = await fetch(`${apiUrl}/lp-divulgacao/${lpId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          
-          if (data.success && data.data) {
-            const lpData = data.data;
-            
-            // Atualizar URL
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set('id', lpId);
-            window.history.replaceState({}, '', newUrl);
-            
-            // Carregar nome
-            const nameInput = document.getElementById('lpNameInput');
-            if (nameInput && lpData.name) {
-              nameInput.value = lpData.name;
-            }
-            
-            // Carregar dados do editor
-            if (window.editor && lpData.grapesData) {
-              try {
-                editor.loadProjectData(lpData.grapesData);
-                console.log('✅ [LP-EDITOR] LP carregada com sucesso');
-              } catch (error) {
-                console.error('❌ [LP-EDITOR] Erro ao carregar dados do editor:', error);
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error('❌ [LP-EDITOR] Erro ao carregar LP:', error);
-        alert('Erro ao carregar a LP: ' + error.message);
-      }
-    }
   </script>
 </body>
 </html> 
