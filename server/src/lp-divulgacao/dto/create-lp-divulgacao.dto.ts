@@ -141,11 +141,11 @@ export class TrackingCodesDto {
 
 export class CreateLPDivulgacaoDto {
   @IsString()
-  name: string;
+  name: string; // Nome da Landing Page (obrigatório)
 
   @IsOptional()
   @IsString()
-  slug?: string;
+  slug?: string; // Será gerado automaticamente se não fornecido pelo schema (opcional)
 
   @IsOptional()
   @IsString()
@@ -153,10 +153,10 @@ export class CreateLPDivulgacaoDto {
 
   @IsOptional()
   @IsEnum(['draft', 'published', 'inactive'])
-  status?: string;
+  status?: string; // Valor padrão será 'draft' (opcional)
 
   @IsString()
-  clientId: string;
+  clientId: string; // ID do cliente logado (obrigatório)
 
   @IsOptional()
   @IsString()
@@ -164,23 +164,23 @@ export class CreateLPDivulgacaoDto {
 
   @IsOptional()
   @IsString()
-  lpdedivulgacaoId?: string;
+  lpdedivulgacaoId?: string; // Será gerado automaticamente pelo schema no middleware
 
   // === CONTEÚDO GRAPESJS ===
   @IsObject()
   @ValidateNested()
   @Type(() => GrapesJSDataDto)
-  grapesData: GrapesJSDataDto;
+  grapesData: GrapesJSDataDto; // Dados do editor GrapesJS (obrigatório)
 
   @IsObject()
   @ValidateNested()
   @Type(() => CompiledOutputDto)
-  compiledOutput: CompiledOutputDto;
+  compiledOutput: CompiledOutputDto; // HTML e CSS compilados (obrigatório)
 
   @IsObject()
   @ValidateNested()
   @Type(() => LPMetadataDto)
-  metadata: LPMetadataDto;
+  metadata: LPMetadataDto; // Metadados da Landing Page (obrigatório)
 
   // === SEO E METADADOS ===
   @IsOptional()

@@ -539,6 +539,21 @@
         const clientId = localStorage.getItem('clientId');
         const lpId = getUrlParam('id'); // ID da LP sendo editada
         
+        // 🔧 CORREÇÃO: Validações adicionais dos dados do editor
+        if (!html || html.trim() === '') {
+          alert('Erro: Conteúdo HTML não pode estar vazio. Adicione algum conteúdo antes de salvar.');
+          return;
+        }
+        
+        if (!grapesData || !grapesData.components || grapesData.components.length === 0) {
+          alert('Erro: Dados do editor não podem estar vazios. Recarregue a página e tente novamente.');
+          return;
+        }
+        
+        // 🔧 CORREÇÃO: Garantir estrutura correta do grapesData
+        if (!grapesData.styles) grapesData.styles = [];
+        if (!grapesData.assets) grapesData.assets = [];
+        
         // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1 e 5
         console.log(`🔍 [DEBUG] ===== INÍCIO DO SALVAMENTO =====`);
         console.log(`🔍 [DEBUG] ID da URL: ${getUrlParam('id')}`);
@@ -565,23 +580,30 @@
           return;
         }
         
-        // 🔧 CORREÇÃO: Slug simplificado
+        // 🔧 CORREÇÃO: Slug único com timestamp para evitar conflitos
+        const timestamp = Date.now();
         const slug = name
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '');
+          .replace(/^-+|-+$/g, '') + `-${timestamp}`;
         
         // 🔧 CORREÇÃO: Payload no formato correto da API
         const payload = {
           name,
           slug,
           clientId,
-          content: {      // ✅ Estrutura correta da API
+          status: 'draft', // ✅ Status padrão
+          compiledOutput: {      // ✅ Estrutura correta da API
             html,
             css
           },
           grapesData,     // ✅ Objeto direto, não string
-          images: images || []
+          metadata: {     // ✅ Metadados obrigatórios
+            blocksUsed: [],
+            version: '1.0.0',
+            editorVersion: '1.0.0'
+          },
+          images: images || [] // ✅ Campo opcional
         };
         
         // 🔧 CORREÇÃO: Detectar se é edição de forma simples
@@ -602,19 +624,42 @@
         console.log(`🔍 [DEBUG] ===== PAYLOAD SENDO ENVIADO =====`);
         console.log(`🔍 [DEBUG] Payload completo:`, payload);
         console.log(`🔍 [DEBUG] Payload JSON:`, JSON.stringify(payload, null, 2));
+        console.log(`🔍 [DEBUG] Estrutura grapesData:`, {
+          hasComponents: !!grapesData.components,
+          componentsLength: grapesData.components?.length,
+          hasStyles: !!grapesData.styles,
+          stylesLength: grapesData.styles?.length,
+          hasAssets: !!grapesData.assets,
+          assetsLength: grapesData.assets?.length
+        });
         console.log(`🔍 [DEBUG] ===== FIM DO PAYLOAD =====`);
         
+        // 🔧 CORREÇÃO: Adicionar autenticação JWT
+        const token = localStorage.getItem('clientToken');
+        if (!token) {
+          throw new Error('Token de autenticação não encontrado. Faça login novamente.');
+        }
+
         // Enviar para o backend
         const response = await fetch(url, {
           method,
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify(payload)
         });
         
         if (!response.ok) {
-          throw new Error('Erro ao salvar a LP no backend.');
+          let errorMessage = 'Erro ao salvar a LP no backend.';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || errorMessage;
+          } catch (e) {
+            // Se não conseguir ler o erro, usar o status
+            errorMessage = `Erro ${response.status}: ${response.statusText}`;
+          }
+          throw new Error(errorMessage);
         }
         
         const data = await response.json();
