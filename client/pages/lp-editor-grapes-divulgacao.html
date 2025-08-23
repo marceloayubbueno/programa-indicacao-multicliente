@@ -74,6 +74,69 @@
       border: none;
     }
     
+    /* 🔧 CORREÇÃO: Estilos para lista de LPs existentes */
+    .existing-lps-list {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .existing-lps-list h3 {
+      margin: 0 0 15px 0;
+      color: #495057;
+      font-size: 1.2rem;
+    }
+    
+    .lp-items {
+      display: grid;
+      gap: 10px;
+    }
+    
+    .lp-item {
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .lp-item:hover {
+      background: #e9ecef;
+      border-color: #adb5bd;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .lp-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    .lp-status.draft {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .lp-status.published {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .lp-status.inactive {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
     .panel__right { 
       width: 320px; 
       background: #fff; 
@@ -539,20 +602,24 @@
         const clientId = localStorage.getItem('clientId');
         const lpId = getUrlParam('id'); // ID da LP sendo editada
         
-        // 🔧 CORREÇÃO: Validações adicionais dos dados do editor
+        // 🔧 CORREÇÃO: Validações mais flexíveis dos dados do editor
         if (!html || html.trim() === '') {
           alert('Erro: Conteúdo HTML não pode estar vazio. Adicione algum conteúdo antes de salvar.');
           return;
         }
         
-        if (!grapesData || !grapesData.components || grapesData.components.length === 0) {
-          alert('Erro: Dados do editor não podem estar vazios. Recarregue a página e tente novamente.');
-          return;
+        // 🔧 CORREÇÃO: Validação mais flexível - aceitar editor vazio para novas LPs
+        if (!grapesData) {
+          console.log('🔍 [DEBUG] grapesData não encontrado, criando estrutura básica');
+          grapesData = { components: [], styles: [], assets: [] };
         }
         
-        // 🔧 CORREÇÃO: Garantir estrutura correta do grapesData
+        // 🔧 CORREÇÃO: Garantir estrutura mínima
+        if (!grapesData.components) grapesData.components = [];
         if (!grapesData.styles) grapesData.styles = [];
         if (!grapesData.assets) grapesData.assets = [];
+        
+
         
         // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1 e 5
         console.log(`🔍 [DEBUG] ===== INÍCIO DO SALVAMENTO =====`);
@@ -1618,6 +1685,9 @@
       
       // 🔧 CORREÇÃO: Carregamento da API simplificado
       document.addEventListener('DOMContentLoaded', async function() {
+        // 🔧 CORREÇÃO: Carregar LPs existentes sempre
+        await loadExistingLPs();
+        
         if (lpId) {
           try {
             console.log(`🔍 [LP-EDITOR] Carregando dados da LP ${lpId} da API...`);
@@ -1752,6 +1822,121 @@
       
     } catch (error) {
       console.error('ERRO na inicialização:', error);
+    }
+
+    // 🔧 CORREÇÃO: Função para carregar LPs existentes do banco
+    async function loadExistingLPs() {
+      try {
+        const clientId = localStorage.getItem('clientId');
+        if (!clientId) {
+          console.log('🔍 [LP-EDITOR] Cliente não logado, pulando carregamento de LPs');
+          return;
+        }
+
+        console.log('🔍 [LP-EDITOR] Carregando LPs existentes...');
+        
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                       (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
+                        'https://programa-indicacao-multicliente-production.up.railway.app');
+        
+        const token = localStorage.getItem('clientToken');
+        if (!token) {
+          console.log('🔍 [LP-EDITOR] Token não encontrado, pulando carregamento');
+          return;
+        }
+
+        const response = await fetch(`${apiUrl}/lp-divulgacao?clientId=${clientId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('🔍 [LP-EDITOR] LPs carregadas:', data);
+          
+          if (data.success && data.data && data.data.length > 0) {
+            // Criar lista de LPs existentes
+            const lpList = document.createElement('div');
+            lpList.className = 'existing-lps-list';
+            lpList.innerHTML = `
+              <h3>📋 Landing Pages Existentes</h3>
+              <div class="lp-items">
+                ${data.data.map(lp => `
+                  <div class="lp-item" onclick="loadLP('${lp.lpdedivulgacaoId}')">
+                    <strong>${lp.name}</strong>
+                    <span class="lp-status ${lp.status}">${lp.status}</span>
+                    <small>${new Date(lp.createdAt).toLocaleDateString()}</small>
+                  </div>
+                `).join('')}
+              </div>
+            `;
+            
+            // Inserir antes do editor
+            const editorContainer = document.getElementById('gjs');
+            if (editorContainer && editorContainer.parentNode) {
+              editorContainer.parentNode.insertBefore(lpList, editorContainer);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('❌ [LP-EDITOR] Erro ao carregar LPs:', error);
+      }
+    }
+
+    // 🔧 CORREÇÃO: Função para carregar uma LP específica
+    async function loadLP(lpId) {
+      try {
+        console.log(`🔍 [LP-EDITOR] Carregando LP ${lpId}...`);
+        
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                       (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
+                        'https://programa-indicacao-multicliente-production.up.railway.app');
+        
+        const token = localStorage.getItem('clientToken');
+        if (!token) {
+          alert('Token de autenticação não encontrado. Faça login novamente.');
+          return;
+        }
+
+        const response = await fetch(`${apiUrl}/lp-divulgacao/${lpId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data.success && data.data) {
+            const lpData = data.data;
+            
+            // Atualizar URL
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('id', lpId);
+            window.history.replaceState({}, '', newUrl);
+            
+            // Carregar nome
+            const nameInput = document.getElementById('lpNameInput');
+            if (nameInput && lpData.name) {
+              nameInput.value = lpData.name;
+            }
+            
+            // Carregar dados do editor
+            if (window.editor && lpData.grapesData) {
+              try {
+                editor.loadProjectData(lpData.grapesData);
+                console.log('✅ [LP-EDITOR] LP carregada com sucesso');
+              } catch (error) {
+                console.error('❌ [LP-EDITOR] Erro ao carregar dados do editor:', error);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('❌ [LP-EDITOR] Erro ao carregar LP:', error);
+        alert('Erro ao carregar a LP: ' + error.message);
+      }
     }
   </script>
 </body>
