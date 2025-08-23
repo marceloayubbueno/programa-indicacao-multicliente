@@ -1705,16 +1705,51 @@
                         // 🔧 CORREÇÃO: Aguardar editor estar completamente pronto
                         await new Promise(resolve => setTimeout(resolve, 500));
                         
-                        editor.loadProjectData(lpData.grapesData);
-                        console.log(`✅ [DEBUG] Dados carregados com sucesso`);
+                        console.log(`🔍 [DEBUG] Tentando carregar dados com loadProjectData...`);
+                        console.log(`🔍 [DEBUG] Dados sendo enviados:`, JSON.stringify(lpData.grapesData, null, 2));
+                        
+                        try {
+                          // 🔧 CORREÇÃO: Tentar método principal primeiro
+                          editor.loadProjectData(lpData.grapesData);
+                          console.log(`✅ [DEBUG] loadProjectData executado com sucesso`);
+                        } catch (loadError) {
+                          console.error(`❌ [DEBUG] Erro no loadProjectData:`, loadError);
+                          
+                          // 🔧 CORREÇÃO: Fallback - tentar carregar HTML e CSS separadamente
+                          try {
+                            console.log(`🔄 [DEBUG] Tentando fallback com setHtml/setCss...`);
+                            
+                            if (lpData.compiledOutput && lpData.compiledOutput.html) {
+                              editor.setHtml(lpData.compiledOutput.html);
+                              console.log(`✅ [DEBUG] HTML carregado via setHtml`);
+                            }
+                            
+                            if (lpData.compiledOutput && lpData.compiledOutput.css) {
+                              editor.setCss(lpData.compiledOutput.css);
+                              console.log(`✅ [DEBUG] CSS carregado via setCss`);
+                            }
+                            
+                          } catch (fallbackError) {
+                            console.error(`❌ [DEBUG] Erro no fallback:`, fallbackError);
+                          }
+                        }
                         
                         // 🔧 CORREÇÃO: Verificar se dados foram realmente carregados
                         setTimeout(() => {
                           const html = editor.getHtml();
                           const css = editor.getCss();
+                          const components = editor.getComponents();
+                          
                           console.log(`🔍 [DEBUG] Verificação pós-carregamento:`);
                           console.log(`🔍 [DEBUG] HTML carregado:`, html ? html.substring(0, 200) : 'VAZIO');
                           console.log(`🔍 [DEBUG] CSS carregado:`, css ? css.substring(0, 200) : 'VAZIO');
+                          console.log(`🔍 [DEBUG] Componentes carregados:`, components ? components.length : 0);
+                          
+                          // 🔧 CORREÇÃO: Se ainda estiver vazio, tentar forçar renderização
+                          if (!html || html.trim() === '') {
+                            console.log(`⚠️ [DEBUG] Editor ainda vazio, tentando forçar renderização...`);
+                            editor.refresh();
+                          }
                         }, 1000);
                         
                       } catch (error) {
