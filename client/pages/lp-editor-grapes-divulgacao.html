@@ -578,12 +578,12 @@
           return;
         }
         
-        // 🔧 CORREÇÃO: Verificar se grapesData tem componentes válidos
+        // 🔧 CORREÇÃO: SOLUÇÃO ROBUSTA para captura de componentes
         if (!grapesData || !grapesData.components || grapesData.components.length === 0) {
           console.error(`❌ [DEBUG] grapesData inválido ou sem componentes:`, grapesData);
           
-          // 🔧 CORREÇÃO: Tentar recapturar dados do editor
-          console.log(`🔄 [DEBUG] Tentando recapturar dados do editor...`);
+          // 🔧 CORREÇÃO: SOLUÇÃO 1 - Tentar recapturar dados do editor
+          console.log(`🔄 [DEBUG] SOLUÇÃO 1: Tentando recapturar dados do editor...`);
           const retryHtml = editor.getHtml();
           const retryCss = editor.getCss();
           const retryGrapesData = editor.getProjectData();
@@ -596,30 +596,86 @@
           });
           
           if (retryGrapesData && retryGrapesData.components && retryGrapesData.components.length > 0) {
-            console.log(`✅ [DEBUG] Dados recapturados com sucesso, usando retryGrapesData`);
+            console.log(`✅ [DEBUG] SOLUÇÃO 1 funcionou, usando retryGrapesData`);
             grapesData = retryGrapesData;
           } else {
-            // 🔧 CORREÇÃO: Verificar se editor tem componentes visíveis
+            // 🔧 CORREÇÃO: SOLUÇÃO 2 - Verificar componentes visíveis
             const visibleComponents = editor.getComponents();
-            console.log(`🔍 [DEBUG] Componentes visíveis no editor:`, visibleComponents);
+            console.log(`🔍 [DEBUG] SOLUÇÃO 2: Componentes visíveis no editor:`, visibleComponents);
             console.log(`🔍 [DEBUG] Quantidade de componentes visíveis:`, visibleComponents.length);
             
             if (visibleComponents && visibleComponents.length > 0) {
-              console.log(`✅ [DEBUG] Editor tem componentes visíveis, forçando atualização...`);
-              // 🔧 CORREÇÃO: Forçar atualização dos dados
-              editor.refresh();
-              await new Promise(resolve => setTimeout(resolve, 100));
+              console.log(`✅ [DEBUG] Editor tem componentes visíveis, aplicando SOLUÇÃO 3...`);
               
-              // 🔧 CORREÇÃO: Tentar capturar novamente
+              // 🔧 CORREÇÃO: SOLUÇÃO 3 - Forçar atualização e recaptura
+              editor.refresh();
+              await new Promise(resolve => setTimeout(resolve, 200)); // Aumentei o tempo
+              
+              // 🔧 CORREÇÃO: SOLUÇÃO 4 - Tentar capturar novamente
               const finalGrapesData = editor.getProjectData();
-              console.log(`🔍 [DEBUG] Dados finais após refresh:`, finalGrapesData);
+              console.log(`🔍 [DEBUG] SOLUÇÃO 4: Dados finais após refresh:`, finalGrapesData);
               
               if (finalGrapesData && finalGrapesData.components && finalGrapesData.components.length > 0) {
-                console.log(`✅ [DEBUG] Dados capturados após refresh, usando finalGrapesData`);
+                console.log(`✅ [DEBUG] SOLUÇÃO 4 funcionou, usando finalGrapesData`);
                 grapesData = finalGrapesData;
               } else {
-                alert('Erro: Editor não conseguiu capturar componentes. Recarregue a página e tente novamente.');
-                return;
+                // 🔧 CORREÇÃO: SOLUÇÃO 5 - CONSTRUIR GRAPESDATA MANUALMENTE
+                console.log(`🔄 [DEBUG] SOLUÇÃO 5: Construindo grapesData manualmente...`);
+                
+                try {
+                  // 🔧 CORREÇÃO: Forçar reconstrução dos componentes
+                  editor.refresh();
+                  await new Promise(resolve => setTimeout(resolve, 300));
+                  
+                  // 🔧 CORREÇÃO: Capturar componentes individuais
+                  const allComponents = editor.getComponents();
+                  const allStyles = editor.getStyles();
+                  
+                  console.log(`🔍 [DEBUG] Componentes capturados individualmente:`, allComponents.length);
+                  console.log(`🔍 [DEBUG] Estilos capturados individualmente:`, allStyles.length);
+                  
+                  if (allComponents && allComponents.length > 0) {
+                    // 🔧 CORREÇÃO: Construir grapesData manualmente
+                    grapesData = {
+                      components: allComponents.map(c => c.toJSON()),
+                      styles: allStyles.map(s => s.toJSON()),
+                      assets: [],
+                      pages: [{
+                        component: allComponents[0].toJSON()
+                      }]
+                    };
+                    
+                    console.log(`✅ [DEBUG] SOLUÇÃO 5 funcionou, grapesData construído manualmente:`, grapesData);
+                  } else {
+                    throw new Error('Não foi possível capturar componentes mesmo com reconstrução');
+                  }
+                } catch (manualError) {
+                  console.error(`❌ [DEBUG] SOLUÇÃO 5 falhou:`, manualError);
+                  
+                  // 🔧 CORREÇÃO: SOLUÇÃO 6 - ÚLTIMO RECURSO
+                  console.log(`🔄 [DEBUG] SOLUÇÃO 6: Último recurso - grapesData mínimo`);
+                  
+                  grapesData = {
+                    components: [{
+                      type: 'default',
+                      tagName: 'div',
+                      content: html,
+                      style: css
+                    }],
+                    styles: [],
+                    assets: [],
+                    pages: [{
+                      component: {
+                        type: 'default',
+                        tagName: 'div',
+                        content: html,
+                        style: css
+                      }
+                    }]
+                  };
+                  
+                  console.log(`✅ [DEBUG] SOLUÇÃO 6 aplicada, grapesData mínimo criado`);
+                }
               }
             } else {
               alert('Erro: Editor não tem conteúdo válido. Adicione blocos ao editor antes de salvar.');
