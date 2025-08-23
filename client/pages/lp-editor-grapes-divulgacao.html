@@ -578,8 +578,32 @@
             console.log(`✅ [DEBUG] Dados recapturados com sucesso, usando retryGrapesData`);
             grapesData = retryGrapesData;
           } else {
-            alert('Erro: Editor não tem conteúdo válido. Adicione blocos ao editor antes de salvar.');
-            return;
+            // 🔧 CORREÇÃO: Verificar se editor tem componentes visíveis
+            const visibleComponents = editor.getComponents();
+            console.log(`🔍 [DEBUG] Componentes visíveis no editor:`, visibleComponents);
+            console.log(`🔍 [DEBUG] Quantidade de componentes visíveis:`, visibleComponents.length);
+            
+            if (visibleComponents && visibleComponents.length > 0) {
+              console.log(`✅ [DEBUG] Editor tem componentes visíveis, forçando atualização...`);
+              // 🔧 CORREÇÃO: Forçar atualização dos dados
+              editor.refresh();
+              await new Promise(resolve => setTimeout(resolve, 100));
+              
+              // 🔧 CORREÇÃO: Tentar capturar novamente
+              const finalGrapesData = editor.getProjectData();
+              console.log(`🔍 [DEBUG] Dados finais após refresh:`, finalGrapesData);
+              
+              if (finalGrapesData && finalGrapesData.components && finalGrapesData.components.length > 0) {
+                console.log(`✅ [DEBUG] Dados capturados após refresh, usando finalGrapesData`);
+                grapesData = finalGrapesData;
+              } else {
+                alert('Erro: Editor não conseguiu capturar componentes. Recarregue a página e tente novamente.');
+                return;
+              }
+            } else {
+              alert('Erro: Editor não tem conteúdo válido. Adicione blocos ao editor antes de salvar.');
+              return;
+            }
           }
         }
         
@@ -1726,42 +1750,71 @@
                     console.log(`🔍 [DEBUG] Carregando dados GrapesJS da API...`);
                     console.log(`🔍 [DEBUG] Estrutura grapesData:`, lpData.grapesData);
                     
-                    // 🔧 CORREÇÃO: Verificar se dados são válidos
-                    if (lpData.grapesData && Object.keys(lpData.grapesData).length > 0) {
-                      try {
-                        console.log(`✅ [DEBUG] Carregando dados do banco...`);
-                        
-                        // 🔧 CORREÇÃO: Aguardar editor estar completamente pronto
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        
-                        console.log(`🔍 [DEBUG] Tentando carregar dados com loadProjectData...`);
-                        console.log(`🔍 [DEBUG] Dados sendo enviados:`, JSON.stringify(lpData.grapesData, null, 2));
-                        
-                        try {
-                          // 🔧 CORREÇÃO: Tentar método principal primeiro
-                          editor.loadProjectData(lpData.grapesData);
-                          console.log(`✅ [DEBUG] loadProjectData executado com sucesso`);
-                        } catch (loadError) {
-                          console.error(`❌ [DEBUG] Erro no loadProjectData:`, loadError);
-                          
-                          // 🔧 CORREÇÃO: Fallback - tentar carregar HTML e CSS separadamente
+                                            // 🔧 CORREÇÃO: Verificar se dados são válidos e converter se necessário
+                        if (lpData.grapesData && Object.keys(lpData.grapesData).length > 0) {
                           try {
-                            console.log(`🔄 [DEBUG] Tentando fallback com setHtml/setCss...`);
+                            console.log(`✅ [DEBUG] Carregando dados do banco...`);
                             
-                            if (lpData.compiledOutput && lpData.compiledOutput.html) {
-                              editor.setHtml(lpData.compiledOutput.html);
-                              console.log(`✅ [DEBUG] HTML carregado via setHtml`);
+                            // 🔧 CORREÇÃO: Aguardar editor estar completamente pronto
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            
+                            // 🔧 CORREÇÃO: Verificar se dados são compatíveis com GrapesJS atual
+                            let grapesDataToLoad = lpData.grapesData;
+                            
+                            // 🔧 CORREÇÃO: Se components estiver vazio mas compiledOutput existir, usar fallback
+                            if ((!grapesDataToLoad.components || grapesDataToLoad.components.length === 0) && 
+                                lpData.compiledOutput && lpData.compiledOutput.html && lpData.compiledOutput.html !== '<body></body>') {
+                              
+                              console.log(`🔄 [DEBUG] Dados antigos detectados, usando fallback com compiledOutput...`);
+                              
+                              try {
+                                // 🔧 CORREÇÃO: Carregar HTML e CSS do compiledOutput
+                                if (lpData.compiledOutput.html) {
+                                  editor.setHtml(lpData.compiledOutput.html);
+                                  console.log(`✅ [DEBUG] HTML carregado via setHtml:`, lpData.compiledOutput.html.substring(0, 200));
+                                }
+                                
+                                if (lpData.compiledOutput.css) {
+                                  editor.setCss(lpData.compiledOutput.css);
+                                  console.log(`✅ [DEBUG] CSS carregado via setCss:`, lpData.compiledOutput.css.substring(0, 200));
+                                }
+                                
+                                console.log(`✅ [DEBUG] Dados antigos carregados com sucesso via fallback`);
+                                return; // Sair da função após carregar via fallback
+                                
+                              } catch (fallbackError) {
+                                console.error(`❌ [DEBUG] Erro no fallback para dados antigos:`, fallbackError);
+                              }
                             }
                             
-                            if (lpData.compiledOutput && lpData.compiledOutput.css) {
-                              editor.setCss(lpData.compiledOutput.css);
-                              console.log(`✅ [DEBUG] CSS carregado via setCss`);
-                            }
+                            // 🔧 CORREÇÃO: Tentar método principal para dados compatíveis
+                            console.log(`🔍 [DEBUG] Tentando carregar dados com loadProjectData...`);
+                            console.log(`🔍 [DEBUG] Dados sendo enviados:`, JSON.stringify(grapesDataToLoad, null, 2));
                             
-                          } catch (fallbackError) {
-                            console.error(`❌ [DEBUG] Erro no fallback:`, fallbackError);
-                          }
-                        }
+                            try {
+                              editor.loadProjectData(grapesDataToLoad);
+                              console.log(`✅ [DEBUG] loadProjectData executado com sucesso`);
+                            } catch (loadError) {
+                              console.error(`❌ [DEBUG] Erro no loadProjectData:`, loadError);
+                              
+                              // 🔧 CORREÇÃO: Fallback final - tentar carregar HTML e CSS separadamente
+                              try {
+                                console.log(`🔄 [DEBUG] Tentando fallback final com setHtml/setCss...`);
+                                
+                                if (lpData.compiledOutput && lpData.compiledOutput.html) {
+                                  editor.setHtml(lpData.compiledOutput.html);
+                                  console.log(`✅ [DEBUG] HTML carregado via setHtml`);
+                                }
+                                
+                                if (lpData.compiledOutput && lpData.compiledOutput.css) {
+                                  editor.setCss(lpData.compiledOutput.css);
+                                  console.log(`✅ [DEBUG] CSS carregado via setCss`);
+                                }
+                                
+                              } catch (fallbackError) {
+                                console.error(`❌ [DEBUG] Erro no fallback final:`, fallbackError);
+                              }
+                            }
                         
                         // 🔧 CORREÇÃO: Verificar se dados foram realmente carregados
                         setTimeout(() => {
