@@ -598,6 +598,12 @@
         console.log(`🔍 [DEBUG] URL da API: ${url}`);
         console.log(`🔍 [DEBUG] Método HTTP: ${method}`);
         
+        // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - PAYLOAD
+        console.log(`🔍 [DEBUG] ===== PAYLOAD SENDO ENVIADO =====`);
+        console.log(`🔍 [DEBUG] Payload completo:`, payload);
+        console.log(`🔍 [DEBUG] Payload JSON:`, JSON.stringify(payload, null, 2));
+        console.log(`🔍 [DEBUG] ===== FIM DO PAYLOAD =====`);
+        
         // Enviar para o backend
         const response = await fetch(url, {
           method,
