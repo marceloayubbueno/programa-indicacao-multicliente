@@ -571,18 +571,15 @@
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-+|-+$/g, '');
         
-        // 🔧 CORREÇÃO: Payload simplificado
+        // 🔧 CORREÇÃO: Payload no formato correto da API
         const payload = {
           name,
           slug,
           clientId,
-          grapesData,
-          compiledOutput: { html, css },
-          images,
-          metadata: {
-            blocksUsed: [],
-            version: '1.0'
-          }
+          html,           // ✅ HTML direto
+          css,            // ✅ CSS direto
+          grapesData: JSON.stringify(grapesData),  // ✅ GrapesJS data como string
+          images: images || []
         };
         
         // 🔧 CORREÇÃO: Detectar se é edição de forma simples

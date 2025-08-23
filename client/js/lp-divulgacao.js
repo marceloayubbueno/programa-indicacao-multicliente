@@ -55,12 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Preencha todos os campos obrigatórios.');
         return;
       }
-      try {
-        const API_URL = window.getApiUrl ? window.getApiUrl() :
-           window.API_URL ||
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
-           'http://localhost:3000/api');
-        const token = localStorage.getItem('clientToken'); // 🔧 CORREÇÃO: clientToken
+              try {
+          const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+          const token = localStorage.getItem('clientToken'); // 🔧 CORREÇÃO: clientToken
         const referrerEmail = localStorage.getItem('referrerEmail') || '';
         const campaign = localStorage.getItem('campaign') || '';
         
@@ -117,10 +114,7 @@ function renderLPDivulgacaoList() {
     return;
   }
   
-  const API_URL = window.getApiUrl ? window.getApiUrl() :
-           window.API_URL ||
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
-           'http://localhost:3000/api');
+    const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
   console.log(`🔗 [LP-DIV] Fazendo requisição para: ${API_URL}/lp-divulgacao?clientId=${clientId}`);
   
   fetch(`${API_URL}/lp-divulgacao?clientId=${clientId}`, {
@@ -324,13 +318,10 @@ window.editLPDivulgacao = function(id) {
   window.location.href = editorUrl;
 };
 
-window.deleteLPDivulgacao = function(id) {
-  if (confirm('Tem certeza que deseja excluir esta LP?')) {
-    const API_URL = window.getApiUrl ? window.getApiUrl() :
-           window.API_URL ||
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
-           'http://localhost:3000/api');
-    const token = localStorage.getItem('clientToken'); // 🔧 CORREÇÃO: clientToken
+  window.deleteLPDivulgacao = function(id) {
+    if (confirm('Tem certeza que deseja excluir esta LP?')) {
+      const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+      const token = localStorage.getItem('clientToken'); // 🔧 CORREÇÃO: clientToken
     
     console.log(`🗑️ [LP-DIV] Excluindo LP: ${id}`);
     
@@ -409,13 +400,10 @@ window.copyEmbedCodeViewDivulgacao = function() {
 };
 
 // Função para alternar status da LP (Ativo/Inativo) - NOVO ENDPOINT
-window.toggleLPStatus = async function(lpId, currentStatus) {
-  try {
-    const API_URL = window.getApiUrl ? window.getApiUrl() :
-           window.API_URL ||
-           (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
-           'http://localhost:3000/api');
-    const token = localStorage.getItem('clientToken');
+  window.toggleLPStatus = async function(lpId, currentStatus) {
+    try {
+      const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+      const token = localStorage.getItem('clientToken');
     
     console.log(`🔄 [LP-DIV] Alterando status da LP ${lpId}: ${currentStatus}`);
     
