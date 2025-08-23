@@ -1782,29 +1782,45 @@
                             // 🔧 CORREÇÃO: Verificar se dados são compatíveis com GrapesJS atual
                             let grapesDataToLoad = lpData.grapesData;
                             
-                            // 🔧 CORREÇÃO: SEMPRE usar compiledOutput se disponível (mais confiável)
-                            if (lpData.compiledOutput && lpData.compiledOutput.html && lpData.compiledOutput.html !== '<body></body>') {
+                            // 🔧 CORREÇÃO: ESTRATÉGIA IDÊNTICA AO EDITOR DE INDICAÇÃO (QUE FUNCIONA!)
+                            if (editor && lpData.compiledOutput && lpData.compiledOutput.html && lpData.compiledOutput.html !== '<body></body>') {
                               
-                              console.log(`🔄 [DEBUG] Usando compiledOutput (mais confiável)...`);
+                              console.log(`🔄 [DEBUG] Usando compiledOutput (estratégia do editor de indicação)...`);
                               console.log(`🔍 [DEBUG] HTML disponível:`, lpData.compiledOutput.html.substring(0, 200));
                               console.log(`🔍 [DEBUG] CSS disponível:`, lpData.compiledOutput.css ? lpData.compiledOutput.css.substring(0, 200) : 'Nenhum');
                               
                               try {
-                                // 🔧 CORREÇÃO: Carregar HTML e CSS do compiledOutput
-                                editor.setHtml(lpData.compiledOutput.html);
-                                console.log(`✅ [DEBUG] HTML carregado via setHtml`);
-                                
-                                if (lpData.compiledOutput.css) {
-                                  editor.setCss(lpData.compiledOutput.css);
-                                  console.log(`✅ [DEBUG] CSS carregado via setCss`);
-                                }
-                                
-                                console.log(`✅ [DEBUG] LP carregada com sucesso via compiledOutput`);
-                                return; // Sair da função após carregar via compiledOutput
+                                // 🔧 CORREÇÃO: MÉTODOS CORRETOS (setComponents + setStyle)
+                                editor.setComponents(lpData.compiledOutput.html || '');
+                                editor.setStyle(lpData.compiledOutput.css || '');
+                                console.log(`✅ [DEBUG] LP carregada com sucesso via setComponents + setStyle`);
+                                return; // Sair da função após carregar com sucesso
                                 
                               } catch (fallbackError) {
                                 console.error(`❌ [DEBUG] Erro ao carregar via compiledOutput:`, fallbackError);
                               }
+                            } else if (editor && lpData.grapesData && lpData.grapesData.components) {
+                              // 🔧 CORREÇÃO: FALLBACK PARA GRAPESDATA (como no editor de indicação)
+                              console.log(`🔄 [DEBUG] Fallback para grapesData...`);
+                              try {
+                                editor.loadProjectData(lpData.grapesData);
+                                console.log(`✅ [DEBUG] LP carregada via grapesData fallback`);
+                                return;
+                              } catch (error) {
+                                console.error(`❌ [DEBUG] Erro no fallback grapesData:`, error);
+                              }
+                            } else if (editor) {
+                              // 🔧 CORREÇÃO: CONTEÚDO PADRÃO (como no editor de indicação)
+                              console.log(`🔄 [DEBUG] Criando conteúdo padrão...`);
+                              editor.setComponents(`
+                                <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center;">
+                                  <div style="max-width: 800px; margin: 0 auto;">
+                                    <h1 style="font-size: 3rem; margin-bottom: 20px; font-weight: bold;">${lpData.name || 'LP de Divulgação'}</h1>
+                                    <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9;">Use os blocos da barra lateral para personalizar esta LP.</p>
+                                  </div>
+                                </section>
+                              `);
+                              console.log(`✅ [DEBUG] Conteúdo padrão criado`);
                             }
                             
                             // 🔧 CORREÇÃO: Tentar método principal para dados compatíveis
