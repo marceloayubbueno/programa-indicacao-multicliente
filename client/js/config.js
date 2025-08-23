@@ -99,7 +99,15 @@ window.successLog = function(message, data = null) {
 
 // 🔧 Função helper para obter URL da API (compatibilidade)
 window.getApiUrl = function(endpoint = '') {
-    return window.APP_CONFIG.API_URL + (endpoint.startsWith('/') ? endpoint : '/' + endpoint);
+    const baseUrl = window.APP_CONFIG.API_URL;
+    if (!endpoint) return baseUrl;
+    
+    // 🔧 CORREÇÃO: Evitar dupla barra
+    if (endpoint.startsWith('/')) {
+        return baseUrl + endpoint;
+    } else {
+        return baseUrl + '/' + endpoint;
+    }
 };
 
 // 🔧 Função helper para obter URL de indicação (compatibilidade)
