@@ -131,6 +131,24 @@ function renderLPList() {
   console.log(`🎨 [LP-DIV] Renderizando ${lpDivulgacaoList.length} LPs na tabela`);
   console.log(`🔍 [LP-DIV] Dados completos das LPs:`, JSON.stringify(lpDivulgacaoList, null, 2));
   
+  // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1
+  console.log(`🔍 [DEBUG] ===== INÍCIO DA RENDERIZAÇÃO =====`);
+  const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
+  console.log(`🔍 [DEBUG] Todas as chaves no localStorage durante renderização:`, allKeys);
+  
+  // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1 (verificar dados de cada LP)
+  lpDivulgacaoList.forEach((lp, index) => {
+    const lpId = lp._id || lp.id;
+    if (lpId) {
+      const html = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`);
+      const css = localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
+      console.log(`🔍 [DEBUG] LP ${index} (${lpId}):`);
+      console.log(`🔍 [DEBUG] - Nome: ${lp.name || lp.title}`);
+      console.log(`🔍 [DEBUG] - HTML no localStorage:`, html ? html.substring(0, 100) : 'NÃO ENCONTRADO');
+      console.log(`🔍 [DEBUG] - CSS no localStorage:`, css ? css.substring(0, 100) : 'NÃO ENCONTRADO');
+    }
+  });
+  
   const tbody = document.getElementById('formsListBodyDivulgacao');
   
   if (!lpDivulgacaoList || lpDivulgacaoList.length === 0) {
@@ -216,7 +234,7 @@ function renderLPList() {
     `;
   }).join('');
   
-  console.log('✅ [LP-DIV] Lista renderizada com sucesso!');
+  console.log(`🔍 [DEBUG] ===== FIM DA RENDERIZAÇÃO =====`);
 }
 
 window.viewLPDivulgacao = function() {
@@ -258,9 +276,28 @@ window.editLPDivulgacao = function(id) {
   console.log(`🔧 [LP-DIV] Tipo do ID: ${typeof id}`);
   console.log(`🔧 [LP-DIV] ID é válido: ${id && id !== 'undefined' && id !== 'null'}`);
   
+  // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 5
+  console.log(`🔍 [DEBUG] ===== INÍCIO DA EDIÇÃO =====`);
+  console.log(`🔍 [DEBUG] ID recebido na função: ${id}`);
+  console.log(`🔍 [DEBUG] URL atual: ${window.location.href}`);
+  
+  // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1
+  const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
+  console.log(`🔍 [DEBUG] Todas as chaves no localStorage antes da edição:`, allKeys);
+  
+  if (id) {
+    const specificHtml = localStorage.getItem(`grapesLPDivulgacao_${id}Html`);
+    const specificCss = localStorage.getItem(`grapesLPDivulgacao_${id}Css`);
+    console.log(`🔍 [DEBUG] Dados da LP ${id} no localStorage:`);
+    console.log(`🔍 [DEBUG] HTML:`, specificHtml ? specificHtml.substring(0, 200) : 'NÃO ENCONTRADO');
+    console.log(`🔍 [DEBUG] CSS:`, specificCss ? specificCss.substring(0, 200) : 'NÃO ENCONTRADO');
+  }
+  
   // 🔧 CORREÇÃO: Redirecionar para o editor com o id da LP e modo de edição
   const editorUrl = `lp-editor-grapes-divulgacao.html?id=${id}&edit=true`;
   console.log(`🔧 [LP-DIV] URL do editor: ${editorUrl}`);
+  
+  console.log(`🔍 [DEBUG] ===== FIM DA EDIÇÃO =====`);
   
   window.location.href = editorUrl;
 };
@@ -302,19 +339,33 @@ window.showEmbedCodeDivulgacao = function(lpId) {
     return;
   }
   
+  // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1
+  console.log(`🔍 [DEBUG] ===== INÍCIO DO SHOW EMBED CODE =====`);
+  console.log(`🔍 [DEBUG] ID da LP para embed: ${lpId}`);
+  
+  const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
+  console.log(`🔍 [DEBUG] Todas as chaves no localStorage antes do embed:`, allKeys);
+  
   // Tentar carregar do localStorage isolado primeiro
   const htmlKey = `grapesLPDivulgacao_${lpId}Html`;
   let html = localStorage.getItem(htmlKey);
   
+  console.log(`🔍 [DEBUG] Dados encontrados no localStorage:`);
+  console.log(`🔍 [DEBUG] HTML específico:`, html ? html.substring(0, 200) : 'NÃO ENCONTRADO');
+  
   // Fallback para sistema antigo se necessário
   if (!html) {
+    console.log(`🔍 [DEBUG] Fallback para sistema antigo...`);
     html = localStorage.getItem('grapesLPDivulgacaoHtml');
+    console.log(`🔍 [DEBUG] HTML genérico:`, html ? html.substring(0, 200) : 'NÃO ENCONTRADO');
   }
   
   if (!html) {
     alert('Conteúdo da LP não encontrado. Salve a LP no editor primeiro.');
     return;
   }
+  
+  console.log(`🔍 [DEBUG] ===== FIM DO SHOW EMBED CODE =====`);
   
   const code = `<iframe srcdoc='${html.replace(/'/g, "&apos;")}' width="100%" height="600" frameborder="0"></iframe>`;
   document.getElementById('embedCodeViewDivulgacao').value = code;
@@ -436,4 +487,4 @@ function showNotification(message, type = 'info') {
       document.body.removeChild(notification);
     }, 300);
   }, 3000);
-}; 
+};

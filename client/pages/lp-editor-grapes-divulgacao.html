@@ -539,6 +539,21 @@
         const clientId = localStorage.getItem('clientId');
         const lpId = getUrlParam('id'); // ID da LP sendo editada
         
+        // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1 e 5
+        console.log(`🔍 [DEBUG] ===== INÍCIO DO SALVAMENTO =====`);
+        console.log(`🔍 [DEBUG] ID da URL: ${getUrlParam('id')}`);
+        console.log(`🔍 [DEBUG] ID da variável lpId: ${lpId}`);
+        console.log(`🔍 [DEBUG] ClientId: ${clientId}`);
+        console.log(`🔍 [DEBUG] Nome da LP: ${name}`);
+        
+        // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1
+        const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
+        console.log(`🔍 [DEBUG] Todas as chaves no localStorage:`, allKeys);
+        if (lpId) {
+          console.log(`🔍 [DEBUG] Conteúdo da chave específica ${lpId}:`, localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`)?.substring(0, 200));
+          console.log(`🔍 [DEBUG] Conteúdo da chave genérica:`, localStorage.getItem('grapesLPDivulgacaoHtml')?.substring(0, 200));
+        }
+        
         // 🔧 CORREÇÃO: Validações simplificadas
         if (!name) {
           alert('Preencha o nome da Landing Page antes de salvar.');
@@ -581,6 +596,9 @@
           method = 'PUT';
         }
         
+        console.log(`🔍 [DEBUG] URL da API: ${url}`);
+        console.log(`🔍 [DEBUG] Método HTTP: ${method}`);
+        
         // Enviar para o backend
         const response = await fetch(url, {
           method,
@@ -598,13 +616,29 @@
         // Buscar o ID corretamente, mesmo se vier aninhado
         const lpdedivulgacaoId = data.data?.lpdedivulgacaoId || data.data?._id || data.lpdedivulgacaoId || data._id;
         
+        // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 5
+        console.log(`🔍 [DEBUG] Resposta da API:`, data);
+        console.log(`🔍 [DEBUG] ID retornado pela API: ${lpdedivulgacaoId}`);
+        console.log(`🔍 [DEBUG] ID da URL vs ID da API: ${lpId} vs ${lpdedivulgacaoId}`);
+        
         // 🔧 CORREÇÃO: Sistema de persistência simplificado e funcional
         if (lpdedivulgacaoId) {
           console.log(`💾 [LP-EDITOR] Salvando dados para LP ${lpdedivulgacaoId}...`);
           
+          // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 2
+          console.log(`🔍 [DEBUG] ===== SALVANDO NO LOCALSTORAGE =====`);
+          console.log(`🔍 [DEBUG] Salvando para LP ID: ${lpdedivulgacaoId}`);
+          console.log(`🔍 [DEBUG] HTML sendo salvo:`, html.substring(0, 200));
+          console.log(`🔍 [DEBUG] CSS sendo salvo:`, css.substring(0, 200));
+          
           // Salvar dados específicos da LP
           localStorage.setItem(`grapesLPDivulgacao_${lpdedivulgacaoId}Html`, html);
           localStorage.setItem(`grapesLPDivulgacao_${lpdedivulgacaoId}Css`, css);
+          
+          // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1
+          console.log(`🔍 [DEBUG] Verificação pós-salvamento:`);
+          console.log(`🔍 [DEBUG] Chave salva: grapesLPDivulgacao_${lpdedivulgacaoId}Html`);
+          console.log(`🔍 [DEBUG] Conteúdo verificado:`, localStorage.getItem(`grapesLPDivulgacao_${lpdedivulgacaoId}Html`)?.substring(0, 200));
           
           console.log(`✅ [LP-EDITOR] Dados salvos para LP ${lpdedivulgacaoId}`);
         } else {
@@ -629,6 +663,8 @@
           newUrl.searchParams.set('id', lpdedivulgacaoId);
           window.history.replaceState({}, '', newUrl);
         }
+        
+        console.log(`🔍 [DEBUG] ===== FIM DO SALVAMENTO =====`);
         
         alert('LP de Divulgação salva com sucesso!');
       } catch (error) {
@@ -655,6 +691,10 @@
         switchTab(tabName);
       });
     });
+    
+    // 🔧 CORREÇÃO CRÍTICA: Definir lpId ANTES de inicializar o editor
+    const lpId = getUrlParam('id');
+    console.log(`🔍 [LP-EDITOR] ID da LP: ${lpId}`);
     
     try {
       const editor = window.editor = grapesjs.init({
@@ -1236,17 +1276,32 @@
       console.log(`🔍 [LP-EDITOR] ID da LP: ${lpId}`);
       
       if (lpId) {
+        // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 3
+        console.log(`🔍 [DEBUG] ===== INÍCIO DO CARREGAMENTO LOCAL =====`);
+        console.log(`🔍 [DEBUG] Tentando carregar LP ID: ${lpId}`);
+        
         // Tentar carregar dados da LP específica
         const specificHtml = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`);
         const specificCss = localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
+        
+        console.log(`🔍 [DEBUG] Dados encontrados no localStorage:`);
+        console.log(`🔍 [DEBUG] HTML específico:`, specificHtml ? specificHtml.substring(0, 200) : 'NÃO ENCONTRADO');
+        console.log(`🔍 [DEBUG] CSS específico:`, specificCss ? specificCss.substring(0, 200) : 'NÃO ENCONTRADO');
         
         if (specificHtml && specificCss) {
           console.log(`✅ [LP-EDITOR] Carregando dados da LP ${lpId}`);
           editor.setComponents(specificHtml);
           editor.setStyle(specificCss);
+          
+          // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 3
+          console.log(`🔍 [DEBUG] Dados carregados no editor:`);
+          console.log(`🔍 [DEBUG] HTML no editor:`, editor.getHtml().substring(0, 200));
+          console.log(`🔍 [DEBUG] CSS no editor:`, editor.getCss().substring(0, 200));
         } else {
           console.log(`📝 [LP-EDITOR] LP ${lpId} sem dados locais`);
         }
+        
+        console.log(`🔍 [DEBUG] ===== FIM DO CARREGAMENTO LOCAL =====`);
       }
       
       // 🔧 CORREÇÃO: Backup automático simples
@@ -1255,12 +1310,31 @@
         
         // Backup automático quando componentes mudam
         editor.on('component:update', () => {
+          // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 2
+          console.log(`🔍 [DEBUG] ===== BACKUP AUTOMÁTICO ACIONADO =====`);
+          console.log(`🔍 [DEBUG] LP ID atual: ${lpId}`);
+          console.log(`🔍 [DEBUG] Timestamp: ${new Date().toISOString()}`);
+          
           const html = editor.getHtml();
           const css = editor.getCss();
+          
+          console.log(`🔍 [DEBUG] HTML sendo salvo no backup:`, html.substring(0, 200));
+          console.log(`🔍 [DEBUG] CSS sendo salvo no backup:`, css.substring(0, 200));
+          
           if (html && css) {
             localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, html);
             localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, css);
+            
+            // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1
+            console.log(`🔍 [DEBUG] Backup salvo para chave: grapesLPDivulgacao_${lpId}Html`);
+            console.log(`🔍 [DEBUG] Verificação pós-backup:`, localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`)?.substring(0, 200));
+            
+            // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 1 (verificar se sobrescreveu outras LPs)
+            const allKeys = Object.keys(localStorage).filter(k => k.includes('grapesLPDivulgacao'));
+            console.log(`🔍 [DEBUG] Todas as chaves após backup:`, allKeys);
           }
+          
+          console.log(`🔍 [DEBUG] ===== FIM DO BACKUP AUTOMÁTICO =====`);
         });
         
         console.log(`✅ [LP-EDITOR] Backup automático configurado para LP ${lpId}`);
@@ -1483,6 +1557,17 @@
           try {
             console.log(`🔍 [LP-EDITOR] Carregando dados da LP ${lpId} da API...`);
             
+            // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4
+            console.log(`🔍 [DEBUG] ===== INÍCIO DO CARREGAMENTO DA API =====`);
+            console.log(`🔍 [DEBUG] LP ID para API: ${lpId}`);
+            
+            // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4 (dados locais antes da API)
+            const localHtmlBefore = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`);
+            const localCssBefore = localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
+            console.log(`🔍 [DEBUG] Dados locais ANTES da API:`);
+            console.log(`🔍 [DEBUG] HTML local:`, localHtmlBefore ? localHtmlBefore.substring(0, 200) : 'NÃO ENCONTRADO');
+            console.log(`🔍 [DEBUG] CSS local:`, localCssBefore ? localCssBefore.substring(0, 200) : 'NÃO ENCONTRADO');
+            
             const apiUrl = (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                            (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
                             'https://programa-indicacao-multicliente-production.up.railway.app')) + '/lp-divulgacao';
@@ -1492,6 +1577,9 @@
             if (res.ok) {
               const data = await res.json();
               
+              // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4
+              console.log(`🔍 [DEBUG] Resposta da API:`, data);
+              
               if (data.success && data.data) {
                 const lpData = data.data;
                 
@@ -1500,20 +1588,46 @@
                   const nameInput = document.getElementById('lpNameInput');
                   if (nameInput) {
                     nameInput.value = lpData.name;
+                    console.log(`🔍 [DEBUG] Nome da LP carregado da API: ${lpData.name}`);
                   }
                 }
                 
                 // 🔧 CORREÇÃO: Carregar dados do GrapesJS se existirem
                 if (lpData.grapesData && window.editor) {
                   try {
+                    console.log(`🔍 [DEBUG] Tentando carregar dados GrapesJS da API...`);
                     editor.loadProjectData(lpData.grapesData);
                     console.log(`✅ [LP-EDITOR] Dados da API carregados com sucesso`);
+                    
+                    // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4 (dados após carregamento da API)
+                    console.log(`🔍 [DEBUG] Dados no editor APÓS carregamento da API:`);
+                    console.log(`🔍 [DEBUG] HTML no editor:`, editor.getHtml().substring(0, 200));
+                    console.log(`🔍 [DEBUG] CSS no editor:`, editor.getCss().substring(0, 200));
+                    
                   } catch (error) {
                     console.log(`📝 [LP-EDITOR] Erro ao carregar dados da API:`, error);
                   }
                 }
+                
+                // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4 (dados locais após a API)
+                const localHtmlAfter = localStorage.getItem(`grapesLPDivulgacao_${lpId}Html`);
+                const localCssAfter = localStorage.getItem(`grapesLPDivulgacao_${lpId}Css`);
+                console.log(`🔍 [DEBUG] Dados locais APÓS a API:`);
+                console.log(`🔍 [DEBUG] HTML local:`, localHtmlAfter ? localHtmlAfter.substring(0, 200) : 'NÃO ENCONTRADO');
+                console.log(`🔍 [DEBUG] CSS local:`, localCssAfter ? localCssAfter.substring(0, 200) : 'NÃO ENCONTRADO');
+                
+                // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4 (verificar se API sobrescreveu dados locais)
+                if (localHtmlBefore && localHtmlAfter && localHtmlBefore !== localHtmlAfter) {
+                  console.log(`⚠️ [DEBUG] ATENÇÃO: API sobrescreveu dados locais!`);
+                  console.log(`🔍 [DEBUG] HTML local ANTES:`, localHtmlBefore.substring(0, 200));
+                  console.log(`🔍 [DEBUG] HTML local DEPOIS:`, localHtmlAfter.substring(0, 200));
+                }
+                
               }
             }
+            
+            console.log(`🔍 [DEBUG] ===== FIM DO CARREGAMENTO DA API =====`);
+            
           } catch (err) {
             console.log(`📝 [LP-EDITOR] Erro na API:`, err);
           }
