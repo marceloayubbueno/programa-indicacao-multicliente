@@ -1638,24 +1638,45 @@
         }
       });
       
-      // 🔧 CORREÇÃO: Carregamento da API simplificado
+      // 🔧 CORREÇÃO: Carregamento da API com autenticação e aguardando editor
       document.addEventListener('DOMContentLoaded', async function() {
         if (lpId) {
           try {
             console.log(`🔍 [LP-EDITOR] Carregando dados da LP ${lpId} da API...`);
             
-            console.log(`🔍 [LP-EDITOR] Carregando LP ${lpId} da API...`);
+            // 🔧 CORREÇÃO: Aguardar editor estar pronto
+            let attempts = 0;
+            while (!window.editor && attempts < 50) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+              attempts++;
+            }
+            
+            if (!window.editor) {
+              console.error('❌ [LP-EDITOR] Editor não inicializado após 5 segundos');
+              return;
+            }
+            
+            console.log(`✅ [LP-EDITOR] Editor pronto, carregando dados...`);
             
             const apiUrl = (window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                            (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 
                             'https://programa-indicacao-multicliente-production.up.railway.app')) + '/lp-divulgacao';
             
-            const res = await fetch(`${apiUrl}/${lpId}`);
+            // 🔧 CORREÇÃO: Adicionar autenticação JWT
+            const token = localStorage.getItem('clientToken');
+            if (!token) {
+              console.error('❌ [LP-EDITOR] Token não encontrado');
+              return;
+            }
+            
+            const res = await fetch(`${apiUrl}/${lpId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
             
             if (res.ok) {
               const data = await res.json();
-              
-              // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4
               console.log(`🔍 [DEBUG] Resposta da API:`, data);
               
               if (data.success && data.data) {
@@ -1670,36 +1691,49 @@
                   }
                 }
                 
-                        // 🔧 CORREÇÃO: Carregar dados do GrapesJS se existirem
-        if (lpData.grapesData && window.editor) {
-          try {
-            console.log(`🔍 [DEBUG] Carregando dados GrapesJS da API...`);
-            
-            // 🔧 CORREÇÃO: Carregar dados do banco diretamente
-            if (lpData.grapesData && Object.keys(lpData.grapesData).length > 0) {
-              try {
-                console.log(`✅ [DEBUG] Carregando dados do banco...`);
-                editor.loadProjectData(lpData.grapesData);
-                console.log(`✅ [DEBUG] Dados carregados com sucesso`);
-              } catch (error) {
-                console.error(`❌ [DEBUG] Erro ao carregar dados:`, error);
-                alert('Erro ao carregar dados da LP. Recarregue a página.');
+                // 🔧 CORREÇÃO: Carregar dados do GrapesJS se existirem
+                if (lpData.grapesData && window.editor) {
+                  try {
+                    console.log(`🔍 [DEBUG] Carregando dados GrapesJS da API...`);
+                    console.log(`🔍 [DEBUG] Estrutura grapesData:`, lpData.grapesData);
+                    
+                    // 🔧 CORREÇÃO: Verificar se dados são válidos
+                    if (lpData.grapesData && Object.keys(lpData.grapesData).length > 0) {
+                      try {
+                        console.log(`✅ [DEBUG] Carregando dados do banco...`);
+                        
+                        // 🔧 CORREÇÃO: Aguardar editor estar completamente pronto
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        editor.loadProjectData(lpData.grapesData);
+                        console.log(`✅ [DEBUG] Dados carregados com sucesso`);
+                        
+                        // 🔧 CORREÇÃO: Verificar se dados foram realmente carregados
+                        setTimeout(() => {
+                          const html = editor.getHtml();
+                          const css = editor.getCss();
+                          console.log(`🔍 [DEBUG] Verificação pós-carregamento:`);
+                          console.log(`🔍 [DEBUG] HTML carregado:`, html ? html.substring(0, 200) : 'VAZIO');
+                          console.log(`🔍 [DEBUG] CSS carregado:`, css ? css.substring(0, 200) : 'VAZIO');
+                        }, 1000);
+                        
+                      } catch (error) {
+                        console.error(`❌ [DEBUG] Erro ao carregar dados:`, error);
+                        alert('Erro ao carregar dados da LP. Recarregue a página.');
+                      }
+                    } else {
+                      console.log(`⚠️ [DEBUG] Nenhum dado encontrado - LP vazia`);
+                    }
+                  } catch (error) {
+                    console.log(`📝 [LP-EDITOR] Erro ao carregar dados:`, error);
+                  }
+                } else {
+                  console.log(`⚠️ [DEBUG] grapesData não encontrado ou editor não disponível`);
+                }
               }
             } else {
-              console.log(`⚠️ [DEBUG] Nenhum dado encontrado - LP vazia`);
+              console.error(`❌ [LP-EDITOR] Erro na API: ${res.status} ${res.statusText}`);
             }
-          } catch (error) {
-            console.log(`📝 [LP-EDITOR] Erro ao carregar dados:`, error);
-          }
-        }
-                
-
-                
-              }
-            }
-            
-
-            
           } catch (err) {
             console.log(`📝 [LP-EDITOR] Erro na API:`, err);
           }
