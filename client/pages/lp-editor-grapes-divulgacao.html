@@ -576,9 +576,11 @@
           name,
           slug,
           clientId,
-          html,           // ✅ HTML direto
-          css,            // ✅ CSS direto
-          grapesData: JSON.stringify(grapesData),  // ✅ GrapesJS data como string
+          content: {      // ✅ Estrutura correta da API
+            html,
+            css
+          },
+          grapesData,     // ✅ Objeto direto, não string
           images: images || []
         };
         
@@ -1618,22 +1620,47 @@
                     console.log(`🔍 [DEBUG] HTML local length:`, localHtml ? localHtml.length : 0);
                     console.log(`🔍 [DEBUG] HTML API length:`, lpData.grapesData ? JSON.stringify(lpData.grapesData).length : 0);
                     
-                    // 🔧 CORREÇÃO: Priorizar dados locais se forem mais completos
-                    if (localHtml && localHtml.length > 50 && (!lpData.grapesData || JSON.stringify(lpData.grapesData).length < 100)) {
-                      console.log(`🔍 [DEBUG] Dados locais são mais completos - mantendo dados locais`);
-                      console.log(`🔍 [DEBUG] NÃO carregando dados da API para evitar sobrescrita`);
-                    } else if (lpData.grapesData && JSON.stringify(lpData.grapesData).length > 100) {
-                      // 🔧 CORREÇÃO ADICIONAL: Verificar se dados locais já foram carregados
-                      if (window.localDataLoaded && localHtml && localHtml.length > 50) {
-                        console.log(`🔍 [DEBUG] Dados locais já carregados e válidos - IGNORANDO API`);
-                        console.log(`🔍 [DEBUG] NÃO sobrescrevendo dados locais com dados da API`);
-                      } else {
-                        console.log(`🔍 [DEBUG] Dados da API são válidos - carregando da API`);
+                    // 🔧 CORREÇÃO CRÍTICA: SEMPRE carregar dados do BANCO primeiro
+                    if (lpData.grapesData && Object.keys(lpData.grapesData).length > 0) {
+                      try {
+                        console.log(`✅ [DEBUG] Carregando dados do BANCO (fonte da verdade)`);
+                        console.log(`🔍 [DEBUG] Dados GrapesJS do banco:`, lpData.grapesData);
+                        
+                        // ✅ CARREGAR DADOS DO BANCO (fonte da verdade)
                         editor.loadProjectData(lpData.grapesData);
-                        console.log(`✅ [LP-EDITOR] Dados da API carregados com sucesso`);
+                        
+                        console.log(`✅ [DEBUG] Dados do BANCO carregados com sucesso`);
+                        
+                        // 🔧 Salvar no localStorage como backup
+                        const currentHtml = editor.getHtml();
+                        const currentCss = editor.getCss();
+                        if (currentHtml && currentCss) {
+                          localStorage.setItem(`grapesLPDivulgacao_${lpId}Html`, currentHtml);
+                          localStorage.setItem(`grapesLPDivulgacao_${lpId}Css`, currentCss);
+                          console.log(`💾 [DEBUG] Dados do banco salvos no localStorage como backup`);
+                        }
+                        
+                      } catch (error) {
+                        console.error(`❌ [DEBUG] Erro ao carregar dados GrapesJS do banco:`, error);
+                        
+                        // 🔄 FALLBACK: Se banco falhar, usar localStorage
+                        console.log(`🔄 [DEBUG] Fallback: tentando carregar do localStorage...`);
+                        if (localHtml && localCss) {
+                          editor.setHtml(localHtml);
+                          editor.setCss(localCss);
+                          console.log(`✅ [DEBUG] Dados carregados do localStorage como fallback`);
+                        }
                       }
                     } else {
-                      console.log(`🔍 [DEBUG] Dados da API inválidos - mantendo dados locais`);
+                      // 🔄 Se não há dados no banco, tentar localStorage
+                      console.log(`🔄 [DEBUG] Nenhum dado no banco, tentando localStorage...`);
+                      if (localHtml && localCss) {
+                        editor.setHtml(localHtml);
+                        editor.setCss(localCss);
+                        console.log(`✅ [DEBUG] Dados carregados do localStorage`);
+                      } else {
+                        console.log(`⚠️ [DEBUG] Nenhum dado encontrado - LP vazia`);
+                      }
                     }
                     
                     // 🔍 [DEBUG] LOGS DE DIAGNÓSTICO - HIPÓTESE 4 (dados após carregamento da API)
