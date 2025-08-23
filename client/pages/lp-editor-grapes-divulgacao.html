@@ -432,7 +432,10 @@
       <button class="btn-device active" data-device="desktop" style="padding: 6px 10px; font-size: 15px;"><i class="fas fa-desktop"></i></button>
       <button class="btn-device" data-device="mobile" style="padding: 6px 10px; font-size: 15px;"><i class="fas fa-mobile-alt"></i></button>
       <button class="btn btn-secondary" onclick="window.location.href='lp-divulgacao.html'" style="padding: 6px 18px;">Voltar</button>
-      <button class="btn btn-primary" onclick="saveLP()" style="padding: 6px 18px;">Salvar LP</button>
+              <button onclick="testEditor()" class="btn btn-secondary" style="margin-right: 10px; padding: 6px 18px;">
+          <i class="fas fa-bug"></i> Testar Editor
+        </button>
+        <button class="btn btn-primary" onclick="saveLP()" style="padding: 6px 18px;">Salvar LP</button>
     </div>
   </div>
   <div style="margin: 18px 0 24px 24px; display: flex; align-items: center;">
@@ -550,6 +553,24 @@
         console.log(`🔍 [DEBUG] grapesData.components.length:`, grapesData?.components?.length);
         console.log(`🔍 [DEBUG] grapesData.styles:`, grapesData?.styles);
         console.log(`🔍 [DEBUG] grapesData.styles.length:`, grapesData?.styles?.length);
+        
+        // 🔧 CORREÇÃO: Verificar se editor tem componentes visíveis
+        const visibleComponents = editor.getComponents();
+        console.log(`🔍 [DEBUG] Componentes visíveis no editor:`, visibleComponents);
+        console.log(`🔍 [DEBUG] Quantidade de componentes visíveis:`, visibleComponents.length);
+        
+        // 🔧 CORREÇÃO: Verificar se editor tem conteúdo real
+        const editorHtml = editor.getHtml();
+        const editorCss = editor.getCss();
+        console.log(`🔍 [DEBUG] Editor HTML atual:`, editorHtml);
+        console.log(`🔍 [DEBUG] Editor CSS atual:`, editorCss);
+        
+        // 🔧 CORREÇÃO: Verificar se há diferença entre dados capturados e editor atual
+        if (html !== editorHtml || css !== editorCss) {
+          console.warn(`⚠️ [DEBUG] DIFERENÇA DETECTADA entre dados capturados e editor atual!`);
+          console.warn(`⚠️ [DEBUG] HTML capturado vs editor:`, html, 'vs', editorHtml);
+          console.warn(`⚠️ [DEBUG] CSS capturado vs editor:`, css, 'vs', editorCss);
+        }
         
         // 🔧 CORREÇÃO: Validações mais flexíveis dos dados do editor
         if (!html || html.trim() === '' || html === '<body></body>') {
@@ -1761,29 +1782,28 @@
                             // 🔧 CORREÇÃO: Verificar se dados são compatíveis com GrapesJS atual
                             let grapesDataToLoad = lpData.grapesData;
                             
-                            // 🔧 CORREÇÃO: Se components estiver vazio mas compiledOutput existir, usar fallback
-                            if ((!grapesDataToLoad.components || grapesDataToLoad.components.length === 0) && 
-                                lpData.compiledOutput && lpData.compiledOutput.html && lpData.compiledOutput.html !== '<body></body>') {
+                            // 🔧 CORREÇÃO: SEMPRE usar compiledOutput se disponível (mais confiável)
+                            if (lpData.compiledOutput && lpData.compiledOutput.html && lpData.compiledOutput.html !== '<body></body>') {
                               
-                              console.log(`🔄 [DEBUG] Dados antigos detectados, usando fallback com compiledOutput...`);
+                              console.log(`🔄 [DEBUG] Usando compiledOutput (mais confiável)...`);
+                              console.log(`🔍 [DEBUG] HTML disponível:`, lpData.compiledOutput.html.substring(0, 200));
+                              console.log(`🔍 [DEBUG] CSS disponível:`, lpData.compiledOutput.css ? lpData.compiledOutput.css.substring(0, 200) : 'Nenhum');
                               
                               try {
                                 // 🔧 CORREÇÃO: Carregar HTML e CSS do compiledOutput
-                                if (lpData.compiledOutput.html) {
-                                  editor.setHtml(lpData.compiledOutput.html);
-                                  console.log(`✅ [DEBUG] HTML carregado via setHtml:`, lpData.compiledOutput.html.substring(0, 200));
-                                }
+                                editor.setHtml(lpData.compiledOutput.html);
+                                console.log(`✅ [DEBUG] HTML carregado via setHtml`);
                                 
                                 if (lpData.compiledOutput.css) {
                                   editor.setCss(lpData.compiledOutput.css);
-                                  console.log(`✅ [DEBUG] CSS carregado via setCss:`, lpData.compiledOutput.css.substring(0, 200));
+                                  console.log(`✅ [DEBUG] CSS carregado via setCss`);
                                 }
                                 
-                                console.log(`✅ [DEBUG] Dados antigos carregados com sucesso via fallback`);
-                                return; // Sair da função após carregar via fallback
+                                console.log(`✅ [DEBUG] LP carregada com sucesso via compiledOutput`);
+                                return; // Sair da função após carregar via compiledOutput
                                 
                               } catch (fallbackError) {
-                                console.error(`❌ [DEBUG] Erro no fallback para dados antigos:`, fallbackError);
+                                console.error(`❌ [DEBUG] Erro ao carregar via compiledOutput:`, fallbackError);
                               }
                             }
                             
