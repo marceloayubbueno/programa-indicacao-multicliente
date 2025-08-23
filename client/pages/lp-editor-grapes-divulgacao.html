@@ -541,20 +541,49 @@
         const clientId = localStorage.getItem('clientId');
         const lpId = getUrlParam('id'); // ID da LP sendo editada
         
+        // 🔧 CORREÇÃO: Logs detalhados dos dados do editor ANTES da validação
+        console.log(`🔍 [DEBUG] ===== DADOS DO EDITOR ANTES DA VALIDAÇÃO =====`);
+        console.log(`🔍 [DEBUG] HTML capturado:`, html ? html.substring(0, 200) : 'VAZIO');
+        console.log(`🔍 [DEBUG] CSS capturado:`, css ? css.substring(0, 200) : 'VAZIO');
+        console.log(`🔍 [DEBUG] grapesData capturado:`, grapesData);
+        console.log(`🔍 [DEBUG] grapesData.components:`, grapesData?.components);
+        console.log(`🔍 [DEBUG] grapesData.components.length:`, grapesData?.components?.length);
+        console.log(`🔍 [DEBUG] grapesData.styles:`, grapesData?.styles);
+        console.log(`🔍 [DEBUG] grapesData.styles.length:`, grapesData?.styles?.length);
+        
         // 🔧 CORREÇÃO: Validações mais flexíveis dos dados do editor
-        if (!html || html.trim() === '') {
-          alert('Erro: Conteúdo HTML não pode estar vazio. Adicione algum conteúdo antes de salvar.');
+        if (!html || html.trim() === '' || html === '<body></body>') {
+          alert('Erro: Editor está vazio. Adicione algum conteúdo antes de salvar.');
           return;
         }
         
-        // 🔧 CORREÇÃO: Validação mais flexível - aceitar editor vazio para novas LPs
-        if (!grapesData) {
-          console.log('🔍 [DEBUG] grapesData não encontrado, criando estrutura básica');
-          grapesData = { components: [], styles: [], assets: [] };
+        // 🔧 CORREÇÃO: Verificar se grapesData tem componentes válidos
+        if (!grapesData || !grapesData.components || grapesData.components.length === 0) {
+          console.error(`❌ [DEBUG] grapesData inválido ou sem componentes:`, grapesData);
+          
+          // 🔧 CORREÇÃO: Tentar recapturar dados do editor
+          console.log(`🔄 [DEBUG] Tentando recapturar dados do editor...`);
+          const retryHtml = editor.getHtml();
+          const retryCss = editor.getCss();
+          const retryGrapesData = editor.getProjectData();
+          
+          console.log(`🔍 [DEBUG] Dados recapturados:`, {
+            html: retryHtml,
+            css: retryCss,
+            grapesData: retryGrapesData,
+            components: retryGrapesData?.components?.length || 0
+          });
+          
+          if (retryGrapesData && retryGrapesData.components && retryGrapesData.components.length > 0) {
+            console.log(`✅ [DEBUG] Dados recapturados com sucesso, usando retryGrapesData`);
+            grapesData = retryGrapesData;
+          } else {
+            alert('Erro: Editor não tem conteúdo válido. Adicione blocos ao editor antes de salvar.');
+            return;
+          }
         }
         
         // 🔧 CORREÇÃO: Garantir estrutura mínima
-        if (!grapesData.components) grapesData.components = [];
         if (!grapesData.styles) grapesData.styles = [];
         if (!grapesData.assets) grapesData.assets = [];
         
