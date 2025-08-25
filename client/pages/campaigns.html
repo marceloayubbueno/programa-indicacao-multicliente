@@ -17,11 +17,11 @@
         </div>
         <ul class="space-y-2 flex-1">
           <li><a href="dashboard.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-chart-line mr-2"></i> Dashboard</a></li>
+          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
           <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
           <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> Lp de indicadores</a></li>
           <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
           <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> Lp de divulgação</a></li>
-          <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
           <li>
             <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleEngagementEmailMenu()">
               <i class="fas fa-envelope mr-2"></i> Engajamento e-mail
@@ -29,10 +29,19 @@
             </div>
             <ul id="engagementEmailMenu" class="ml-8 mt-1 space-y-1 hidden">
               <li><a href="email-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> E-mail marketing</a></li>
-              <li><a href="engajamento-email-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos de E-mail</a></li>
+              <li><a href="send-bulk-email.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> Fluxos</a></li>
             </ul>
           </li>
-          <li><a href="engajamento-whatsapp.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-whatsapp mr-2"></i> Engajamentos Whatsapp</a></li>
+          <li>
+            <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleWhatsAppMenu()">
+              <i class="fas fa-whatsapp mr-2"></i> Engajamentos Whatsapp
+              <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="whatsappArrow" style="transform: rotate(0deg);"></i>
+            </div>
+            <ul id="whatsappMenu" class="ml-8 mt-1 space-y-1 hidden">
+              <li><a href="whatsapp-templates.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope mr-2"></i> Templates</a></li>
+              <li><a href="whatsapp-flows.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-project-diagram mr-2"></i> Fluxos</a></li>
+            </ul>
+          </li>
           <li><a href="referrals.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user-plus mr-2"></i> Gestão de leads</a></li>
           <li>
             <div class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer group" onclick="toggleFinanceMenu()">
@@ -52,7 +61,6 @@
             <ul id="settingsMenu" class="ml-8 mt-1 space-y-1 hidden">
               <li><a href="my-data.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-user mr-2"></i> Meus dados</a></li>
               <li><a href="email-config.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-envelope-open mr-2"></i> Configuração de e-mail</a></li>
-              <li><a href="configuracao-whatsapp.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-whatsapp mr-2"></i> Configuração de whatsapp</a></li>
               <li><a href="configuracao-integracoes.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-plug mr-2"></i> Configuração Integrações</a></li>
             </ul>
           </li>
@@ -137,41 +145,12 @@
     <script src="../js/config.js"></script>
     <script src="../js/campaigns.js"></script>
     <script src="../js/auth.js"></script>
-    <script>checkAuth();
-    // Script para expandir/colapsar o menu Financeiro
-    function toggleFinanceMenu() {
-      const menu = document.getElementById('financeMenu');
-      const arrow = document.getElementById('financeArrow');
-      menu.classList.toggle('hidden');
-      if (menu.classList.contains('hidden')) {
-        arrow.style.transform = 'rotate(0deg)';
-      } else {
-        arrow.style.transform = 'rotate(90deg)';
-      }
-    }
-
-    // Script para expandir/colapsar o menu Engajamento
-    function toggleEngagementEmailMenu() {
-      const menu = document.getElementById('engagementEmailMenu');
-      const arrow = document.getElementById('engagementEmailArrow');
-      menu.classList.toggle('hidden');
-      if (menu.classList.contains('hidden')) {
-        arrow.style.transform = 'rotate(0deg)';
-      } else {
-        arrow.style.transform = 'rotate(90deg)';
-      }
-    }
-
-    function toggleSettingsMenu() {
-      const menu = document.getElementById('settingsMenu');
-      const arrow = document.getElementById('settingsArrow');
-      menu.classList.toggle('hidden');
-      if (menu.classList.contains('hidden')) {
-        arrow.style.transform = 'rotate(0deg)';
-      } else {
-        arrow.style.transform = 'rotate(90deg)';
-      }
-    }
+    <script>
+        checkAuth();
+        // Destacar menu ativo
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightActiveMenu();
+        });
     </script>
     <!-- Frontend carregado -->
 </body>
