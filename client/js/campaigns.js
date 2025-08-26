@@ -1006,13 +1006,6 @@ function showLPIndicadoresModal(data) {
                     ` : ''}
                     
                     <button 
-                        onclick="window.open('${lpIndicadores.previewUrl}', '_blank')" 
-                        class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center">
-                        <i class="fas fa-eye mr-2"></i>
-                        Preview da LP
-                    </button>
-                    
-                    <button 
                         onclick="window.open('${lpIndicadores.editUrl}', '_blank')" 
                         class="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center justify-center">
                         <i class="fas fa-edit mr-2"></i>
