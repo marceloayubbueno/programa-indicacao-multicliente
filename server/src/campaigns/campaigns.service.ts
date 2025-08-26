@@ -308,7 +308,7 @@ export class CampaignsService {
         
         // URLs corretas baseadas na função real:
         const publicUrl = lp.status === 'published' ? `https://lp.virallead.com.br/lp-indicadores/slug/${lp.slug}` : null;
-        const editUrl = `${CLIENT_BASE_URL}/client/pages/lp-editor-grapes.html?id=${(lp as any)._id?.toString()}`;
+        const editUrl = `${CLIENT_BASE_URL}/pages/lp-editor-grapes.html?id=${(lp as any)._id?.toString()}`;
         const previewUrl = `${CLIENT_BASE_URL}/client/pages/lp-preview.html?id=${(lp as any)._id?.toString()}`;
 
         return {
