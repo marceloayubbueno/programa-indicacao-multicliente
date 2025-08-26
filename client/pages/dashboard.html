@@ -69,66 +69,139 @@
       <!-- Main Content -->
       <div class="flex-1 flex flex-col bg-gray-900 min-h-screen">
         <div class="flex-1 flex flex-col">
-          <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm">
-            <h1 class="text-3xl font-bold text-blue-400">Dashboard</h1>
+          <header class="px-8 py-6 bg-gray-900 flex items-center justify-between shadow-sm border-b border-gray-700">
+            <div class="flex flex-col gap-2">
+              <h1 class="text-3xl font-bold text-blue-400">Dashboard</h1>
+              <p class="text-gray-400">Visão geral das suas campanhas e métricas</p>
+            </div>
             <div class="flex items-center gap-4">
-              <span id="clientName" class="block text-gray-200 font-medium">Nome do Cliente</span>
-              <i class="fas fa-user-circle text-2xl text-gray-400"></i>
+              <div class="text-right">
+                <p class="text-sm text-gray-400">Bem-vindo,</p>
+                <p class="font-semibold text-gray-100" id="clientName">Nome do Cliente</p>
+              </div>
+              <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-user text-white"></i>
+              </div>
             </div>
           </header>
           <main class="flex-1 p-8">
             <!-- Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
-                <span class="text-gray-400 text-sm mb-2">Campanhas Ativas</span>
-                <span class="text-2xl font-bold text-gray-100">0</span>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors shadow">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-gray-400 text-sm font-medium mb-2">Campanhas Ativas</p>
+                    <p class="text-3xl font-bold text-gray-100" id="activeCampaigns">0</p>
+                    <p class="text-green-400 text-sm mt-1">
+                      <i class="fas fa-arrow-up mr-1"></i>+5% esta semana
+                    </p>
+                  </div>
+                  <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-rocket text-green-400 text-xl"></i>
+                  </div>
+                </div>
               </div>
-              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
-                <span class="text-gray-400 text-sm mb-2">Total de Participantes</span>
-                <span class="text-2xl font-bold text-gray-100">0</span>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors shadow">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-gray-400 text-sm font-medium mb-2">Total de Participantes</p>
+                    <p class="text-3xl font-bold text-gray-100" id="totalParticipants">0</p>
+                    <p class="text-blue-400 text-sm mt-1">
+                      <i class="fas fa-arrow-up mr-1"></i>+12% este mês
+                    </p>
+                  </div>
+                  <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-blue-400 text-xl"></i>
+                  </div>
+                </div>
               </div>
-              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
-                <span class="text-gray-400 text-sm mb-2">Indicações Recebidas</span>
-                <span class="text-2xl font-bold text-gray-100">0</span>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors shadow">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-gray-400 text-sm font-medium mb-2">Indicações Recebidas</p>
+                    <p class="text-3xl font-bold text-gray-100" id="totalReferrals">0</p>
+                    <p class="text-yellow-400 text-sm mt-1">
+                      <i class="fas fa-arrow-right mr-1"></i>Estável
+                    </p>
+                  </div>
+                  <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-user-plus text-yellow-400 text-xl"></i>
+                  </div>
+                </div>
               </div>
-              <div class="bg-gray-800 rounded-xl p-6 shadow flex flex-col items-start border-none">
-                <span class="text-gray-400 text-sm mb-2">Recompensas Pagas</span>
-                <span class="text-2xl font-bold text-gray-100">R$ 0,00</span>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors shadow">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-gray-400 text-sm font-medium mb-2">Recompensas Pagas</p>
+                    <p class="text-3xl font-bold text-gray-100" id="totalRewards">R$ 0,00</p>
+                    <p class="text-purple-400 text-sm mt-1">
+                      <i class="fas fa-arrow-up mr-1"></i>+8% este mês
+                    </p>
+                  </div>
+                  <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-gift text-purple-400 text-xl"></i>
+                  </div>
+                </div>
               </div>
             </div>
             <!-- Gráficos -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div class="bg-gray-800 rounded-xl p-6 shadow border-none flex flex-col">
-                <h3 class="text-lg font-semibold text-gray-100 mb-4">Indicações por Campanha</h3>
-                <div id="campaignChart" class="flex-1 flex items-center justify-center text-gray-500">[Gráfico aqui]</div>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-xl font-semibold text-gray-100">Indicações por Campanha</h3>
+                  <div class="text-sm text-gray-400">
+                    <i class="fas fa-chart-line mr-1"></i>Últimos 6 meses
+                  </div>
+                </div>
+                <div class="h-64 flex items-center justify-center">
+                  <canvas id="campaignChart" class="w-full h-full"></canvas>
+                </div>
               </div>
-              <div class="bg-gray-800 rounded-xl p-6 shadow border-none flex flex-col">
-                <h3 class="text-lg font-semibold text-gray-100 mb-4">Conversão de Indicações</h3>
-                <div id="conversionChart" class="flex-1 flex items-center justify-center text-gray-500">[Gráfico aqui]</div>
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-xl font-semibold text-gray-100">Conversão de Indicações</h3>
+                  <div class="text-sm text-gray-400">
+                    <i class="fas fa-chart-pie mr-1"></i>Taxa de sucesso
+                  </div>
+                </div>
+                <div class="h-64 flex items-center justify-center">
+                  <canvas id="conversionChart" class="w-full h-full"></canvas>
+                </div>
               </div>
             </div>
             <!-- Atividade Recente -->
-            <div class="bg-gray-800 rounded-xl p-6 shadow border-none">
-              <h3 class="text-lg font-semibold text-gray-100 mb-4">Atividade Recente</h3>
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-100">Atividade Recente</h3>
+                <a href="#" class="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                  Ver todas <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+              </div>
               <div class="divide-y divide-gray-700">
                 <div class="flex items-center gap-4 py-4">
-                  <span class="text-2xl">📊</span>
+                  <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-rocket text-green-400 text-sm"></i>
+                  </div>
                   <div class="flex-1">
-                    <p class="text-gray-100">Nova campanha criada: "Indique e Ganhe"</p>
+                    <p class="text-gray-100 font-medium">Nova campanha criada: "Indique e Ganhe"</p>
                     <small class="text-gray-400">Há 2 horas</small>
                   </div>
                 </div>
                 <div class="flex items-center gap-4 py-4">
-                  <span class="text-2xl">👥</span>
+                  <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-users text-blue-400 text-sm"></i>
+                  </div>
                   <div class="flex-1">
-                    <p class="text-gray-100">Novo participante registrado</p>
+                    <p class="text-gray-100 font-medium">Novo participante registrado</p>
                     <small class="text-gray-400">Há 3 horas</small>
                   </div>
                 </div>
                 <div class="flex items-center gap-4 py-4">
-                  <span class="text-2xl">🎁</span>
+                  <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-gift text-purple-400 text-sm"></i>
+                  </div>
                   <div class="flex-1">
-                    <p class="text-gray-100">Recompensa paga para João Silva</p>
+                    <p class="text-gray-100 font-medium">Recompensa paga para João Silva</p>
                     <small class="text-gray-400">Há 5 horas</small>
                   </div>
                 </div>
@@ -138,6 +211,7 @@
         </div>
       </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/config.js"></script>
     <script src="../js/dashboard.js"></script>
     <script src="../js/auth.js"></script>
