@@ -27,7 +27,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function loadRewardType(id) {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('clientToken');
     const response = await fetch(`${apiUrl}/${id}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ async function handleSaveRewardType(event) {
     clientId: localStorage.getItem('clientId')
   };
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('clientToken');
     let response;
     if (editingRewardTypeId) {
       response = await fetch(`${apiUrl}/${editingRewardTypeId}`, {
