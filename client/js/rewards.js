@@ -85,11 +85,11 @@ function toggleRewardFields() {
     });
     
     // Mostrar campos específicos do tipo selecionado
-    if (type === 'points') {
+    if (type === 'pontos') {
         document.getElementById('pointsFields').style.display = 'block';
     } else if (type === 'pix') {
         document.getElementById('pixFields').style.display = 'block';
-    } else if (type === 'discount') {
+    } else if (type === 'desconto') {
         document.getElementById('discountFields').style.display = 'block';
     }
 }
@@ -164,12 +164,12 @@ async function handleNewRewardType(event) {
     event.preventDefault();
     const API_URL = getApiUrl();
     const type = document.getElementById('rewardType').value;
-    const rewardData = {
-        type: type,
-        value: parseFloat(document.getElementById(type === 'pix' ? 'pixValue' : type === 'discount' ? 'discountValue' : 'pointsValue').value),
-        description: document.getElementById('rewardName').value,
-        clientId: localStorage.getItem('clientId')
-    };
+            const rewardData = {
+            type: type,
+            value: parseFloat(document.getElementById(type === 'pix' ? 'pixValue' : type === 'desconto' ? 'discountValue' : 'pointsValue').value),
+            description: document.getElementById('rewardName').value,
+            clientId: localStorage.getItem('clientId')
+        };
     try {
         const token = localStorage.getItem('clientToken');
         let response;
@@ -235,20 +235,20 @@ async function deleteRewardType(id) {
 
 function getTypeLabel(type) {
     const labels = {
-        points: 'Pontos',
+        pontos: 'Pontos',
         pix: 'PIX',
-        discount: 'Desconto'
+        desconto: 'Desconto'
     };
     return labels[type] || type;
 }
 
 function formatValue(rewardType) {
     switch(rewardType.type) {
-        case 'points':
+        case 'pontos':
             return `${rewardType.value} Pontos`;
         case 'pix':
             return `R$ ${parseFloat(rewardType.value).toFixed(2)}`;
-        case 'discount':
+        case 'desconto':
             return `${rewardType.value}% de Desconto`;
         default:
             return rewardType.value;
@@ -279,11 +279,11 @@ function editRewardType(id) {
             document.getElementById('pixValue').value = type.value;
             document.getElementById('pointsValue').value = '';
             document.getElementById('discountValue').value = '';
-        } else if (type.type === 'points') {
+        } else if (type.type === 'pontos') {
                 document.getElementById('pointsValue').value = type.value;
             document.getElementById('pixValue').value = '';
             document.getElementById('discountValue').value = '';
-        } else if (type.type === 'discount') {
+        } else if (type.type === 'desconto') {
                 document.getElementById('discountValue').value = type.value;
             document.getElementById('pixValue').value = '';
             document.getElementById('pointsValue').value = '';
