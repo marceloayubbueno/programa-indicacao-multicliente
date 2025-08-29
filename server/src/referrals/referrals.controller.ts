@@ -1,7 +1,10 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Logger, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Logger, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ReferralsService } from './referrals.service';
+import { JwtClientAuthGuard } from '../auth/guards/jwt-client-auth.guard';
+import { ClientId } from '../auth/decorators/client-id.decorator';
 
 @Controller('referrals')
+@UseGuards(JwtClientAuthGuard) // 🔒 PROTEÇÃO: Todas as rotas protegidas por JWT
 export class ReferralsController {
   private readonly logger = new Logger(ReferralsController.name);
 
@@ -9,10 +12,10 @@ export class ReferralsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createReferral(@Body() body: any) {
+  async createReferral(@Body() body: any, @ClientId() clientId: string) {
     this.logger.log('Recebido POST /referrals');
     this.logger.debug('Body recebido:', JSON.stringify(body));
-    const { leadName, leadEmail, leadPhone, campaignId, clientId, indicatorId } = body;
+    const { leadName, leadEmail, leadPhone, campaignId, indicatorId } = body;
     if (!leadName || !leadEmail || !leadPhone) {
       this.logger.warn('Campos obrigatórios ausentes');
       return { success: false, message: 'Nome, e-mail e celular são obrigatórios.' };
@@ -23,7 +26,7 @@ export class ReferralsController {
         leadEmail,
         leadPhone,
         campaignId,
-        clientId,
+        clientId, // 🔒 SEGURANÇA: Usar clientId do JWT
         indicatorId,
         status: 'pendente',
       });
@@ -36,10 +39,10 @@ export class ReferralsController {
   }
 
   @Get()
-  async getAllReferrals() {
+  async getAllReferrals(@ClientId() clientId: string) {
     this.logger.log('Recebido GET /referrals');
     try {
-      const referrals = await this.referralsService.findAll();
+      const referrals = await this.referralsService.findByClient(clientId); // 🔒 SEGURANÇA: Filtrar por clientId
       return { success: true, data: referrals };
     } catch (err) {
       this.logger.error('Erro ao listar referrals:', err);

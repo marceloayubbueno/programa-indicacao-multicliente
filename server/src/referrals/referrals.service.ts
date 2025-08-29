@@ -63,6 +63,33 @@ export class ReferralsService {
     }));
   }
 
+  // 🔒 SEGURANÇA: Método para filtrar por clientId seguindo padrão do sistema
+  async findByClient(clientId: string): Promise<any[]> {
+    this.logger.debug(`🔍 [DEBUG] Buscando indicações para clientId: ${clientId}`);
+    const referrals = await this.referralModel.find({ clientId })
+      .populate('indicatorId', 'name')
+      .populate('campaignId', 'name')
+      .sort({ createdAt: -1 })
+      .exec();
+    
+    this.logger.debug(`🔍 [DEBUG] Encontrados ${referrals.length} referrals para cliente ${clientId}`);
+    
+    // Mapear para retornar os campos necessários para o frontend
+    return referrals.map(ref => ({
+      _id: ref._id,
+      leadName: ref.leadName,
+      leadEmail: ref.leadEmail,
+      leadPhone: ref.leadPhone,
+      status: ref.status,
+      createdAt: (ref as any).createdAt,
+      indicatorName: this.safeGetProperty(ref.indicatorId, 'name') || '-',
+      campaignName: this.getCampaignNameSafely(ref.campaignId),
+      referralSource: (ref as any).referralSource || 'manual',
+      indicatorReferralCode: (ref as any).indicatorReferralCode || null,
+      rewardValue: (ref as any).rewardValue || 0,
+    }));
+  }
+
   // === FUNÇÕES HELPER PARA PROPRIEDADES SEGURAS ===
   
   /**
