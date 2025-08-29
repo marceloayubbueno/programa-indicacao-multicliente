@@ -219,33 +219,111 @@ function changePage(direction) {
 }
 
 // Funções de modal
-function showConversionModal(leadId) {
+async function showConversionModal(leadId) {
     const lead = currentLeads.find(l => l._id === leadId);
     if (!lead) return;
 
     document.getElementById('conversionLeadName').textContent = lead.leadName;
     document.getElementById('conversionIndicator').textContent = lead.indicatorName || 'N/A';
-    document.getElementById('conversionValue').value = '';
-    document.getElementById('conversionNotes').value = '';
+    document.getElementById('conversionCampaign').textContent = lead.campaignName || 'N/A';
+    
+    // Exibir "Carregando..." enquanto busca a recompensa
+    document.getElementById('conversionReward').textContent = 'Carregando...';
     
     // Armazenar ID do lead para uso posterior
     document.getElementById('conversionModal').dataset.leadId = leadId;
     document.getElementById('conversionModal').classList.remove('hidden');
+    
+    // Buscar automaticamente a recompensa da campanha
+    if (lead.campaignId) {
+        try {
+            await loadCampaignReward(lead.campaignId);
+        } catch (error) {
+            console.error('Erro ao carregar recompensa da campanha:', error);
+            document.getElementById('conversionReward').textContent = 'Erro ao carregar recompensa';
+        }
+    } else {
+        document.getElementById('conversionReward').textContent = 'Campanha não encontrada';
+    }
 }
 
 function closeConversionModal() {
     document.getElementById('conversionModal').classList.add('hidden');
 }
 
+// Nova função para carregar recompensa da campanha
+async function loadCampaignReward(campaignId) {
+    try {
+        // 🌍 USAR CONFIGURAÇÃO DINÂMICA
+        const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
+                      (window.location.hostname === 'localhost' ? 
+                       'http://localhost:3000' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app');
+        
+        // Preparar headers de autenticação
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        const clientToken = localStorage.getItem('clientToken');
+        const adminToken = localStorage.getItem('adminToken');
+        
+        if (clientToken) {
+            headers['Authorization'] = `Bearer ${clientToken}`;
+        } else if (adminToken) {
+            headers['Authorization'] = `Bearer ${adminToken}`;
+        }
+        
+        // Usar o endpoint de debug para buscar informações da campanha
+        const response = await fetch(`${apiUrl}/campaigns/debug/campaign/${campaignId}/detailed`, { headers });
+        const data = await response.json();
+        
+        if (data.success && data.data?.campaign) {
+            const campaign = data.data.campaign;
+            
+            // Buscar recompensa de conversão se existir
+            if (campaign.rewardOnConversion) {
+                const rewardResponse = await fetch(`${apiUrl}/rewards/${campaign.rewardOnConversion}`, { headers });
+                const rewardData = await rewardResponse.json();
+                
+                if (rewardData.success && rewardData.data) {
+                    const reward = rewardData.data;
+                    const rewardText = formatRewardValue(reward);
+                    document.getElementById('conversionReward').textContent = rewardText;
+                } else {
+                    document.getElementById('conversionReward').textContent = 'Recompensa não encontrada';
+                }
+            } else {
+                document.getElementById('conversionReward').textContent = 'Nenhuma recompensa configurada';
+            }
+        } else {
+            document.getElementById('conversionReward').textContent = 'Campanha não encontrada';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar recompensa:', error);
+        document.getElementById('conversionReward').textContent = 'Erro ao carregar recompensa';
+    }
+}
+
+// Função para formatar o valor da recompensa
+function formatRewardValue(reward) {
+    if (!reward) return 'N/A';
+    
+    switch (reward.type) {
+        case 'pix':
+            return `R$ ${parseFloat(reward.value || 0).toFixed(2)}`;
+        case 'pontos':
+            return `${reward.value || 0} Pontos`;
+        case 'desconto':
+            return `${reward.value || 0}% de Desconto`;
+        default:
+            return reward.value || 'Valor não definido';
+    }
+}
+
 async function confirmConversion() {
     const leadId = document.getElementById('conversionModal').dataset.leadId;
-    const value = document.getElementById('conversionValue').value;
     const notes = document.getElementById('conversionNotes').value;
-
-    if (!value || parseFloat(value) <= 0) {
-        alert('Por favor, informe um valor válido para a conversão.');
-        return;
-    }
 
     try {
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA  
@@ -259,7 +337,6 @@ async function confirmConversion() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                conversionValue: parseFloat(value),
                 notes: notes
             })
         });
