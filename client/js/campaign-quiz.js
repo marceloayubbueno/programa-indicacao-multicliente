@@ -5,11 +5,11 @@ function getApiUrl() {
            'http://localhost:3000/api');
 }
 
-let currentStep = 0;
-let selectedCampaignType = null;
+let currentStep = 1;
+let selectedCampaignType = 'offline'; // Definir como offline por padrão
 let selectedSourceType = null;
 
-const totalSteps = 6; // 0 a 6
+const totalSteps = 5; // 1 a 5
 
 // --- Recompensas ---
 // Variáveis para armazenar IDs das recompensas selecionadas
@@ -32,7 +32,7 @@ function showStep(step) {
     }
   } else {
     // Mostra a etapa normal
-    const stepId = step === 0 ? 'step0' : step === 1 ? 'step1' : step === 2 ? 'step2' : step === 4 ? 'step4' : step === 5 ? 'step5' : step === 6 ? 'step6' : '';
+    const stepId = step === 1 ? 'step1' : step === 2 ? 'step2' : step === 4 ? 'step4' : step === 5 ? 'step5' : step === 6 ? 'step6' : '';
     if (stepId) {
       const el = document.getElementById(stepId);
       if (el) el.style.display = 'block';
@@ -40,7 +40,7 @@ function showStep(step) {
   }
 
   // Atualiza barra de progresso
-  const progressPercents = [0, 16.6, 33.2, 49.8, 66.4, 83, 100];
+  const progressPercents = [0, 20, 40, 60, 80, 100];
   document.getElementById('progressBar').style.width = progressPercents[step] + '%';
 
   // Botões
@@ -82,16 +82,6 @@ function showStep(step) {
 
 function nextStep() {
   // Validação por etapa
-  if (currentStep === 0) {
-    if (!selectedCampaignType) {
-      alert('Selecione o tipo de campanha.');
-      return;
-    }
-    if (selectedCampaignType === 'online') {
-      alert('O fluxo de Link de Compartilhamento (Conversão Online) estará disponível em breve!');
-      return;
-    }
-  }
   if (currentStep === 1) {
     const name = document.getElementById('campaignName').value.trim();
     if (!name) {
@@ -143,13 +133,7 @@ function previousStep() {
   }
 }
 
-function selectCampaignType(type) {
-  selectedCampaignType = type;
-  document.getElementById('cardOffline').classList.toggle('ring-2', type === 'offline');
-  document.getElementById('cardOffline').classList.toggle('ring-blue-500', type === 'offline');
-  document.getElementById('cardOnline').classList.toggle('ring-2', type === 'online');
-  document.getElementById('cardOnline').classList.toggle('ring-yellow-500', type === 'online');
-}
+// Função removida - tipo de campanha definido como 'offline' por padrão
 
 function selectSourceType(type) {
   selectedSourceType = type;
@@ -1131,8 +1115,6 @@ async function salvarCampanhaBackend() {
   } else if (typeof selectedCampaignType !== 'undefined') {
     if (selectedCampaignType === 'offline') {
       type = 'lp-divulgacao';
-    } else if (selectedCampaignType === 'online') {
-      type = 'link-compartilhamento';
     }
   }
 

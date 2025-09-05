@@ -31,28 +31,11 @@
         <main class="flex-1 p-8">
           <!-- Barra de progresso -->
           <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden mb-8">
-            <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" id="progressBar" style="width: 16.6%"></div>
+            <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" id="progressBar" style="width: 20%"></div>
           </div>
           <div id="quizSteps">
-            <!-- Etapa 01: Tipo de Campanha -->
-            <section class="quiz-step active" id="step0">
-              <h2 class="text-2xl font-bold text-blue-400 mb-4">Qual o tipo de campanha?</h2>
-              <p class="text-gray-300 mb-6">Escolha o tipo de campanha que melhor se encaixa no seu objetivo. Você poderá personalizar todos os detalhes nas próximas etapas.</p>
-              <div class="flex gap-8 mt-6">
-                <div class="rounded-xl p-8 flex-1 bg-gray-800 shadow hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-blue-400" onclick="selectCampaignType('offline')" id="cardOffline">
-                  <h3 class="text-lg font-bold mb-2 flex items-center text-blue-300"><i class="fas fa-bullhorn mr-2"></i> LP de Divulgação (Conversão Offline)</h3>
-                  <p class="text-gray-300 mb-2">Para empresas que fazem contato direto com o cliente após a indicação. Ideal para vendas consultivas, B2B, serviços, etc.</p>
-                  <span class="inline-block bg-blue-900 text-blue-300 px-2 py-1 rounded text-xs">Fluxo disponível</span>
-                </div>
-                <div class="rounded-xl p-8 flex-1 bg-gray-800 shadow opacity-60 cursor-not-allowed border-2 border-transparent" onclick="selectCampaignType('online')" id="cardOnline">
-                  <h3 class="text-lg font-bold mb-2 flex items-center text-yellow-400"><i class="fas fa-link mr-2"></i> Link de Compartilhamento (Conversão Online)</h3>
-                  <p class="text-gray-300 mb-2">Para empresas com jornada 100% online, como e-commerce. O lead finaliza a compra sem contato manual.</p>
-                  <span class="inline-block bg-yellow-900 text-yellow-400 px-2 py-1 rounded text-xs">Em breve</span>
-                </div>
-              </div>
-            </section>
-            <!-- Etapa 02: Dados da Campanha -->
-            <section class="quiz-step" id="step1">
+            <!-- Etapa 01: Dados da Campanha -->
+            <section class="quiz-step active" id="step1">
               <h2 class="text-2xl font-bold text-blue-400 mb-4">Dados da campanha</h2>
               <p class="text-gray-300 mb-6">Preencha as informações principais da sua campanha. O nome será usado para identificar a campanha e criar a lista de indicadores.</p>
               <div class="form-group mb-4">
@@ -72,7 +55,7 @@
                 </div>
               </div>
             </section>
-            <!-- Etapa 03: Fonte dos Indicadores -->
+            <!-- Etapa 02: Fonte dos Indicadores -->
             <section class="quiz-step" id="step2">
               <h2 class="text-2xl font-bold text-blue-400 mb-4">Como você quer cadastrar os indicadores?</h2>
               <p class="text-gray-300 mb-6">Escolha se os indicadores serão cadastrados via LP (formulário público) ou a partir de uma lista de participantes já existente.</p>
@@ -87,7 +70,7 @@
                 </div>
               </div>
             </section>
-            <!-- Etapa 03.1: Se LP de Indicadores -->
+            <!-- Etapa 02.1: Se LP de Indicadores -->
             <section class="quiz-step" id="step3-lp" style="display:none;">
               <h2 class="text-2xl font-bold text-blue-400 mb-4">Escolha o modelo da LP de Indicadores</h2>
               <p class="text-gray-300 mb-6">Selecione um modelo pronto ou personalize sua própria LP de indicadores. Você pode editar o modelo no editor visual.</p>
@@ -96,7 +79,7 @@
               </div>
               <button class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors mt-4" onclick="editarLPIndicadores()"><i class="fas fa-pen mr-2"></i>Editar/Personalizar LP</button>
             </section>
-            <!-- Etapa 03.2: Se Lista de Participantes -->
+            <!-- Etapa 02.2: Se Lista de Participantes -->
             <section class="quiz-step" id="step3-lista" style="display:none;">
               <h2 class="text-2xl font-bold text-blue-400 mb-4">Selecione ou crie a lista de participantes</h2>
               <div class="mb-8">
@@ -121,7 +104,7 @@
                 <div id="criacaoManualListaContainer" style="display:none;"></div>
               </div>
             </section>
-            <!-- Etapa 04: LP de Divulgação -->
+            <!-- Etapa 03: LP de Divulgação -->
             <section class="quiz-step" id="step4">
               <h2 class="text-2xl font-bold text-blue-400 mb-4">LP de Divulgação</h2>
               <p class="text-gray-300 mb-6">Selecione um modelo de LP de divulgação ou personalize no editor visual. Cada indicador terá um link exclusivo baseado neste modelo.</p>
@@ -130,7 +113,7 @@
               </div>
               <button class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors mt-4" onclick="editarLPDivulgacao()"><i class="fas fa-pen mr-2"></i>Editar/Personalizar LP de Divulgação</button>
             </section>
-            <!-- Etapa 05: Recompensas -->
+            <!-- Etapa 04: Recompensas -->
             <section class="quiz-step" id="step5">
               <h2 class="text-2xl font-bold text-blue-400 mb-4">Recompensas</h2>
               <p class="text-gray-300 mb-6">
@@ -167,7 +150,7 @@
                 </button>
               </div>
             </section>
-            <!-- Etapa 06: Resumo da Campanha -->
+            <!-- Etapa 05: Resumo da Campanha -->
             <section class="quiz-step" id="step6">
               <h2 class="text-2xl font-bold text-blue-400 mb-4">Resumo da Campanha</h2>
               <p class="text-gray-300 mb-6">Confira todos os detalhes antes de finalizar. Você pode voltar e ajustar qualquer etapa.</p>
