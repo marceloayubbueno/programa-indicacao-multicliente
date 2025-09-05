@@ -76,4 +76,29 @@ export class RewardsController {
     }
     return this.rewardsService.remove(id);
   }
+
+  @Get(':id/campaigns')
+  async findCampaignsUsingReward(@Param('id') id: string, @Request() req) {
+    const clientId = req.user?.clientId || req.user?.sub;
+    this.logger.debug(`[GET /rewards/:id/campaigns] Buscando campanhas para rewardId: ${id}, clientId: ${clientId}`);
+    
+    try {
+      // Verificar se a recompensa pertence ao cliente
+      const reward = await this.rewardsService.findOne(id);
+      if (reward.clientId.toString() !== clientId) {
+        throw new Error('Acesso negado: recompensa não pertence ao cliente');
+      }
+      
+      const campaigns = await this.rewardsService.findCampaignsUsingReward(id, clientId);
+      
+      return {
+        success: true,
+        data: campaigns,
+        message: 'Campanhas encontradas com sucesso'
+      };
+    } catch (error) {
+      this.logger.error(`[GET /rewards/:id/campaigns] Erro ao buscar campanhas: ${error.message}`);
+      throw error;
+    }
+  }
 } 

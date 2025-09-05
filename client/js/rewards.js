@@ -129,7 +129,7 @@ function renderRewardTypesGrid(rewardTypes) {
     
     if (!rewardTypes || rewardTypes.length === 0) {
         console.log('📝 [REWARDS] Nenhum tipo encontrado, mostrando mensagem vazia');
-        grid.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-gift fa-2x mb-4"></i><p class="text-gray-300 text-lg">Nenhum tipo de recompensa cadastrado</p><p class="text-gray-500 text-sm mt-2">Clique em "Novo Tipo de Recompensa" para começar.</p></td></tr>';
+        grid.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-gift fa-2x mb-4"></i><p class="text-gray-300 text-lg">Nenhum tipo de recompensa cadastrado</p><p class="text-gray-500 text-sm mt-2">Clique em "Novo Tipo de Recompensa" para começar.</p></td></tr>';
         return;
     }
     
@@ -148,6 +148,11 @@ function renderRewardTypesGrid(rewardTypes) {
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${formatValue(type)}</td>
               <td class="px-6 py-4 text-sm text-gray-400">${type.details || type.description || 'Sem descrição'}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${formatDate(type.createdAt)}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                <div id="campaigns-${type._id || type.id}" class="campaigns-cell">
+                  <i class="fas fa-spinner fa-spin text-gray-500"></i>
+                </div>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button class="text-blue-400 hover:text-blue-300 mr-3" onclick="editRewardType('${type._id || type.id}')" title="Editar">
                   <i class="fas fa-edit"></i>
@@ -159,6 +164,9 @@ function renderRewardTypesGrid(rewardTypes) {
             </tr>
         `;
     }).join('');
+    
+    // Carregar campanhas para cada recompensa
+    loadCampaignsForRewards(rewardTypes);
     
     console.log('✅ [REWARDS] Grid renderizado com sucesso!');
 }
@@ -366,4 +374,46 @@ window.showNewRewardTypeModal = function() {
 async function loadRewards() {
     console.log('🔍 [REWARDS] loadRewards chamada - redirecionando para loadRewardTypes');
     await loadRewardTypes();
+}
+
+// Função para carregar campanhas que usam cada recompensa
+async function loadCampaignsForRewards(rewardTypes) {
+    const API_URL = getApiUrl();
+    const token = localStorage.getItem('clientToken');
+    
+    for (const reward of rewardTypes) {
+        try {
+            const response = await fetch(`${API_URL}/rewards/${reward._id || reward.id}/campaigns`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': 'Bearer ' + token })
+                }
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                const campaigns = result.data || [];
+                updateCampaignsCell(reward._id || reward.id, campaigns);
+            } else {
+                updateCampaignsCell(reward._id || reward.id, []);
+            }
+        } catch (error) {
+            console.error(`Erro ao carregar campanhas para recompensa ${reward._id}:`, error);
+            updateCampaignsCell(reward._id || reward.id, []);
+        }
+    }
+}
+
+// Função para atualizar a célula de campanhas
+function updateCampaignsCell(rewardId, campaigns) {
+    const cell = document.getElementById(`campaigns-${rewardId}`);
+    if (!cell) return;
+    
+    if (campaigns.length === 0) {
+        cell.innerHTML = '<span class="text-gray-500 text-xs">Nenhuma campanha</span>';
+    } else if (campaigns.length === 1) {
+        cell.innerHTML = `<span class="text-blue-400 text-xs">${campaigns[0].name}</span>`;
+    } else {
+        cell.innerHTML = `<span class="text-blue-400 text-xs">${campaigns.length} campanhas</span>`;
+    }
 } 
