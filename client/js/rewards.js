@@ -166,7 +166,6 @@ function renderRewardTypesGrid(rewardTypes) {
     }).join('');
     
     // Carregar campanhas para cada recompensa
-    loadCampaignsForRewards(rewardTypes);
     
     console.log('✅ [REWARDS] Grid renderizado com sucesso!');
 }
@@ -374,47 +373,3 @@ window.showNewRewardTypeModal = function() {
 async function loadRewards() {
     await loadRewardTypes();
 }
-
-// Função para carregar campanhas que usam cada recompensa
-async function loadCampaignsForRewards(rewardTypes) {
-    const API_URL = getApiUrl();
-    const token = localStorage.getItem('clientToken');
-    
-    
-    for (const reward of rewardTypes) {
-        const rewardId = reward._id || reward.id;
-        try {
-            const response = await fetch(`${API_URL}/rewards/${rewardId}/campaigns`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token && { 'Authorization': 'Bearer ' + token })
-                }
-            });
-            
-            if (response.ok) {
-                const result = await response.json();
-                const campaigns = result.data || [];
-                updateCampaignsCell(rewardId, campaigns);
-            } else {
-                updateCampaignsCell(rewardId, []);
-            }
-        } catch (error) {
-            console.error(`Erro ao carregar campanhas para recompensa ${rewardId}:`, error);
-            updateCampaignsCell(rewardId, []);
-        }
-    }
-}
-
-// Função para atualizar a célula de campanhas
-function updateCampaignsCell(rewardId, campaigns) {
-    const cell = document.getElementById(`campaigns-${rewardId}`);
-    if (!cell) return;
-    
-    if (campaigns.length === 0) {
-        cell.innerHTML = '<span class="text-gray-500 text-xs">Nenhuma campanha</span>';
-    } else if (campaigns.length === 1) {
-        cell.innerHTML = `<span class="text-blue-400 text-xs">${campaigns[0].name}</span>`;
-    } else {
-        cell.innerHTML = `<span class="text-blue-400 text-xs">${campaigns.length} campanhas</span>`;
-    }
-} 
