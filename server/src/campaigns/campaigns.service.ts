@@ -64,36 +64,8 @@ export class CampaignsService {
         
         try {
           const rewardTemplates = await this.rewardsService['rewardModel'].find({ _id: { $in: rewardTemplateIds } });
-          const duplicatedRewards = await this.rewardsService.duplicateRewardsForCampaign(rewardTemplates, campaignId, campaignName, data.clientId);
+          await this.rewardsService.duplicateRewardsForCampaign(rewardTemplates, campaignId, campaignName, data.clientId);
           console.log('[CREATE-CAMPAIGN] ✅ Recompensas duplicadas para campanha.');
-          
-          // Atualizar a campanha com os IDs das recompensas duplicadas
-          if (duplicatedRewards && duplicatedRewards.length > 0) {
-            const updateData: any = {};
-            
-            // Encontrar a recompensa duplicada correspondente
-            if (data.rewardOnReferral) {
-              const originalReward = rewardTemplates.find(r => r._id.toString() === data.rewardOnReferral);
-              const duplicatedReward = duplicatedRewards.find(r => r.type === originalReward.type && r.value === originalReward.value);
-              if (duplicatedReward) {
-                updateData.rewardOnReferral = duplicatedReward._id;
-              }
-            }
-            
-            if (data.rewardOnConversion) {
-              const originalReward = rewardTemplates.find(r => r._id.toString() === data.rewardOnConversion);
-              const duplicatedReward = duplicatedRewards.find(r => r.type === originalReward.type && r.value === originalReward.value);
-              if (duplicatedReward) {
-                updateData.rewardOnConversion = duplicatedReward._id;
-              }
-            }
-            
-            // Atualizar a campanha com os novos IDs
-            if (Object.keys(updateData).length > 0) {
-              await this.campaignModel.findByIdAndUpdate(campaignId, updateData);
-              console.log('[CREATE-CAMPAIGN] ✅ Campanha atualizada com IDs das recompensas duplicadas.');
-            }
-          }
         } catch (error) {
           console.error('[CREATE-CAMPAIGN] ❌ Erro ao duplicar recompensas:', error.message);
           // Não falha a criação da campanha se recompensas falharem
