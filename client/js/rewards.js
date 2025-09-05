@@ -129,7 +129,7 @@ function renderRewardTypesGrid(rewardTypes) {
     
     if (!rewardTypes || rewardTypes.length === 0) {
         console.log('📝 [REWARDS] Nenhum tipo encontrado, mostrando mensagem vazia');
-        grid.innerHTML = '<div class="col-span-full text-center py-12"><div class="text-gray-400 text-xl mb-4"><i class="fas fa-gift fa-3x"></i></div><p class="text-gray-300 text-lg">Nenhum tipo de recompensa cadastrado</p><p class="text-gray-500 text-sm mt-2">Clique em "Novo Tipo de Recompensa" para começar.</p></div>';
+        grid.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-gift fa-2x mb-4"></i><p class="text-gray-300 text-lg">Nenhum tipo de recompensa cadastrado</p><p class="text-gray-500 text-sm mt-2">Clique em "Novo Tipo de Recompensa" para começar.</p></td></tr>';
         return;
     }
     
@@ -138,22 +138,25 @@ function renderRewardTypesGrid(rewardTypes) {
     grid.innerHTML = rewardTypes.map((type, index) => {
         console.log(`🔍 [REWARDS] Tipo ${index}:`, type);
         return `
-            <div class="bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col gap-2 hover:shadow-2xl transition-shadow border border-gray-700">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-lg font-bold text-blue-400">${type.description || type.name || 'Sem nome'}</h3>
-                <span class="px-3 py-1 rounded-full text-xs font-semibold ${type.type === 'pix' ? 'bg-blue-900 text-blue-300' : type.type === 'points' ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'}">${getTypeLabel(type.type)}</span>
-              </div>
-              <div class="text-gray-200 text-base mb-1">${formatValue(type)}</div>
-              <div class="text-gray-400 text-sm mb-2">${type.description || 'Sem descrição'}</div>
-              <div class="flex gap-2 mt-2">
-                <button class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-sm transition-colors" onclick="editRewardType('${type._id || type.id}')" title="Editar">
-                  <i class="fas fa-edit mr-1"></i>Editar
+            <tr class="hover:bg-gray-800 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-100">${type.description || type.name || 'Sem nome'}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full ${type.type === 'pix' ? 'bg-blue-900 text-blue-300' : type.type === 'pontos' ? 'bg-green-900 text-green-300' : type.type === 'desconto' ? 'bg-yellow-900 text-yellow-300' : type.type === 'valor_fixo' ? 'bg-purple-900 text-purple-300' : 'bg-red-900 text-red-300'}">${getTypeLabel(type.type)}</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${formatValue(type)}</td>
+              <td class="px-6 py-4 text-sm text-gray-400">${type.details || type.description || 'Sem descrição'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${formatDate(type.createdAt)}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <button class="text-blue-400 hover:text-blue-300 mr-3" onclick="editRewardType('${type._id || type.id}')" title="Editar">
+                  <i class="fas fa-edit"></i>
                 </button>
-                <button class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 text-sm transition-colors" onclick="deleteRewardType('${type._id || type.id}')" title="Excluir">
-                  <i class="fas fa-trash mr-1"></i>Excluir
+                <button class="text-red-400 hover:text-red-300" onclick="deleteRewardType('${type._id || type.id}')" title="Excluir">
+                  <i class="fas fa-trash"></i>
                 </button>
-              </div>
-            </div>
+              </td>
+            </tr>
         `;
     }).join('');
     
@@ -237,9 +240,17 @@ function getTypeLabel(type) {
     const labels = {
         pontos: 'Pontos',
         pix: 'PIX',
-        desconto: 'Desconto'
+        desconto: 'Desconto',
+        valor_fixo: 'Valor Fixo',
+        valor_percentual: 'Valor %'
     };
     return labels[type] || type;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
 }
 
 function formatValue(rewardType) {
@@ -250,6 +261,10 @@ function formatValue(rewardType) {
             return `R$ ${parseFloat(rewardType.value).toFixed(2)}`;
         case 'desconto':
             return `${rewardType.value}% de Desconto`;
+        case 'valor_fixo':
+            return `R$ ${parseFloat(rewardType.fixedValue || rewardType.value).toFixed(2)}`;
+        case 'valor_percentual':
+            return `${rewardType.percentageValue || rewardType.value}%`;
         default:
             return rewardType.value;
     }
