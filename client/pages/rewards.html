@@ -81,7 +81,7 @@
             <!-- Cards de Recompensas Disponíveis -->
             <div class="mb-8">
               <h2 class="text-xl font-semibold text-gray-200 mb-4">Recompensas Disponíveis</h2>
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+              <div id="availableRewardsCards" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
                 <!-- Card Pontos -->
                 <div class="bg-gray-800 rounded-lg border border-gray-700 px-3 py-4 text-center">
                   <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -195,7 +195,7 @@
                       </th>
                     </tr>
                   </thead>
-                  <tbody id="typesSection" class="bg-gray-900 divide-y divide-gray-800">
+                  <tbody id="rewardsTableBody" class="bg-gray-900 divide-y divide-gray-800">
                     <!-- Loading State -->
                     <tr id="loadingRow">
                       <td colspan="6" class="px-6 py-8 text-center text-gray-400">

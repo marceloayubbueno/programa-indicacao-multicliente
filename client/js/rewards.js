@@ -119,9 +119,9 @@ async function loadRewardTypes() {
 }
 
 function renderRewardTypesGrid(rewardTypes) {
-    const grid = document.getElementById('typesSection');
+    const grid = document.getElementById('rewardsTableBody');
     if (!grid) {
-        console.error('❌ [REWARDS] Elemento typesSection não encontrado!');
+        console.error('❌ [REWARDS] Elemento rewardsTableBody não encontrado!');
         return;
     }
     
