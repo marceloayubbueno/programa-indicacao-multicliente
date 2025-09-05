@@ -63,7 +63,6 @@ export class RewardsService {
    * Busca campanhas que estão usando uma recompensa específica
    */
   async findCampaignsUsingReward(rewardId: string, clientId: string): Promise<Array<{_id: string, name: string}>> {
-    this.logger.debug(`[findCampaignsUsingReward] Buscando campanhas para rewardId: ${rewardId}, clientId: ${clientId}`);
     try {
       // Importar modelo de Campaign dinamicamente para evitar dependência circular
       const mongoose = await import('mongoose');
@@ -77,7 +76,6 @@ export class RewardsService {
         ]
       }).select('name _id').exec();
       
-      this.logger.debug(`[findCampaignsUsingReward] ${campaigns.length} campanhas encontradas`);
       return campaigns.map(c => ({ _id: c._id.toString(), name: c.name }));
     } catch (error) {
       this.logger.error(`[findCampaignsUsingReward] Erro ao buscar campanhas: ${error.message}`);
