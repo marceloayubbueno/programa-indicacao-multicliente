@@ -63,10 +63,26 @@ export class RewardsService {
    * Busca campanhas que estão usando uma recompensa específica
    */
   async findCampaignsUsingReward(rewardId: string, clientId: string): Promise<Array<{_id: string, name: string}>> {
+    this.logger.debug(`[findCampaignsUsingReward] Iniciando busca: rewardId=${rewardId}, clientId=${clientId}`);
+    
     try {
       // Importar modelo de Campaign dinamicamente para evitar dependência circular
       const mongoose = await import('mongoose');
       const CampaignModel = mongoose.model('Campaign');
+      
+      // Primeiro, vamos ver todas as campanhas do cliente
+      const allCampaigns = await CampaignModel.find({
+        clientId: new Types.ObjectId(clientId)
+      }).select('name _id rewardOnReferral rewardOnConversion').exec();
+      
+      this.logger.debug(`[findCampaignsUsingReward] Total de campanhas do cliente ${clientId}: ${allCampaigns.length}`);
+      
+      // Log das campanhas para debug
+      allCampaigns.forEach(campaign => {
+        this.logger.debug(`[findCampaignsUsingReward] Campanha: ${campaign.name} (${campaign._id})`);
+        this.logger.debug(`[findCampaignsUsingReward] - rewardOnReferral: ${campaign.rewardOnReferral}`);
+        this.logger.debug(`[findCampaignsUsingReward] - rewardOnConversion: ${campaign.rewardOnConversion}`);
+      });
       
       const campaigns = await CampaignModel.find({
         clientId: new Types.ObjectId(clientId),
@@ -75,6 +91,8 @@ export class RewardsService {
           { rewardOnConversion: new Types.ObjectId(rewardId) }
         ]
       }).select('name _id').exec();
+      
+      this.logger.debug(`[findCampaignsUsingReward] Campanhas que usam recompensa ${rewardId}: ${campaigns.length}`);
       
       return campaigns.map(c => ({ _id: c._id.toString(), name: c.name }));
     } catch (error) {
