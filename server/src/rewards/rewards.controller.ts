@@ -80,20 +80,15 @@ export class RewardsController {
   @Get(':id/campaigns')
   async findCampaignsUsingReward(@Param('id') id: string, @Request() req) {
     const clientId = req.user?.clientId || req.user?.sub;
-    this.logger.debug(`[GET /rewards/:id/campaigns] Buscando campanhas para rewardId: ${id}, clientId: ${clientId}`);
     
     try {
       // Verificar se a recompensa pertence ao cliente
       const reward = await this.rewardsService.findOne(id);
-      this.logger.debug(`[GET /rewards/:id/campaigns] Recompensa encontrada: ${reward.id}, clientId da recompensa: ${reward.clientId}`);
-      
       if (reward.clientId.toString() !== clientId) {
-        this.logger.error(`[GET /rewards/:id/campaigns] Acesso negado: recompensa ${id} pertence ao cliente ${reward.clientId}, mas requisição é do cliente ${clientId}`);
         throw new Error('Acesso negado: recompensa não pertence ao cliente');
       }
       
       const campaigns = await this.rewardsService.findCampaignsUsingReward(id, clientId);
-      this.logger.debug(`[GET /rewards/:id/campaigns] ${campaigns.length} campanhas encontradas para recompensa ${id}`);
       
       return {
         success: true,

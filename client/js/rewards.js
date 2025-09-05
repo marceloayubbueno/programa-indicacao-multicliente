@@ -372,7 +372,6 @@ window.showNewRewardTypeModal = function() {
 
 // 🆕 IMPLEMENTAR FUNÇÃO loadRewards (mesmo conteúdo de loadRewardTypes por enquanto)
 async function loadRewards() {
-    console.log('🔍 [REWARDS] loadRewards chamada - redirecionando para loadRewardTypes');
     await loadRewardTypes();
 }
 
@@ -381,40 +380,26 @@ async function loadCampaignsForRewards(rewardTypes) {
     const API_URL = getApiUrl();
     const token = localStorage.getItem('clientToken');
     
-    console.log('🔍 [DEBUG] Iniciando busca de campanhas para', rewardTypes.length, 'recompensas');
-    console.log('🔍 [DEBUG] API_URL:', API_URL);
-    console.log('🔍 [DEBUG] Token existe:', !!token);
     
     for (const reward of rewardTypes) {
         const rewardId = reward._id || reward.id;
-        console.log(`🔍 [DEBUG] Processando recompensa: ${rewardId} (${reward.description || reward.name})`);
-        
         try {
-            const url = `${API_URL}/rewards/${rewardId}/campaigns`;
-            console.log(`🔍 [DEBUG] Fazendo requisição para: ${url}`);
-            
-            const response = await fetch(url, {
+            const response = await fetch(`${API_URL}/rewards/${rewardId}/campaigns`, {
                 headers: {
                     'Content-Type': 'application/json',
                     ...(token && { 'Authorization': 'Bearer ' + token })
                 }
             });
             
-            console.log(`🔍 [DEBUG] Resposta para ${rewardId}:`, response.status, response.ok);
-            
             if (response.ok) {
                 const result = await response.json();
-                console.log(`🔍 [DEBUG] Dados recebidos para ${rewardId}:`, result);
                 const campaigns = result.data || [];
-                console.log(`🔍 [DEBUG] Campanhas extraídas para ${rewardId}:`, campaigns);
                 updateCampaignsCell(rewardId, campaigns);
             } else {
-                const errorText = await response.text();
-                console.log(`❌ [DEBUG] Erro na resposta para ${rewardId}:`, response.status, errorText);
                 updateCampaignsCell(rewardId, []);
             }
         } catch (error) {
-            console.error(`❌ [DEBUG] Erro ao carregar campanhas para recompensa ${rewardId}:`, error);
+            console.error(`Erro ao carregar campanhas para recompensa ${rewardId}:`, error);
             updateCampaignsCell(rewardId, []);
         }
     }
