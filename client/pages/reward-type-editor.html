@@ -74,16 +74,39 @@
             </div>
             <div>
               <label for="rewardType" class="block text-sm font-medium mb-1">Tipo:</label>
-              <select id="rewardType" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+              <select id="rewardType" required onchange="toggleRewardFields()" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
                 <option value="">Selecione um tipo</option>
                 <option value="pontos">Pontos</option>
                 <option value="pix">PIX</option>
                 <option value="desconto">Desconto</option>
+                <option value="valor_fixo">Valor Fixo</option>
+                <option value="valor_percentual">Valor Percentual</option>
               </select>
             </div>
             <div>
               <label for="rewardValue" class="block text-sm font-medium mb-1">Valor:</label>
               <input type="number" id="rewardValue" required min="0" step="0.01" placeholder="Ex: 50.00" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+            </div>
+            
+            <!-- Campos para Valor Fixo -->
+            <div id="valorFixoFields" class="reward-type-fields" style="display: none;">
+              <div>
+                <label for="valorFixo" class="block text-sm font-medium mb-1">Valor Fixo (R$):</label>
+                <input type="number" id="valorFixo" min="0.01" step="0.01" placeholder="Ex: 100.00" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+              </div>
+            </div>
+            
+            <!-- Campos para Valor Percentual -->
+            <div id="valorPercentualFields" class="reward-type-fields" style="display: none;">
+              <div>
+                <label for="percentualValue" class="block text-sm font-medium mb-1">Percentual (%):</label>
+                <input type="number" id="percentualValue" min="0.01" max="100" step="0.01" placeholder="Ex: 10.00" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+              </div>
+              <div>
+                <label for="baseValue" class="block text-sm font-medium mb-1">Valor Base (R$) - Opcional:</label>
+                <input type="number" id="baseValue" min="0" step="0.01" placeholder="Ex: 1000.00" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-3 py-2">
+                <p class="text-xs text-gray-400 mt-1">Deixe vazio para definir o valor na conversão do lead</p>
+              </div>
             </div>
             <div>
               <label for="rewardDescription" class="block text-sm font-medium mb-1">Descrição:</label>

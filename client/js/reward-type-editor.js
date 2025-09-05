@@ -23,6 +23,9 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('cancelBtn').addEventListener('click', () => {
     window.location.href = 'rewards.html';
   });
+  
+  // Inicializar campos baseado no tipo selecionado
+  toggleRewardFields();
 });
 
 async function loadRewardType(id) {
@@ -49,6 +52,17 @@ function fillForm(data) {
   document.getElementById('rewardType').value = data.type;
   document.getElementById('rewardValue').value = data.value;
   document.getElementById('rewardDescription').value = data.description || '';
+  
+  // Preencher campos específicos dos novos tipos
+  if (data.type === 'valor_fixo') {
+    document.getElementById('valorFixo').value = data.fixedValue || '';
+  } else if (data.type === 'valor_percentual') {
+    document.getElementById('percentualValue').value = data.percentageValue || '';
+    document.getElementById('baseValue').value = data.baseValue || '';
+  }
+  
+  // Atualizar exibição dos campos
+  toggleRewardFields();
 }
 
 async function handleSaveRewardType(event) {
@@ -60,6 +74,17 @@ async function handleSaveRewardType(event) {
     details: document.getElementById('rewardDescription').value,
     clientId: localStorage.getItem('clientId')
   };
+  
+  // Adicionar campos específicos dos novos tipos
+  if (rewardData.type === 'valor_fixo') {
+    rewardData.fixedValue = parseFloat(document.getElementById('valorFixo').value);
+  } else if (rewardData.type === 'valor_percentual') {
+    rewardData.percentageValue = parseFloat(document.getElementById('percentualValue').value);
+    const baseValue = document.getElementById('baseValue').value;
+    if (baseValue) {
+      rewardData.baseValue = parseFloat(baseValue);
+    }
+  }
   try {
     const token = localStorage.getItem('clientToken');
     let response;
@@ -99,4 +124,21 @@ function handleDuplicate() {
   fillForm({ ...originalRewardData, description: '', _id: undefined });
   editingRewardTypeId = null;
   alert('Dados duplicados! Edite o nome e salve para criar um novo tipo de recompensa.');
+}
+
+// Função para controlar exibição dos campos específicos por tipo de recompensa
+function toggleRewardFields() {
+  const rewardType = document.getElementById('rewardType').value;
+  
+  // Esconder todos os campos específicos
+  document.querySelectorAll('.reward-type-fields').forEach(field => {
+    field.style.display = 'none';
+  });
+  
+  // Mostrar campos específicos baseado no tipo selecionado
+  if (rewardType === 'valor_fixo') {
+    document.getElementById('valorFixoFields').style.display = 'block';
+  } else if (rewardType === 'valor_percentual') {
+    document.getElementById('valorPercentualFields').style.display = 'block';
+  }
 } 
