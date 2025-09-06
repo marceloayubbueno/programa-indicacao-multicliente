@@ -58,7 +58,6 @@ function fillForm(data) {
     document.getElementById('valorFixo').value = data.fixedValue || '';
   } else if (data.type === 'valor_percentual') {
     document.getElementById('percentualValue').value = data.percentageValue || '';
-    document.getElementById('baseValue').value = data.baseValue || '';
   }
   
   // Atualizar exibição dos campos
@@ -67,23 +66,24 @@ function fillForm(data) {
 
 async function handleSaveRewardType(event) {
   event.preventDefault();
+  const rewardType = document.getElementById('rewardType').value;
   const rewardData = {
-    type: document.getElementById('rewardType').value,
-    value: parseFloat(document.getElementById('rewardValue').value),
+    type: rewardType,
     description: document.getElementById('rewardName').value,
     details: document.getElementById('rewardDescription').value,
     clientId: localStorage.getItem('clientId')
   };
   
+  // Adicionar valor apenas se não for valor_percentual
+  if (rewardType !== 'valor_percentual') {
+    rewardData.value = parseFloat(document.getElementById('rewardValue').value);
+  }
+  
   // Adicionar campos específicos dos novos tipos
-  if (rewardData.type === 'valor_fixo') {
+  if (rewardType === 'valor_fixo') {
     rewardData.fixedValue = parseFloat(document.getElementById('valorFixo').value);
-  } else if (rewardData.type === 'valor_percentual') {
+  } else if (rewardType === 'valor_percentual') {
     rewardData.percentageValue = parseFloat(document.getElementById('percentualValue').value);
-    const baseValue = document.getElementById('baseValue').value;
-    if (baseValue) {
-      rewardData.baseValue = parseFloat(baseValue);
-    }
   }
   try {
     const token = localStorage.getItem('clientToken');
@@ -134,6 +134,14 @@ function toggleRewardFields() {
   document.querySelectorAll('.reward-type-fields').forEach(field => {
     field.style.display = 'none';
   });
+  
+  // Controlar exibição do campo "Valor" principal
+  const rewardValueField = document.getElementById('rewardValueField');
+  if (rewardType === 'valor_percentual') {
+    rewardValueField.style.display = 'none';
+  } else {
+    rewardValueField.style.display = 'block';
+  }
   
   // Mostrar campos específicos baseado no tipo selecionado
   if (rewardType === 'valor_fixo') {
