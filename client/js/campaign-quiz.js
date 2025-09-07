@@ -820,16 +820,94 @@ function renderRewardsForBlock(containerId, rewards, selectedId, type) {
     const option = document.createElement('option');
     option.value = reward._id;
     let valorFormatado = '';
-    if (reward.type === 'DINHEIRO' || reward.type === 'pix') {
-      valorFormatado = `R$ ${reward.value.toFixed(2)}`;
-    } else if (reward.type === 'PONTOS' || reward.type === 'points') {
-      valorFormatado = `${reward.value} pontos`;
-    } else if (reward.type === 'VOUCHER' || reward.type === 'discount') {
-      valorFormatado = `Voucher de R$ ${reward.value.toFixed(2)}`;
-    } else {
-      valorFormatado = reward.value;
+    let tipoFormatado = '';
+    
+    // Formatação baseada no tipo de recompensa
+    switch(reward.type) {
+      case 'pix':
+        valorFormatado = `R$ ${reward.value.toFixed(2)}`;
+        tipoFormatado = 'PIX';
+        break;
+      case 'pontos':
+        valorFormatado = `${reward.value} pontos`;
+        tipoFormatado = 'Pontos';
+        break;
+      case 'desconto':
+        valorFormatado = `${reward.value}% desconto`;
+        tipoFormatado = 'Desconto';
+        break;
+      case 'desconto_valor_financeiro':
+        valorFormatado = `R$ ${reward.value.toFixed(2)} desconto`;
+        tipoFormatado = 'Desconto em Valor';
+        break;
+      case 'valor_fixo':
+        valorFormatado = `R$ ${reward.value.toFixed(2)}`;
+        tipoFormatado = 'Valor Fixo';
+        break;
+      case 'valor_percentual':
+        valorFormatado = `${reward.value}%`;
+        tipoFormatado = 'Valor Percentual';
+        break;
+      case 'desconto_recorrente':
+        valorFormatado = `${reward.value}% recorrente`;
+        tipoFormatado = 'Desconto Recorrente';
+        break;
+      case 'cashback':
+        valorFormatado = `${reward.value}% cashback`;
+        tipoFormatado = 'Cashback';
+        break;
+      case 'credito_digital':
+        valorFormatado = `R$ ${reward.value.toFixed(2)} crédito`;
+        tipoFormatado = 'Crédito Digital';
+        break;
+      case 'produto_gratis':
+        valorFormatado = `${reward.value} produto(s)`;
+        tipoFormatado = 'Produto Grátis';
+        break;
+      case 'comissao_recorrente':
+        valorFormatado = `${reward.value}% comissão`;
+        tipoFormatado = 'Comissão Recorrente';
+        break;
+      case 'bonus_volume':
+        valorFormatado = `R$ ${reward.value.toFixed(2)} bônus`;
+        tipoFormatado = 'Bônus por Volume';
+        break;
+      case 'desconto_progressivo':
+        valorFormatado = `${reward.value}% inicial`;
+        tipoFormatado = 'Desconto Progressivo';
+        break;
+      case 'vale_presente':
+        valorFormatado = `R$ ${reward.value.toFixed(2)} vale`;
+        tipoFormatado = 'Vale-Presente';
+        break;
+      case 'valor_conversao':
+        valorFormatado = `${reward.value}% da conversão`;
+        tipoFormatado = 'Por Valor da Conversão';
+        break;
+      case 'meta':
+        valorFormatado = `R$ ${reward.value.toFixed(2)} meta`;
+        tipoFormatado = 'Por Meta';
+        break;
+      // Compatibilidade com tipos antigos
+      case 'DINHEIRO':
+        valorFormatado = `R$ ${reward.value.toFixed(2)}`;
+        tipoFormatado = 'Dinheiro';
+        break;
+      case 'PONTOS':
+        valorFormatado = `${reward.value} pontos`;
+        tipoFormatado = 'Pontos';
+        break;
+      case 'VOUCHER':
+        valorFormatado = `R$ ${reward.value.toFixed(2)} voucher`;
+        tipoFormatado = 'Voucher';
+        break;
+      default:
+        valorFormatado = reward.value;
+        tipoFormatado = reward.type;
+        break;
     }
-    option.textContent = `${reward.type} ${valorFormatado} ${reward.description ? '- ' + reward.description : ''}`;
+    
+    option.textContent = `${tipoFormatado} - ${valorFormatado} ${reward.description ? '- ' + reward.description : ''}`;
     if (selectedId === reward._id) option.selected = true;
     select.appendChild(option);
   });
@@ -861,6 +939,70 @@ function selecionarRecompensa(id, type) {
     selectedRewardOnConversion = id;
   }
   renderRewards();
+  // Verificar se precisa mostrar campo de valor base
+  verificarValorBase(id, type);
+}
+
+// Função para verificar se precisa mostrar campo de valor base
+async function verificarValorBase(rewardId, type) {
+  if (!rewardId || rewardId === 'none') {
+    // Esconder campo de valor base se não há recompensa selecionada
+    esconderCampoValorBase(type);
+    return;
+  }
+
+  try {
+    const rewards = await fetchRewardsBackend();
+    const reward = rewards.find(r => r._id === rewardId);
+    
+    if (reward && reward.type === 'valor_percentual') {
+      mostrarCampoValorBase(type);
+    } else {
+      esconderCampoValorBase(type);
+    }
+  } catch (error) {
+    console.error('Erro ao verificar valor base:', error);
+    esconderCampoValorBase(type);
+  }
+}
+
+// Função para mostrar campo de valor base
+function mostrarCampoValorBase(type) {
+  const containerId = type === 'referral' ? 'rewardsOnReferral' : 'rewardsOnConversion';
+  const container = document.getElementById(containerId);
+  
+  // Remove campo existente se houver
+  const existingField = container.querySelector('.valor-base-field');
+  if (existingField) {
+    existingField.remove();
+  }
+  
+  // Cria campo de valor base
+  const valorBaseField = document.createElement('div');
+  valorBaseField.className = 'valor-base-field mt-2';
+  valorBaseField.innerHTML = `
+    <label class="block text-sm text-gray-300 mb-1">Valor Base (R$) - Opcional</label>
+    <input type="number" 
+           id="valorBase_${type}" 
+           min="0" 
+           step="0.01" 
+           placeholder="Ex: 100.00" 
+           class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-3 py-2 focus:outline-none focus:border-blue-500">
+    <p class="text-xs text-gray-400 mt-1">Deixe vazio para definir na conversão do lead</p>
+  `;
+  
+  container.appendChild(valorBaseField);
+}
+
+// Função para esconder campo de valor base
+function esconderCampoValorBase(type) {
+  const containerId = type === 'referral' ? 'rewardsOnReferral' : 'rewardsOnConversion';
+  const container = document.getElementById(containerId);
+  
+  const existingField = container.querySelector('.valor-base-field');
+  if (existingField) {
+    existingField.remove();
+  }
 }
 
 // Seleciona "nenhuma recompensa" para um tipo específico
@@ -1140,9 +1282,21 @@ async function salvarCampanhaBackend() {
   // Adicionar campos de template baseados nas seleções atuais
   if (selectedRewardOnReferral && selectedRewardOnReferral !== 'none') {
     payload.rewardOnReferralTemplateId = selectedRewardOnReferral;
+    
+    // Adicionar valor base se for recompensa percentual
+    const valorBaseReferral = document.getElementById('valorBase_referral')?.value;
+    if (valorBaseReferral && valorBaseReferral.trim() !== '') {
+      payload.rewardOnReferralBaseValue = parseFloat(valorBaseReferral);
+    }
   }
   if (selectedRewardOnConversion && selectedRewardOnConversion !== 'none') {
     payload.rewardOnConversionTemplateId = selectedRewardOnConversion;
+    
+    // Adicionar valor base se for recompensa percentual
+    const valorBaseConversion = document.getElementById('valorBase_conversion')?.value;
+    if (valorBaseConversion && valorBaseConversion.trim() !== '') {
+      payload.rewardOnConversionBaseValue = parseFloat(valorBaseConversion);
+    }
   }
   if (window.selectedLPIndicadoresId) {
     payload.lpIndicadoresTemplateId = window.selectedLPIndicadoresId;
