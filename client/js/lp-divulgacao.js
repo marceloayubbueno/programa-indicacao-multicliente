@@ -114,12 +114,12 @@ function renderLPDivulgacaoList() {
     return;
   }
   
-    const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/api';
+    const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:3000/';
   console.log(`🔗 [LP-DIV] Fazendo requisição para: ${API_URL}/lp-divulgacao?clientId=${clientId}`);
   
   fetch(`${API_URL}/lp-divulgacao?clientId=${clientId}`, {
     headers: {
-      'Authorization': `Bearer ${token}` // 🔧 CORREÇÃO: adicionar autenticação
+      'Authorization': `Bearer ${token}` // 🔧 CORREÇÃO: adicionar  autenticação
     }
   })
     .then(response => {

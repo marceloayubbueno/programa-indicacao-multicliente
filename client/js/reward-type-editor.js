@@ -14,8 +14,13 @@ window.addEventListener('DOMContentLoaded', () => {
   checkAuth();
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
+  const type = params.get('type');
+  
   if (id) {
     loadRewardType(id);
+  } else if (type) {
+    // Pré-selecionar tipo de recompensa quando vindo de rewards-available.html
+    preSelectRewardType(type);
   }
 
   document.getElementById('rewardTypeForm').addEventListener('submit', handleSaveRewardType);
@@ -27,6 +32,42 @@ window.addEventListener('DOMContentLoaded', () => {
   // Inicializar campos baseado no tipo selecionado
   toggleRewardFields();
 });
+
+// Pré-selecionar tipo de recompensa quando vindo de rewards-available.html
+function preSelectRewardType(type) {
+  console.log(`🎯 [REWARD-EDITOR] Pré-selecionando tipo: ${type}`);
+  
+  const rewardTypeSelect = document.getElementById('rewardType');
+  if (rewardTypeSelect) {
+    rewardTypeSelect.value = type;
+    
+    // Atualizar título da página para mostrar o tipo selecionado
+    const typeLabels = {
+      pontos: 'Pontos',
+      pix: 'PIX',
+      desconto: 'Desconto em %',
+      desconto_valor_financeiro: 'Desconto em Valor',
+      valor_fixo: 'Valor Fixo',
+      valor_percentual: 'Valor % Percentual',
+      desconto_recorrente: 'Desconto Recorrente',
+      cashback: 'Cashback',
+      credito_digital: 'Crédito Digital',
+      produto_gratis: 'Produto/Serviço Grátis',
+      comissao_recorrente: 'Comissão Recorrente',
+      bonus_volume: 'Bônus por Volume',
+      desconto_progressivo: 'Desconto Progressivo',
+      vale_presente: 'Vale-Presente',
+      valor_conversao: 'Por Valor da Conversão',
+      meta: 'Por Meta'
+    };
+    
+    const typeLabel = typeLabels[type] || type;
+    document.title = `Criar ${typeLabel} - Editor de Recompensas`;
+    
+    // Atualizar campos baseado no tipo selecionado
+    toggleRewardFields();
+  }
+}
 
 async function loadRewardType(id) {
   try {
@@ -137,7 +178,9 @@ function toggleRewardFields() {
   
   // Controlar exibição do campo "Valor" principal
   const rewardValueField = document.getElementById('rewardValueField');
-  if (rewardType === 'valor_percentual') {
+  
+  // Esconder campo genérico "Valor:" para tipos que têm campos específicos
+  if (rewardType === 'valor_fixo' || rewardType === 'valor_percentual') {
     rewardValueField.style.display = 'none';
   } else {
     rewardValueField.style.display = 'block';
@@ -148,5 +191,40 @@ function toggleRewardFields() {
     document.getElementById('valorFixoFields').style.display = 'block';
   } else if (rewardType === 'valor_percentual') {
     document.getElementById('valorPercentualFields').style.display = 'block';
+  }
+  
+  // Mostrar descrição da recompensa selecionada
+  showRewardTypeDescription(rewardType);
+}
+
+// Função para mostrar descrição do tipo de recompensa selecionado
+function showRewardTypeDescription(rewardType) {
+  const descriptionContainer = document.getElementById('rewardTypeDescription');
+  const descriptionText = document.getElementById('rewardDescriptionText');
+  
+  const descriptions = {
+    pontos: 'Sistema de pontos que podem ser acumulados e trocados por benefícios. Ideal para programas de fidelidade e engajamento contínuo.',
+    pix: 'Pagamento instantâneo via PIX em dinheiro real. Perfeito para recompensas financeiras diretas e motivacionais.',
+    desconto: 'Desconto percentual aplicado em produtos ou serviços. Ideal para incentivar compras e reduzir custos para clientes indicados.',
+    desconto_valor_financeiro: 'Desconto em valor fixo (R$) aplicado em produtos ou serviços. Oferece economia direta e tangível.',
+    valor_fixo: 'Valor financeiro fixo pago mensalmente para indicadores/influenciadores. Garante renda estável e previsível.',
+    valor_percentual: 'Comissionamento variável baseado no valor do produto adquirido pelo cliente indicado. Recompensa proporcional ao resultado.',
+    desconto_recorrente: 'Desconto aplicado mensalmente de forma recorrente. Ideal para manter clientes engajados a longo prazo.',
+    cashback: 'Devolução de parte do valor gasto em compras. Incentiva novas compras e aumenta o valor do cliente.',
+    credito_digital: 'Crédito digital para uso na plataforma ou em produtos específicos. Flexível e fácil de gerenciar.',
+    produto_gratis: 'Produto ou serviço gratuito como recompensa. Aumenta o valor percebido e pode gerar upsell.',
+    comissao_recorrente: 'Comissão mensal recorrente baseada em indicadores ativos. Cria fonte de renda contínua.',
+    bonus_volume: 'Bônus adicional baseado no volume de indicações. Incentiva alta performance e produtividade.',
+    desconto_progressivo: 'Desconto que aumenta conforme mais indicações são feitas. Recompensa progressiva e escalável.',
+    vale_presente: 'Vale-presente para uso em produtos ou serviços específicos. Flexível e atrativo para clientes.',
+    valor_conversao: 'Recompensa baseada no valor da conversão do lead indicado. Alinha incentivos com resultados financeiros.',
+    meta: 'Recompensa baseada no cumprimento de metas específicas. Ideal para campanhas com objetivos claros.'
+  };
+  
+  if (rewardType && descriptions[rewardType]) {
+    descriptionText.textContent = descriptions[rewardType];
+    descriptionContainer.style.display = 'block';
+  } else {
+    descriptionContainer.style.display = 'none';
   }
 } 

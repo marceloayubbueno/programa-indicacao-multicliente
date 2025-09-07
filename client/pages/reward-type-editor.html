@@ -83,78 +83,9 @@
         </div>
       </header>
 
-      <!-- Cards Informativos -->
-      <div class="px-8 py-6">
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
-          <!-- Card Pontos -->
-          <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-                <i class="fas fa-star text-white text-sm"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-semibold text-gray-100">Pontos</h3>
-                <p class="text-xs text-gray-400">Sistema de pontos</p>
-              </div>
-            </div>
-          </div>
 
-          <!-- Card PIX -->
-          <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                <i class="fas fa-mobile-alt text-white text-sm"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-semibold text-gray-100">PIX</h3>
-                <p class="text-xs text-gray-400">Pagamento instantâneo</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card Descontos -->
-          <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                <i class="fas fa-percentage text-white text-sm"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-semibold text-gray-100">Descontos</h3>
-                <p class="text-xs text-gray-400">Cupons de desconto</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card Valor Fixo -->
-          <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <i class="fas fa-dollar-sign text-white text-sm"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-semibold text-gray-100">Valor Fixo</h3>
-                <p class="text-xs text-gray-400">Valor determinado</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card Valor % -->
-          <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                <i class="fas fa-chart-line text-white text-sm"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-semibold text-gray-100">Valor %</h3>
-                <p class="text-xs text-gray-400">Percentual variável</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <main class="flex-1 flex flex-col items-center justify-center p-8">
-        <div class="bg-gray-800 rounded-xl shadow-lg p-8 w-full max-w-xl flex flex-col gap-6">
+      <main class="flex-1 p-8">
+        <div class="bg-gray-800 rounded-xl shadow-lg p-8 w-full flex flex-col gap-6">
           <form id="rewardTypeForm" class="flex flex-col gap-4">
             <div>
               <label for="rewardName" class="block text-sm font-medium mb-1">Nome da Recompensa:</label>
@@ -166,10 +97,32 @@
                 <option value="">Selecione um tipo</option>
                 <option value="pontos">Pontos</option>
                 <option value="pix">PIX</option>
-                <option value="desconto">Desconto</option>
+                <option value="desconto">Desconto em %</option>
+                <option value="desconto_valor_financeiro">Desconto em Valor</option>
                 <option value="valor_fixo">Valor Fixo</option>
-                <option value="valor_percentual">Valor Percentual</option>
+                <option value="valor_percentual">Valor % Percentual</option>
+                <option value="desconto_recorrente">Desconto Recorrente</option>
+                <option value="cashback">Cashback</option>
+                <option value="credito_digital">Crédito Digital</option>
+                <option value="produto_gratis">Produto/Serviço Grátis</option>
+                <option value="comissao_recorrente">Comissão Recorrente</option>
+                <option value="bonus_volume">Bônus por Volume</option>
+                <option value="desconto_progressivo">Desconto Progressivo</option>
+                <option value="vale_presente">Vale-Presente</option>
+                <option value="valor_conversao">Por Valor da Conversão</option>
+                <option value="meta">Por Meta</option>
               </select>
+            </div>
+            
+            <!-- Descrição da Recompensa Selecionada -->
+            <div id="rewardTypeDescription" class="bg-blue-900/20 border border-blue-700/30 rounded-lg p-3 mb-4" style="display: none;">
+              <div class="flex items-start space-x-2">
+                <i class="fas fa-info-circle text-blue-400 mt-0.5"></i>
+                <div>
+                  <p class="text-sm text-blue-200 font-medium mb-1">Sobre este tipo de recompensa:</p>
+                  <p id="rewardDescriptionText" class="text-sm text-gray-300"></p>
+                </div>
+              </div>
             </div>
             <div id="rewardValueField">
               <label for="rewardValue" class="block text-sm font-medium mb-1">Valor:</label>
