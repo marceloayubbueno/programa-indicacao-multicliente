@@ -91,14 +91,62 @@ async function loadRewardType(id) {
 function fillForm(data) {
   document.getElementById('rewardName').value = data.description || '';
   document.getElementById('rewardType').value = data.type;
-  document.getElementById('rewardValue').value = data.value;
   document.getElementById('rewardDescription').value = data.description || '';
   
-  // Preencher campos específicos dos novos tipos
-  if (data.type === 'valor_fixo') {
-    document.getElementById('valorFixo').value = data.fixedValue || '';
-  } else if (data.type === 'valor_percentual') {
-    document.getElementById('percentualValue').value = data.percentageValue || '';
+  // Preencher campos específicos baseado no tipo
+  switch(data.type) {
+    case 'pontos':
+      document.getElementById('pontosValue').value = data.value || '';
+      break;
+    case 'pix':
+      document.getElementById('pixValue').value = data.value || '';
+      break;
+    case 'desconto':
+      document.getElementById('descontoValue').value = data.value || '';
+      break;
+    case 'desconto_valor_financeiro':
+      document.getElementById('descontoValorFinanceiroValue').value = data.value || '';
+      break;
+    case 'valor_fixo':
+      document.getElementById('valorFixo').value = data.fixedValue || data.value || '';
+      break;
+    case 'valor_percentual':
+      document.getElementById('percentualValue').value = data.percentageValue || data.value || '';
+      break;
+    case 'desconto_recorrente':
+      document.getElementById('descontoRecorrenteValue').value = data.value || '';
+      break;
+    case 'cashback':
+      document.getElementById('cashbackValue').value = data.value || '';
+      break;
+    case 'credito_digital':
+      document.getElementById('creditoDigitalValue').value = data.value || '';
+      break;
+    case 'produto_gratis':
+      document.getElementById('produtoGratisValue').value = data.value || '';
+      break;
+    case 'comissao_recorrente':
+      document.getElementById('comissaoRecorrenteValue').value = data.value || '';
+      break;
+    case 'bonus_volume':
+      document.getElementById('bonusVolumeValue').value = data.value || '';
+      break;
+    case 'desconto_progressivo':
+      document.getElementById('descontoProgressivoValue').value = data.value || '';
+      break;
+    case 'vale_presente':
+      document.getElementById('valePresenteValue').value = data.value || '';
+      break;
+    case 'valor_conversao':
+      document.getElementById('valorConversaoValue').value = data.value || '';
+      break;
+    case 'meta':
+      document.getElementById('metaValue').value = data.value || '';
+      break;
+    default:
+      // Para tipos não implementados, usar campo genérico
+      document.getElementById('rewardValue').value = data.value || '';
+      break;
   }
   
   // Atualizar exibição dos campos
@@ -115,16 +163,62 @@ async function handleSaveRewardType(event) {
     clientId: localStorage.getItem('clientId')
   };
   
-  // Adicionar valor apenas se não for valor_percentual
-  if (rewardType !== 'valor_percentual') {
-    rewardData.value = parseFloat(document.getElementById('rewardValue').value);
-  }
-  
-  // Adicionar campos específicos dos novos tipos
-  if (rewardType === 'valor_fixo') {
-    rewardData.fixedValue = parseFloat(document.getElementById('valorFixo').value);
-  } else if (rewardType === 'valor_percentual') {
-    rewardData.percentageValue = parseFloat(document.getElementById('percentualValue').value);
+  // Coletar valor do campo específico baseado no tipo
+  switch(rewardType) {
+    case 'pontos':
+      rewardData.value = parseInt(document.getElementById('pontosValue').value);
+      break;
+    case 'pix':
+      rewardData.value = parseFloat(document.getElementById('pixValue').value);
+      break;
+    case 'desconto':
+      rewardData.value = parseFloat(document.getElementById('descontoValue').value);
+      break;
+    case 'desconto_valor_financeiro':
+      rewardData.value = parseFloat(document.getElementById('descontoValorFinanceiroValue').value);
+      break;
+    case 'valor_fixo':
+      rewardData.value = parseFloat(document.getElementById('valorFixo').value);
+      rewardData.fixedValue = parseFloat(document.getElementById('valorFixo').value);
+      break;
+    case 'valor_percentual':
+      rewardData.percentageValue = parseFloat(document.getElementById('percentualValue').value);
+      // Não enviar value para valor_percentual
+      break;
+    case 'desconto_recorrente':
+      rewardData.value = parseFloat(document.getElementById('descontoRecorrenteValue').value);
+      break;
+    case 'cashback':
+      rewardData.value = parseFloat(document.getElementById('cashbackValue').value);
+      break;
+    case 'credito_digital':
+      rewardData.value = parseFloat(document.getElementById('creditoDigitalValue').value);
+      break;
+    case 'produto_gratis':
+      rewardData.value = parseInt(document.getElementById('produtoGratisValue').value);
+      break;
+    case 'comissao_recorrente':
+      rewardData.value = parseFloat(document.getElementById('comissaoRecorrenteValue').value);
+      break;
+    case 'bonus_volume':
+      rewardData.value = parseFloat(document.getElementById('bonusVolumeValue').value);
+      break;
+    case 'desconto_progressivo':
+      rewardData.value = parseFloat(document.getElementById('descontoProgressivoValue').value);
+      break;
+    case 'vale_presente':
+      rewardData.value = parseFloat(document.getElementById('valePresenteValue').value);
+      break;
+    case 'valor_conversao':
+      rewardData.value = parseFloat(document.getElementById('valorConversaoValue').value);
+      break;
+    case 'meta':
+      rewardData.value = parseFloat(document.getElementById('metaValue').value);
+      break;
+    default:
+      // Para tipos não implementados, usar campo genérico
+      rewardData.value = parseFloat(document.getElementById('rewardValue').value);
+      break;
   }
   try {
     const token = localStorage.getItem('clientToken');
@@ -176,21 +270,68 @@ function toggleRewardFields() {
     field.style.display = 'none';
   });
   
-  // Controlar exibição do campo "Valor" principal
-  const rewardValueField = document.getElementById('rewardValueField');
+  // Esconder todos os campos de valor específicos
+  document.querySelectorAll('.reward-type-value-field').forEach(field => {
+    field.style.display = 'none';
+  });
   
-  // Esconder campo genérico "Valor:" para tipos que têm campos específicos
-  if (rewardType === 'valor_fixo' || rewardType === 'valor_percentual') {
-    rewardValueField.style.display = 'none';
-  } else {
-    rewardValueField.style.display = 'block';
-  }
+  // Esconder campo genérico
+  document.getElementById('rewardValueField').style.display = 'none';
   
-  // Mostrar campos específicos baseado no tipo selecionado
-  if (rewardType === 'valor_fixo') {
-    document.getElementById('valorFixoFields').style.display = 'block';
-  } else if (rewardType === 'valor_percentual') {
-    document.getElementById('valorPercentualFields').style.display = 'block';
+  // Mostrar campo específico baseado no tipo selecionado
+  switch(rewardType) {
+    case 'pontos':
+      document.getElementById('pontosValueField').style.display = 'block';
+      break;
+    case 'pix':
+      document.getElementById('pixValueField').style.display = 'block';
+      break;
+    case 'desconto':
+      document.getElementById('descontoValueField').style.display = 'block';
+      break;
+    case 'desconto_valor_financeiro':
+      document.getElementById('descontoValorFinanceiroValueField').style.display = 'block';
+      break;
+    case 'valor_fixo':
+      document.getElementById('valorFixoFields').style.display = 'block';
+      break;
+    case 'valor_percentual':
+      document.getElementById('valorPercentualFields').style.display = 'block';
+      break;
+    case 'desconto_recorrente':
+      document.getElementById('descontoRecorrenteValueField').style.display = 'block';
+      break;
+    case 'cashback':
+      document.getElementById('cashbackValueField').style.display = 'block';
+      break;
+    case 'credito_digital':
+      document.getElementById('creditoDigitalValueField').style.display = 'block';
+      break;
+    case 'produto_gratis':
+      document.getElementById('produtoGratisValueField').style.display = 'block';
+      break;
+    case 'comissao_recorrente':
+      document.getElementById('comissaoRecorrenteValueField').style.display = 'block';
+      break;
+    case 'bonus_volume':
+      document.getElementById('bonusVolumeValueField').style.display = 'block';
+      break;
+    case 'desconto_progressivo':
+      document.getElementById('descontoProgressivoValueField').style.display = 'block';
+      break;
+    case 'vale_presente':
+      document.getElementById('valePresenteValueField').style.display = 'block';
+      break;
+    case 'valor_conversao':
+      document.getElementById('valorConversaoValueField').style.display = 'block';
+      break;
+    case 'meta':
+      document.getElementById('metaValueField').style.display = 'block';
+      break;
+    default:
+      // Para tipos não implementados, mostrar campo genérico
+      document.getElementById('rewardValueField').style.display = 'block';
+      break;
   }
   
   // Mostrar descrição da recompensa selecionada

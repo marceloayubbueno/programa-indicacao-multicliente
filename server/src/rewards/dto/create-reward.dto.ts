@@ -2,6 +2,7 @@ import { IsEnum, IsNumber, IsOptional, IsString, IsNotEmpty } from 'class-valida
 import { RewardType } from '../entities/reward.schema';
 
 export class CreateRewardDto {
+  // CAMPOS EXISTENTES (NÃO ALTERAR - JÁ FUNCIONAM)
   @IsEnum(RewardType)
   type: RewardType;
 
@@ -23,4 +24,29 @@ export class CreateRewardDto {
   @IsString()
   @IsNotEmpty({ message: 'clientId é obrigatório' })
   clientId: string;
+
+  // CAMPOS ADICIONAIS PARA NOVOS TIPOS (OPCIONAIS - NÃO QUEBRAM FUNCIONALIDADE EXISTENTE)
+  @IsNumber()
+  @IsOptional()
+  fixedValue?: number;
+
+  @IsNumber()
+  @IsOptional()
+  percentageValue?: number;
+
+  @IsNumber()
+  @IsOptional()
+  baseValue?: number;
+
+  @IsString()
+  @IsOptional()
+  cupomCode?: string;
+
+  @IsNumber()
+  @IsOptional()
+  validadeDias?: number;
+
+  @IsNumber()
+  @IsOptional()
+  limiteUso?: number;
 } 
