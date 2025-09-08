@@ -6,7 +6,7 @@ function downloadTemplate() {
     try {
         // Criar link temporário para download
         const link = document.createElement('a');
-        link.href = 'planilha-de-exemplo.xlsx';
+        link.href = 'https://app.virallead.com.br/planilha-de-exemplo.xlsx';
         link.download = 'planilha-de-exemplo.xlsx';
         link.style.display = 'none';
         document.body.appendChild(link);
