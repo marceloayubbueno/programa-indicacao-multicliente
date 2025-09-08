@@ -17,7 +17,7 @@ const ENV = {
         REFERRAL_BASE_URL: 'http://localhost:3000/indicacao'
     },
     production: {
-        API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/api',
+        API_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/',
         CLIENT_URL: 'https://programa-indicacao-multicliente-production.up.railway.app',
         REFERRAL_BASE_URL: 'https://programa-indicacao-multicliente-production.up.railway.app/indicacao'
     }
