@@ -150,6 +150,21 @@ if (!window.location.pathname.includes('/login.html') &&
 // ===== FUNÇÕES DE MENU CENTRALIZADAS =====
 // Funções para controlar os menus dropdown do sistema
 
+function toggleRewardsMenu() {
+    const menu = document.getElementById('rewardsMenu');
+    const arrow = document.getElementById('rewardsArrow');
+    
+    if (menu && arrow) {
+        if (menu.classList.contains('hidden')) {
+            menu.classList.remove('hidden');
+            arrow.style.transform = 'rotate(90deg)';
+        } else {
+            menu.classList.add('hidden');
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+}
+
 function toggleEngagementEmailMenu() {
     const menu = document.getElementById('engagementEmailMenu');
     const arrow = document.getElementById('engagementEmailArrow');
