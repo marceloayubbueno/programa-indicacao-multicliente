@@ -1,6 +1,26 @@
 // 🎯 EDITAR LISTA - VERSÃO SIMPLIFICADA E OTIMIZADA
 // ===================================================
 
+// 📥 FUNÇÃO PARA BAIXAR PLANILHA DE EXEMPLO
+function downloadTemplate() {
+    try {
+        // Criar link temporário para download
+        const link = document.createElement('a');
+        link.href = '/templates/planilha-de-exemplo.xlsx';
+        link.download = 'planilha-de-exemplo.xlsx';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Mostrar notificação de sucesso
+        showNotification('📥 Planilha de exemplo baixada com sucesso!', 'success');
+    } catch (error) {
+        console.error('Erro ao baixar template:', error);
+        showNotification('❌ Erro ao baixar planilha de exemplo', 'error');
+    }
+}
+
 // 🌐 CONFIGURAÇÃO CORRIGIDA
 function getApiUrl() {
     return window.API_URL ||
