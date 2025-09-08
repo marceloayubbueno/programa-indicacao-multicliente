@@ -6,7 +6,7 @@ function downloadTemplate() {
     try {
         // Criar link temporário para download
         const link = document.createElement('a');
-        link.href = 'https://programa-indicacao-multicliente-production.up.railway.app/excel/planilha-de-exemplo.xlsx';
+        link.href = '/client/planilha-de-exemplo.xlsx';
         link.download = 'planilha-de-exemplo.xlsx';
         link.style.display = 'none';
         document.body.appendChild(link);
