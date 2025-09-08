@@ -249,6 +249,10 @@ async function showConversionModal(leadId) {
 
 function closeConversionModal() {
     document.getElementById('conversionModal').classList.add('hidden');
+    // Limpar campos dinâmicos
+    hideRewardFields();
+    // Limpar campo de observações
+    document.getElementById('conversionNotes').value = '';
 }
 
 // Nova função para carregar recompensa da campanha
@@ -290,8 +294,12 @@ async function loadCampaignReward(campaignId) {
                     const reward = rewardData.data;
                     const rewardText = formatRewardValue(reward);
                     document.getElementById('conversionReward').textContent = rewardText;
+                    
+                    // Mostrar campos específicos baseado no tipo de recompensa
+                    showRewardFields(reward);
                 } else {
                     document.getElementById('conversionReward').textContent = 'Recompensa não encontrada';
+                    hideRewardFields();
                 }
             } else {
                 document.getElementById('conversionReward').textContent = 'Nenhuma recompensa configurada';
@@ -316,8 +324,165 @@ function formatRewardValue(reward) {
             return `${reward.value || 0} Pontos`;
         case 'desconto':
             return `${reward.value || 0}% de Desconto`;
+        case 'desconto_valor_financeiro':
+            return `R$ ${parseFloat(reward.value || 0).toFixed(2)} de Desconto`;
+        case 'valor_fixo':
+            return `R$ ${parseFloat(reward.value || 0).toFixed(2)} Fixo`;
+        case 'valor_percentual':
+            return `${reward.value || 0}% da Conversão`;
+        case 'desconto_recorrente':
+            return `${reward.value || 0}% Recorrente`;
+        case 'cashback':
+            return `${reward.value || 0}% Cashback`;
+        case 'credito_digital':
+            return `R$ ${parseFloat(reward.value || 0).toFixed(2)} Crédito`;
+        case 'produto_gratis':
+            return `${reward.value || 0} Produto(s) Grátis`;
+        case 'comissao_recorrente':
+            return `${reward.value || 0}% Comissão`;
+        case 'bonus_volume':
+            return `R$ ${parseFloat(reward.value || 0).toFixed(2)} Bônus`;
+        case 'desconto_progressivo':
+            return `${reward.value || 0}% Progressivo`;
+        case 'vale_presente':
+            return `R$ ${parseFloat(reward.value || 0).toFixed(2)} Vale-Presente`;
+        case 'valor_conversao':
+            return `${reward.value || 0}% da Conversão`;
+        case 'meta':
+            return `R$ ${parseFloat(reward.value || 0).toFixed(2)} Meta`;
+        // Compatibilidade com tipos antigos
+        case 'DINHEIRO':
+            return `R$ ${parseFloat(reward.value || 0).toFixed(2)}`;
+        case 'PONTOS':
+            return `${reward.value || 0} Pontos`;
+        case 'VOUCHER':
+            return `R$ ${parseFloat(reward.value || 0).toFixed(2)} Voucher`;
         default:
             return reward.value || 'Valor não definido';
+    }
+}
+
+// Função para mostrar campos específicos baseado no tipo de recompensa
+function showRewardFields(reward) {
+    // Esconder todos os campos primeiro
+    hideRewardFields();
+    
+    if (!reward) return;
+    
+    const modal = document.getElementById('conversionModal');
+    const rewardContainer = modal.querySelector('.mb-4.p-3.bg-gray-700.rounded-lg');
+    
+    // Criar container para campos dinâmicos
+    let fieldsContainer = modal.querySelector('#dynamicRewardFields');
+    if (!fieldsContainer) {
+        fieldsContainer = document.createElement('div');
+        fieldsContainer.id = 'dynamicRewardFields';
+        fieldsContainer.className = 'mb-4 p-3 bg-gray-700 rounded-lg';
+        rewardContainer.parentNode.insertBefore(fieldsContainer, rewardContainer.nextSibling);
+    }
+    
+    // Mostrar campos baseado no tipo
+    switch (reward.type) {
+        case 'valor_fixo':
+        case 'desconto_valor_financeiro':
+        case 'credito_digital':
+        case 'bonus_volume':
+        case 'vale_presente':
+        case 'meta':
+            fieldsContainer.innerHTML = `
+                <label class="block text-gray-300 mb-2">Valor da Recompensa (R$):</label>
+                <input type="number" 
+                       id="rewardValue" 
+                       min="0" 
+                       step="0.01" 
+                       value="${reward.value || 0}" 
+                       class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-3 py-2 focus:outline-none focus:border-blue-500">
+                <p class="text-xs text-gray-400 mt-1">Valor fixo da recompensa</p>
+            `;
+            break;
+            
+        case 'valor_percentual':
+        case 'valor_conversao':
+            fieldsContainer.innerHTML = `
+                <label class="block text-gray-300 mb-2">Valor Base (R$):</label>
+                <input type="number" 
+                       id="rewardBaseValue" 
+                       min="0" 
+                       step="0.01" 
+                       placeholder="Ex: 100.00" 
+                       class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-3 py-2 focus:outline-none focus:border-blue-500">
+                <p class="text-xs text-gray-400 mt-1">Valor sobre o qual será calculado o percentual</p>
+                <div class="mt-2 p-2 bg-gray-800 rounded">
+                    <p class="text-sm text-gray-300">Valor Final: <span id="finalValue" class="text-yellow-400 font-bold">R$ 0,00</span></p>
+                </div>
+            `;
+            
+            // Adicionar evento para calcular valor final
+            const baseValueInput = fieldsContainer.querySelector('#rewardBaseValue');
+            const finalValueSpan = fieldsContainer.querySelector('#finalValue');
+            
+            baseValueInput.addEventListener('input', () => {
+                const baseValue = parseFloat(baseValueInput.value) || 0;
+                const percentage = parseFloat(reward.value) || 0;
+                const finalValue = (baseValue * percentage) / 100;
+                finalValueSpan.textContent = `R$ ${finalValue.toFixed(2)}`;
+            });
+            break;
+            
+        case 'desconto':
+        case 'desconto_recorrente':
+        case 'cashback':
+        case 'comissao_recorrente':
+        case 'desconto_progressivo':
+            fieldsContainer.innerHTML = `
+                <label class="block text-gray-300 mb-2">Percentual (%):</label>
+                <input type="number" 
+                       id="rewardPercentage" 
+                       min="0" 
+                       max="100" 
+                       step="0.01" 
+                       value="${reward.value || 0}" 
+                       class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-3 py-2 focus:outline-none focus:border-blue-500">
+                <p class="text-xs text-gray-400 mt-1">Percentual da recompensa</p>
+            `;
+            break;
+            
+        case 'pontos':
+            fieldsContainer.innerHTML = `
+                <label class="block text-gray-300 mb-2">Quantidade de Pontos:</label>
+                <input type="number" 
+                       id="rewardPoints" 
+                       min="0" 
+                       value="${reward.value || 0}" 
+                       class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-3 py-2 focus:outline-none focus:border-blue-500">
+                <p class="text-xs text-gray-400 mt-1">Quantidade de pontos a serem creditados</p>
+            `;
+            break;
+            
+        case 'produto_gratis':
+            fieldsContainer.innerHTML = `
+                <label class="block text-gray-300 mb-2">Quantidade de Produtos:</label>
+                <input type="number" 
+                       id="rewardProducts" 
+                       min="1" 
+                       value="${reward.value || 1}" 
+                       class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-3 py-2 focus:outline-none focus:border-blue-500">
+                <p class="text-xs text-gray-400 mt-1">Quantidade de produtos grátis</p>
+            `;
+            break;
+            
+        default:
+            // Para outros tipos, não mostrar campos específicos
+            fieldsContainer.innerHTML = '';
+            break;
+    }
+}
+
+// Função para esconder campos dinâmicos
+function hideRewardFields() {
+    const fieldsContainer = document.getElementById('dynamicRewardFields');
+    if (fieldsContainer) {
+        fieldsContainer.innerHTML = '';
     }
 }
 
@@ -331,14 +496,31 @@ async function confirmConversion() {
                       (window.location.hostname === 'localhost' ? 
                        'http://localhost:3000' : 
                        'https://programa-indicacao-multicliente-production.up.railway.app');
+        // Coletar valores dos campos dinâmicos
+        const rewardValue = document.getElementById('rewardValue')?.value;
+        const rewardBaseValue = document.getElementById('rewardBaseValue')?.value;
+        const rewardPercentage = document.getElementById('rewardPercentage')?.value;
+        const rewardPoints = document.getElementById('rewardPoints')?.value;
+        const rewardProducts = document.getElementById('rewardProducts')?.value;
+        
+        // Preparar payload com valores dinâmicos
+        const payload = {
+            notes: notes
+        };
+        
+        // Adicionar valores específicos se existirem
+        if (rewardValue) payload.rewardValue = parseFloat(rewardValue);
+        if (rewardBaseValue) payload.rewardBaseValue = parseFloat(rewardBaseValue);
+        if (rewardPercentage) payload.rewardPercentage = parseFloat(rewardPercentage);
+        if (rewardPoints) payload.rewardPoints = parseInt(rewardPoints);
+        if (rewardProducts) payload.rewardProducts = parseInt(rewardProducts);
+        
         const response = await fetch(`${apiUrl}/referrals/${leadId}/mark-conversion`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                notes: notes
-            })
+            body: JSON.stringify(payload)
         });
 
         const result = await response.json();
