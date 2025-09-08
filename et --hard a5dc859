@@ -1,5 +1,0 @@
-[33m7b46c2c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: corrigir busca de clientId usando ObjectId no sendTestMessage
-[33mb318a30[m fix: adicionar logs detalhados e guard no sendTestMessage
-[33md5cfe0a[m fix: corrigir nome da propriedade whatsAppClientService no controller
-[33m0c9b01b[m fix: corrigir erros de TypeScript no WhatsApp client service
-[33m38d0cf5[m feat: adicionar endpoint de teste de mensagem para clientes WhatsApp

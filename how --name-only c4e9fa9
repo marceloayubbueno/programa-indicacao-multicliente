@@ -1,7 +1,0 @@
-[33mcommit ccc36a4dd1b99c23368b27d9fbeea9ebadc6c915[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
-Author: marceloayubbueno <marcelo_ayub@hotmail.com>
-Date:   Thu Sep 4 15:16:19 2025 -0300
-
-    feat: implementar prioridade 3 - LP de indicadores com suporte a ecommerce
-
-server/src/lp-indicadores/lp-indicadores.service.ts

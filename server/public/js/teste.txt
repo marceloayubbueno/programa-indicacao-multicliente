@@ -1,1 +1,0 @@
-Arquivo de teste para diagnóstico de deploy estático. Se você está lendo isso em produção, a pasta public/js está sendo servida corretamente. 

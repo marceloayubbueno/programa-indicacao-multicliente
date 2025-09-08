@@ -1,5 +1,0 @@
-[33m156b920[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m  CORREÇÃO CRÍTICA: Formatação automática de números brasileiros para +55 - Resolve problema de envio WhatsApp via Twilio - Formatação inteligente detecta Brasil automaticamente - Preserva números internacionais - Aplicado em: fila, processador e envio
-[33m04e7dd7[m  DEBUG COMPLETO FINAL: Adicionar logs detalhados para mensagens PENDING e RETRY - Identificação completa do problema nextRetryAt
-[33m9844c20[m  DEBUG COMPLETO FILAS: Adicionar getAllMessages e logs detalhados para diagnosticar status das mensagens - Identificação completa do problema WhatsApp
-[33md545e0b[m  DEBUG SISTEMA FILAS: Adicionar logs detalhados para identificar onde está falhando processPendingMessages() - Diagnóstico completo do WhatsApp
-[33m2541e30[m  RESTAURAR SISTEMA: Desfazer mudanças que quebraram WhatsApp - Voltar ao estado funcional
