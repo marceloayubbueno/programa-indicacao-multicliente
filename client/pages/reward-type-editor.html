@@ -19,7 +19,16 @@
         <li><a href="campaigns.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-rocket mr-2"></i> Campanhas</a></li>
         <li><a href="participants.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-users mr-2"></i> Central de Participantes</a></li>
         <li><a href="lp-indicadores.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-clipboard-list mr-2"></i> Lp de indicadores</a></li>
-        <li><a href="rewards.html" class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold"><i class="fas fa-gift mr-2"></i> Recompensas</a></li>
+        <li>
+          <div class="flex items-center pl-4 px-3 py-2 rounded-lg bg-gray-800 text-blue-400 font-semibold cursor-pointer group" onclick="toggleRewardsMenu()">
+            <i class="fas fa-gift mr-2"></i> Recompensas
+            <span class="ml-2"></span><i class="fas fa-chevron-right transition-transform duration-200" id="rewardsArrow" style="transform: rotate(0deg);"></i>
+          </div>
+          <ul id="rewardsMenu" class="ml-8 mt-1 space-y-1 hidden">
+            <li><a href="rewards.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-gift mr-2"></i> Recompensas Cadastradas</a></li>
+            <li><a href="rewards-available.html" class="flex items-center pl-10 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-star mr-2"></i> Recompensas Disponíveis</a></li>
+          </ul>
+        </li>
         <li><a href="lp-divulgacao.html" class="flex items-center pl-4 px-3 py-2 rounded-lg hover:bg-gray-700"><i class="fas fa-bullhorn mr-2"></i> Lp de divulgação</a></li>
         <!-- Engajamentos Whatsapp -->
         <li>
