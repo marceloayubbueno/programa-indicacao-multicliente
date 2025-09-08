@@ -6,7 +6,7 @@
 //                 'https://programa-indicacao-multicliente-production.up.railway.app/api');
 
 // 🔧 USAR CONFIGURAÇÃO GLOBAL
-const API_URL = window.APP_CONFIG?.API_URL || window.API_URL;
+const API_URL = window.APP_CONFIG?.API_URL || 'https://programa-indicacao-multicliente-production.up.railway.app';
 
 // Função para fazer login
 async function handleLogin(event) {
@@ -32,7 +32,7 @@ async function handleLogin(event) {
     errorBox.textContent = '';
 
     try {
-        const response = await fetch(`${API_URL}/api/auth/client-login`, {
+        const response = await fetch(`${API_URL}/auth/client-login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -107,7 +107,7 @@ async function loadClientData() {
 
     try {
         console.log('Fazendo requisição para /clients/me');
-        const response = await fetch(`${API_URL}/api/clients/me`, {
+        const response = await fetch(`${API_URL}/clients/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             },

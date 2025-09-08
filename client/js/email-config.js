@@ -37,7 +37,7 @@ async function loadClientInfo() {
     const token = localStorage.getItem('clientToken');
     if (!token) return;
 
-    const response = await fetch(`${getApiUrl()}/clients/me`, {
+    const response = await fetch(`${window.APP_CONFIG?.API_URL || 'https://programa-indicacao-multicliente-production.up.railway.app'}/clients/me`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -76,7 +76,7 @@ async function loadCurrentConfig() {
 
     showLoading('Carregando configuração...');
 
-    const response = await fetch(`${getApiUrl()}/email-templates/config/me`, {
+    const response = await fetch(`${window.APP_CONFIG?.API_URL || 'https://programa-indicacao-multicliente-production.up.railway.app'}/email-templates/config/me`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
