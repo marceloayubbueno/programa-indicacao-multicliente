@@ -6,7 +6,7 @@ function downloadTemplate() {
     try {
         // Criar link temporário para download
         const link = document.createElement('a');
-        link.href = '/client/templates/planilha-de-exemplo.xlsx';
+        link.href = '/templates/planilha-exemplo';
         link.download = 'planilha-de-exemplo.xlsx';
         link.style.display = 'none';
         document.body.appendChild(link);

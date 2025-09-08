@@ -25,6 +25,7 @@ import { EmailConfigModule } from './email-config/email-config.module';
 import { MailModule } from './common/mail.module';
 import { WhatsAppModule } from './whatsapp/whatsapp.module';
 import { WhatsAppFlowTriggerModule } from './whatsapp/whatsapp-flow-trigger.module';
+import { TemplatesModule } from './templates/templates.module';
 
 // 🆕 NOVO: Função UUID customizada para resolver problema do ScheduleModule
 function generateUUID(): `${string}-${string}-${string}-${string}-${string}` {
@@ -73,6 +74,7 @@ function generateUUID(): `${string}-${string}-${string}-${string}-${string}` {
     MailModule,
     WhatsAppModule,
     WhatsAppFlowTriggerModule,
+    TemplatesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
