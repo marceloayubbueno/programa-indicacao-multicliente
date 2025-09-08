@@ -247,7 +247,20 @@ function highlightActiveMenu() {
             // Expandir o menu pai
             const parentMenu = item.closest('ul');
             if (parentMenu && parentMenu.id) {
-                const parentButton = document.querySelector(`[onclick*="${parentMenu.id.replace('Menu', '')}"]`);
+                // Buscar o botão pai de forma mais específica
+                let parentButton;
+                if (parentMenu.id === 'rewardsMenu') {
+                    parentButton = document.querySelector('[onclick="toggleRewardsMenu()"]');
+                } else if (parentMenu.id === 'whatsappMenu') {
+                    parentButton = document.querySelector('[onclick="toggleWhatsAppMenu()"]');
+                } else if (parentMenu.id === 'financeMenu') {
+                    parentButton = document.querySelector('[onclick="toggleFinanceMenu()"]');
+                } else if (parentMenu.id === 'settingsMenu') {
+                    parentButton = document.querySelector('[onclick="toggleSettingsMenu()"]');
+                } else if (parentMenu.id === 'engagementEmailMenu') {
+                    parentButton = document.querySelector('[onclick="toggleEngagementEmailMenu()"]');
+                }
+                
                 if (parentButton) {
                     parentMenu.classList.remove('hidden');
                     const arrow = parentButton.querySelector('.fa-chevron-right');
