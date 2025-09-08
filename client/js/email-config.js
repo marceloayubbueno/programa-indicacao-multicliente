@@ -37,10 +37,27 @@ async function loadClientInfo() {
     const token = localStorage.getItem('clientToken');
     if (!token) return;
 
-    // Aqui você pode carregar o nome do cliente se houver endpoint
+    const response = await fetch(`${getApiUrl()}/clients/me`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        window.location.href = 'login.html';
+        return;
+      }
+      throw new Error('Erro ao carregar dados do cliente');
+    }
+
+    const data = await response.json();
+    
+    // Preencher nome do cliente
     const clientNameElement = document.getElementById('clientName');
     if (clientNameElement) {
-      clientNameElement.textContent = 'Cliente'; // Placeholder
+      clientNameElement.textContent = data.companyName || 'Cliente';
     }
   } catch (error) {
     console.error('❌ [EMAIL-CONFIG] Erro ao carregar info do cliente:', error);

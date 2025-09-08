@@ -32,7 +32,7 @@ async function handleLogin(event) {
     errorBox.textContent = '';
 
     try {
-        const response = await fetch(`${API_URL}/auth/client-login`, {
+        const response = await fetch(`${API_URL}/api/auth/client-login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -107,7 +107,7 @@ async function loadClientData() {
 
     try {
         console.log('Fazendo requisição para /clients/me');
-        const response = await fetch(`${API_URL}/clients/me`, {
+        const response = await fetch(`${API_URL}/api/clients/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             },
