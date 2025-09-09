@@ -508,12 +508,25 @@ async function confirmConversion() {
             notes: notes
         };
         
-        // Adicionar valores específicos se existirem
-        if (rewardValue) payload.rewardValue = parseFloat(rewardValue);
+        // Adicionar valores específicos se existirem (mapeamento correto conforme documento)
+        if (rewardValue) payload.editableRewardValue = parseFloat(rewardValue);
         if (rewardBaseValue) payload.rewardBaseValue = parseFloat(rewardBaseValue);
-        if (rewardPercentage) payload.rewardPercentage = parseFloat(rewardPercentage);
+        if (rewardPercentage) payload.percentageValue = parseFloat(rewardPercentage);
         if (rewardPoints) payload.rewardPoints = parseInt(rewardPoints);
         if (rewardProducts) payload.rewardProducts = parseInt(rewardProducts);
+        
+        // Adicionar campos obrigatórios conforme documento
+        if (rewardValue || rewardPercentage) {
+            payload.rewardCalculationType = rewardPercentage ? 'percentage' : 'fixed';
+        }
+        
+        // Calcular valor final se for percentual
+        if (rewardPercentage && rewardBaseValue) {
+            const finalValue = (parseFloat(rewardBaseValue) * parseFloat(rewardPercentage)) / 100;
+            payload.finalRewardValue = finalValue;
+        } else if (rewardValue) {
+            payload.finalRewardValue = parseFloat(rewardValue);
+        }
         
         const response = await fetch(`${apiUrl}/referrals/${leadId}/mark-conversion`, {
             method: 'POST',

@@ -86,7 +86,16 @@ export class ReferralsController {
   @Post(':id/mark-conversion')
   async markConversion(
     @Param('id') id: string,
-    @Body() body: { notes?: string }
+    @Body() body: { 
+      notes?: string;
+      editableRewardValue?: number;
+      rewardBaseValue?: number;
+      percentageValue?: number;
+      rewardPoints?: number;
+      rewardProducts?: number;
+      rewardCalculationType?: string;
+      finalRewardValue?: number;
+    }
   ) {
     this.logger.log(`Marcando conversão para referral: ${id}`);
     
@@ -94,9 +103,20 @@ export class ReferralsController {
       // Importar CampaignsService dinamicamente
       const { CampaignsService } = await import('../campaigns/campaigns.service');
       
+      // Preparar dados editáveis conforme documento
+      const editableRewardData = {
+        editableRewardValue: body.editableRewardValue,
+        rewardBaseValue: body.rewardBaseValue,
+        percentageValue: body.percentageValue,
+        rewardPoints: body.rewardPoints,
+        rewardProducts: body.rewardProducts,
+        rewardCalculationType: body.rewardCalculationType,
+        finalRewardValue: body.finalRewardValue
+      };
+      
       // TODO: Idealmente isso deveria ser injetado no construtor
       // Por enquanto, vamos atualizar diretamente via service
-      await this.referralsService.markAsConverted(id, body.notes);
+      await this.referralsService.markAsConverted(id, body.notes, editableRewardData);
       
       return {
         success: true,

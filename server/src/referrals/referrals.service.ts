@@ -140,7 +140,7 @@ export class ReferralsService {
   /**
    * Marca uma indicação como convertida (venda realizada)
    */
-  async markAsConverted(referralId: string, notes?: string): Promise<void> {
+  async markAsConverted(referralId: string, notes?: string, editableRewardData?: any): Promise<void> {
 
     
     this.logger.log(`Marcando referral ${referralId} como convertido (padrão estabelecido)`);
@@ -189,24 +189,40 @@ export class ReferralsService {
             const conversionRewardConfig = campaign.rewardOnConversion as any;
 
             
-            // Calcular valor total (recompensa existente + recompensa de conversão)
-            const currentReward = referral.rewardValue || 0;
-            const conversionReward = conversionRewardConfig.value;
-            const totalReward = currentReward + conversionReward;
-            
+            // === NOVA LÓGICA: PROCESSAR VALORES EDITÁVEIS ===
+            let finalRewardValue = 0;
+            let rewardCalculationType = 'fixed';
+            let rewardBaseValue = 0;
 
+            if (editableRewardData) {
+              // Processar valores editáveis fornecidos pelo frontend
+              const processedReward = await this.calculateRewardValue(conversionRewardConfig, editableRewardData);
+              finalRewardValue = processedReward.finalValue;
+              rewardCalculationType = processedReward.calculationType;
+              rewardBaseValue = processedReward.baseValue || 0;
+            } else {
+              // Lógica original para compatibilidade
+              const currentReward = referral.rewardValue || 0;
+              const conversionReward = conversionRewardConfig.value;
+              finalRewardValue = currentReward + conversionReward;
+            }
             
             // Atualizar referral com recompensa de conversão
             await this.referralModel.findByIdAndUpdate(referralId, {
-              rewardValue: totalReward,
+              rewardValue: finalRewardValue,
               rewardStatus: 'pending', // Aparece novamente no gerenciador
               rewardType: 'conversion_bonus',
               conversionRewardId: conversionRewardConfig._id,
-              conversionRewardValue: conversionReward
+              conversionRewardValue: finalRewardValue,
+              // === NOVOS CAMPOS ===
+              editableRewardValue: editableRewardData?.editableRewardValue || null,
+              finalRewardValue: finalRewardValue,
+              rewardCalculationType: rewardCalculationType,
+              rewardBaseValue: rewardBaseValue
             });
             
 
-            this.logger.log(`🎊 Recompensa de conversão de R$ ${conversionReward} adicionada. Total: R$ ${totalReward}`);
+            this.logger.log(`🎊 Recompensa de conversão de R$ ${finalRewardValue} adicionada. Total: R$ ${finalRewardValue}`);
           } else {
             this.logger.log('ℹ️ Nenhuma recompensa de conversão configurada na campanha');
           }
@@ -732,6 +748,97 @@ export class ReferralsService {
       this.logger.error('❌ Erro ao processar recompensa por indicação:', error);
       this.logger.error(`   - Erro completo: ${error.message}`);
       this.logger.error(`   - Stack: ${error.stack}`);
+    }
+  }
+
+  // === MÉTODOS PARA NOVOS TIPOS DE RECOMPENSA ===
+
+  /**
+   * Calcula valor da recompensa baseado no tipo e dados fornecidos
+   */
+  private async calculateRewardValue(rewardConfig: any, editableData?: any): Promise<{
+    finalValue: number;
+    calculationType: string;
+    baseValue?: number;
+  }> {
+    try {
+      const rewardType = rewardConfig.type;
+
+      // Recompensas fixas
+      if (rewardType === 'valor_fixo' || rewardType === 'pix' || rewardType === 'pontos') {
+        const fixedValue = editableData?.editableRewardValue || rewardConfig.fixedValue || rewardConfig.value;
+        return {
+          finalValue: fixedValue,
+          calculationType: 'fixed',
+          baseValue: 0
+        };
+      }
+
+      // Recompensas percentuais
+      if (rewardType === 'valor_percentual' || rewardType === 'desconto') {
+        const baseValue = editableData?.rewardBaseValue || rewardConfig.baseValue || 0;
+        const percentage = editableData?.percentageValue || rewardConfig.percentageValue || rewardConfig.value;
+        
+        if (baseValue <= 0) {
+          throw new Error('Valor base é obrigatório para recompensas percentuais');
+        }
+
+        const calculatedValue = (baseValue * percentage) / 100;
+        
+        return {
+          finalValue: calculatedValue,
+          calculationType: 'percentage',
+          baseValue: baseValue
+        };
+      }
+
+      // Tipos existentes (compatibilidade)
+      return {
+        finalValue: rewardConfig.value,
+        calculationType: 'fixed',
+        baseValue: 0
+      };
+
+    } catch (error) {
+      this.logger.error('Erro ao calcular valor da recompensa:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Processa valores editáveis fornecidos na conversão
+   */
+  private async processEditableReward(rewardConfig: any, editableData: any): Promise<any> {
+    try {
+      if (!editableData) {
+        return {
+          finalValue: rewardConfig.value,
+          calculationType: 'fixed',
+          baseValue: 0
+        };
+      }
+
+      return await this.calculateRewardValue(rewardConfig, editableData);
+    } catch (error) {
+      this.logger.error('Erro ao processar recompensa editável:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Valida campos obrigatórios baseado no tipo de recompensa
+   */
+  private validateRewardFields(rewardType: string, editableData: any): void {
+    if (rewardType === 'valor_percentual' || rewardType === 'desconto') {
+      if (!editableData?.rewardBaseValue && !editableData?.baseValue) {
+        throw new Error('Valor base é obrigatório para recompensas percentuais');
+      }
+    }
+
+    if (rewardType === 'valor_fixo') {
+      if (!editableData?.editableRewardValue && !editableData?.fixedValue) {
+        throw new Error('Valor fixo é obrigatório para este tipo de recompensa');
+      }
     }
   }
 } 

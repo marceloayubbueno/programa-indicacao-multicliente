@@ -84,6 +84,19 @@ export class Referral extends Document {
 
   @Prop({ required: false })
   convertedAt?: Date;
+
+  // === CAMPOS PARA VALORES EDITÁVEIS DE RECOMPENSA ===
+  @Prop({ required: false })
+  editableRewardValue?: number;
+
+  @Prop({ required: false })
+  finalRewardValue?: number;
+
+  @Prop({ required: false, enum: ['fixed', 'percentage'], default: 'fixed' })
+  rewardCalculationType?: string;
+
+  @Prop({ required: false })
+  rewardBaseValue?: number;
   // === FIM DOS NOVOS CAMPOS ===
 
   // === CAMPOS DE TIMESTAMP (IGUAL AO PARTICIPANTSCHEMA) ===
