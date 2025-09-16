@@ -11,8 +11,8 @@ async function carregarSaldoCarteira() {
   if (!token) return;
   const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL :
     (window.location.hostname === 'localhost' ?
-      'http://localhost:3000/api' :
-      'https://programa-indicacao-multicliente-production.up.railway.app/api');
+      'http://localhost:3000' :
+      'https://programa-indicacao-multicliente-production.up.railway.app/');
   try {
     const res = await fetch(`${apiUrl}/admin/api/carteira/saldo`, {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -30,8 +30,8 @@ async function carregarExtratoCarteira() {
   if (!token) return;
   const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL :
     (window.location.hostname === 'localhost' ?
-      'http://localhost:3000/api' :
-      'https://programa-indicacao-multicliente-production.up.railway.app/api');
+      'http://localhost:3000' :
+      'https://programa-indicacao-multicliente-production.up.railway.app/');
   try {
     const res = await fetch(`${apiUrl}/admin/api/carteira/extrato`, {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -90,7 +90,7 @@ window.gerarCobrancaReal = async function gerarCobrancaReal() {
   const clientId = localStorage.getItem('clientId');
   const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL :
     (window.location.hostname === 'localhost' ?
-      'http://localhost:3000/api' :
+      'http://localhost:3000' :
       'https://programa-indicacao-multicliente-production.up.railway.app/api');
   const btn = document.querySelector('#formGerarCobranca button');
   btn.disabled = true;

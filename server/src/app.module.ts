@@ -35,8 +35,10 @@ function generateUUID(): `${string}-${string}-${string}-${string}-${string}` {
   }) as `${string}-${string}-${string}-${string}-${string}`;
 }
 
-// 🆕 NOVO: Configurar global crypto para ScheduleModule funcionar
-(global as any).crypto = { randomUUID: generateUUID };
+// 🆕 NOVO: Configurar global crypto para ScheduleModule funcionar (verificação segura)
+if (!global.crypto) {
+  (global as any).crypto = { randomUUID: generateUUID };
+}
 
 @Module({
   imports: [

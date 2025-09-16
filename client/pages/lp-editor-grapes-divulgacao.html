@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="../js/config.js"></script>
+  <script src="../js/lp-referral-form-public.js"></script>
   <style>
     body { 
       background: #f5f6fa; 
@@ -960,11 +961,12 @@
                 <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 20px;">
                   <div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                     <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">Receba mais informações</h2>
-                    <form style="display: flex; flex-direction: column; gap: 20px;">
-                      <input type="text" placeholder="Seu nome completo" style="padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
-                      <input type="email" placeholder="Seu melhor e-mail" style="padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
-                      <input type="tel" placeholder="Seu telefone (WhatsApp)" style="padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                    <form class="lp-referral-form" onsubmit="return window.submitReferralForm(event)" style="display: flex; flex-direction: column; gap: 20px;">
+                      <input type="text" name="name" placeholder="Seu nome completo" style="padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                      <input type="email" name="email" placeholder="Seu melhor e-mail" style="padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                      <input type="tel" name="phone" placeholder="Seu telefone (WhatsApp)" style="padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
                       <button type="submit" style="background: #ff6b6b; color: white; padding: 18px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">QUERO RECEBER AS INFORMAÇÕES</button>
+                      <div class="lp-referral-feedback" style="margin-top:8px;font-size:0.95em;"></div>
                     </form>
                     <p style="text-align: center; font-size: 12px; color: #666; margin-top: 15px;">Seus dados estão seguros conosco</p>
                   </div>

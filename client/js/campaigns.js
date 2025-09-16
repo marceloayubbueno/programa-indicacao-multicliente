@@ -2,7 +2,7 @@
 function getApiUrl() {
     return window.API_URL ||
            (window.APP_CONFIG ? window.APP_CONFIG.API_URL :
-           'http://localhost:3000/api');
+           'http://localhost:3000');
 }
 
 // Variáveis globais

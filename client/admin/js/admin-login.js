@@ -4,9 +4,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const adminLoginForm = document.getElementById('adminLoginForm');
     
-    // 🌍 USAR CONFIGURAÇÃO DINÂMICA DO config.js
+    // 🌍 CONFIGURAÇÃO DA API - Priorizando config.js com fallback seguro
     const BASE_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL.replace('/api', '') : 
-                     (window.location.hostname === 'localhost' ? 
+                     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 
                       'http://localhost:3000' : 
                       'https://programa-indicacao-multicliente-production.up.railway.app');
 

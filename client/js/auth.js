@@ -1,12 +1,8 @@
-// 🔧 CORREÇÃO: Removendo declaração duplicada de API_URL (já existe em config.js)
-// URLs da API - usando configuração global do config.js
-// const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
-//                (window.location.hostname === 'localhost' ? 
-//                 'http://localhost:3000/api' : 
-//                 'https://programa-indicacao-multicliente-production.up.railway.app/api');
-
-// 🔧 USAR CONFIGURAÇÃO GLOBAL
-const API_URL = window.APP_CONFIG?.API_URL || 'https://programa-indicacao-multicliente-production.up.railway.app';
+// 🔧 CONFIGURAÇÃO DA API - Priorizando produção com fallback para local
+const API_URL = window.APP_CONFIG?.API_URL || 
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 
+     'http://localhost:3000' : 
+     'https://programa-indicacao-multicliente-production.up.railway.app');
 
 // Função para fazer login
 async function handleLogin(event) {
