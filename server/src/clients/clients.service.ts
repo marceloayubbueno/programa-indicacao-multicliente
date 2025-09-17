@@ -40,7 +40,7 @@ export class ClientsService {
     const hash = await bcrypt.hash(createClientDto.password, 10);
     // Validação de obrigatoriedade do CNPJ
     let dtoToSave: any = { ...createClientDto };
-    if (createClientDto.plan !== 'trial') {
+    if (createClientDto.plan !== 'trial' && createClientDto.plan !== 'Trial') {
       if (!createClientDto.cnpj || createClientDto.cnpj.trim() === '') {
         throw new BadRequestException('CNPJ é obrigatório para este plano.');
       }
