@@ -38,21 +38,14 @@ export class ClientsService {
       throw new BadRequestException('A senha é obrigatória para criar um cliente.');
     }
     const hash = await bcrypt.hash(createClientDto.password, 10);
-    // Validação de obrigatoriedade do CNPJ
+    // CNPJ opcional para todos os planos
     let dtoToSave: any = { ...createClientDto };
-    if (createClientDto.plan !== 'trial' && createClientDto.plan !== 'Trial') {
-      if (!createClientDto.cnpj || createClientDto.cnpj.trim() === '') {
-        throw new BadRequestException('CNPJ é obrigatório para este plano.');
-      }
-    } else {
-      // Remover cnpj se for undefined, null ou string vazia
-      if (
-        typeof dtoToSave.cnpj === 'undefined' ||
-        dtoToSave.cnpj === null ||
-        dtoToSave.cnpj === ''
-      ) {
-        delete dtoToSave.cnpj;
-      }
+    if (
+      typeof dtoToSave.cnpj === 'undefined' ||
+      dtoToSave.cnpj === null ||
+      dtoToSave.cnpj === ''
+    ) {
+      delete dtoToSave.cnpj;
     }
     const created = new this.clientModel({
       ...dtoToSave,
