@@ -86,8 +86,8 @@ async function buscarPlanoTrial() {
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA
     const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                   (window.location.hostname === 'localhost' ? 
-                   'http://localhost:3000/api' : 
-                   'https://programa-indicacao-multicliente-production.up.railway.app/api');
+                   'http://localhost:3000' : 
+                   'https://programa-indicacao-multicliente-production.up.railway.app');
     const response = await fetch(`${apiUrl}/planos`);
         const planos = await response.json();
         const trial = planos.find(p => p.nome && p.nome.toLowerCase() === 'trial');
@@ -104,8 +104,8 @@ async function cadastrarClienteTrial(formData, planId) {
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA
         const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                       (window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/api' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+                       'http://localhost:3000' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app');
         const response = await fetch(`${apiUrl}/clients/trial`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -127,8 +127,8 @@ async function autenticarCliente(email, senha) {
         // 🌍 USAR CONFIGURAÇÃO DINÂMICA
         const apiUrl = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 
                       (window.location.hostname === 'localhost' ? 
-                       'http://localhost:3000/api' : 
-                       'https://programa-indicacao-multicliente-production.up.railway.app/api');
+                       'http://localhost:3000' : 
+                       'https://programa-indicacao-multicliente-production.up.railway.app');
         const response = await fetch(`${apiUrl}/auth/client-login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
