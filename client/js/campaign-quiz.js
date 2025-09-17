@@ -637,49 +637,6 @@ async function handleUploadLista(e) {
 
 
 
-  try {
-    // 1. Cria lista
-    const resLista = await fetch(`${getApiUrl()}/participant-lists`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ name: nome, clientId, tipo: 'participante' })
-    });
-    if (!resLista.ok) throw new Error('Erro ao criar lista');
-    const lista = await resLista.json();
-    // 2. Importa participantes
-    const resImport = await fetch(`${getApiUrl()}/participants/import`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ clientId, participants: contatos })
-    });
-    if (!resImport.ok) throw new Error('Erro ao importar participantes');
-    const importData = await resImport.json();
-    // 3. Associa participantes à lista
-    const participantIds = (importData.data || []).map(p => p._id);
-    if (participantIds.length) {
-      await fetch(`${getApiUrl()}/participant-lists/${lista.data._id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ participants: participantIds })
-      });
-    }
-    statusDiv.textContent = 'Lista criada com sucesso!';
-    renderListasParticipantes();
-    selectedListaId = lista.data._id;
-    validarListaSelecionada();
-  } catch (err) {
-    statusDiv.textContent = 'Erro: ' + err.message;
-  }
-}
 
 // Busca recompensas do backend para o usuário logado
 async function fetchRewardsBackend() {
@@ -1394,7 +1351,7 @@ window.abrirEditarLista = function() {
   }));
   
   // Abrir página de editar lista
-  window.open('/pages/editar-lista.html', '_blank');
+  window.open('../pages/editar-lista.html', '_blank');
 }
 
 // 🆕 FUNÇÃO PARA VERIFICAR RETORNO DO QUIZ
