@@ -5,7 +5,7 @@ export class CreateClientDto {
   @IsNotEmpty()
   companyName: string;
 
-  @ValidateIf(o => o.plan !== 'trial' && o.plan !== 'Trial')
+  @ValidateIf(o => o.plan !== 'trial' && o.plan !== 'Trial' && !o.plan?.toString().includes('trial'))
   @IsString()
   @IsOptional()
   cnpj?: string;
