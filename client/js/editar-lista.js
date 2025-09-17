@@ -437,14 +437,14 @@ function setupFormSubmit() {
     const formData = {
       name: document.getElementById('listName').value.trim(),
       description: document.getElementById('listDescription').value.trim(),
-      tipo: document.getElementById('listTipo').value,
+      tipo: 'participante',
       status: 'active',
       clientId: localStorage.getItem('clientId')
     };
 
     // Validações
-    if (!formData.name || !formData.tipo) {
-      showNotification('Preencha todos os campos obrigatórios.', 'warning');
+    if (!formData.name) {
+      showNotification('Preencha o nome da lista.', 'warning');
       return;
     }
 

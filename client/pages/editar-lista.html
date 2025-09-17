@@ -84,16 +84,6 @@
                 <input type="text" id="listName" name="listName" required placeholder="Ex: Clientes VIP 2025" class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
               </div>
               
-              <div class="flex flex-col gap-2">
-                <label for="listTipo" class="text-sm font-medium">Tipo da Lista*:</label>
-                <select id="listTipo" name="listTipo" required class="w-full rounded-lg border border-gray-700 bg-gray-900 text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="">Selecione o tipo</option>
-                  <option value="participante">🎯 Participante</option>
-                  <option value="indicador">👥 Indicador</option>
-                  <option value="influenciador">⭐ Influenciador</option>
-                  <option value="mista">🔄 Mista</option>
-                </select>
-              </div>
             </div>
             
             <div class="mt-4">
@@ -106,14 +96,6 @@
           <div>
             <h3 class="text-lg font-semibold text-blue-400 mb-4">👥 Adicionar Participantes</h3>
             
-            <!-- 🔍 BUSCAR PARTICIPANTES CADASTRADOS -->
-            <div class="mb-6 p-4 bg-gray-700 rounded-lg">
-              <h4 class="font-medium text-green-400 mb-3">🔍 Buscar Participantes Já Cadastrados</h4>
-              <div class="relative">
-                <input type="text" id="participantSearch" placeholder="Digite nome ou e-mail para buscar..." class="w-full rounded-lg border border-gray-600 bg-gray-800 text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500" autocomplete="off">
-                <div id="autocompleteSuggestions" class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-b-lg shadow-lg hidden"></div>
-              </div>
-            </div>
 
             <!-- 📤 IMPORTAR NOVOS PARTICIPANTES -->
             <div class="p-4 bg-gray-700 rounded-lg">
@@ -142,19 +124,6 @@
                 </div>
               </div>
 
-              <!-- 📋 COLAR DO EXCEL -->
-              <div class="mb-4">
-                <label class="block text-sm font-medium mb-2">📋 Ou Colar Dados do Excel:</label>
-                <div class="bg-gray-600 p-3 rounded-lg mb-2">
-                  <p class="text-xs text-gray-300 mb-2">💡 <strong>Como usar:</strong></p>
-                  <p class="text-xs text-gray-300">1. Copie 3 colunas do Excel: <code class="bg-gray-800 px-1 rounded">Nome | Email | Telefone</code></p>
-                  <p class="text-xs text-gray-300">2. Cole abaixo e clique em "Processar Dados"</p>
-                </div>
-                <textarea id="pasteArea" rows="4" placeholder="Nome&#9;Email&#9;Telefone&#10;João Silva&#9;joao@email.com&#9;(11) 99999-9999&#10;Maria Santos&#9;maria@email.com&#9;(11) 88888-8888" class="w-full rounded-lg border border-gray-600 bg-gray-800 text-gray-100 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"></textarea>
-                <button type="button" id="btnPasteImport" class="mt-2 px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors">
-                  <i class="fas fa-magic mr-2"></i>Processar Dados
-                </button>
-              </div>
 
               <!-- 📊 PREVIEW DE IMPORTAÇÃO -->
               <div id="importPreview" class="text-sm"></div>
