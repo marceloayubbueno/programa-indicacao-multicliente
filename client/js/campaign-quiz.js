@@ -1382,8 +1382,13 @@ function verificarRetornoQuiz() {
         // Mostrar etapa correta
         showStep(currentStep);
         
-        // Sempre recarregar listas quando volta do quiz
-        renderListasParticipantes();
+        // Verificar se o container existe antes de renderizar
+        setTimeout(() => {
+          const container = document.getElementById('listasParticipantes');
+          if (container) {
+            renderListasParticipantes();
+          }
+        }, 100);
         
         // Mostrar notificação de sucesso
         alert('Lista criada com sucesso! Você pode continuar o quiz.');
