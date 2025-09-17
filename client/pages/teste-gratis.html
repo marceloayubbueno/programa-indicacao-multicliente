@@ -1,123 +1,303 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teste Grátis - Programa de Indicação</title>
     <link rel="stylesheet" href="../css/tailwind.output.css">
-    <link rel="stylesheet" href="../css/teste-gratis.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body>
-    <div class="container">
-        <div class="form-container">
-            <div class="form-header">
-                <h1>Teste Grátis</h1>
-                <p>Experimente nosso programa de indicação por 14 dias gratuitamente</p>
-            </div>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center px-4">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-gray-900">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-gray-900 to-blue-800/20"></div>
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%233B82F6\" fill-opacity=\"0.05\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+    </div>
 
-            <form id="testeGratisForm" onsubmit="return handleSubmit(event)">
-                <div class="form-group">
-                    <label for="nome">Nome Completo *</label>
-                    <input type="text" id="nome" name="nome" required 
-                           placeholder="Digite seu nome completo">
-                </div>
-
-                <div class="form-group">
-                    <label for="email">E-mail Corporativo *</label>
-                    <input type="email" id="email" name="email" required 
-                           placeholder="Digite seu e-mail corporativo">
-                </div>
-
-                <div class="form-group">
-                    <label for="whatsapp">WhatsApp *</label>
-                    <input type="tel" id="whatsapp" name="whatsapp" required 
-                           placeholder="(00) 00000-0000"
-                           pattern="\(\d{2}\)\s\d{5}-\d{4}">
-                </div>
-
-                <div class="form-group">
-                    <label for="empresa">Nome da Empresa *</label>
-                    <input type="text" id="empresa" name="empresa" required 
-                           placeholder="Digite o nome da sua empresa">
-                </div>
-
-                <div class="form-group">
-                    <label for="funcionarios">Número de Funcionários *</label>
-                    <select id="funcionarios" name="funcionarios" required>
-                        <option value="">Selecione uma opção</option>
-                        <option value="1-10">1 a 10 funcionários</option>
-                        <option value="11-50">11 a 50 funcionários</option>
-                        <option value="51-200">51 a 200 funcionários</option>
-                        <option value="201-500">201 a 500 funcionários</option>
-                        <option value="501+">Mais de 500 funcionários</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="senha">Senha *</label>
-                    <div class="password-input">
-                        <input type="password" id="senha" name="senha" required 
-                               placeholder="Digite sua senha"
-                               minlength="8">
-                        <button type="button" class="toggle-password" onclick="togglePassword()">
-                            👁️
-                        </button>
+    <!-- Main Container -->
+    <div class="relative w-full max-w-7xl">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Form Container -->
+            <div class="flex-1">
+                <div class="bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 p-8">
+                    <!-- Header -->
+                    <div class="text-center mb-8">
+                        <!-- Logo -->
+                        <div class="mb-6">
+                            <img src="../imagens/logo branca.png" 
+                                 alt="Logo Oficial" 
+                                 class="h-20 w-auto mx-auto"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-4" style="display: none;">
+                                <i class="fas fa-rocket text-green-400 text-2xl"></i>
+                            </div>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-100 mb-2">Teste Grátis</h1>
+                        <p class="text-gray-400 text-sm">Experimente nosso programa de indicação por 14 dias gratuitamente</p>
                     </div>
-                    <small class="password-hint">
-                        A senha deve ter no mínimo 8 caracteres
-                    </small>
-                </div>
 
-                <div class="form-group terms">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="termos" name="termos" required>
-                        <span>Li e aceito os <a href="#" target="_blank">Termos de Uso</a> e a <a href="#" target="_blank">Política de Privacidade</a></span>
-                    </label>
-                </div>
+                    <!-- Form -->
+                    <form id="testeGratisForm" class="space-y-6" onsubmit="return handleSubmit(event)">
+                        <!-- Nome Field -->
+                        <div class="space-y-2">
+                            <label for="nome" class="block text-sm font-medium text-gray-300">
+                                <i class="fas fa-user mr-2 text-gray-400"></i>Nome Completo *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="nome" 
+                                name="nome" 
+                                required 
+                                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                                placeholder="Digite seu nome completo"
+                            >
+                        </div>
 
-                <button type="submit" class="btn-primary">Começar Teste Grátis</button>
+                        <!-- Email Field -->
+                        <div class="space-y-2">
+                            <label for="email" class="block text-sm font-medium text-gray-300">
+                                <i class="fas fa-envelope mr-2 text-gray-400"></i>E-mail Corporativo *
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required 
+                                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                                placeholder="seu@empresa.com"
+                            >
+                        </div>
 
-                <div class="login-link">
-                    Já possui uma conta? <a href="login.html">Faça login aqui</a>
+                        <!-- WhatsApp Field -->
+                        <div class="space-y-2">
+                            <label for="whatsapp" class="block text-sm font-medium text-gray-300">
+                                <i class="fas fa-phone mr-2 text-gray-400"></i>WhatsApp *
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="whatsapp" 
+                                name="whatsapp" 
+                                required 
+                                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                                placeholder="(00) 00000-0000"
+                                pattern="\(\d{2}\)\s\d{5}-\d{4}"
+                            >
+                        </div>
+
+                        <!-- Empresa Field -->
+                        <div class="space-y-2">
+                            <label for="empresa" class="block text-sm font-medium text-gray-300">
+                                <i class="fas fa-building mr-2 text-gray-400"></i>Nome da Empresa *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="empresa" 
+                                name="empresa" 
+                                required 
+                                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                                placeholder="Digite o nome da sua empresa"
+                            >
+                        </div>
+
+                        <!-- Funcionários Field -->
+                        <div class="space-y-2">
+                            <label for="funcionarios" class="block text-sm font-medium text-gray-300">
+                                <i class="fas fa-users mr-2 text-gray-400"></i>Número de Funcionários *
+                            </label>
+                            <select 
+                                id="funcionarios" 
+                                name="funcionarios" 
+                                required
+                                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                            >
+                                <option value="" class="bg-gray-700">Selecione uma opção</option>
+                                <option value="1-10" class="bg-gray-700">1 a 10 funcionários</option>
+                                <option value="11-50" class="bg-gray-700">11 a 50 funcionários</option>
+                                <option value="51-200" class="bg-gray-700">51 a 200 funcionários</option>
+                                <option value="201-500" class="bg-gray-700">201 a 500 funcionários</option>
+                                <option value="501+" class="bg-gray-700">Mais de 500 funcionários</option>
+                            </select>
+                        </div>
+
+                        <!-- Senha Field -->
+                        <div class="space-y-2">
+                            <label for="senha" class="block text-sm font-medium text-gray-300">
+                                <i class="fas fa-lock mr-2 text-gray-400"></i>Senha *
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="senha" 
+                                    name="senha" 
+                                    required 
+                                    minlength="8"
+                                    class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 pr-12"
+                                    placeholder="••••••••"
+                                >
+                                <button 
+                                    type="button" 
+                                    id="togglePassword"
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 focus:outline-none"
+                                >
+                                    <i class="fas fa-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                            <small class="text-xs text-gray-400">
+                                A senha deve ter no mínimo 8 caracteres
+                            </small>
+                        </div>
+
+                        <!-- Terms -->
+                        <div class="flex items-start space-x-3">
+                            <input 
+                                type="checkbox" 
+                                id="termos" 
+                                name="termos" 
+                                required
+                                class="w-4 h-4 text-green-600 bg-gray-700 border-gray-600 rounded focus:ring-green-500 focus:ring-2 mt-1"
+                            >
+                            <label for="termos" class="text-sm text-gray-300">
+                                Li e aceito os <a href="#" target="_blank" class="text-green-400 hover:text-green-300">Termos de Uso</a> e a <a href="#" target="_blank" class="text-green-400 hover:text-green-300">Política de Privacidade</a>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button 
+                            type="submit" 
+                            id="submitButton"
+                            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <span id="submitText">
+                                <i class="fas fa-rocket mr-2"></i>Começar Teste Grátis
+                            </span>
+                            <span id="submitLoading" class="hidden">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>Processando...
+                            </span>
+                        </button>
+
+                        <!-- Login Link -->
+                        <div class="text-center text-sm text-gray-400">
+                            Já possui uma conta? <a href="login.html" class="text-green-400 hover:text-green-300 transition-colors">Faça login aqui</a>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
+            <!-- Benefits Container -->
+            <div class="flex-1">
+                <div class="bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 p-8">
+                    <div class="text-center mb-8">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-500/20 rounded-full mb-4">
+                            <i class="fas fa-star text-blue-400 text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-100 mb-2">Benefícios do Teste Grátis</h2>
+                        <p class="text-gray-400 text-sm">Descubra todas as vantagens</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4 p-4 bg-gray-700/50 rounded-lg">
+                            <div class="flex-shrink-0 w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-check text-green-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-100 mb-1">Acesso Completo</h3>
+                                <p class="text-sm text-gray-400">Teste todas as funcionalidades sem limitações</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 p-4 bg-gray-700/50 rounded-lg">
+                            <div class="flex-shrink-0 w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-rocket text-blue-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-100 mb-1">Configuração Rápida</h3>
+                                <p class="text-sm text-gray-400">Configure sua primeira campanha em minutos</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 p-4 bg-gray-700/50 rounded-lg">
+                            <div class="flex-shrink-0 w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-headset text-purple-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-100 mb-1">Suporte Dedicado</h3>
+                                <p class="text-sm text-gray-400">Suporte técnico durante todo o período de teste</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 p-4 bg-gray-700/50 rounded-lg">
+                            <div class="flex-shrink-0 w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-shield-alt text-orange-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-100 mb-1">Sem Compromisso</h3>
+                                <p class="text-sm text-gray-400">Cancele a qualquer momento, sem custos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="benefits-container">
-            <h2>Benefícios do Teste Grátis</h2>
-            <ul class="benefits-list">
-                <li>
-                    <span class="icon">✨</span>
-                    <div class="benefit-content">
-                        <h3>Acesso Completo</h3>
-                        <p>Teste todas as funcionalidades sem limitações</p>
-                    </div>
-                </li>
-                <li>
-                    <span class="icon">🚀</span>
-                    <div class="benefit-content">
-                        <h3>Configuração Rápida</h3>
-                        <p>Configure sua primeira campanha em minutos</p>
-                    </div>
-                </li>
-                <li>
-                    <span class="icon">💬</span>
-                    <div class="benefit-content">
-                        <h3>Suporte Dedicado</h3>
-                        <p>Suporte técnico durante todo o período de teste</p>
-                    </div>
-                </li>
-                <li>
-                    <span class="icon">🔒</span>
-                    <div class="benefit-content">
-                        <h3>Sem Compromisso</h3>
-                        <p>Cancele a qualquer momento, sem custos</p>
-                    </div>
-                </li>
-            </ul>
+        <!-- Footer -->
+        <div class="text-center mt-8 text-gray-400 text-sm">
+            <p>Sistema de Programa de Indicação</p>
+            <p class="mt-1">© 2024 - Teste Grátis</p>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="../js/teste-gratis.js"></script>
+    <script>
+        // Toggle Password Visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('senha');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        });
+
+        // Enhanced Form Handling
+        document.getElementById('testeGratisForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitButton = document.getElementById('submitButton');
+            const submitText = document.getElementById('submitText');
+            const submitLoading = document.getElementById('submitLoading');
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitText.classList.add('hidden');
+            submitLoading.classList.remove('hidden');
+            
+            try {
+                await handleSubmit(e);
+            } catch (err) {
+                console.error('Erro no formulário:', err);
+            } finally {
+                submitButton.disabled = false;
+                submitText.classList.remove('hidden');
+                submitLoading.classList.add('hidden');
+            }
+        });
+
+        // Add subtle animations on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const formCard = document.querySelector('.bg-gray-800');
+            formCard.style.opacity = '0';
+            formCard.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                formCard.style.transition = 'all 0.5s ease-out';
+                formCard.style.opacity = '1';
+                formCard.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
 </body>
 </html> 
