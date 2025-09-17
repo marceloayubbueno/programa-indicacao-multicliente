@@ -659,9 +659,11 @@ async function createList(formData) {
 
   showNotification('Lista criada com sucesso!', 'success');
   
-  // Verificar se foi aberto a partir do quiz
-  const quizReturnData = localStorage.getItem('quizReturnData');
-  if (quizReturnData) {
+  // Verificar se foi aberto a partir do quiz ou da central de participantes
+  const urlParams = new URLSearchParams(window.location.search);
+  const fromQuiz = urlParams.get('from') === 'quiz';
+  
+  if (fromQuiz) {
     // Fechar esta aba e voltar ao quiz
     setTimeout(() => {
       console.log('🔍 H3 - RETORNO AO QUIZ EXECUTADO:', {
@@ -672,7 +674,7 @@ async function createList(formData) {
       window.close(); // Fecha a aba atual
     }, 1500);
   } else {
-    // Redirecionamento normal para participants.html
+    // Redirecionamento normal para central de participantes
     setTimeout(() => {
       console.log('🔍 H3 - REDIRECIONAMENTO EXECUTADO:', {
         action: 'REDIRECT_EXECUTED',
