@@ -1351,7 +1351,7 @@ window.abrirEditarLista = function() {
   }));
   
   // Abrir página de editar lista
-  window.open('../pages/editar-lista.html?from=quiz', '_blank');
+  window.open('editar-lista.html?from=quiz', '_blank');
 }
 
 // 🆕 FUNÇÃO PARA VERIFICAR RETORNO DO QUIZ
