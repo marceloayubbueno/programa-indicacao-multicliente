@@ -121,33 +121,36 @@ function loadAvailableRewardsCards() {
             color: 'bg-indigo-500',
             bgColor: 'bg-gray-800'
         },
-        {
-            id: 'cashback',
-            name: 'Cashback',
-            description: 'Devolução de parte do valor gasto',
-            usage: 'Após conversão do cliente indicado',
-            icon: 'fas fa-undo',
-            color: 'bg-orange-500',
-            bgColor: 'bg-gray-800'
-        },
-        {
-            id: 'credito_digital',
-            name: 'Crédito Digital',
-            description: 'Crédito virtual para produtos/serviços',
-            usage: 'Geração do lead ou conversão',
-            icon: 'fas fa-credit-card',
-            color: 'bg-teal-500',
-            bgColor: 'bg-gray-800'
-        },
-        {
-            id: 'produto_gratis',
-            name: 'Produto/Serviço Grátis',
-            description: 'Acesso gratuito a produtos específicos',
-            usage: 'Geração do lead ou conversão',
-            icon: 'fas fa-gift',
-            color: 'bg-pink-500',
-            bgColor: 'bg-gray-800'
-        },
+        // TEMPORARIAMENTE INATIVADO - Cashback
+        // {
+        //     id: 'cashback',
+        //     name: 'Cashback',
+        //     description: 'Devolução de parte do valor gasto',
+        //     usage: 'Após conversão do cliente indicado',
+        //     icon: 'fas fa-undo',
+        //     color: 'bg-orange-500',
+        //     bgColor: 'bg-gray-800'
+        // },
+        // TEMPORARIAMENTE INATIVADO - Crédito Digital
+        // {
+        //     id: 'credito_digital',
+        //     name: 'Crédito Digital',
+        //     description: 'Crédito virtual para produtos/serviços',
+        //     usage: 'Geração do lead ou conversão',
+        //     icon: 'fas fa-credit-card',
+        //     color: 'bg-teal-500',
+        //     bgColor: 'bg-gray-800'
+        // },
+        // TEMPORARIAMENTE INATIVADO - Produto/Serviço Grátis
+        // {
+        //     id: 'produto_gratis',
+        //     name: 'Produto/Serviço Grátis',
+        //     description: 'Acesso gratuito a produtos específicos',
+        //     usage: 'Geração do lead ou conversão',
+        //     icon: 'fas fa-gift',
+        //     color: 'bg-pink-500',
+        //     bgColor: 'bg-gray-800'
+        // },
         {
             id: 'comissao_recorrente',
             name: 'Comissão Recorrente',
@@ -157,51 +160,56 @@ function loadAvailableRewardsCards() {
             color: 'bg-amber-500',
             bgColor: 'bg-gray-800'
         },
-        {
-            id: 'bonus_volume',
-            name: 'Bônus por Volume',
-            description: 'Bônus adicional baseado no número de indicações',
-            usage: 'Acumulativo por período',
-            icon: 'fas fa-chart-bar',
-            color: 'bg-violet-500',
-            bgColor: 'bg-gray-800'
-        },
-        {
-            id: 'desconto_progressivo',
-            name: 'Desconto Progressivo',
-            description: 'Desconto que aumenta com indicações',
-            usage: 'Aplicado nas próximas compras',
-            icon: 'fas fa-trending-up',
-            color: 'bg-sky-500',
-            bgColor: 'bg-gray-800'
-        },
-        {
-            id: 'vale_presente',
-            name: 'Vale-Presente',
-            description: 'Vales para Amazon, iFood, Uber, etc.',
-            usage: 'Geração do lead ou conversão',
-            icon: 'fas fa-ticket-alt',
-            color: 'bg-lime-500',
-            bgColor: 'bg-gray-800'
-        },
-        {
-            id: 'valor_conversao',
-            name: 'Por Valor da Conversão',
-            description: 'Bônus baseado no valor da primeira compra',
-            usage: 'Após primeira compra do cliente indicado',
-            icon: 'fas fa-shopping-cart',
-            color: 'bg-neutral-500',
-            bgColor: 'bg-gray-800'
-        },
-        {
-            id: 'meta',
-            name: 'Por Meta',
-            description: 'Bônus por atingir metas específicas',
-            usage: 'Após atingir meta definida',
-            icon: 'fas fa-bullseye',
-            color: 'bg-blue-600',
-            bgColor: 'bg-gray-800'
-        }
+        // TEMPORARIAMENTE INATIVADO - Bônus por Volume
+        // {
+        //     id: 'bonus_volume',
+        //     name: 'Bônus por Volume',
+        //     description: 'Bônus adicional baseado no número de indicações',
+        //     usage: 'Acumulativo por período',
+        //     icon: 'fas fa-chart-bar',
+        //     color: 'bg-violet-500',
+        //     bgColor: 'bg-gray-800'
+        // },
+        // TEMPORARIAMENTE INATIVADO - Desconto Progressivo
+        // {
+        //     id: 'desconto_progressivo',
+        //     name: 'Desconto Progressivo',
+        //     description: 'Desconto que aumenta com indicações',
+        //     usage: 'Aplicado nas próximas compras',
+        //     icon: 'fas fa-trending-up',
+        //     color: 'bg-sky-500',
+        //     bgColor: 'bg-gray-800'
+        // },
+        // TEMPORARIAMENTE INATIVADO - Vale-Presente
+        // {
+        //     id: 'vale_presente',
+        //     name: 'Vale-Presente',
+        //     description: 'Vales para Amazon, iFood, Uber, etc.',
+        //     usage: 'Geração do lead ou conversão',
+        //     icon: 'fas fa-ticket-alt',
+        //     color: 'bg-lime-500',
+        //     bgColor: 'bg-gray-800'
+        // },
+        // TEMPORARIAMENTE INATIVADO - Por Valor da Conversão
+        // {
+        //     id: 'valor_conversao',
+        //     name: 'Por Valor da Conversão',
+        //     description: 'Bônus baseado no valor da primeira compra',
+        //     usage: 'Após primeira compra do cliente indicado',
+        //     icon: 'fas fa-shopping-cart',
+        //     color: 'bg-neutral-500',
+        //     bgColor: 'bg-gray-800'
+        // },
+        // TEMPORARIAMENTE INATIVADO - Por Meta
+        // {
+        //     id: 'meta',
+        //     name: 'Por Meta',
+        //     description: 'Bônus por atingir metas específicas',
+        //     usage: 'Após atingir meta definida',
+        //     icon: 'fas fa-bullseye',
+        //     color: 'bg-blue-600',
+        //     bgColor: 'bg-gray-800'
+        // }
     ];
     
     cardsContainer.innerHTML = '';
