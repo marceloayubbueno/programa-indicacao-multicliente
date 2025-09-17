@@ -1043,6 +1043,20 @@ window.onload = function() {
   showStep(currentStep);
 };
 
+// 🆕 LISTENER PARA REFRESH AUTOMÁTICO QUANDO VOLTA PARA A ABA
+window.addEventListener('focus', function() {
+  console.log('🔍 H6 - Janela recebeu foco, verificando se precisa refresh das listas');
+  
+  // Verificar se estamos na etapa de seleção de listas
+  if (currentStep === 3 && selectedSourceType === 'list') {
+    const container = document.getElementById('listasParticipantes');
+    if (container) {
+      console.log('🔍 H6 - Fazendo refresh automático das listas');
+      renderListasParticipantes();
+    }
+  }
+});
+
 window.nextStep = nextStep;
 window.previousStep = previousStep;
 window.selectCampaignType = selectCampaignType;
