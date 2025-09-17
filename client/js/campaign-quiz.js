@@ -1382,10 +1382,8 @@ function verificarRetornoQuiz() {
         // Mostrar etapa correta
         showStep(currentStep);
         
-        // Recarregar listas para mostrar a nova lista criada
-        if (selectedSourceType === 'list') {
-          renderListasParticipantes();
-        }
+        // Sempre recarregar listas quando volta do quiz
+        renderListasParticipantes();
         
         // Mostrar notificação de sucesso
         alert('Lista criada com sucesso! Você pode continuar o quiz.');
