@@ -348,7 +348,7 @@ async function fetchListasParticipantes() {
   }
 
   try {
-    const url = `${getApiUrl()}/participant-lists?clientId=${clientId}`;
+    const url = `${getApiUrl()}/participant-lists?clientId=${clientId}&_t=${Date.now()}`;
     console.log('🔍 H1 - URL da requisição:', url);
 
     const response = await fetch(url, {
