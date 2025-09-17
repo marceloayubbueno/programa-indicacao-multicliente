@@ -99,18 +99,9 @@
               <div class="mb-8">
                 <h3 class="text-lg font-semibold text-gray-200 mb-2">2. Faça upload de uma lista</h3>
                 <p class="text-gray-400 mb-2">Adicione contatos de uma lista do seu computador.</p>
-                <button id="uploadListaBtn" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors mb-2"><i class="fas fa-upload mr-2"></i>Subir Lista (CSV, XLS, XLSX)</button>
+                <button id="uploadListaBtn" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors mb-2" onclick="abrirEditarLista()"><i class="fas fa-upload mr-2"></i>Subir Lista (CSV, XLS, XLSX)</button>
                 <input type="file" id="inputUploadLista" accept=".csv,.xls,.xlsx" style="display:none;" />
                 <div id="uploadListaStatus" class="text-xs text-gray-400 mt-2"></div>
-              </div>
-              <div class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-200 mb-2">3. Crie uma nova lista</h3>
-                <p class="text-gray-400 mb-2">Selecione contatos um a um manualmente.</p>
-                <div class="flex gap-2 mb-2">
-                  <input type="text" id="novaListaNome" class="w-full rounded-lg bg-gray-900 border border-gray-700 text-gray-100 px-4 py-2 focus:outline-none focus:border-blue-500" placeholder="Nome da nova lista">
-                  <button class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold shadow hover:bg-green-700 transition-colors" onclick="abrirCriacaoManualLista()">Criar Manualmente</button>
-                </div>
-                <div id="criacaoManualListaContainer" style="display:none;"></div>
               </div>
             </section>
             <!-- Etapa 03: LP de Divulgação -->

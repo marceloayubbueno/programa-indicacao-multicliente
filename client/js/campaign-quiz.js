@@ -506,30 +506,6 @@ function validarListaSelecionada() {
   }
 }
 
-window.criarNovaLista = async function() {
-  const nome = document.getElementById('novaListaNome').value.trim();
-  if (!nome) {
-    alert('Informe o nome da nova lista.');
-    return;
-  }
-  const clientId = localStorage.getItem('clientId');
-  const token = localStorage.getItem('clientToken');
-  try {
-    const response = await fetch(`${getApiUrl()}/participant-lists`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ name: nome, clientId, tipo: 'participante' })
-    });
-    if (!response.ok) throw new Error('Erro ao criar lista');
-    document.getElementById('novaListaNome').value = '';
-    renderListasParticipantes();
-  } catch (err) {
-    alert('Erro ao criar lista: ' + err.message);
-  }
-};
 
 // --- Upload de Lista (CSV) ---
 function setupUploadLista() {
@@ -657,63 +633,10 @@ async function handleUploadLista(e) {
   }
 }
 
-// --- Criação manual de lista ---
-window.abrirCriacaoManualLista = function() {
-  const container = document.getElementById('criacaoManualListaContainer');
-  container.style.display = 'block';
-  container.innerHTML = `
-    <div class="mb-2 flex gap-2">
-      <input type="text" id="manualNome" placeholder="Nome" class="rounded bg-gray-800 border border-gray-600 px-2 py-1 text-gray-100" />
-      <input type="email" id="manualEmail" placeholder="E-mail" class="rounded bg-gray-800 border border-gray-600 px-2 py-1 text-gray-100" />
-      <input type="text" id="manualPhone" placeholder="Telefone" class="rounded bg-gray-800 border border-gray-600 px-2 py-1 text-gray-100" />
-      <button class="px-2 py-1 bg-blue-600 text-white rounded" onclick="adicionarContatoManual()">Adicionar</button>
-    </div>
-    <table class="w-full text-sm mb-2"><thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th></th></tr></thead><tbody id="manualContatos"></tbody></table>
-    <button class="px-4 py-2 rounded bg-green-600 text-white font-semibold" onclick="salvarListaManual()">Salvar Lista</button>
-    <div id="manualListaStatus" class="text-xs text-gray-400 mt-2"></div>
-  `;
-  window.manualContatos = [];
-  renderManualContatos();
-};
 
-window.adicionarContatoManual = function() {
-  const nome = document.getElementById('manualNome').value.trim();
-  const email = document.getElementById('manualEmail').value.trim();
-  const phone = document.getElementById('manualPhone').value.trim();
-  if (!nome || !email || !phone) return;
-  window.manualContatos.push({ name: nome, email, phone, tipo: 'participante' });
-  document.getElementById('manualNome').value = '';
-  document.getElementById('manualEmail').value = '';
-  document.getElementById('manualPhone').value = '';
-  renderManualContatos();
-};
 
-window.removerContatoManual = function(idx) {
-  window.manualContatos.splice(idx, 1);
-  renderManualContatos();
-};
 
-function renderManualContatos() {
-  const tbody = document.getElementById('manualContatos');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  (window.manualContatos || []).forEach((c, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${c.name}</td><td>${c.email}</td><td>${c.phone}</td><td><button onclick="removerContatoManual(${i})" class="text-red-400">Remover</button></td>`;
-    tbody.appendChild(tr);
-  });
-}
 
-window.salvarListaManual = async function() {
-  const nome = document.getElementById('novaListaNome').value.trim() || prompt('Nome da nova lista:');
-  const contatos = window.manualContatos || [];
-  const clientId = localStorage.getItem('clientId');
-  const token = localStorage.getItem('clientToken');
-  const statusDiv = document.getElementById('manualListaStatus');
-  if (!nome || !contatos.length) {
-    statusDiv.textContent = 'Preencha o nome e adicione pelo menos um contato.';
-    return;
-  }
   try {
     // 1. Cria lista
     const resLista = await fetch(`${getApiUrl()}/participant-lists`, {
@@ -753,7 +676,6 @@ window.salvarListaManual = async function() {
     renderListasParticipantes();
     selectedListaId = lista.data._id;
     validarListaSelecionada();
-    document.getElementById('criacaoManualListaContainer').style.display = 'none';
   } catch (err) {
     statusDiv.textContent = 'Erro: ' + err.message;
   }
@@ -1160,6 +1082,7 @@ async function fixListSynchronization(listId, participants) {
 // Inicialização
 window.onload = function() {
   console.log('🔍 H5 - window.onload executado, currentStep:', currentStep);
+  verificarRetornoQuiz(); // Verificar se há retorno do quiz
   showStep(currentStep);
 };
 
@@ -1451,4 +1374,67 @@ async function salvarCampanhaBackend() {
 // Handler global para o botão de finalizar do resumo
 window.finalizarCampanha = function() {
   salvarCampanhaBackend();
+}
+
+// 🆕 FUNÇÃO PARA ABRIR PÁGINA DE EDITAR LISTA
+window.abrirEditarLista = function() {
+  // Salvar estado atual do quiz para retorno
+  localStorage.setItem('quizReturnData', JSON.stringify({
+    currentStep: currentStep,
+    selectedSourceType: selectedSourceType,
+    campaignName: document.getElementById('campaignName')?.value || '',
+    campaignDescription: document.getElementById('campaignDescription')?.value || '',
+    campaignStartDate: document.getElementById('campaignStartDate')?.value || '',
+    campaignEndDate: document.getElementById('campaignEndDate')?.value || '',
+    selectedLPIndicadoresId: window.selectedLPIndicadoresId,
+    selectedLPDivulgacaoId: window.selectedLPDivulgacaoId,
+    selectedRewardOnReferral: selectedRewardOnReferral,
+    selectedRewardOnConversion: selectedRewardOnConversion,
+    timestamp: Date.now()
+  }));
+  
+  // Abrir página de editar lista
+  window.open('/pages/editar-lista.html', '_blank');
+}
+
+// 🆕 FUNÇÃO PARA VERIFICAR RETORNO DO QUIZ
+function verificarRetornoQuiz() {
+  const returnData = localStorage.getItem('quizReturnData');
+  if (returnData) {
+    try {
+      const data = JSON.parse(returnData);
+      // Verificar se o retorno é recente (últimos 5 minutos)
+      if (Date.now() - data.timestamp < 300000) {
+        // Restaurar estado do quiz
+        currentStep = data.currentStep;
+        selectedSourceType = data.selectedSourceType;
+        
+        if (data.campaignName) document.getElementById('campaignName').value = data.campaignName;
+        if (data.campaignDescription) document.getElementById('campaignDescription').value = data.campaignDescription;
+        if (data.campaignStartDate) document.getElementById('campaignStartDate').value = data.campaignStartDate;
+        if (data.campaignEndDate) document.getElementById('campaignEndDate').value = data.campaignEndDate;
+        
+        window.selectedLPIndicadoresId = data.selectedLPIndicadoresId;
+        window.selectedLPDivulgacaoId = data.selectedLPDivulgacaoId;
+        selectedRewardOnReferral = data.selectedRewardOnReferral;
+        selectedRewardOnConversion = data.selectedRewardOnConversion;
+        
+        // Limpar dados de retorno
+        localStorage.removeItem('quizReturnData');
+        
+        // Mostrar etapa correta
+        showStep(currentStep);
+        
+        // Recarregar listas para mostrar a nova lista criada
+        if (selectedSourceType === 'list') {
+          renderListasParticipantes();
+        }
+        
+        // Mostrar notificação de sucesso
+        alert('Lista criada com sucesso! Você pode continuar o quiz.');
+      }
+    } catch (error) {
+      console.error('Erro ao restaurar estado do quiz:', error);
+    }
+  }
 } 

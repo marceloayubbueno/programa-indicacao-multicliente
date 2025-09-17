@@ -658,14 +658,30 @@ async function createList(formData) {
   });
 
   showNotification('Lista criada com sucesso!', 'success');
-  setTimeout(() => {
-    console.log('🔍 H3 - REDIRECIONAMENTO EXECUTADO:', {
-      action: 'REDIRECT_EXECUTED',
-      targetPage: 'participants.html',
-      timestamp: new Date().toISOString()
-    });
-    window.location.href = 'participants.html';
-  }, 1500);
+  
+  // Verificar se foi aberto a partir do quiz
+  const quizReturnData = localStorage.getItem('quizReturnData');
+  if (quizReturnData) {
+    // Fechar esta aba e voltar ao quiz
+    setTimeout(() => {
+      console.log('🔍 H3 - RETORNO AO QUIZ EXECUTADO:', {
+        action: 'RETURN_TO_QUIZ',
+        source: 'editar-lista.html',
+        timestamp: new Date().toISOString()
+      });
+      window.close(); // Fecha a aba atual
+    }, 1500);
+  } else {
+    // Redirecionamento normal para participants.html
+    setTimeout(() => {
+      console.log('🔍 H3 - REDIRECIONAMENTO EXECUTADO:', {
+        action: 'REDIRECT_EXECUTED',
+        targetPage: 'participants.html',
+        timestamp: new Date().toISOString()
+      });
+      window.location.href = 'participants.html';
+    }, 1500);
+  }
 }
 
 // 🔧 FUNÇÕES DE PARSING
