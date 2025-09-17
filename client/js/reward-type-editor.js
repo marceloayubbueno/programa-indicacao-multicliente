@@ -183,7 +183,7 @@ async function handleSaveRewardType(event) {
       break;
     case 'valor_percentual':
       rewardData.percentageValue = parseFloat(document.getElementById('percentualValue').value);
-      // Não enviar value para valor_percentual
+      rewardData.value = parseFloat(document.getElementById('percentualValue').value); // Campo obrigatório no schema
       break;
     case 'desconto_recorrente':
       rewardData.value = parseFloat(document.getElementById('descontoRecorrenteValue').value);
