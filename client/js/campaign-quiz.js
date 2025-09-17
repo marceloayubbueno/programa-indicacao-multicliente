@@ -516,7 +516,7 @@ function setupUploadLista() {
     uploadBtn.id = 'uploadListaBtn';
     uploadBtn.className = 'ml-2 px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors';
     uploadBtn.innerHTML = '<i class="fas fa-upload mr-2"></i>Subir Lista (CSV)';
-    uploadBtn.onclick = () => document.getElementById('inputUploadLista').click();
+    uploadBtn.onclick = abrirEditarLista;
     container.parentElement.insertBefore(uploadBtn, container.nextSibling);
     // Input file oculto
     let input = document.getElementById('inputUploadLista');
@@ -537,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const uploadBtn = document.getElementById('uploadListaBtn');
   const inputUpload = document.getElementById('inputUploadLista');
   if (uploadBtn && inputUpload) {
-    uploadBtn.onclick = () => inputUpload.click();
+    // Não sobrescrever o onclick do botão - ele já tem onclick="abrirEditarLista()" no HTML
     inputUpload.onchange = handleUploadLista;
   }
 });
