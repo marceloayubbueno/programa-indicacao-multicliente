@@ -1153,26 +1153,55 @@ async function renderResumoCampanha() {
   }
 
   container.innerHTML = `
-    <div class="mb-4">
-      <h3 class="text-lg font-bold text-blue-400 mb-2">Resumo da Campanha</h3>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">Nome:</span> ${nome}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(1)">Editar</button></div>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">Descrição:</span> ${descricao}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(1)">Editar</button></div>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">Período:</span> ${dataInicio} até ${dataFim}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(1)">Editar</button></div>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">Tipo de Campanha:</span> ${tipoCampanha}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(0)">Editar</button></div>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">Fonte dos Indicadores:</span> ${fonteIndicadores}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(2)">Editar</button></div>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">LP de Indicadores:</span> ${lpIndicadores}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(3)">Editar</button></div>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">LP de Divulgação:</span> ${lpDivulgacao}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(4)">Editar</button></div>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">Lista de Participantes:</span> ${listaParticipantes}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(3)">Editar</button></div>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">Recompensa por Indicação:</span> ${recompensaIndicacao}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(5)">Editar</button></div>
-      <div class="mb-2 flex items-center justify-between"><span><span class="font-semibold">Recompensa por Conversão:</span> ${recompensaConversao}</span><button class="text-xs text-blue-400 underline" onclick="window.irParaEtapa(5)">Editar</button></div>
+    <div class="space-y-6">
+      <!-- Card Dados Básicos -->
+      <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <h4 class="text-blue-400 font-bold mb-3">Dados Básicos</h4>
+        <div class="space-y-2">
+          <div><span class="font-semibold text-gray-300">Nome:</span> <span class="text-white">${nome}</span></div>
+          <div><span class="font-semibold text-gray-300">Descrição:</span> <span class="text-white">${descricao}</span></div>
+          <div><span class="font-semibold text-gray-300">Período:</span> <span class="text-white">${dataInicio} até ${dataFim}</span></div>
+        </div>
+      </div>
+
+      <!-- Card Configuração -->
+      <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <h4 class="text-blue-400 font-bold mb-3">Configuração</h4>
+        <div class="space-y-2">
+          <div><span class="font-semibold text-gray-300">Tipo de Campanha:</span> <span class="text-white">${tipoCampanha}</span></div>
+          <div><span class="font-semibold text-gray-300">Fonte dos Indicadores:</span> <span class="text-white">${fonteIndicadores}</span></div>
+        </div>
+      </div>
+
+      <!-- Card Landing Pages -->
+      <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <h4 class="text-blue-400 font-bold mb-3">Landing Pages</h4>
+        <div class="space-y-2">
+          <div><span class="font-semibold text-gray-300">LP de Indicadores:</span> <span class="text-white">${lpIndicadores}</span></div>
+          <div><span class="font-semibold text-gray-300">LP de Divulgação:</span> <span class="text-white">${lpDivulgacao}</span></div>
+        </div>
+      </div>
+
+      <!-- Card Participantes -->
+      <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <h4 class="text-blue-400 font-bold mb-3">Participantes</h4>
+        <div class="space-y-2">
+          <div><span class="font-semibold text-gray-300">Lista de Participantes:</span> <span class="text-white">${listaParticipantes}</span></div>
+        </div>
+      </div>
+
+      <!-- Card Recompensas -->
+      <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <h4 class="text-blue-400 font-bold mb-3">Recompensas</h4>
+        <div class="space-y-2">
+          <div><span class="font-semibold text-gray-300">Recompensa por Indicação:</span> <span class="text-white">${recompensaIndicacao}</span></div>
+          <div><span class="font-semibold text-gray-300">Recompensa por Conversão:</span> <span class="text-white">${recompensaConversao}</span></div>
+        </div>
+      </div>
     </div>
   `;
 }
 
-window.irParaEtapa = function(step) {
-  currentStep = step;
-  showStep(currentStep);
-};
 
 // === [INÍCIO] Função para salvar campanha no backend ===
 async function salvarCampanhaBackend() {
@@ -1386,10 +1415,6 @@ async function salvarCampanhaBackend() {
 
 // Handler do botão de próximo passo (será configurado dinamicamente em showStep)
 
-// Handler global para o botão de finalizar do resumo
-window.finalizarCampanha = function() {
-  salvarCampanhaBackend();
-}
 
 // 🆕 FUNÇÃO PARA ABRIR PÁGINA DE EDITAR LISTA
 window.abrirEditarLista = function() {
