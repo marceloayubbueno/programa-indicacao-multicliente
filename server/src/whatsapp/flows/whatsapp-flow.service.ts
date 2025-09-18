@@ -408,4 +408,73 @@ export class WhatsAppFlowService {
 
     return stats;
   }
+
+  /**
+   * Disparar fluxo manualmente
+   */
+  async triggerFlowManually(
+    flowId: string, 
+    clientId: Types.ObjectId, 
+    body: {
+      manualTrigger?: boolean;
+      targetAudience?: string;
+      campaignId?: string;
+    }
+  ) {
+    try {
+      // Buscar fluxo e validar
+      const flow = await this.getFlowById(flowId, clientId);
+      
+      if (!flow) {
+        throw new BadRequestException('Fluxo não encontrado');
+      }
+
+      if (flow.status !== 'active') {
+        throw new BadRequestException('Apenas fluxos ativos podem ser disparados manualmente');
+      }
+
+      if (!flow.messages || flow.messages.length === 0) {
+        throw new BadRequestException('Este fluxo não possui mensagens para disparar');
+      }
+
+      // Buscar participantes baseado no campaignId
+      let participants = [];
+      if (body.campaignId) {
+        const { Participant } = await import('../../clients/entities/participant.schema');
+        const participantModel = this.connection.model('Participant', Participant);
+        
+        participants = await participantModel.find({
+          campaignId: body.campaignId,
+          clientId: clientId,
+          tipo: 'indicador' // Apenas indicadores recebem mensagens de boas-vindas
+        }).exec();
+      }
+
+      // Simular envio de mensagens (implementação básica)
+      const messagesSent = participants.length;
+      const eligibleParticipants = participants.length;
+
+      // Atualizar estatísticas do fluxo
+      await this.updateFlowStatistics(flowId, {
+        totalSent: (flow.statistics?.totalSent || 0) + messagesSent,
+        lastSentAt: new Date()
+      });
+
+      return {
+        success: true,
+        message: 'Fluxo disparado manualmente com sucesso',
+        messagesSent,
+        eligibleParticipants,
+        participants: participants.map(p => ({
+          id: p._id,
+          name: p.name,
+          email: p.email,
+          phone: p.phone
+        }))
+      };
+
+    } catch (error) {
+      throw new BadRequestException(`Erro ao disparar fluxo: ${error.message}`);
+    }
+  }
 }

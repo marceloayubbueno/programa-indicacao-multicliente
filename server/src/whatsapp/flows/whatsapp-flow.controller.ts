@@ -164,6 +164,25 @@ export class WhatsAppFlowController {
     return { message: 'Estatísticas atualizadas com sucesso' };
   }
 
+  // ===== FLOW EXECUTION =====
+
+  /**
+   * Disparar fluxo manualmente
+   */
+  @Post(':id/trigger')
+  async triggerFlow(
+    @Param('id') id: string,
+    @Body() body: {
+      manualTrigger?: boolean;
+      targetAudience?: string;
+      campaignId?: string;
+    },
+    @Request() req: any
+  ) {
+    const clientId = new Types.ObjectId(req.user.clientId);
+    return await this.flowService.triggerFlowManually(id, clientId, body);
+  }
+
   // ===== VALIDATION ENDPOINTS =====
 
   /**
