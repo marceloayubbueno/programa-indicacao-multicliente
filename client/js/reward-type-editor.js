@@ -15,7 +15,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
   const type = params.get('type');
-  const from = params.get('from');
   
   if (id) {
     loadRewardType(id);
@@ -27,7 +26,11 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('rewardTypeForm').addEventListener('submit', handleSaveRewardType);
   document.getElementById('duplicateBtn').addEventListener('click', handleDuplicate);
   document.getElementById('cancelBtn').addEventListener('click', () => {
-    if (from === 'quiz') {
+    // Verificar se foi aberto a partir do quiz ou da área de recompensas
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromQuiz = urlParams.get('from') === 'quiz';
+    
+    if (fromQuiz) {
       // Fechar aba e voltar ao quiz
       window.close();
     } else {
@@ -251,7 +254,12 @@ async function handleSaveRewardType(event) {
     }
     if (!response.ok) throw new Error('Erro ao salvar tipo de recompensa');
     alert('Tipo de recompensa salvo com sucesso!');
-    if (from === 'quiz') {
+    
+    // Verificar se foi aberto a partir do quiz ou da área de recompensas
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromQuiz = urlParams.get('from') === 'quiz';
+    
+    if (fromQuiz) {
       // Fechar aba e voltar ao quiz
       setTimeout(() => {
         window.close();
