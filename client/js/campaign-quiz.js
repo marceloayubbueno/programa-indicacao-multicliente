@@ -952,7 +952,7 @@ window.criarNovaRecompensa = function(type) {
   }));
   
   // Abrir editor de recompensas
-  window.open('https://app.virallead.com.br/pages/reward-type-editor.html', '_blank');
+  window.open('https://app.virallead.com.br/pages/reward-type-editor.html?from=quiz', '_blank');
 };
 
 // 🔧 FUNÇÕES DE DEBUG PARA INVESTIGAR PROBLEMA BACKEND
