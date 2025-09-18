@@ -9,7 +9,7 @@ let currentStep = 1;
 let selectedCampaignType = 'offline'; // Definir como offline por padrão
 let selectedSourceType = null;
 
-const totalSteps = 5; // 1 a 5
+const totalSteps = 6; // 1 a 6
 
 // --- Recompensas ---
 // Variáveis para armazenar IDs das recompensas selecionadas
@@ -144,6 +144,12 @@ function nextStep() {
     // Se estamos no step 3, ir para 4
     if (currentStep === 3) {
       currentStep = 4;
+      showStep(currentStep);
+      return;
+    }
+    // Se estamos no step 5, ir para 6
+    if (currentStep === 5) {
+      currentStep = 6;
       showStep(currentStep);
       return;
     }
