@@ -108,6 +108,11 @@ function nextStep() {
         alert('Selecione uma LP de indicadores.');
         return;
       }
+    } else if (selectedCampaignType === 'offline') {
+      if (!window.selectedLPDivulgacaoId) {
+        alert('Selecione uma LP de divulgação.');
+        return;
+      }
     }
   }
   
