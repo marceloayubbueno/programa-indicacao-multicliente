@@ -95,6 +95,30 @@ function nextStep() {
       return;
     }
   }
+  
+  // Validação etapa 3: Lista/LP obrigatória
+  if (currentStep === 3) {
+    if (selectedSourceType === 'list') {
+      if (!selectedListaId) {
+        alert('Selecione uma lista de participantes.');
+        return;
+      }
+    } else if (selectedSourceType === 'lp') {
+      if (!window.selectedLPIndicadoresId) {
+        alert('Selecione uma LP de indicadores.');
+        return;
+      }
+    }
+  }
+  
+  // Validação etapa 4: Recompensa obrigatória
+  if (currentStep === 4) {
+    if (!selectedRewardOnReferral && !selectedRewardOnConversion) {
+      alert('Selecione pelo menos uma recompensa.');
+      return;
+    }
+  }
+  
   // Step 3: validação pode ser feita nas subetapas
   if (currentStep < totalSteps) {
     // Se estamos no step 2 e indo para 3, mostrar subetapa correta
