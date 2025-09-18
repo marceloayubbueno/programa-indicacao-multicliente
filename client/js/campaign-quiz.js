@@ -81,7 +81,9 @@ function showStep(step) {
 }
 
 function nextStep() {
-  // Validação por etapa
+  // ===== VALIDAÇÕES POR ETAPA =====
+  
+  // ETAPA 1: Dados da Campanha
   if (currentStep === 1) {
     const name = document.getElementById('campaignName').value.trim();
     if (!name) {
@@ -89,6 +91,8 @@ function nextStep() {
       return;
     }
   }
+  
+  // ETAPA 2: Fonte dos Indicadores
   if (currentStep === 2) {
     if (!selectedSourceType) {
       alert('Selecione a fonte dos indicadores.');
@@ -96,35 +100,40 @@ function nextStep() {
     }
   }
   
-  // Validação etapa 3: Lista/LP obrigatória
+  // ETAPA 3: Seleção de Lista de Participantes OU LP de Indicadores
   if (currentStep === 3) {
     if (selectedSourceType === 'list') {
+      // Se escolheu lista de participantes, validar se selecionou uma lista
       if (!selectedListaId) {
         alert('Selecione uma lista de participantes.');
         return;
       }
     } else if (selectedSourceType === 'lp') {
+      // Se escolheu LP de indicadores, validar se selecionou uma LP
       if (!window.selectedLPIndicadoresId) {
         alert('Selecione uma LP de indicadores.');
-        return;
-      }
-    } else if (selectedCampaignType === 'offline') {
-      if (!window.selectedLPDivulgacaoId) {
-        alert('Selecione uma LP de divulgação.');
         return;
       }
     }
   }
   
-  // Validação etapa 4: Recompensa obrigatória
+  // ETAPA 4: LP de Divulgação
   if (currentStep === 4) {
+    if (!window.selectedLPDivulgacaoId) {
+      alert('Selecione uma LP de divulgação.');
+      return;
+    }
+  }
+  
+  // ETAPA 5: Recompensas
+  if (currentStep === 5) {
     if (!selectedRewardOnReferral && !selectedRewardOnConversion) {
       alert('Selecione pelo menos uma recompensa.');
       return;
     }
   }
   
-  // Step 3: validação pode ser feita nas subetapas
+  // ===== NAVEGAÇÃO ENTRE ETAPAS =====
   if (currentStep < totalSteps) {
     // Se estamos no step 2 e indo para 3, mostrar subetapa correta
     if (currentStep === 2) {
