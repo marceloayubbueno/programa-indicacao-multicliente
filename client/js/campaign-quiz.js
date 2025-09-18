@@ -935,11 +935,24 @@ window.selecionarNenhumaRecompensa = function(type) {
 
 // Cria nova recompensa (abre modal ou redireciona)
 window.criarNovaRecompensa = function(type) {
-  // Salva o tipo de recompensa sendo criado para usar após retorno
-  localStorage.setItem('creatingRewardFor', type);
-
-  // Abre página de criação de recompensa em nova aba
-  window.open('rewards-form.html', '_blank');
+  // Salvar estado atual do quiz para retorno
+  localStorage.setItem('quizReturnData', JSON.stringify({
+    currentStep: currentStep,
+    selectedSourceType: selectedSourceType,
+    campaignName: document.getElementById('campaignName')?.value || '',
+    campaignDescription: document.getElementById('campaignDescription')?.value || '',
+    campaignStartDate: document.getElementById('campaignStartDate')?.value || '',
+    campaignEndDate: document.getElementById('campaignEndDate')?.value || '',
+    selectedLPIndicadoresId: window.selectedLPIndicadoresId,
+    selectedLPDivulgacaoId: window.selectedLPDivulgacaoId,
+    selectedRewardOnReferral: selectedRewardOnReferral,
+    selectedRewardOnConversion: selectedRewardOnConversion,
+    creatingRewardFor: type,
+    timestamp: Date.now()
+  }));
+  
+  // Abrir editor de recompensas
+  window.open('https://app.virallead.com.br/pages/reward-type-editor.html', '_blank');
 };
 
 // 🔧 FUNÇÕES DE DEBUG PARA INVESTIGAR PROBLEMA BACKEND
@@ -1097,6 +1110,15 @@ window.addEventListener('focus', function() {
     if (container) {
       console.log('🔍 H6 - Fazendo refresh automático das listas');
       renderListasParticipantes();
+    }
+  }
+  
+  // Verificar se estamos na etapa de seleção de recompensas
+  if (currentStep === 5) {
+    const container = document.getElementById('rewardsOnReferral');
+    if (container) {
+      console.log('🔍 H6 - Fazendo refresh automático das recompensas');
+      renderRewards();
     }
   }
 });
@@ -1464,6 +1486,21 @@ function verificarRetornoQuiz() {
         
         // Mostrar etapa correta
         showStep(currentStep);
+        
+        // Verificar se é retorno de criação de recompensa
+        if (data.creatingRewardFor) {
+          // Verificar se o container existe antes de renderizar
+          setTimeout(() => {
+            const container = document.getElementById('rewardsOnReferral');
+            if (container) {
+              renderRewards();
+            }
+          }, 100);
+          
+          // Mostrar notificação de sucesso
+          alert('Recompensa criada com sucesso! Você pode continuar o quiz.');
+          return;
+        }
         
         // Verificar se o container existe antes de renderizar
         setTimeout(() => {
