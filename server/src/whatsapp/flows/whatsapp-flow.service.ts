@@ -423,6 +423,7 @@ export class WhatsAppFlowService {
       campaignId?: string;
     }
   ) {
+    console.log('🔍 [TRIGGER] Executando - flowId:', flowId, 'targetAudience:', body.targetAudience, 'campaignId:', body.campaignId);
     try {
       // Buscar fluxo e validar
       const flow = await this.getFlowById(flowId, clientId);
