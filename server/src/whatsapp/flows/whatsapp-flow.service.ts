@@ -2,11 +2,13 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { WhatsAppFlow, WhatsAppFlowDocument } from '../entities/whatsapp-flow.schema';
+import { Participant } from '../../clients/entities/participant.schema';
 
 @Injectable()
 export class WhatsAppFlowService {
   constructor(
     @InjectModel(WhatsAppFlow.name) private flowModel: Model<WhatsAppFlowDocument>,
+    @InjectModel(Participant.name) private participantModel: Model<Participant>,
   ) {}
 
   // ===== CRUD OPERATIONS =====
@@ -438,12 +440,9 @@ export class WhatsAppFlowService {
       }
 
       // Buscar participantes baseado no campaignId
-      let participants = [];
+      let participants: Participant[] = [];
       if (body.campaignId) {
-        const { Participant } = await import('../../clients/entities/participant.schema');
-        const participantModel = this.connection.model('Participant', Participant);
-        
-        participants = await participantModel.find({
+        participants = await this.participantModel.find({
           campaignId: body.campaignId,
           clientId: clientId,
           tipo: 'indicador' // Apenas indicadores recebem mensagens de boas-vindas
