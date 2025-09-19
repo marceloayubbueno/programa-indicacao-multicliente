@@ -1330,7 +1330,7 @@ window.triggerManualFlow = async function(flowId) {
             ? 'https://programa-indicacao-multicliente-production.up.railway.app'
             : 'http://localhost:3000';
         
-        const fullUrl = `${apiBaseUrl}/whatsapp/flows/${flowId}/trigger`;
+        const fullUrl = `${apiBaseUrl}/whatsapp/manual-trigger/${flowId}/execute`;
         console.log('🔍 [DEBUG] Disparando fluxo manualmente em:', fullUrl);
         console.log('🔍 [DEBUG] Dados do fluxo:', flow);
         
