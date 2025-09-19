@@ -3,14 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { WhatsAppFlow, WhatsAppFlowDocument } from '../entities/whatsapp-flow.schema';
 import { Participant } from '../../clients/entities/participant.schema';
-import { WhatsAppFlowTriggerService } from '../whatsapp-flow-trigger.service';
 
 @Injectable()
 export class WhatsAppFlowService {
   constructor(
     @InjectModel(WhatsAppFlow.name) private flowModel: Model<WhatsAppFlowDocument>,
     @InjectModel(Participant.name) private participantModel: Model<Participant>,
-    private readonly whatsAppFlowTriggerService: WhatsAppFlowTriggerService,
   ) {}
 
   // ===== CRUD OPERATIONS =====
@@ -456,87 +454,72 @@ export class WhatsAppFlowService {
         triggerTypes = ['indicator_joined'];
       }
 
-      // ✅ CORREÇÃO: Usar sistema automático em vez de nova query
-      let result;
-      if (body.targetAudience === 'indicators') {
-        // Buscar participantes indicadores e usar sistema automático
-        const participants = await this.participantModel.find({
+      // ✅ CORREÇÃO: Usar sistema automático global (como no documento)
+      let participants: Participant[] = [];
+      if (body.campaignId) {
+        // Determinar tipo de participante baseado no targetAudience
+        let tipoFilter: any = 'indicador'; // fallback
+        
+        if (body.targetAudience === 'leads') {
+          tipoFilter = 'lead';
+        } else if (body.targetAudience === 'mixed') {
+          tipoFilter = { $in: ['indicador', 'lead'] };
+        }
+        
+        participants = await this.participantModel.find({
           campaignId: body.campaignId,
           clientId: clientId,
-          tipo: 'indicador'
+          tipo: tipoFilter
         }).exec();
+      }
 
-        let messagesSent = 0;
-        let eligibleParticipants = participants.length;
+      // Usar sistema automático global para cada participante
+      let messagesSent = 0;
+      const eligibleParticipants = participants.length;
 
-        // Usar sistema automático para cada participante
+      if (global.whatsAppFlowTriggerService && participants.length > 0) {
         for (const participant of participants) {
-          const triggerResult = await this.whatsAppFlowTriggerService.triggerIndicatorJoined(
-            {
-              id: participant._id.toString(),
-              name: participant.name,
-              email: participant.email,
-              phone: participant.phone,
-              uniqueReferralCode: participant.uniqueReferralCode,
-              plainPassword: participant.plainPassword
-            },
-            clientId,
-            body.campaignId
-          );
-          
-          if (triggerResult.success) {
-            messagesSent += triggerResult.messagesAdded;
+          try {
+            const triggerResult = await global.whatsAppFlowTriggerService.triggerIndicatorJoined(
+              {
+                id: participant._id.toString(),
+                name: participant.name,
+                email: participant.email,
+                phone: participant.phone,
+                uniqueReferralCode: participant.uniqueReferralCode,
+                plainPassword: participant.plainPassword
+              },
+              clientId,
+              body.campaignId
+            );
+            
+            if (triggerResult.success) {
+              messagesSent += triggerResult.messagesAdded;
+            }
+          } catch (error) {
+            console.error('Erro ao disparar fluxo para participante:', error.message);
           }
         }
-
-        // Atualizar estatísticas do fluxo
-        await this.updateFlowStatistics(flowId, {
-          totalSent: (flow.statistics?.totalSent || 0) + messagesSent,
-          lastSentAt: new Date()
-        });
-
-        return {
-          success: true,
-          message: 'Fluxo disparado manualmente com sucesso',
-          messagesSent,
-          eligibleParticipants,
-          participants: participants.map(p => ({
-            id: p._id,
-            name: p.name,
-            email: p.email,
-            phone: p.phone
-          }))
-        };
-      } else {
-        // Para leads e mixed, usar lógica similar
-        const participants = await this.participantModel.find({
-          campaignId: body.campaignId,
-          clientId: clientId,
-          tipo: body.targetAudience === 'leads' ? 'lead' : { $in: ['indicador', 'lead'] }
-        }).exec();
-
-        const messagesSent = participants.length;
-        const eligibleParticipants = participants.length;
-
-        // Atualizar estatísticas do fluxo
-        await this.updateFlowStatistics(flowId, {
-          totalSent: (flow.statistics?.totalSent || 0) + messagesSent,
-          lastSentAt: new Date()
-        });
-
-        return {
-          success: true,
-          message: 'Fluxo disparado manualmente com sucesso',
-          messagesSent,
-          eligibleParticipants,
-          participants: participants.map(p => ({
-            id: p._id,
-            name: p.name,
-            email: p.email,
-            phone: p.phone
-          }))
-        };
       }
+
+      // Atualizar estatísticas do fluxo
+      await this.updateFlowStatistics(flowId, {
+        totalSent: (flow.statistics?.totalSent || 0) + messagesSent,
+        lastSentAt: new Date()
+      });
+
+      return {
+        success: true,
+        message: 'Fluxo disparado manualmente com sucesso',
+        messagesSent,
+        eligibleParticipants,
+        participants: participants.map(p => ({
+          id: p._id,
+          name: p.name,
+          email: p.email,
+          phone: p.phone
+        }))
+      };
 
     } catch (error) {
       throw new BadRequestException(`Erro ao disparar fluxo: ${error.message}`);
