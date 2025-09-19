@@ -4,16 +4,30 @@
 const TEMPLATE_BLOCKS = {
   welcome: {
     id: 'welcome',
-    name: 'Boas-vindas',
+    name: 'Boas-vinda-indicador',
     icon: '📧',
     category: 'marketing',
     description: 'Mensagem de boas-vindas para novos indicadores',
     content: {
-      body: 'Olá {{nome}}! Bem-vindo ao nosso programa de indicação. Você está pronto para começar sua jornada de sucesso? 🚀',
+      body: 'Olá {{nome}}!\n\nBem-vindo ao programa de indicações da {{nomedaempresa}}\n\nVocê foi incluido na campanha {{nomeCampanha}}\n\nComece agora mesmo a indicar e ganhar, compartilhoe seu link com outras pessoas\n\nLink de compartilhamenro: {{linkunico}}\n\n\nAcesse sua área de área de indicador no link:\nhttps://app.virallead.com.br/indicador/login.html\n\nÚtilize seu e-mail e senha para logar\n📧 Email: {{email}}\nSenha: {{senhaindicador}}\n\nVocê está pronto para começar sua jornada de sucesso? 🚀',
       footer: 'Entre em contato conosco para mais informações.'
     },
-    variables: ['nome'],
+    variables: ['nome', 'nomedaempresa', 'nomeCampanha', 'linkunico', 'email', 'senhaindicador'],
     color: 'bg-blue-500'
+  },
+  
+  leadWelcome: {
+    id: 'leadWelcome',
+    name: 'Bem-vindo-lead',
+    icon: '👥',
+    category: 'marketing',
+    description: 'Mensagem de boas-vindas para leads indicados',
+    content: {
+      body: 'Olá, {{nomeLead}}!\n\nVocê foi indicado pelo {{nome}}\n\nAgora você pode contratratar a plataforma a com 50% de desconto\n\nAcesse o link a baixo para contratar hoje:\nLink:',
+      footer: 'Entre em contato conosco para mais informações.'
+    },
+    variables: ['nomeLead', 'nome'],
+    color: 'bg-green-500'
   },
   
   offer: {
