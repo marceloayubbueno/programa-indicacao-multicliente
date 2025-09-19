@@ -1,4 +1,5 @@
 import { Controller, Post, Param, Body, UseGuards, Request } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { ManualTriggerService } from './manual-trigger.service';
 import { JwtClientAuthGuard } from '../../auth/guards/jwt-client-auth.guard';
 
@@ -20,7 +21,7 @@ export class ManualTriggerController {
     },
     @Request() req: any
   ) {
-    const clientId = req.user.clientId;
+    const clientId = new Types.ObjectId(req.user.clientId);
     return await this.manualTriggerService.triggerFlowManually(flowId, clientId, body);
   }
 }
