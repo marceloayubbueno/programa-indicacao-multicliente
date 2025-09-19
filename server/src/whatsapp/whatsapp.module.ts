@@ -23,6 +23,7 @@ import { WhatsAppQueueModule } from './whatsapp-queue.module';
 import { WhatsAppQueue, WhatsAppQueueSchema } from './entities/whatsapp-queue.schema';
 import { WhatsAppFlowTriggerModule } from './whatsapp-flow-trigger.module';
 import { WhatsAppQueueProcessorService } from './whatsapp-queue-processor.service';
+import { ManualTriggerModule } from './manual-trigger/manual-trigger.module';
 
 
 @Module({
@@ -41,6 +42,7 @@ import { WhatsAppQueueProcessorService } from './whatsapp-queue-processor.servic
     WhatsAppFlowModule,
     WhatsAppQueueModule,
     WhatsAppFlowTriggerModule,
+    ManualTriggerModule,
   ],
   controllers: [
     WhatsAppAdminController,
