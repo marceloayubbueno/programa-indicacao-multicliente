@@ -439,13 +439,36 @@ export class WhatsAppFlowService {
         throw new BadRequestException('Este fluxo não possui mensagens para disparar');
       }
 
-      // Buscar participantes baseado no campaignId
+      // ✅ CORREÇÃO: Mapear targetAudience para triggerType seguindo padrão do sistema automático
+      let triggerTypes: string[] = [];
+      
+      if (body.targetAudience === 'indicators') {
+        triggerTypes = ['indicator_joined'];
+      } else if (body.targetAudience === 'leads') {
+        triggerTypes = ['lead_indicated'];
+      } else if (body.targetAudience === 'mixed') {
+        triggerTypes = ['indicator_joined', 'lead_indicated'];
+      } else {
+        // Fallback para indicadores (comportamento anterior)
+        triggerTypes = ['indicator_joined'];
+      }
+
+      // ✅ CORREÇÃO: Buscar participantes baseado no triggerType e campaignId
       let participants: Participant[] = [];
       if (body.campaignId) {
+        // Determinar tipo de participante baseado no targetAudience
+        let tipoFilter: any = 'indicador'; // fallback
+        
+        if (body.targetAudience === 'leads') {
+          tipoFilter = 'lead';
+        } else if (body.targetAudience === 'mixed') {
+          tipoFilter = { $in: ['indicador', 'lead'] };
+        }
+        
         participants = await this.participantModel.find({
           campaignId: body.campaignId,
           clientId: clientId,
-          tipo: 'indicador' // Apenas indicadores recebem mensagens de boas-vindas
+          tipo: tipoFilter
         }).exec();
       }
 
