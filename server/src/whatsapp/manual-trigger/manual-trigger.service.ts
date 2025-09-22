@@ -119,7 +119,7 @@ export class ManualTriggerService {
         
         participants = await this.participantModel.find({
           campaignId: body.campaignId,
-          clientId: clientId,
+          clientId: clientId.toString(), // ✅ CORREÇÃO: Usar string em vez de ObjectId
           tipo: tipoFilter
         }).exec();
         
