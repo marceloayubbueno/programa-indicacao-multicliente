@@ -78,6 +78,22 @@ export class ManualTriggerService {
         
         console.log('🔍 [DEBUG] TipoFilter determinado:', tipoFilter);
         
+        // 🔍 DEBUG TEMPORÁRIO - Verificar se campanha e cliente existem
+        const Campaign = this.participantModel.db.models.Campaign || this.participantModel.db.model('Campaign');
+        const Client = this.participantModel.db.models.Client || this.participantModel.db.model('Client');
+        
+        const campaignExists = await Campaign.findById(body.campaignId);
+        const clientExists = await Client.findById(clientId);
+        
+        console.log('🔍 [DEBUG] Verificação de existência:', {
+          campaignId: body.campaignId,
+          campaignExists: !!campaignExists,
+          campaignName: campaignExists?.name,
+          clientId: clientId.toString(),
+          clientExists: !!clientExists,
+          clientName: clientExists?.companyName
+        });
+        
         // 🔍 DEBUG TEMPORÁRIO - Verificar se existem participantes no banco
         const totalParticipants = await this.participantModel.countDocuments({ clientId: clientId });
         const campaignParticipants = await this.participantModel.countDocuments({ 
@@ -100,6 +116,19 @@ export class ManualTriggerService {
           campaignParticipants,
           indicatorParticipants,
           leadParticipants
+        });
+        
+        // 🔍 DEBUG TEMPORÁRIO - Verificar todos os participantes do cliente
+        const allClientParticipants = await this.participantModel.find({ clientId: clientId }).select('_id name email tipo campaignId').exec();
+        console.log('🔍 [DEBUG] Todos os participantes do cliente:', {
+          count: allClientParticipants.length,
+          participants: allClientParticipants.map(p => ({
+            id: p._id,
+            name: p.name,
+            email: p.email,
+            tipo: p.tipo,
+            campaignId: p.campaignId
+          }))
         });
         
         participants = await this.participantModel.find({
