@@ -54,19 +54,9 @@ export class ManualTriggerService {
         triggerTypes = ['indicator_joined'];
       }
 
-      // 🔍 DEBUG TEMPORÁRIO - Logs para investigação
-      console.log('🔍 [DEBUG] Início da função triggerFlowManually');
-      console.log('🔍 [DEBUG] Parâmetros recebidos:', {
-        flowId,
-        clientId: clientId.toString(),
-        body
-      });
-
       // Usar sistema automático global - CÓPIA EXATA
       let participants: Participant[] = [];
       if (body.campaignId) {
-        console.log('🔍 [DEBUG] Entrando no bloco de busca de participantes');
-        
         // Determinar tipo de participante baseado no targetAudience
         let tipoFilter: any = 'indicador'; // fallback
         
@@ -76,58 +66,27 @@ export class ManualTriggerService {
           tipoFilter = { $in: ['indicador', 'lead'] };
         }
         
-        console.log('🔍 [DEBUG] TipoFilter determinado:', tipoFilter);
+        // 🔍 DEBUG ESSENCIAL - Verificar todos os clientes e participantes no banco
+        const allClients = await this.participantModel.db.models.Client.find({}).select('_id companyName').exec();
+        const allParticipants = await this.participantModel.find({}).select('_id name email tipo campaignId clientId').exec();
         
-        // 🔍 DEBUG TEMPORÁRIO - Verificar se campanha e cliente existem
-        const Campaign = this.participantModel.db.models.Campaign || this.participantModel.db.model('Campaign');
-        const Client = this.participantModel.db.models.Client || this.participantModel.db.model('Client');
-        
-        const campaignExists = await Campaign.findById(body.campaignId);
-        const clientExists = await Client.findById(clientId);
-        
-        console.log('🔍 [DEBUG] Verificação de existência:', {
-          campaignId: body.campaignId,
-          campaignExists: !!campaignExists,
-          campaignName: campaignExists?.name,
-          clientId: clientId.toString(),
-          clientExists: !!clientExists,
-          clientName: clientExists?.companyName
+        console.log('🔍 [DEBUG] Todos os clientes no banco:', {
+          count: allClients.length,
+          clients: allClients.map(c => ({
+            id: c._id,
+            name: c.companyName
+          }))
         });
         
-        // 🔍 DEBUG TEMPORÁRIO - Verificar se existem participantes no banco
-        const totalParticipants = await this.participantModel.countDocuments({ clientId: clientId });
-        const campaignParticipants = await this.participantModel.countDocuments({ 
-          clientId: clientId, 
-          campaignId: body.campaignId 
-        });
-        const indicatorParticipants = await this.participantModel.countDocuments({ 
-          clientId: clientId, 
-          campaignId: body.campaignId,
-          tipo: 'indicador'
-        });
-        const leadParticipants = await this.participantModel.countDocuments({ 
-          clientId: clientId, 
-          campaignId: body.campaignId,
-          tipo: 'lead'
-        });
-        
-        console.log('🔍 [DEBUG] Participant counts:', {
-          totalParticipants,
-          campaignParticipants,
-          indicatorParticipants,
-          leadParticipants
-        });
-        
-        // 🔍 DEBUG TEMPORÁRIO - Verificar todos os participantes do cliente
-        const allClientParticipants = await this.participantModel.find({ clientId: clientId }).select('_id name email tipo campaignId').exec();
-        console.log('🔍 [DEBUG] Todos os participantes do cliente:', {
-          count: allClientParticipants.length,
-          participants: allClientParticipants.map(p => ({
+        console.log('🔍 [DEBUG] Todos os participantes no banco:', {
+          count: allParticipants.length,
+          participants: allParticipants.map(p => ({
             id: p._id,
             name: p.name,
             email: p.email,
             tipo: p.tipo,
-            campaignId: p.campaignId
+            campaignId: p.campaignId,
+            clientId: p.clientId
           }))
         });
         
@@ -139,16 +98,12 @@ export class ManualTriggerService {
         
         console.log('🔍 [DEBUG] Query result:', {
           participantsFound: participants.length,
-          sampleParticipants: participants.slice(0, 3).map(p => ({
-            id: p._id,
-            name: p.name,
-            email: p.email,
-            tipo: p.tipo,
-            campaignId: p.campaignId
-          }))
+          queryUsed: {
+            campaignId: body.campaignId,
+            clientId: clientId.toString(),
+            tipo: tipoFilter
+          }
         });
-      } else {
-        console.log('🔍 [DEBUG] Nenhum campaignId fornecido, pulando busca de participantes');
       }
 
       // Usar sistema automático global para cada participante - CÓPIA EXATA
