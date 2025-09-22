@@ -54,9 +54,19 @@ export class ManualTriggerService {
         triggerTypes = ['indicator_joined'];
       }
 
+      // 🔍 DEBUG TEMPORÁRIO - Logs no início da função
+      console.log('🔍 [DEBUG] Início da função triggerFlowManually');
+      console.log('🔍 [DEBUG] Parâmetros recebidos:', {
+        flowId,
+        clientId: clientId.toString(),
+        body
+      });
+
       // Usar sistema automático global - CÓPIA EXATA
       let participants: Participant[] = [];
       if (body.campaignId) {
+        console.log('🔍 [DEBUG] Entrando no bloco de busca de participantes');
+        
         // Determinar tipo de participante baseado no targetAudience
         let tipoFilter: any = 'indicador'; // fallback
         
@@ -66,31 +76,7 @@ export class ManualTriggerService {
           tipoFilter = { $in: ['indicador', 'lead'] };
         }
         
-        // 🔍 DEBUG TEMPORÁRIO - Logs detalhados
-        console.log('🔍 [DEBUG] Query parameters:', {
-          campaignId: body.campaignId,
-          clientId: clientId.toString(),
-          targetAudience: body.targetAudience,
-          tipoFilter: tipoFilter
-        });
-        
-        // 🔍 DEBUG TEMPORÁRIO - Verificar se existem participantes no banco
-        const totalParticipants = await this.participantModel.countDocuments({ clientId: clientId });
-        const campaignParticipants = await this.participantModel.countDocuments({ 
-          clientId: clientId, 
-          campaignId: body.campaignId 
-        });
-        const indicatorParticipants = await this.participantModel.countDocuments({ 
-          clientId: clientId, 
-          campaignId: body.campaignId,
-          tipo: 'indicador'
-        });
-        
-        console.log('🔍 [DEBUG] Participant counts:', {
-          totalParticipants,
-          campaignParticipants,
-          indicatorParticipants
-        });
+        console.log('🔍 [DEBUG] TipoFilter determinado:', tipoFilter);
         
         participants = await this.participantModel.find({
           campaignId: body.campaignId,
@@ -98,16 +84,9 @@ export class ManualTriggerService {
           tipo: tipoFilter
         }).exec();
         
-        console.log('🔍 [DEBUG] Query result:', {
-          participantsFound: participants.length,
-          sampleParticipants: participants.slice(0, 3).map(p => ({
-            id: p._id,
-            name: p.name,
-            email: p.email,
-            tipo: p.tipo,
-            campaignId: p.campaignId
-          }))
-        });
+        console.log('🔍 [DEBUG] Participantes encontrados:', participants.length);
+      } else {
+        console.log('🔍 [DEBUG] Nenhum campaignId fornecido, pulando busca de participantes');
       }
 
       // Usar sistema automático global para cada participante - CÓPIA EXATA
