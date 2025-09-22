@@ -66,29 +66,56 @@ export class ManualTriggerService {
           tipoFilter = { $in: ['indicador', 'lead'] };
         }
         
-        // 🔍 DEBUG ESSENCIAL - Verificar todos os clientes e participantes no banco
-        const allClients = await this.participantModel.db.models.Client.find({}).select('_id companyName').exec();
-        const allParticipants = await this.participantModel.find({}).select('_id name email tipo campaignId clientId').exec();
-        
-        console.log('🔍 [DEBUG] Todos os clientes no banco:', {
-          count: allClients.length,
-          clients: allClients.map(c => ({
-            id: c._id,
-            name: c.companyName
-          }))
+        // 🔍 DEBUG ESSENCIAL - Verificar query específica
+        console.log('🔍 [DEBUG] Query parameters:', {
+          campaignId: body.campaignId,
+          clientId: clientId.toString(),
+          tipoFilter: tipoFilter
         });
         
-        console.log('🔍 [DEBUG] Todos os participantes no banco:', {
-          count: allParticipants.length,
-          participants: allParticipants.map(p => ({
+        // 🔍 DEBUG - Testar query com diferentes formatos
+        const query1 = { clientId: clientId };
+        const query2 = { clientId: clientId.toString() };
+        const query3 = { campaignId: body.campaignId };
+        const query4 = { campaignId: new Types.ObjectId(body.campaignId) };
+        const query5 = { tipo: tipoFilter };
+        
+        const result1 = await this.participantModel.find(query1).select('_id name email tipo campaignId clientId').exec();
+        const result2 = await this.participantModel.find(query2).select('_id name email tipo campaignId clientId').exec();
+        const result3 = await this.participantModel.find(query3).select('_id name email tipo campaignId clientId').exec();
+        const result4 = await this.participantModel.find(query4).select('_id name email tipo campaignId clientId').exec();
+        const result5 = await this.participantModel.find(query5).select('_id name email tipo campaignId clientId').exec();
+        
+        console.log('🔍 [DEBUG] Query tests:', {
+          query1_clientId_ObjectId: result1.length,
+          query2_clientId_string: result2.length,
+          query3_campaignId_string: result3.length,
+          query4_campaignId_ObjectId: result4.length,
+          query5_tipo_filter: result5.length
+        });
+        
+        // 🔍 DEBUG - Mostrar amostra de cada resultado
+        if (result1.length > 0) {
+          console.log('🔍 [DEBUG] Sample from query1 (clientId ObjectId):', result1.slice(0, 2).map(p => ({
             id: p._id,
             name: p.name,
             email: p.email,
             tipo: p.tipo,
             campaignId: p.campaignId,
             clientId: p.clientId
-          }))
-        });
+          })));
+        }
+        
+        if (result2.length > 0) {
+          console.log('🔍 [DEBUG] Sample from query2 (clientId string):', result2.slice(0, 2).map(p => ({
+            id: p._id,
+            name: p.name,
+            email: p.email,
+            tipo: p.tipo,
+            campaignId: p.campaignId,
+            clientId: p.clientId
+          })));
+        }
         
         participants = await this.participantModel.find({
           campaignId: body.campaignId,
@@ -96,7 +123,7 @@ export class ManualTriggerService {
           tipo: tipoFilter
         }).exec();
         
-        console.log('🔍 [DEBUG] Query result:', {
+        console.log('🔍 [DEBUG] Final query result:', {
           participantsFound: participants.length,
           queryUsed: {
             campaignId: body.campaignId,
