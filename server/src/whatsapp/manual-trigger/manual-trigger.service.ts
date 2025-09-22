@@ -66,11 +66,48 @@ export class ManualTriggerService {
           tipoFilter = { $in: ['indicador', 'lead'] };
         }
         
+        // 🔍 DEBUG TEMPORÁRIO - Logs detalhados
+        console.log('🔍 [DEBUG] Query parameters:', {
+          campaignId: body.campaignId,
+          clientId: clientId.toString(),
+          targetAudience: body.targetAudience,
+          tipoFilter: tipoFilter
+        });
+        
+        // 🔍 DEBUG TEMPORÁRIO - Verificar se existem participantes no banco
+        const totalParticipants = await this.participantModel.countDocuments({ clientId: clientId });
+        const campaignParticipants = await this.participantModel.countDocuments({ 
+          clientId: clientId, 
+          campaignId: body.campaignId 
+        });
+        const indicatorParticipants = await this.participantModel.countDocuments({ 
+          clientId: clientId, 
+          campaignId: body.campaignId,
+          tipo: 'indicador'
+        });
+        
+        console.log('🔍 [DEBUG] Participant counts:', {
+          totalParticipants,
+          campaignParticipants,
+          indicatorParticipants
+        });
+        
         participants = await this.participantModel.find({
           campaignId: body.campaignId,
           clientId: clientId,
           tipo: tipoFilter
         }).exec();
+        
+        console.log('🔍 [DEBUG] Query result:', {
+          participantsFound: participants.length,
+          sampleParticipants: participants.slice(0, 3).map(p => ({
+            id: p._id,
+            name: p.name,
+            email: p.email,
+            tipo: p.tipo,
+            campaignId: p.campaignId
+          }))
+        });
       }
 
       // Usar sistema automático global para cada participante - CÓPIA EXATA
