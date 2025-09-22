@@ -54,19 +54,9 @@ export class ManualTriggerService {
         triggerTypes = ['indicator_joined'];
       }
 
-      // 🔍 DEBUG TEMPORÁRIO - Logs no início da função
-      console.log('🔍 [DEBUG] Início da função triggerFlowManually');
-      console.log('🔍 [DEBUG] Parâmetros recebidos:', {
-        flowId,
-        clientId: clientId.toString(),
-        body
-      });
-
       // Usar sistema automático global - CÓPIA EXATA
       let participants: Participant[] = [];
       if (body.campaignId) {
-        console.log('🔍 [DEBUG] Entrando no bloco de busca de participantes');
-        
         // Determinar tipo de participante baseado no targetAudience
         let tipoFilter: any = 'indicador'; // fallback
         
@@ -76,17 +66,11 @@ export class ManualTriggerService {
           tipoFilter = { $in: ['indicador', 'lead'] };
         }
         
-        console.log('🔍 [DEBUG] TipoFilter determinado:', tipoFilter);
-        
         participants = await this.participantModel.find({
           campaignId: body.campaignId,
           clientId: clientId,
           tipo: tipoFilter
         }).exec();
-        
-        console.log('🔍 [DEBUG] Participantes encontrados:', participants.length);
-      } else {
-        console.log('🔍 [DEBUG] Nenhum campaignId fornecido, pulando busca de participantes');
       }
 
       // Usar sistema automático global para cada participante - CÓPIA EXATA
