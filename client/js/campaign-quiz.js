@@ -1470,6 +1470,9 @@ window.abrirEditarLista = function() {
 
 // 🆕 FUNÇÃO PARA VERIFICAR RETORNO DO QUIZ
 function verificarRetornoQuiz() {
+  // Limpar dados antigos para evitar restauração indesejada
+  localStorage.removeItem('quizReturnData');
+  
   const returnData = localStorage.getItem('quizReturnData');
   if (returnData) {
     try {
@@ -1526,4 +1529,7 @@ function verificarRetornoQuiz() {
       console.error('Erro ao restaurar estado do quiz:', error);
     }
   }
-} 
+}
+
+// 🆕 LIMPEZA INICIAL: Remover dados antigos do localStorage
+localStorage.removeItem('quizReturnData');
