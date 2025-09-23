@@ -119,10 +119,16 @@ function nextStep() {
   
   // ETAPA 4: LP de Divulgação
   if (currentStep === 4) {
-    if (!window.selectedLPDivulgacaoId) {
-      alert('Selecione uma LP de divulgação.');
-      return;
-    }
+    // Validação mais segura - aguarda processamento da seleção
+    setTimeout(() => {
+      if (!window.selectedLPDivulgacaoId) {
+        alert('Selecione uma LP de divulgação.');
+        return;
+      }
+      // Continuar navegação após validação
+      continueToNextStep();
+    }, 100);
+    return; // Impede navegação imediata
   }
   
   // ETAPA 5: Recompensas
@@ -134,6 +140,10 @@ function nextStep() {
   }
   
   // ===== NAVEGAÇÃO ENTRE ETAPAS =====
+  continueToNextStep();
+}
+
+function continueToNextStep() {
   if (currentStep < totalSteps) {
     // Se estamos no step 2 e indo para 3, mostrar subetapa correta
     if (currentStep === 2) {
