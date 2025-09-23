@@ -363,7 +363,6 @@ async function renderLPDivulgacaoModelos() {
 }
 
 // Selecionar LP de Divulgação para a campanha
-window.selectedLPDivulgacaoId = null;
 window.selecionarLPDivulgacao = function(id) {
   window.selectedLPDivulgacaoId = id;
   renderLPDivulgacaoModelos();
